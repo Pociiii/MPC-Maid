@@ -32,43 +32,40 @@ const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
 
+    const commandsPath = path.join(foldersPath, folder);
 
-const commandsPath = path.join(foldersPath, folder);
-
-const commandFiles = fs
+    const commandFiles = fs
     .readdirSync(commandsPath)
     .filter(file => file.endsWith('.js'));
 
-for (const file of commandFiles) {
+    for (const file of commandFiles) {
 
-    const filePath = path.join(commandsPath, file);
+        const filePath = path.join(commandsPath, file);
 
-    const command = require(filePath);
+        const command = require(filePath);
 
-    if ('data' in command && 'execute' in command) {
+        if ('data' in command && 'execute' in command) {
 
-        client.commands.set(
-            command.data.name,
-            command
-        );
+            client.commands.set(
+                command.data.name,
+                command
+            );
 
-        commands.push(
-            command.data.toJSON()
-        );
+            commands.push(
+                command.data.toJSON()
+            );
 
-        console.log(
-            `Loaded command: ${command.data.name}`
-        );
+            console.log(
+                `Loaded command: ${command.data.name}`
+            );
+        }
+        else {
+
+            console.log(
+                `Missing data or execute in ${file}`
+            );
+        }
     }
-    else {
-
-        console.log(
-            `Missing data or execute in ${file}`
-        );
-    }
-}
-
-
 }
 
 // Register slash commands
