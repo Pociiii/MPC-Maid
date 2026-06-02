@@ -43,6 +43,15 @@ function createEmbed(options = {}) {
     return embed;
 }
 
+function createReply(embed, ephemeral = false) {
+
+    return {
+        embeds: [embed],
+        flags: ephemeral ? 64 : 0
+    };
+}
+
 module.exports = {
-    createEmbed
+    createEmbed,
+    createReply
 };

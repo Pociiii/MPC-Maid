@@ -1,9 +1,19 @@
 const { SlashCommandBuilder } = require('discord.js');
-
+const { COLORS } = require('../../data/constants');
 const { getOrCreateUser } = require('../../utils/users');
-const { createEmbed } = require('../../utils/embeds');
+const {
+    createEmbed,
+    createReply
+} = require('../../utils/embeds');
 
 const emojis = require('../../utils/emojis');
+
+const { getRankTitle } =
+    require('../../utils/ranks');
+
+const COMMAND_CONFIG = {
+    ephemeral: true
+};
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -12,17 +22,16 @@ module.exports = {
 
     async execute(interaction) {
 
-        const user = await getOrCreateUser(
-            interaction.user.id
-        );
+        const user = await getOrCreateUser(interaction.user.id);
+
+        const rankTitle = getRankTitle(user.ranking);
 
         const embed = createEmbed({
 
-            color: '#ff69b4',
+            color: COLORS.DEFAULT,
 
             authorName: interaction.user.displayName,
-            authorIcon: interaction.user.displayAvatarURL(),
-
+            thumbnail: interaction.user.displayAvatarURL(),
             title: 'Profile',
 
             description:
@@ -33,7 +42,7 @@ module.exports = {
 - ${emojis.stamina} Stamina: **${user.stamina}**
 - ${emojis.fame} Fame: **${user.fame}**
 
-- ${emojis.ranking} Ranking: **${user.ranking}**
+- ${emojis.ranking} Ranking: **${rankTitle} (${user.ranking})**
 - ${emojis.scene_completed} Scenes Completed: **${user.scenes_completed}**`,
 
             footerText: 'MPC Maid',
@@ -41,8 +50,11 @@ module.exports = {
 
         });
 
-        await interaction.reply({
-            embeds: [embed]
-        });
+        await interaction.reply(
+            createReply(
+                embed,
+                COMMAND_CONFIG.ephemeral
+            )
+        );
     }
 };

@@ -1,4 +1,8 @@
 const db = require('../database/database');
+const {
+    ECONOMY,
+    STATS
+} = require('../data/constants');
 
 // Get user
 function getUser(userId) {
@@ -38,11 +42,11 @@ function createUser(userId) {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 userId,
-                500,
+                ECONOMY.STARTING_COINS,
                 0,
-                1,
-                1,
-                1,
+                STATS.DEFAULT_PERFORMANCE,
+                STATS.DEFAULT_STAMINA,
+                STATS.DEFAULT_FAME,
                 0,
                 0
             ],
