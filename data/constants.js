@@ -71,13 +71,17 @@ const RANKS = {
     }
 };
 
+const COOLDOWNS = {
+    DROP: 600
+};
+
 module.exports = {
     COLORS,
     CYBER_COLORS,
     getRandomColor,
     ECONOMY,
     STATS,
-    COLORS,
     SCENE_PHASES,
-    RANKS
+    RANKS,
+    COOLDOWNS
 };

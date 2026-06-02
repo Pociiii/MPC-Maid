@@ -167,8 +167,33 @@ async interaction => {
 
         } catch (err) {
 
-            console.error('REPLY ERROR');
-            console.error(err);
+            console.error('COMMAND ERROR');
+            console.error(error);
+
+            try {
+
+                if (interaction.replied ||
+                    interaction.deferred) {
+
+                    await interaction.followUp({
+                        content: 'There was an error executing this command.'
+                    });
+
+                } else {
+
+                    await interaction.reply({
+                        content: 'There was an error executing this command.'
+                    });
+
+                }
+
+            } catch (error) {
+
+                console.error('COMMAND ERROR');
+                console.error(error);
+
+            }
+
 
         }
     }
