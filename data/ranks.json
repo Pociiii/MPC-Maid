@@ -1,0 +1,22 @@
+[
+    {
+        "title": "Amateur",
+        "minimum": 0
+    },
+    {
+        "title": "Rising Star",
+        "minimum": 500
+    },
+    {
+        "title": "Professional",
+        "minimum": 1000
+    },
+    {
+        "title": "Top Performer",
+        "minimum": 1500
+    },
+    {
+        "title": "Hall of Fame",
+        "minimum": 2500
+    }
+]

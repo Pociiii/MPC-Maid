@@ -1,3 +1,32 @@
+const CYBER_COLORS = [
+    '#FF2E88',
+    '#A020F0',
+    '#00BFFF',
+    '#00FFFF',
+    '#C724FF',
+    '#FF00FF',
+    '#4D6CFF',
+    '#FF4FD8',
+    '#7A00FF',
+    '#00FFD5'
+];
+
+const COLORS = {
+    DEFAULT: '#ff69b4',
+    SUCCESS: '#57F287',
+    ERROR: '#ED4245'
+};
+
+function getRandomColor() {
+
+    return CYBER_COLORS[
+        Math.floor(
+            Math.random() * CYBER_COLORS.length
+        )
+    ];
+
+}
+
 const ECONOMY = {
     STARTING_COINS: 500
 };
@@ -6,12 +35,6 @@ const STATS = {
     DEFAULT_PERFORMANCE: 1,
     DEFAULT_STAMINA: 1,
     DEFAULT_FAME: 1
-};
-
-const COLORS = {
-    DEFAULT: '#ff69b4',
-    SUCCESS: '#57F287',
-    ERROR: '#ED4245'
 };
 
 const SCENE_PHASES = {
@@ -49,6 +72,9 @@ const RANKS = {
 };
 
 module.exports = {
+    COLORS,
+    CYBER_COLORS,
+    getRandomColor,
     ECONOMY,
     STATS,
     COLORS,

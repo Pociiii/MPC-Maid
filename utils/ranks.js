@@ -1,22 +1,15 @@
-const { RANKS } = require('../data/constants');
+const ranks =
+    require('../data/ranks.json');
 
 function getRankTitle(ranking) {
 
-    if (ranking >= RANKS.HALL_OF_FAME.value)
-        return RANKS.HALL_OF_FAME.title;
+    let current = ranks[0];
 
-    if (ranking >= RANKS.TOP_PERFORMER.value)
-        return RANKS.TOP_PERFORMER.title;
+    for (const rank of ranks) {
 
-    if (ranking >= RANKS.PROFESSIONAL.value)
-        return RANKS.PROFESSIONAL.title;
+        if (ranking >= rank.minimum)
+            current = rank;
+    }
 
-    if (ranking >= RANKS.RISING_STAR.value)
-        return RANKS.RISING_STAR.title;
-
-    return RANKS.AMATEUR.title;
+    return current.title;
 }
-
-module.exports = {
-    getRankTitle
-};
