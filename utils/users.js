@@ -2,64 +2,80 @@ const db = require('../database/database');
 
 // Get user
 function getUser(userId) {
-return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
 
+        db.get(
+            'SELECT * FROM users WHERE id = ?',
+            [userId],
+            (err, row) => {
 
-    db.get(
-        'SELECT * FROM users WHERE id = ?',
-        [userId],
-        (err, row) => {
+                if (err)
+                    return reject(err);
 
-            if (err)
-                return reject(err);
+                resolve(row);
+            }
+        );
 
-            resolve(row);
-        }
-    );
-
-});
-
+    });
 
 }
 
 // Create user
 function createUser(userId) {
-return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
 
+        db.run(
+            `INSERT INTO users (
+                id,
+                coins,
+                xp,
+                performance,
+                stamina,
+                fame,
+                ranking,
+                scenes_completed
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                userId,
+                500,
+                0,
+                1,
+                1,
+                1,
+                0,
+                0
+            ],
+            function(err) {
 
-    db.run(
-        'INSERT INTO users (id, coins) VALUES (?, ?)',
-        [userId, 0],
-        function(err) {
+                if (err)
+                    return reject(err);
 
-            if (err)
-                return reject(err);
+                resolve();
+            }
+        );
 
-            resolve();
-        }
-    );
-
-});
-
-
+    });
 }
 
 // Get user or create if missing
 async function getOrCreateUser(userId) {
 
+    let user = await getUser(userId);
 
-let user = await getUser(userId);
+    console.log("LOOKUP:", userId);
+    console.log("USER:", user);
 
-if (!user) {
+    if (!user) {
 
-    await createUser(userId);
+        console.log("CREATING USER");
 
-    user = await getUser(userId);
-}
+        await createUser(userId);
 
-return user;
+        user = await getUser(userId);
+    }
 
-
+    return user;
 }
 
 // Add coins
@@ -131,20 +147,184 @@ return new Promise((resolve, reject) => {
 // Get balance only
 async function getBalance(userId) {
 
+    const user = await getOrCreateUser(userId);
 
-const user = await getOrCreateUser(userId);
-
-return user.coins;
-
+    return user.coins;
 
 }
 
+// Get xp only
+async function getXP(userId) {
+
+    const user = await getOrCreateUser(userId);
+
+    return user.xp;
+}
+
+
+// add xp
+function addXP(userId, amount) {
+    return new Promise((resolve, reject) => {
+
+        db.run(
+            'UPDATE users SET xp = xp + ? WHERE id = ?',
+            [amount, userId],
+            function(err) {
+
+                if (err)
+                    return reject(err);
+
+                resolve();
+            }
+        );
+
+    });
+}
+
+// Get performance
+async function getPerformance(userId) {
+
+    const user = await getOrCreateUser(userId);
+
+    return user.performance;
+}
+
+// Get stamina
+async function getStamina(userId) {
+
+    const user = await getOrCreateUser(userId);
+
+    return user.stamina;
+}
+
+// Get fame
+async function getFame(userId) {
+
+    const user = await getOrCreateUser(userId);
+
+    return user.fame;
+}
+
+// Set performance
+function setPerformance(userId, amount) {
+    return new Promise((resolve, reject) => {
+
+        db.run(
+            'UPDATE users SET performance = ? WHERE id = ?',
+            [amount, userId],
+            function(err) {
+
+                if (err)
+                    return reject(err);
+
+                resolve();
+            }
+        );
+
+    });
+}
+
+// Set stamina
+function setStamina(userId, amount) {
+    return new Promise((resolve, reject) => {
+
+        db.run(
+            'UPDATE users SET stamina = ? WHERE id = ?',
+            [amount, userId],
+            function(err) {
+
+                if (err)
+                    return reject(err);
+
+                resolve();
+            }
+        );
+
+    });
+}
+
+// Set fame
+function setFame(userId, amount) {
+    return new Promise((resolve, reject) => {
+
+        db.run(
+            'UPDATE users SET fame = ? WHERE id = ?',
+            [amount, userId],
+            function(err) {
+
+                if (err)
+                    return reject(err);
+
+                resolve();
+            }
+        );
+
+    });
+}
+
+async function getRanking(userId) {
+
+    const user = await getOrCreateUser(userId);
+
+    return user.ranking;
+}
+
+async function getScenesCompleted(userId) {
+
+    const user = await getOrCreateUser(userId);
+
+    return user.scenes_completed;
+}
+
+
+function addRanking(userId, amount) {
+    return new Promise((resolve, reject) => {
+
+        db.run(
+            'UPDATE users SET ranking = ranking + ? WHERE id = ?',
+            [amount, userId],
+            err => err ? reject(err) : resolve()
+        );
+
+    });
+}
+
+function addScene(userId) {
+    return new Promise((resolve, reject) => {
+
+        db.run(
+            'UPDATE users SET scenes_completed = scenes_completed + 1 WHERE id = ?',
+            [userId],
+            err => err ? reject(err) : resolve()
+        );
+
+    });
+}
+
 module.exports = {
-getUser,
-createUser,
-getOrCreateUser,
-addCoins,
-removeCoins,
-setCoins,
-getBalance
+    getUser,
+    createUser,
+    getOrCreateUser,
+
+    getBalance,
+    addCoins,
+    removeCoins,
+    setCoins,
+
+    getXP,
+    addXP,
+
+    getPerformance,
+    getStamina,
+    getFame,
+
+    setPerformance,
+    setStamina,
+    setFame,
+
+    getRanking,
+    getScenesCompleted,
+
+    addRanking,
+    addScene
 };

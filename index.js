@@ -75,34 +75,33 @@ version: '10'
 
 (async () => {
 
+    try {
 
-try {
+        console.log(
+            `Registering ${commands.length} slash commands...`
+        );
 
-    console.log(
-        `Registering ${commands.length} slash commands...`
-    );
+        await rest.put(
+            Routes.applicationGuildCommands(
+                process.env.CLIENT_ID,
+                process.env.GUILD_ID
+            ),
+            {
+                body: commands
+            }
+        );
 
-    await rest.put(
-        Routes.applicationGuildCommands(
-            process.env.CLIENT_ID,
-            process.env.GUILD_ID
-        ),
-        {
-            body: commands
-        }
-    );
+        console.log(
+            'Slash commands registered.'
+        );
 
-    console.log(
-        'Slash commands registered.'
-    );
+    }
 
-}
-catch (error) {
+    catch (error) {
 
-    console.error(error);
+        console.error(error);
 
-}
-
+    }
 
 })();
 
@@ -146,25 +145,30 @@ async interaction => {
     }
     catch (error) {
 
+        console.error('COMMAND ERROR');
         console.error(error);
 
-        if (interaction.replied ||
-            interaction.deferred) {
+        try {
 
-            await interaction.followUp({
-                content:
-                    'There was an error executing this command.',
-                ephemeral: true
-            });
+            if (interaction.replied ||
+                interaction.deferred) {
 
-        }
-        else {
+                await interaction.followUp({
+                    content: 'There was an error executing this command.'
+                });
 
-            await interaction.reply({
-                content:
-                    'There was an error executing this command.',
-                ephemeral: true
-            });
+            } else {
+
+                await interaction.reply({
+                    content: 'There was an error executing this command.'
+                });
+
+            }
+
+        } catch (err) {
+
+            console.error('REPLY ERROR');
+            console.error(err);
 
         }
     }

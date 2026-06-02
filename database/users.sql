@@ -1,4 +1,0 @@
-CREATE TABLE users (
-    id TEXT PRIMARY KEY,
-    coins INTEGER DEFAULT 0
-);

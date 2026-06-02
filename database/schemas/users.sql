@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY,
+
+    coins INTEGER DEFAULT 500,
+    xp INTEGER DEFAULT 0,
+
+    performance INTEGER DEFAULT 1,
+    stamina INTEGER DEFAULT 1,
+    fame INTEGER DEFAULT 1,
+
+    ranking INTEGER DEFAULT 0,
+    scenes_completed INTEGER DEFAULT 0
+
+);
