@@ -1,15 +1,36 @@
+const fs = require('fs');
 const path = require('path');
+
+function getGifFilePath(category) {
+
+    return path.join(
+        __dirname,
+        '..',
+        'data',
+        'gifs',
+        `${category}.json`
+    );
+
+}
+
+function getGifList(category) {
+
+    const filePath =
+        getGifFilePath(category);
+
+    return JSON.parse(
+        fs.readFileSync(
+            filePath,
+            'utf8'
+        )
+    );
+
+}
 
 function getRandomGif(category) {
 
-    const gifs = require(
-        path.join(
-            '..',
-            'data',
-            'gifs',
-            `${category}.json`
-        )
-    );
+    const gifs =
+        getGifList(category);
 
     const index =
         Math.floor(
@@ -21,8 +42,36 @@ function getRandomGif(category) {
         index: index + 1,
         total: gifs.length
     };
+
+}
+
+function addGif(category, url) {
+
+    const filePath =
+        getGifFilePath(category);
+
+    const gifs = JSON.parse(
+        fs.readFileSync(
+            filePath,
+            'utf8'
+        )
+    );
+
+    gifs.push(url);
+
+    fs.writeFileSync(
+        filePath,
+        JSON.stringify(
+            gifs,
+            null,
+            4
+        )
+    );
+
 }
 
 module.exports = {
-    getRandomGif
+    getRandomGif,
+    addGif,
+    getGifList
 };

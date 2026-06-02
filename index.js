@@ -123,7 +123,64 @@ readyClient => {
 client.on(
 Events.InteractionCreate,
 async interaction => {
+    if (interaction.isStringSelectMenu()) {
 
+        if (
+            interaction.customId ===
+            'addgif_category'
+        ) {
+
+            const category =
+                interaction.values[0];
+
+            const {
+                StringSelectMenuBuilder,
+                ActionRowBuilder
+            } = require('discord.js');
+
+            const phases = [
+                'foreplay',
+                'oral',
+                'sex',
+                'finale'
+            ];
+
+            const menu =
+                new StringSelectMenuBuilder()
+                    .setCustomId(
+                        `addgif_phase:${category}`
+                    )
+                    .setPlaceholder(
+                        'Select phase'
+                    )
+                    .addOptions(
+                        phases.map(phase => ({
+                            label:
+                                phase.charAt(0)
+                                .toUpperCase()
+                                +
+                                phase.slice(1),
+
+                            value: phase
+                        }))
+                    );
+
+            const row =
+                new ActionRowBuilder()
+                    .addComponents(menu);
+
+            return interaction.update({
+
+                content:
+                    `Category: ${category}`,
+
+                components: [row]
+
+            });
+
+        }
+
+    }
 
     if (!interaction.isChatInputCommand())
         return;
