@@ -37,9 +37,11 @@ function createUser(userId) {
                 stamina,
                 fame,
                 ranking,
-                scenes_completed
+                scenes_completed,
+                spanks_taken,
+                spanks_given
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 userId,
                 ECONOMY.STARTING_COINS,
@@ -47,6 +49,8 @@ function createUser(userId) {
                 STATS.DEFAULT_PERFORMANCE,
                 STATS.DEFAULT_STAMINA,
                 STATS.DEFAULT_FAME,
+                0,
+                0,
                 0,
                 0
             ],

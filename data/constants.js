@@ -34,7 +34,10 @@ const ECONOMY = {
 const STATS = {
     DEFAULT_PERFORMANCE: 1,
     DEFAULT_STAMINA: 1,
-    DEFAULT_FAME: 1
+    DEFAULT_FAME: 1,
+    DEFAULT_RANKING: 0,
+    DEFAULT_SPANKS_TAKEN: 0,
+    DEFAULT_SPANKS_GIVEN: 0
 };
 
 const SCENE_PHASES = {
@@ -72,7 +75,8 @@ const RANKS = {
 };
 
 const COOLDOWNS = {
-    DROP: 600
+    DROP: 600,
+    WIGGLE: 600
 };
 
 module.exports = {

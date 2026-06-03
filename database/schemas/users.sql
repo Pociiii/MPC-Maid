@@ -9,6 +9,9 @@ CREATE TABLE IF NOT EXISTS users (
     fame INTEGER DEFAULT 1,
 
     ranking INTEGER DEFAULT 0,
-    scenes_completed INTEGER DEFAULT 0
+    scenes_completed INTEGER DEFAULT 0,
+
+    spanks_taken INTEGER DEFAULT 0,
+    spanks_given INTEGER DEFAULT 0
 
 );

@@ -13,3 +13,7 @@ function getRankTitle(ranking) {
 
     return current.title;
 }
+
+module.exports = {
+    getRankTitle
+};

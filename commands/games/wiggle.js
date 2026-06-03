@@ -13,16 +13,16 @@ const {
 module.exports = {
 
     data: new SlashCommandBuilder()
-        .setName('drop')
-        .setDescription('Random titty drop'),
+        .setName('wiggle')
+        .setDescription('Random wiggle'),
 
     async execute(interaction) {
         
         const remaining =
             checkCooldown(
                 interaction.user.id,
-                'drop',
-                COOLDOWNS.DROP
+                'wiggle',
+                COOLDOWNS.WIGGLE
             );
 
         if (remaining > 0) {
@@ -35,19 +35,19 @@ module.exports = {
 
             return interaction.reply({
                 content:
-                    `⏳ You must wait ${minutes}m ${seconds}s before using /drop again.`,
+                    `⏳ You must wait ${minutes}m ${seconds}s before using /wiggle again.`,
                 flags: 64
             });
 
         }
 
 
-        const result = getRandomGif('titty_drop');
+        const result = getRandomGif('wiggle');
         const embed = createEmbed({
             color: getRandomColor(),
             authorName: interaction.user.displayName,
             authorIcon: interaction.user.displayAvatarURL(),
-            title: 'Titty Drop',
+            title: 'Wiggle',
             image: result.url,
             footerText: `GIF #${result.index}/${result.total}`,
             timestamp: true
