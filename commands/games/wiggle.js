@@ -7,7 +7,7 @@ const {
     getRandomColor
 } = require('../../data/constants');
 const {
-    checkCooldown
+    handleCooldown
 } = require('../../utils/cooldowns');
 
 module.exports = {
@@ -18,28 +18,14 @@ module.exports = {
 
     async execute(interaction) {
         
-        const remaining =
-            checkCooldown(
-                interaction.user.id,
-                'wiggle',
+        if (
+            await handleCooldown(
+                interaction,
+                interaction.commandName,
                 COOLDOWNS.WIGGLE
-            );
-
-        if (remaining > 0) {
-
-            const minutes =
-                Math.floor(remaining / 60);
-
-            const seconds =
-                remaining % 60;
-
-            return interaction.reply({
-                content:
-                    `⏳ You must wait ${minutes}m ${seconds}s before using /wiggle again.`,
-                flags: 64
-            });
-
-        }
+            )
+        )
+            return;
 
 
         const result = getRandomGif('wiggle');

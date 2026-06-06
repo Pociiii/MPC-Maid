@@ -76,7 +76,8 @@ const RANKS = {
 
 const COOLDOWNS = {
     DROP: 600,
-    WIGGLE: 600
+    WIGGLE: 600,
+    FLEX: 600
 };
 
 module.exports = {
