@@ -39,9 +39,11 @@ function createUser(userId) {
                 ranking,
                 scenes_completed,
                 spanks_taken,
-                spanks_given
+                spanks_given,
+                kisses_taken,
+                kisses_given
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 userId,
                 ECONOMY.STARTING_COINS,
@@ -52,8 +54,12 @@ function createUser(userId) {
                 0,
                 0,
                 0,
+                0,
+                0,
                 0
             ],
+
+
             function(err) {
 
                 if (err)
@@ -309,6 +315,106 @@ function addScene(userId) {
     });
 }
 
+async function addSpankGiven(userId) {
+
+    return new Promise((resolve, reject) => {
+
+        db.run(
+            `
+            UPDATE users
+            SET spanks_given = spanks_given + 1
+            WHERE id = ?
+            `,
+            [userId],
+            err => {
+
+                if (err)
+                    reject(err);
+                else
+                    resolve();
+
+            }
+        );
+
+    });
+
+}
+
+async function addSpankTaken(userId) {
+
+    return new Promise((resolve, reject) => {
+
+        db.run(
+            `
+            UPDATE users
+            SET spanks_taken = spanks_taken + 1
+            WHERE id = ?
+            `,
+            [userId],
+            err => {
+
+                if (err)
+                    reject(err);
+                else
+                    resolve();
+
+            }
+        );
+
+    });
+
+}
+
+async function addKissGiven(userId) {
+
+    return new Promise((resolve, reject) => {
+
+        db.run(
+            `
+            UPDATE users
+            SET kisses_given = kisses_given + 1
+            WHERE id = ?
+            `,
+            [userId],
+            err => {
+
+                if (err)
+                    reject(err);
+                else
+                    resolve();
+
+            }
+        );
+
+    });
+
+}
+
+async function addKissTaken(userId) {
+
+    return new Promise((resolve, reject) => {
+
+        db.run(
+            `
+            UPDATE users
+            SET kisses_taken = kisses_taken + 1
+            WHERE id = ?
+            `,
+            [userId],
+            err => {
+
+                if (err)
+                    reject(err);
+                else
+                    resolve();
+
+            }
+        );
+
+    });
+
+}
+
 module.exports = {
     getUser,
     createUser,
@@ -334,5 +440,11 @@ module.exports = {
     getScenesCompleted,
 
     addRanking,
-    addScene
+    addScene,
+    
+    addSpankGiven,
+    addSpankTaken,
+
+    addKissGiven,
+    addKissTaken
 };

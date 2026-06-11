@@ -9,6 +9,13 @@ const {
 const {
     handleCooldown
 } = require('../../utils/cooldowns');
+const {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle
+} = require('discord.js');
+
+
 
 module.exports = {
 
@@ -29,18 +36,36 @@ module.exports = {
 
 
         const result = getRandomGif('wiggle');
+
         const embed = createEmbed({
             color: getRandomColor(),
-            authorName: interaction.user.displayName,
-            authorIcon: interaction.user.displayAvatarURL(),
+            authorName: interaction.member.displayName,
+            authorIcon: interaction.member.displayAvatarURL(),
             title: 'Wiggle',
+            description: `<@${interaction.user.id}> wiggles teasingly.`,
             image: result.url,
             footerText: `GIF #${result.index}/${result.total}`,
             timestamp: true
         });
 
+        const row = new ActionRowBuilder()
+            .addComponents(
+
+                new ButtonBuilder()
+                    .setCustomId(
+                        `spank:${interaction.user.id}`
+                    )
+                    .setLabel('Spank')
+                    .setEmoji('1486644512032948314')
+                    .setStyle(
+                        ButtonStyle.Secondary
+                    )
+
+            );
+            
         await interaction.reply({
-            embeds: [embed]
+            embeds: [embed],
+            components: [row]
         });
 
     }

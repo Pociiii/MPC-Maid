@@ -31,8 +31,8 @@ module.exports = {
         const result = getRandomGif('titty_drop');
         const embed = createEmbed({
             color: getRandomColor(),
-            authorName: interaction.user.displayName,
-            authorIcon: interaction.user.displayAvatarURL(),
+            authorName: interaction.member.displayName,
+            authorIcon: interaction.member.displayAvatarURL(),
             title: 'Titty Drop',
             image: result.url,
             footerText: `GIF #${result.index}/${result.total}`,

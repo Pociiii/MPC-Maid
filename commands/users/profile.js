@@ -43,7 +43,12 @@ module.exports = {
 - ${emojis.fame} Fame: **${user.fame}**
 
 - ${emojis.ranking} Ranking: **${rankTitle} (${user.ranking})**
-- ${emojis.scene_completed} Scenes Completed: **${user.scenes_completed}**`,
+- ${emojis.scene_completed} Scenes Completed: **${user.scenes_completed}**
+
+- ${emojis.spank_given} Spanks Given: **${user.spanks_given}**
+- ${emojis.spank_taken} Spanks Taken: **${user.spanks_taken}**
+- ${emojis.kiss_given} Kisses Given: **${user.kisses_given}**
+- ${emojis.kiss_taken} Kisses Taken: **${user.kisses_taken}**`,
 
             footerText: 'MPC Maid',
             timestamp: true

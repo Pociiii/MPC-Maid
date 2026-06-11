@@ -15,6 +15,12 @@ const {
 const ROLES =
     require('../../data/roles.json');
 
+    const {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle
+} = require('discord.js');
+
 module.exports = {
 
     data: new SlashCommandBuilder()
@@ -51,17 +57,57 @@ module.exports = {
 
             color: getRandomColor(),
 
-            authorName: interaction.user.displayName,
-            authorIcon: interaction.user.displayAvatarURL(),
+            authorName:
+                interaction.member.displayName,
+
+            authorIcon:
+                interaction.member.displayAvatarURL(),
+
             title: 'Flex',
-            image: result.url,
-            footerText: `GIF #${result.index}/${result.total}`,
-            timestamp: true
+
+            description:
+                `<@${interaction.user.id}> flexes confidently.`,
+
+            image:
+                result.url,
+
+            footerText:
+                `GIF #${result.index}/${result.total}`,
+
+            timestamp:
+                true
 
         });
+        const row =
+    new ActionRowBuilder()
+        .addComponents(
+
+            new ButtonBuilder()
+
+                .setCustomId(
+                    `blowkiss:${interaction.user.id}`
+                )
+
+                .setLabel(
+                    'Blow Kiss'
+                )
+
+                .setEmoji(
+                    '<a:ADP_kiss:1450797539862511720>'
+                )
+
+                .setStyle(
+                    ButtonStyle.Secondary
+                )
+
+        );
 
         await interaction.reply({
-            embeds: [embed]
+
+            embeds: [embed],
+
+            components: [row]
+
         });
 
     }

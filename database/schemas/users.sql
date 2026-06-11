@@ -12,6 +12,9 @@ CREATE TABLE IF NOT EXISTS users (
     scenes_completed INTEGER DEFAULT 0,
 
     spanks_taken INTEGER DEFAULT 0,
-    spanks_given INTEGER DEFAULT 0
+    spanks_given INTEGER DEFAULT 0,
+    
+    kisses_taken INTEGER DEFAULT 0,
+    kisses_given INTEGER DEFAULT 0
 
 );

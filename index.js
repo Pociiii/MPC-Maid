@@ -12,6 +12,37 @@ REST,
 Routes
 } = require('discord.js');
 
+const ROLES =
+    require('./data/roles.json');
+
+const {
+    getRandomGif
+} = require('./utils/gifs');
+
+const {
+    createEmbed
+} = require('./utils/embeds');
+
+const {
+    getRandomColor
+} = require('./data/constants');
+
+const {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle
+} = require('discord.js');
+
+const {
+
+    addSpankGiven,
+    addSpankTaken
+
+} = require('./utils/users');
+
+const handleInteractions =
+    require('./handlers/interactions');
+
 // Initialize database
 require('./database/database');
 
@@ -123,64 +154,14 @@ readyClient => {
 client.on(
 Events.InteractionCreate,
 async interaction => {
-    if (interaction.isStringSelectMenu()) {
+    
 
-        if (
-            interaction.customId ===
-            'addgif_category'
-        ) {
-
-            const category =
-                interaction.values[0];
-
-            const {
-                StringSelectMenuBuilder,
-                ActionRowBuilder
-            } = require('discord.js');
-
-            const phases = [
-                'foreplay',
-                'oral',
-                'sex',
-                'finale'
-            ];
-
-            const menu =
-                new StringSelectMenuBuilder()
-                    .setCustomId(
-                        `addgif_phase:${category}`
-                    )
-                    .setPlaceholder(
-                        'Select phase'
-                    )
-                    .addOptions(
-                        phases.map(phase => ({
-                            label:
-                                phase.charAt(0)
-                                .toUpperCase()
-                                +
-                                phase.slice(1),
-
-                            value: phase
-                        }))
-                    );
-
-            const row =
-                new ActionRowBuilder()
-                    .addComponents(menu);
-
-            return interaction.update({
-
-                content:
-                    `Category: ${category}`,
-
-                components: [row]
-
-            });
-
-        }
-
-    }
+    if (
+    await handleInteractions(
+        interaction
+    )
+)
+    return;
 
     if (!interaction.isChatInputCommand())
         return;
