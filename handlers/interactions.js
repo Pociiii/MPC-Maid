@@ -7,6 +7,12 @@ const handleAddGifCategory =
 const handleBlowKiss =
     require('./buttons/blowkiss');
 
+const handleRelationshipAccept =
+    require('./buttons/relationshipAccept');
+
+const handleRelationshipDecline =
+    require('./buttons/relationshipDecline');
+
 module.exports = async (
     interaction
 ) => {
@@ -27,6 +33,18 @@ module.exports = async (
 
             case 'spank':
                 await handleSpank(
+                    interaction
+                );
+                return true;
+
+            case 'relationship_accept':
+                await handleRelationshipAccept(
+                    interaction
+                );
+                return true;
+
+            case 'relationship_decline':
+                await handleRelationshipDecline(
                     interaction
                 );
                 return true;

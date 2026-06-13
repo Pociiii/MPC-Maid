@@ -41,9 +41,12 @@ function createUser(userId) {
                 spanks_taken,
                 spanks_given,
                 kisses_taken,
-                kisses_given
+                kisses_given,
+                partner_id,
+                mother_id,
+                father_id
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 userId,
                 ECONOMY.STARTING_COINS,
@@ -56,7 +59,11 @@ function createUser(userId) {
                 0,
                 0,
                 0,
-                0
+                0,
+                null,
+                null,
+                null
+
             ],
 
 
