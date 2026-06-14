@@ -245,91 +245,6 @@ async function getUserName(
 }
 
 
-function setPartner(
-    userId1,
-    userId2
-) {
-
-    return new Promise(
-        (resolve, reject) => {
-
-            db.serialize(() => {
-
-                db.run(
-                    `
-                    UPDATE users
-                    SET partner_id = ?
-                    WHERE id = ?
-                    `,
-                    [
-                        userId2,
-                        userId1
-                    ]
-                );
-
-                db.run(
-                    `
-                    UPDATE users
-                    SET partner_id = ?
-                    WHERE id = ?
-                    `,
-                    [
-                        userId1,
-                        userId2
-                    ],
-
-                    err => {
-
-                        if (err)
-                            reject(err);
-                        else
-                            resolve();
-
-                    }
-
-                );
-
-            });
-
-        }
-    );
-
-}
-
-function getRelationshipData(
-    userId
-) {
-
-    return new Promise(
-        (resolve, reject) => {
-
-            db.get(
-                `
-                SELECT
-                    partner_id,
-                    mother_id,
-                    father_id
-                FROM users
-                WHERE id = ?
-                `,
-                [userId],
-
-                (err, row) => {
-
-                    if (err)
-                        reject(err);
-                    else
-                        resolve(row);
-
-                }
-            );
-
-        }
-    );
-
-}
-
-
 module.exports = {
 
 
@@ -343,9 +258,7 @@ module.exports = {
 
     getChildren,
     
-    getUserName,
-    setPartner,
-    getRelationshipData
+    getUserName
 
 
 };

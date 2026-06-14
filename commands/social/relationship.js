@@ -14,12 +14,13 @@ const {
 } = require('../../data/constants');
 
 const {
-    getRelationshipData
+    getRelationshipData, getUserName
 } = require('../../utils/relationships');
 
 const {
     getOrCreateUser
 } = require('../../utils/users');
+
 
 module.exports = {
 
@@ -40,6 +41,20 @@ module.exports = {
 
                     .setDescription(
                         'View relationships'
+                    )
+
+                    .addUserOption(option =>
+
+                        option
+
+                            .setName('user')
+
+                            .setDescription(
+                                'Target user'
+                            )
+
+                            .setRequired(false)
+
                     )
 
             )
@@ -68,50 +83,101 @@ module.exports = {
 
                     )
 
-            ),
+            )
 
-    async execute(
-        interaction
-    ) {
+            .addSubcommand(sub =>
+
+            sub
+
+                .setName('mother')
+
+                .setDescription(
+                    'Request a mother'
+                )
+
+                .addUserOption(option =>
+
+                    option
+
+                        .setName('user')
+
+                        .setDescription(
+                            'Target user'
+                        )
+
+                        .setRequired(true)
+
+                )
+
+        )
+
+        .addSubcommand(sub =>
+
+            sub
+
+                .setName('father')
+
+                .setDescription(
+                    'Request a father'
+                )
+
+                .addUserOption(option =>
+
+                    option
+
+                        .setName('user')
+
+                        .setDescription(
+                            'Target user'
+                        )
+
+                        .setRequired(true)
+
+                )
+
+        ),
+
+    async execute(interaction) {
 
         const subcommand =
             interaction.options.getSubcommand();
 
-        if (
-            subcommand === 'view'
-        ) {
+        //
+        // VIEW
+        //
+        if (subcommand === 'view') {
+
+            const target =
+                interaction.options.getUser(
+                    'user'
+                ) || interaction.user;
 
             await getOrCreateUser(
-                interaction.user.id
+                target.id
             );
 
             const relationships =
                 await getRelationshipData(
-                    interaction.user.id
+                    target.id
                 );
 
-            let partner =
-                'None';
+            const partner =
+                await getUserName(
+                    interaction.client,
+                    relationships.partner_id
+                );
 
-            if (
-                relationships.partner_id
-            ) {
+            const mother =
+                await getUserName(
+                    interaction.client,
+                    relationships.mother_id
+                );
 
-                try {
-
-                    const partnerUser =
-                        await interaction.client.users.fetch(
-                            relationships.partner_id
-                        );
-
-                    partner =
-                        partnerUser.displayName ||
-                        partnerUser.username;
-
-                }
-                catch {}
-
-            }
+            const father =
+                await getUserName(
+                    interaction.client,
+                    relationships.father_id
+                );
 
             const embed =
                 createEmbed({
@@ -120,16 +186,22 @@ module.exports = {
                         getRandomColor(),
 
                     authorName:
-                        interaction.member.displayName,
+                        target.displayName ||
+                        target.username,
 
                     authorIcon:
-                        interaction.user.displayAvatarURL(),
+                        target.displayAvatarURL(),
 
                     title:
-                        '❤️ Relationships',
+                        `Relationships`,
 
                     description:
-                        `**Partner**\n${partner}`,
+
+    `❤️ **Partner**: ${partner || 'None'}
+
+    👩 **Mother**: ${mother || 'Unknown'}
+
+    👨 **Father**: ${father || 'Unknown'}`,
 
                     timestamp:
                         true
@@ -144,9 +216,21 @@ module.exports = {
 
         }
 
+        //
+        // REQUESTS
+        //
         if (
-            subcommand === 'partner'
+
+            subcommand === 'partner' ||
+
+            subcommand === 'mother' ||
+
+            subcommand === 'father'
+
         ) {
+
+            const relationshipType =
+                subcommand;
 
             const target =
                 interaction.options.getUser(
@@ -161,7 +245,7 @@ module.exports = {
                 return interaction.reply({
 
                     content:
-                        '❌ You cannot partner yourself.',
+                        '❌ You cannot target yourself.',
 
                     flags: 64
 
@@ -186,7 +270,7 @@ module.exports = {
 
                             .setCustomId(
 
-                                `relationship_accept:partner:${interaction.user.id}`
+                                `relationship_accept:${relationshipType}:${interaction.user.id}`
 
                             )
 
@@ -202,7 +286,7 @@ module.exports = {
 
                             .setCustomId(
 
-                                `relationship_decline:partner:${interaction.user.id}`
+                                `relationship_decline:${relationshipType}:${interaction.user.id}`
 
                             )
 
@@ -226,7 +310,7 @@ module.exports = {
                         '❤️ Relationship Request',
 
                     description:
-                        `${interaction.user.username} wants to add you as their partner.`,
+                        `${interaction.member.displayName} wants to add you as their ${relationshipType}.`,
 
                     timestamp:
                         true
@@ -246,13 +330,14 @@ module.exports = {
                 return interaction.reply({
 
                     content:
-                        `❤️ Partner request sent to ${target.username}.`,
+                        `❤️ ${relationshipType} request sent to ${target.username}.`,
 
                     flags: 64
 
                 });
 
             }
+
             catch {
 
                 return interaction.reply({

@@ -21,10 +21,57 @@ module.exports = {
                 ':'
             );
 
-        if (
-            type !== 'partner'
-        )
-            return;
+        switch (type) {
+
+            case 'partner':
+
+                await setPartner(
+
+                    requesterId,
+
+                    interaction.user.id
+
+                );
+
+                break;
+
+            case 'mother':
+
+                await setMother(
+
+                    requesterId,
+
+                    interaction.user.id
+
+                );
+
+                break;
+
+            case 'father':
+
+                await setFather(
+
+                    requesterId,
+
+                    interaction.user.id
+
+                );
+
+                break;
+
+        }
+
+            const {
+
+                setPartner,
+
+                setMother,
+
+                setFather
+
+            } = require(
+                '../../utils/relationships'
+            );
 
         const requester =
             await getRelationshipData(
