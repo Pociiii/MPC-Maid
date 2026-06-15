@@ -1,7 +1,14 @@
 const {
+
     setPartner,
+    setMother,
+    setFather,
+
     getRelationshipData
-} = require('../../utils/relationships');
+
+} = require(
+    '../../utils/relationships'
+);
 
 module.exports = {
 
@@ -13,106 +20,107 @@ module.exports = {
     ) {
 
         const [
+
             ,
             type,
             requesterId
+
         ] =
             interaction.customId.split(
                 ':'
             );
 
-        switch (type) {
-
-            case 'partner':
-
-                await setPartner(
-
-                    requesterId,
-
-                    interaction.user.id
-
-                );
-
-                break;
-
-            case 'mother':
-
-                await setMother(
-
-                    requesterId,
-
-                    interaction.user.id
-
-                );
-
-                break;
-
-            case 'father':
-
-                await setFather(
-
-                    requesterId,
-
-                    interaction.user.id
-
-                );
-
-                break;
-
-        }
-
-            const {
-
-                setPartner,
-
-                setMother,
-
-                setFather
-
-            } = require(
-                '../../utils/relationships'
-            );
-
-        const requester =
-            await getRelationshipData(
-                requesterId
-            );
-
-        const target =
-            await getRelationshipData(
-                interaction.user.id
-            );
-
+        //
+        // PARTNER
+        //
         if (
-            requester.partner_id ||
-            target.partner_id
+            type === 'partner'
         ) {
 
-            return interaction.reply({
+            const requester =
+                await getRelationshipData(
+                    requesterId
+                );
 
-                content:
-                    '❌ One of the users already has a partner.',
+            const target =
+                await getRelationshipData(
+                    interaction.user.id
+                );
 
-                flags: 64
+            if (
 
-            });
+                requester.partner_id ||
+
+                target.partner_id
+
+            ) {
+
+                return interaction.reply({
+
+                    content:
+                        '❌ One of the users already has a partner.',
+
+                    flags: 64
+
+                });
+
+            }
+
+            await setPartner(
+
+                requesterId,
+
+                interaction.user.id
+
+            );
 
         }
 
-        await setPartner(
+        //
+        // MOTHER
+        //
+        if (
+            type === 'mother'
+        ) {
 
-            requesterId,
+            await setMother(
 
-            interaction.user.id
+                requesterId,
 
-        );
+                interaction.user.id
+
+            );
+
+        }
+
+        //
+        // FATHER
+        //
+        if (
+            type === 'father'
+        ) {
+
+            await setFather(
+
+                requesterId,
+
+                interaction.user.id
+
+            );
+
+        }
+
+        const label =
+            type.charAt(0).toUpperCase() +
+            type.slice(1);
 
         await interaction.update({
 
             content:
-                '❤️ Relationship accepted.',
+                `✅ ${label} relationship accepted.`,
 
-            embeds: [],
+            embeds:
+                interaction.message.embeds,
 
             components: []
 

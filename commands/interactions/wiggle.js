@@ -21,7 +21,19 @@ module.exports = {
 
     data: new SlashCommandBuilder()
         .setName('wiggle')
-        .setDescription('Random wiggle'),
+        .setDescription('Random wiggle')
+        .addAttachmentOption(option =>
+
+        option
+
+            .setName('media')
+
+            .setDescription(
+                'Custom GIF'
+            )
+
+            .setRequired(false)
+        ),
 
     async execute(interaction) {
         
@@ -35,7 +47,57 @@ module.exports = {
             return;
 
 
-        const result = getRandomGif('wiggle');
+        const attachment =
+            interaction.options.getAttachment(
+                'media'
+            );
+        if (
+            attachment &&
+            !attachment.contentType?.startsWith(
+                'image/'
+            ) &&
+            !attachment.contentType?.startsWith(
+                'video/'
+            )
+        ) {
+
+            return interaction.reply({
+
+                content:
+                    '❌ Please upload an image or GIF.',
+
+                flags: 64
+
+            });
+
+        }
+
+        let imageUrl;
+        let footerText;
+
+        if (attachment) {
+
+            imageUrl =
+                attachment.url;
+
+            footerText =
+                `Custom media by ${interaction.member.displayName}`;
+
+        }
+        else {
+
+            const result =
+                getRandomGif(
+                    'wiggle'
+                );
+
+            imageUrl =
+                result.url;
+
+            footerText =
+                `GIF #${result.index}/${result.total}`;
+
+        }
 
         const embed = createEmbed({
             color: getRandomColor(),
@@ -43,8 +105,8 @@ module.exports = {
             authorIcon: interaction.member.displayAvatarURL(),
             title: 'Wiggle',
             description: `<@${interaction.user.id}> wiggles teasingly.`,
-            image: result.url,
-            footerText: `GIF #${result.index}/${result.total}`,
+            image: imageUrl,
+            footerText: footerText,
             timestamp: true
         });
 

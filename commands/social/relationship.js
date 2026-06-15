@@ -14,13 +14,18 @@ const {
 } = require('../../data/constants');
 
 const {
-    getRelationshipData, getUserName
+    getRelationshipData
 } = require('../../utils/relationships');
 
 const {
     getOrCreateUser
 } = require('../../utils/users');
 
+const {
+    ROLES
+} = require(
+    '../../data/roles'
+);
 
 module.exports = {
 
@@ -53,7 +58,7 @@ module.exports = {
                                 'Target user'
                             )
 
-                            .setRequired(false)
+                            .setRequired(true)
 
                     )
 
@@ -162,22 +167,19 @@ module.exports = {
                 );
 
             const partner =
-                await getUserName(
-                    interaction.client,
-                    relationships.partner_id
-                );
+                relationships.partner_id
+                    ? `<@${relationships.partner_id}>`
+                    : 'None';
 
             const mother =
-                await getUserName(
-                    interaction.client,
-                    relationships.mother_id
-                );
+                relationships.mother_id
+                    ? `<@${relationships.mother_id}>`
+                    : 'Unknown';
 
             const father =
-                await getUserName(
-                    interaction.client,
-                    relationships.father_id
-                );
+                relationships.father_id
+                    ? `<@${relationships.father_id}>`
+                    : 'Unknown';
 
             const embed =
                 createEmbed({
@@ -197,11 +199,10 @@ module.exports = {
 
                     description:
 
-    `❤️ **Partner**: ${partner || 'None'}
+`- **Partner**: ${partner || 'None'}
 
-    👩 **Mother**: ${mother || 'Unknown'}
-
-    👨 **Father**: ${father || 'Unknown'}`,
+- **Mother**: ${mother || 'Unknown'}
+- **Father**: ${father || 'Unknown'}`,
 
                     timestamp:
                         true
@@ -210,8 +211,8 @@ module.exports = {
 
             return interaction.reply({
 
-                embeds: [embed]
-
+                embeds: [embed],
+                flags: 64
             });
 
         }
@@ -236,6 +237,17 @@ module.exports = {
                 interaction.options.getUser(
                     'user'
                 );
+            const targetMember =
+                await interaction.guild.members.fetch(
+                    target.id
+                );
+
+            const {
+                MALE,
+                FEMALE
+            } = require(
+                '../../data/roles'
+            );
 
             if (
                 target.id ===
@@ -253,6 +265,41 @@ module.exports = {
 
             }
 
+            if (
+                relationshipType === 'mother' &&
+                !targetMember.roles.cache.has(
+                    FEMALE
+                )
+            ) {
+
+                return interaction.reply({
+
+                    content:
+                        '❌ The selected user must have the Female role to be a mother.',
+
+                    flags: 64
+
+                });
+
+            }
+
+            if (
+                relationshipType === 'father' &&
+                !targetMember.roles.cache.has(
+                    MALE
+                )
+            ) {
+
+                return interaction.reply({
+
+                    content:
+                        '❌ The selected user must have the Male role to be a father.',
+
+                    flags: 64
+
+                });
+
+            }
             await getOrCreateUser(
                 interaction.user.id
             );
@@ -307,7 +354,7 @@ module.exports = {
                         getRandomColor(),
 
                     title:
-                        '❤️ Relationship Request',
+                        'Relationship Request',
 
                     description:
                         `${interaction.member.displayName} wants to add you as their ${relationshipType}.`,
@@ -330,7 +377,7 @@ module.exports = {
                 return interaction.reply({
 
                     content:
-                        `❤️ ${relationshipType} request sent to ${target.username}.`,
+                        `${relationshipType} request sent to ${target.username}.`,
 
                     flags: 64
 

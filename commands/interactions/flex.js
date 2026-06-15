@@ -24,8 +24,22 @@ const ROLES =
 module.exports = {
 
     data: new SlashCommandBuilder()
-        .setName('flex')
-        .setDescription('Show off your muscles'),
+    .setName('flex')
+    .setDescription('Show off your muscles')
+
+    .addAttachmentOption(option =>
+
+        option
+
+            .setName('media')
+
+            .setDescription(
+                'Custom media'
+            )
+
+            .setRequired(false)
+
+    ),
 
     async execute(interaction) {
 
@@ -38,20 +52,68 @@ module.exports = {
         )
             return;
 
-        let category = 'flex_w';
+        const attachment =
+            interaction.options.getAttachment(
+                'media'
+            );
 
         if (
-            interaction.member.roles.cache.has(
-                ROLES.DARK_SKIN
+            attachment &&
+            !attachment.contentType?.startsWith(
+                'image/'
+            ) &&
+            !attachment.contentType?.startsWith(
+                'video/'
             )
         ) {
 
-            category = 'flex_b';
+            return interaction.reply({
+
+                content:
+                    '❌ Please upload an image, GIF, or video.',
+
+                flags: 64
+
+            });
 
         }
 
-        const result =
-            getRandomGif(category);
+        let imageUrl;
+        let footerText;
+
+        if (attachment) {
+
+            imageUrl =
+                attachment.url;
+
+            footerText =
+                `Custom media by ${interaction.member.displayName}`;
+
+        }
+        else {
+
+            let category = 'flex_w';
+
+            if (
+                interaction.member.roles.cache.has(
+                    ROLES.DARK_SKIN
+                )
+            ) {
+
+                category = 'flex_b';
+
+            }
+
+            const result =
+                getRandomGif(category);
+
+            imageUrl =
+                result.url;
+
+            footerText =
+                `GIF #${result.index}/${result.total}`;
+
+        }
 
         const embed = createEmbed({
 
@@ -69,10 +131,10 @@ module.exports = {
                 `<@${interaction.user.id}> flexes confidently.`,
 
             image:
-                result.url,
+                imageUrl,
 
             footerText:
-                `GIF #${result.index}/${result.total}`,
+                footerText,
 
             timestamp:
                 true

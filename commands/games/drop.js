@@ -13,8 +13,22 @@ const {
 module.exports = {
 
     data: new SlashCommandBuilder()
-        .setName('drop')
-        .setDescription('Random titty drop'),
+    .setName('drop')
+    .setDescription('Random titty drop')
+
+    .addAttachmentOption(option =>
+
+        option
+
+            .setName('media')
+
+            .setDescription(
+                'Custom media'
+            )
+
+            .setRequired(false)
+
+    ),
 
     async execute(interaction) {
         
@@ -28,14 +42,68 @@ module.exports = {
             return;
 
 
-        const result = getRandomGif('titty_drop');
+        const attachment =
+            interaction.options.getAttachment(
+                'media'
+            );
+
+        if (
+            attachment &&
+            !attachment.contentType?.startsWith(
+                'image/'
+            ) &&
+            !attachment.contentType?.startsWith(
+                'video/'
+            )
+        ) {
+
+            return interaction.reply({
+
+                content:
+                    '❌ Please upload an image, GIF, or video.',
+
+                flags: 64
+
+            });
+
+        }
+
+        let imageUrl;
+        let footerText;
+
+        if (attachment) {
+
+            imageUrl =
+                attachment.url;
+
+            footerText =
+                `Custom media by ${interaction.member.displayName}`;
+
+        }
+        else {
+
+            const result =
+                getRandomGif(
+                    'titty_drop'
+                );
+
+            imageUrl =
+                result.url;
+
+            footerText =
+                `GIF #${result.index}/${result.total}`;
+
+        }
         const embed = createEmbed({
             color: getRandomColor(),
             authorName: interaction.member.displayName,
             authorIcon: interaction.member.displayAvatarURL(),
             title: 'Titty Drop',
-            image: result.url,
-            footerText: `GIF #${result.index}/${result.total}`,
+            image:
+                imageUrl,
+
+            footerText:
+                footerText,
             timestamp: true
         });
 

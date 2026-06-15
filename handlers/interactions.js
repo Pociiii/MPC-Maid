@@ -38,15 +38,19 @@ module.exports = async (
                 return true;
 
             case 'relationship_accept':
-                await handleRelationshipAccept(
+
+                await handleRelationshipAccept.execute(
                     interaction
                 );
+
                 return true;
 
             case 'relationship_decline':
-                await handleRelationshipDecline(
+
+                await handleRelationshipDecline.execute(
                     interaction
                 );
+
                 return true;
 
         }

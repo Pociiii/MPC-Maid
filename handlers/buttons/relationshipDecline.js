@@ -7,12 +7,27 @@ module.exports = {
         interaction
     ) {
 
+        const [
+
+            ,
+            type
+
+        ] =
+            interaction.customId.split(
+                ':'
+            );
+
+        const label =
+            type.charAt(0).toUpperCase() +
+            type.slice(1);
+
         await interaction.update({
 
             content:
-                '❌ Relationship declined.',
+                `❌ ${label} relationship declined.`,
 
-            embeds: [],
+            embeds:
+                interaction.message.embeds,
 
             components: []
 
