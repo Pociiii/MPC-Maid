@@ -78,7 +78,7 @@ const COOLDOWNS = {
     DROP: 600,
     WIGGLE: 600,
     FLEX: 600,
-    HORNY: 1800
+    HORNY: 900
 };
 
 module.exports = {
