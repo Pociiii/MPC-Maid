@@ -74,6 +74,13 @@ const RANKS = {
     }
 };
 
+const CHANNELS= {
+
+    GIF_REVIEW: '1515932224464224376',
+    RUMORS: '1504424543865929888'
+
+}
+
 const COOLDOWNS = {
     DROP: 600,
     WIGGLE: 600,
@@ -89,5 +96,6 @@ module.exports = {
     STATS,
     SCENE_PHASES,
     RANKS,
-    COOLDOWNS
+    COOLDOWNS,
+    CHANNELS
 };

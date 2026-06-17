@@ -45,17 +45,23 @@ function getRandomGif(category) {
 
 }
 
-function addGif(category, url) {
+function addGifToFile(
+    filePath,
+    url
+) {
 
-    const filePath =
-        getGifFilePath(category);
+    const gifs =
+        JSON.parse(
+            fs.readFileSync(
+                filePath,
+                'utf8'
+            )
+        );
 
-    const gifs = JSON.parse(
-        fs.readFileSync(
-            filePath,
-            'utf8'
-        )
-    );
+    if (
+        gifs.includes(url)
+    )
+        return false;
 
     gifs.push(url);
 
@@ -68,10 +74,12 @@ function addGif(category, url) {
         )
     );
 
+    return true;
+
 }
 
 module.exports = {
     getRandomGif,
-    addGif,
+    addGifToFile,
     getGifList
 };
