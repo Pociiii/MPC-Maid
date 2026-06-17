@@ -2,15 +2,9 @@ const path =
     require('path');
 
 const {
-    addGifToFile
+    approveGif
 } = require(
-    '../../utils/gifs'
-);
-
-const {
-    CHANNELS
-} = require(
-    '../../data/constants'
+    '../../utils/gifApproval'
 );
 
 module.exports = {
@@ -22,8 +16,7 @@ module.exports = {
         const [
 
             ,
-            category,
-            submitterId
+            category
 
         ] =
             interaction.customId.split(
@@ -32,12 +25,6 @@ module.exports = {
 
         const sceneType =
             interaction.values[0];
-
-        const gifUrl =
-            interaction.message
-                .embeds[0]
-                .footer
-                .text;
 
         const filePath =
             path.join(
@@ -56,60 +43,15 @@ module.exports = {
 
             );
 
-        const added =
-            addGifToFile(
-                filePath,
-                gifUrl
-            );
+        return approveGif(
 
-        if (
-            !added
-        ) {
+            interaction,
 
-            return interaction.reply({
+            filePath,
 
-                content:
-                    '❌ This GIF already exists.',
+            `${category} → ${sceneType}`
 
-                flags: 64
-
-            });
-
-        }
-
-        await interaction.update({
-
-            content:
-                `✅ Approved by ${interaction.user}`,
-
-            embeds:
-                interaction.message.embeds,
-
-            components: []
-
-        });
-
-        const rumorsChannel =
-            interaction.client.channels.cache.get(
-                CHANNELS.RUMORS
-            );
-
-        if (
-            rumorsChannel
-        ) {
-
-            await rumorsChannel.send({
-
-                embeds: [
-
-                    interaction.message
-                        .embeds[0]
-
-                ]
-
-            });
-
-        }
+        );
 
     }
 

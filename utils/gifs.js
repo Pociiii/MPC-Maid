@@ -77,9 +77,32 @@ function addGifToFile(
     return true;
 
 }
+function getGifCount(
+    filePath
+) {
 
+    try {
+
+        const gifs =
+            JSON.parse(
+                fs.readFileSync(
+                    filePath,
+                    'utf8'
+                )
+            );
+
+        return gifs.length;
+
+    } catch {
+
+        return 0;
+
+    }
+
+}
 module.exports = {
     getRandomGif,
     addGifToFile,
-    getGifList
+    getGifList,
+    getGifCount
 };

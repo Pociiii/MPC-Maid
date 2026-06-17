@@ -36,7 +36,7 @@ const gifFlexType =
 
 const gifHornyType =
     require('./menus/gifHornyType');
-    
+
 module.exports = async (
     interaction
 ) => {

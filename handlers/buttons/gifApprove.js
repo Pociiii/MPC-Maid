@@ -7,6 +7,21 @@ const {
     'discord.js'
 );
 
+const path =
+    require('path');
+
+const {
+    getGifCount
+} = require(
+    '../../utils/gifs'
+);
+
+const {
+    approveGif
+} = require(
+    '../../utils/gifApproval'
+);
+
 module.exports = {
 
     async execute(
@@ -44,7 +59,47 @@ module.exports = {
                 category
             )
         ) {
+            const sceneFolder =
+                path.join(
+                    __dirname,
+                    '..',
+                    '..',
+                    'data',
+                    'scenes',
+                    category
+                );
 
+            const foreplayCount =
+                getGifCount(
+                    path.join(
+                        sceneFolder,
+                        'foreplay.json'
+                    )
+                );
+
+            const oralCount =
+                getGifCount(
+                    path.join(
+                        sceneFolder,
+                        'oral.json'
+                    )
+                );
+
+            const sexCount =
+                getGifCount(
+                    path.join(
+                        sceneFolder,
+                        'sex.json'
+                    )
+                );
+
+            const finaleCount =
+                getGifCount(
+                    path.join(
+                        sceneFolder,
+                        'finale.json'
+                    )
+                );
             const menu =
                 new StringSelectMenuBuilder()
 
@@ -61,32 +116,27 @@ module.exports = {
                     .addOptions(
 
                         {
-                            label:
-                                'Foreplay',
+                            label: `Foreplay (${foreplayCount})`,
 
-                            value:
-                                'foreplay'
+                            value: 'foreplay'
                         },
 
                         {
-                            label:
-                                'Oral',
+                            label: `Oral (${oralCount})`,
 
                             value:
                                 'oral'
                         },
 
                         {
-                            label:
-                                'Sex',
+                            label: `Sex (${sexCount})`,
 
                             value:
                                 'sex'
                         },
 
                         {
-                            label:
-                                'Finale',
+                            label: `Finale (${finaleCount})`,
 
                             value:
                                 'finale'
@@ -121,7 +171,29 @@ module.exports = {
         if (
             category === 'flex'
         ) {
+            const flexWCount =
+                getGifCount(
+                    path.join(
+                        __dirname,
+                        '..',
+                        '..',
+                        'data',
+                        'gifs',
+                        'flex_w.json'
+                    )
+                );
 
+            const flexBCount =
+                getGifCount(
+                    path.join(
+                        __dirname,
+                        '..',
+                        '..',
+                        'data',
+                        'gifs',
+                        'flex_b.json'
+                    )
+                );
             const menu =
                 new StringSelectMenuBuilder()
 
@@ -138,16 +210,14 @@ module.exports = {
                     .addOptions(
 
                         {
-                            label:
-                                'White Male',
+                            label: `White Male (${flexWCount})`,
 
                             value:
                                 'flex_w'
                         },
 
                         {
-                            label:
-                                'Black Male',
+                            label: `Black Male (${flexBCount})`,
 
                             value:
                                 'flex_b'
@@ -182,7 +252,47 @@ module.exports = {
         if (
             category === 'horny'
         ) {
+            const hornyFolder =
+                path.join(
+                    __dirname,
+                    '..',
+                    '..',
+                    'data',
+                    'gifs',
+                    'horny'
+                );
 
+            const wmCount =
+                getGifCount(
+                    path.join(
+                        hornyFolder,
+                        'wm.json'
+                    )
+                );
+
+            const bmCount =
+                getGifCount(
+                    path.join(
+                        hornyFolder,
+                        'bm.json'
+                    )
+                );
+
+            const wfCount =
+                getGifCount(
+                    path.join(
+                        hornyFolder,
+                        'wf.json'
+                    )
+                );
+
+            const bfCount =
+                getGifCount(
+                    path.join(
+                        hornyFolder,
+                        'bf.json'
+                    )
+                );
             const menu =
                 new StringSelectMenuBuilder()
 
@@ -199,32 +309,28 @@ module.exports = {
                     .addOptions(
 
                         {
-                            label:
-                                'WM',
+                            label: `WM (${wmCount})`,
 
                             value:
                                 'wm'
                         },
 
                         {
-                            label:
-                                'BM',
+                            label: `BM (${bmCount})`,
 
                             value:
                                 'bm'
                         },
 
                         {
-                            label:
-                                'WF',
+                            label: `WF (${wfCount})`,
 
                             value:
                                 'wf'
                         },
 
                         {
-                            label:
-                                'BF',
+                            label: `BF (${bfCount})`,
 
                             value:
                                 'bf'
@@ -257,17 +363,29 @@ module.exports = {
         //
         // Direct-save categories
         //
-        return interaction.update({
 
-            content:
-                `TODO: Save directly to ${category}`,
+        
 
-            embeds:
-                interaction.message.embeds,
+        const filePath =
+            path.join(
 
-            components: []
+                __dirname,
 
-        });
+                '..',
+                '..',
+
+                'data',
+                'gifs',
+
+                `${category}.json`
+
+            );
+
+        return approveGif(
+            interaction,
+            filePath,
+            category
+        );
 
     }
 
