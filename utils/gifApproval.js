@@ -78,10 +78,7 @@ async function approveGif(
 
     if (rumorsChannel) {
 
-        const {
-            EmbedBuilder
-        } = require('discord.js');
-
+        
         const embed =
             EmbedBuilder.from(
                 interaction.message.embeds[0]
@@ -109,9 +106,14 @@ async function approveGif(
                     {
                         name: '👤 Submitted By',
                         value: `<@${submitter}>`,
-                        inline: false
+                        inline: true
+                    },
+                    {
+                        name: '📤 Submit Your Own GIF',
+                        value: `<#${CHANNELS.GIFS}>`,
+                        inline: true
                     }
-
+                    
                 );
 
         await rumorsChannel.send({
