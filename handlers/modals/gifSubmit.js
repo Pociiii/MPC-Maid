@@ -58,22 +58,18 @@ module.exports = {
 
                 description:
 
-`**Submitted by**
-<@${interaction.member.id}>
+`**Submitted by**: <@${interaction.member.id}>
 
-**Category**
-${category}
+**Category**: ${category}
 
-**URL**
-${gifUrl}`,
+**URL**: ${gifUrl}`,
 
                 image:
                     gifUrl,
 
                 timestamp:
-                    true,
-                footerText:
-                    gifUrl
+                    true
+
             });
 
         const row =

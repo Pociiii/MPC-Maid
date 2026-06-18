@@ -37,6 +37,14 @@ const gifFlexType =
 const gifHornyType =
     require('./menus/gifHornyType');
 
+const gifReject =
+    require('./buttons/gifReject');
+
+const gifRejectModal =
+    require('./modals/gifRejectModal');
+
+const memberCard =
+    require('./buttons/memberCard');
 module.exports = async (
     interaction
 ) => {
@@ -99,6 +107,21 @@ module.exports = async (
 
                 return true;
             
+            case 'gifreject':
+
+                await gifReject.execute(
+                    interaction
+                );
+
+                return true;
+            
+            case 'membercard':
+
+                await memberCard.execute(
+                    interaction
+                );
+
+                return true;
         }
 
     }
@@ -178,7 +201,19 @@ module.exports = async (
             return true;
 
         }
+        if (
+            interaction.customId.startsWith(
+                'gifrejectmodal:'
+            )
+        ) {
 
+            await gifRejectModal.execute(
+                interaction
+            );
+
+            return true;
+
+        }
     }
 
     return false;
