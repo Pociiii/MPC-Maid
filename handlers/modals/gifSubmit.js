@@ -121,12 +121,26 @@ module.exports = {
 
         await interaction.reply({
 
-            content:
+    embeds: [
+
+        createEmbed({
+
+            color:
+                getRandomColor(),
+
+            description:
                 '✅ GIF submitted for review.',
 
-            flags: 64
+            image:
+                gifUrl
 
-        });
+        })
+
+    ],
+
+    flags: 64
+
+});
 
     }
 

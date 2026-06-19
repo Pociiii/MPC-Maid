@@ -41,7 +41,9 @@ module.exports = {
 
 🎬 **Scenes**: GiFs used by the /porn-scene command.
 
-🎮 **Interactions**: GIFs used by commands like Wiggle, Flex, Horny, Drop and more.`,
+🎮 **Interactions**: GIFs used by commands like Wiggle, Flex, Horny, Drop and more.
+
+-# Bot is not hosted on a server yet and buttons may not be working all the time, check if <@1510634400986042510> is online`,
 
                 timestamp:
                     true
@@ -83,6 +85,20 @@ module.exports = {
 
                         .setStyle(
                             ButtonStyle.Success
+                        ),
+
+                    new ButtonBuilder()
+
+                        .setCustomId(
+                            'gifsubmit_info'
+                        )
+
+                        .setLabel(
+                            'GIF Info'
+                        )
+
+                        .setStyle(
+                            ButtonStyle.Secondary
                         )
 
                 );

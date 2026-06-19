@@ -33,13 +33,15 @@ module.exports = {
                     getRandomColor(),
 
                 title:
-                    '🎫 MPC Member Card',
+                    '🪪 MPC Member Card',
 
                 description:
 
-`Generate your official Midnight Pleasure Club membership card.
+`Generate your official **Midnight Pleasure Club** membership card.
 
-Rembember to change your nick to your in-game nick first.`,
+Rembember to change your nick to your in-game name first.
+
+-# Bot is not hosted on a server yet and buttons may not be working all the time, check if <@1510634400986042510> is online`,
 
                 timestamp:
                     true
@@ -61,7 +63,7 @@ Rembember to change your nick to your in-game nick first.`,
                             'Get Card'
                         )
 
-                        .setEmoji('🎫')
+                        .setEmoji('🪪')
 
                         .setStyle(
                             ButtonStyle.Primary

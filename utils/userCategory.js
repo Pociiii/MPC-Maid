@@ -5,23 +5,33 @@ function getUserCategory(
     interaction
 ) {
 
+    return getMemberCategory(
+        interaction.member
+    );
+
+}
+
+function getMemberCategory(
+    member
+) {
+
     const isMale =
-        interaction.member.roles.cache.has(
+        member.roles.cache.has(
             ROLES.MALE
         );
 
     const isFemale =
-        interaction.member.roles.cache.has(
+        member.roles.cache.has(
             ROLES.FEMALE
         );
 
     const isLightSkin =
-        interaction.member.roles.cache.has(
+        member.roles.cache.has(
             ROLES.LIGHT_SKIN
         );
 
     const isDarkSkin =
-        interaction.member.roles.cache.has(
+        member.roles.cache.has(
             ROLES.DARK_SKIN
         );
 
@@ -47,5 +57,6 @@ function getUserCategory(
 }
 
 module.exports = {
-    getUserCategory
+    getUserCategory,
+    getMemberCategory
 };

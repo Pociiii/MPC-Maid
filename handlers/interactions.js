@@ -4,6 +4,9 @@ const handleSpank =
 const handleBlowKiss =
     require('./buttons/blowkiss');
 
+const handleHornyHelp =
+    require('./buttons/hornyHelp');
+
 const handleRelationshipAccept =
     require('./buttons/relationshipAccept');
 
@@ -15,6 +18,9 @@ const gifSubmitScenes =
 
 const gifSubmitInteractions =
     require('./buttons/gifSubmitInteractions');
+
+const gifSubmitInfo =
+    require('./buttons/gifSubmitInfo');
 
 const gifSceneSelect =
     require('./menus/gifSceneSelect');
@@ -67,6 +73,12 @@ module.exports = async (
                 );
                 return true;
 
+            case 'horny_help':
+                await handleHornyHelp(
+                    interaction
+                );
+                return true;
+
             case 'relationship_accept':
 
                 await handleRelationshipAccept.execute(
@@ -94,6 +106,14 @@ module.exports = async (
             case 'gifsubmit_interactions':
 
                 await gifSubmitInteractions.execute(
+                    interaction
+                );
+
+            return true;
+
+            case 'gifsubmit_info':
+
+                await gifSubmitInfo.execute(
                     interaction
                 );
 

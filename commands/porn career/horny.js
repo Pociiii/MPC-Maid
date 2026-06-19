@@ -1,4 +1,9 @@
-const { SlashCommandBuilder } =
+const {
+    SlashCommandBuilder,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle
+} =
     require('discord.js');
 
 const {
@@ -100,9 +105,38 @@ module.exports = {
 
             });
 
+        const helpLabel =
+            `Help ${interaction.member.displayName}`
+                .slice(
+                    0,
+                    80
+                );
+
+        const row =
+            new ActionRowBuilder()
+                .addComponents(
+
+                    new ButtonBuilder()
+
+                        .setCustomId(
+                            `horny_help:${interaction.user.id}`
+                        )
+
+                        .setLabel(
+                            helpLabel
+                        )
+
+                        .setStyle(
+                            ButtonStyle.Secondary
+                        )
+
+                );
+
         await interaction.reply({
 
-            embeds: [embed]
+            embeds: [embed],
+
+            components: [row]
 
         });
 
