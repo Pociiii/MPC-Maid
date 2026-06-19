@@ -1,0 +1,481 @@
+const fs =
+    require('fs');
+
+const path =
+    require('path');
+
+const {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle
+} = require('discord.js');
+
+const {
+    createEmbed
+} = require('../../utils/embeds');
+
+const {
+    CHANNELS,
+    getRandomColor
+} = require('../../data/constants');
+
+const maxParts = 8;
+
+const sceneRoot =
+    path.join(
+        __dirname,
+        '..',
+        '..',
+        'data',
+        'scenes'
+    );
+
+const castLabels = {
+    wm_wf: 'WM / WF',
+    wm_bf: 'WM / BF',
+    bm_wf: 'BM / WF',
+    bm_bf: 'BM / BF',
+    wf_wf: 'WF / WF',
+    wf_bf: 'WF / BF',
+    bf_bf: 'BF / BF'
+};
+
+const phaseLabels = {
+    foreplay: 'Foreplay',
+    oral: 'Oral',
+    sex: 'Sex',
+    finale: 'Finale'
+};
+
+const phaseCodes = {
+    foreplay: 'f',
+    oral: 'o',
+    sex: 's',
+    finale: 'e'
+};
+
+const codePhases = {
+    f: 'foreplay',
+    o: 'oral',
+    s: 'sex',
+    e: 'finale'
+};
+
+const phaseValues =
+    Object.keys(
+        phaseLabels
+    );
+
+function encodeParts(
+    parts
+) {
+
+    return parts
+        .map(
+            (part) =>
+                phaseCodes[part]
+        )
+        .join(
+            ''
+        );
+
+}
+
+function decodeParts(
+    value
+) {
+
+    if (!value)
+        return [];
+
+    return value
+        .split(
+            ''
+        )
+        .map(
+            (code) =>
+                codePhases[code]
+        )
+        .filter(
+            Boolean
+        );
+
+}
+
+function createCustomId(
+    action,
+    userId,
+    cast,
+    parts
+) {
+
+    return `customscene_${action}:${userId}:${cast}:${encodeParts(parts)}`;
+
+}
+
+function formatParts(
+    parts
+) {
+
+    if (
+        parts.length === 0
+    )
+        return 'No parts selected yet.';
+
+    return parts
+        .map(
+            (part, index) =>
+                `${index + 1}. ${phaseLabels[part]}`
+        )
+        .join(
+            '\n'
+        );
+
+}
+
+function buildBuilderEmbed(
+    cast,
+    parts
+) {
+
+    return createEmbed({
+        color:
+            getRandomColor(),
+        title:
+            'Custom Scene Builder',
+        description:
+`Cast: **${castLabels[cast] ?? cast}**
+Parts: **${parts.length}/${maxParts}**
+
+${formatParts(parts)}`,
+        footerText:
+            'Add up to 8 parts, then press Finish.',
+        timestamp:
+            true
+    });
+
+}
+
+function buildBuilderRows(
+    userId,
+    cast,
+    parts,
+    disabled = false
+) {
+
+    const partButtons =
+        phaseValues.map(
+            (phase) =>
+                new ButtonBuilder()
+                    .setCustomId(
+                        createCustomId(
+                            'part',
+                            userId,
+                            cast,
+                            [
+                                ...parts,
+                                phase
+                            ]
+                        )
+                    )
+                    .setLabel(
+                        phaseLabels[phase]
+                    )
+                    .setStyle(
+                        ButtonStyle.Secondary
+                    )
+                    .setDisabled(
+                        disabled ||
+                        parts.length >= maxParts
+                    )
+        );
+
+    const undoButton =
+        new ButtonBuilder()
+            .setCustomId(
+                createCustomId(
+                    'undo',
+                    userId,
+                    cast,
+                    parts.slice(
+                        0,
+                        -1
+                    )
+                )
+            )
+            .setLabel(
+                'Undo'
+            )
+            .setStyle(
+                ButtonStyle.Danger
+            )
+            .setDisabled(
+                disabled ||
+                parts.length === 0
+            );
+
+    const finishButton =
+        new ButtonBuilder()
+            .setCustomId(
+                createCustomId(
+                    'finish',
+                    userId,
+                    cast,
+                    parts
+                )
+            )
+            .setLabel(
+                'Finish'
+            )
+            .setStyle(
+                ButtonStyle.Success
+            )
+            .setDisabled(
+                disabled ||
+                parts.length === 0
+            );
+
+    return [
+        new ActionRowBuilder()
+            .addComponents(
+                partButtons
+            ),
+        new ActionRowBuilder()
+            .addComponents(
+                undoButton,
+                finishButton
+            )
+    ];
+
+}
+
+function getRandomSceneGif(
+    cast,
+    phase
+) {
+
+    const filePath =
+        path.join(
+            sceneRoot,
+            cast,
+            `${phase}.json`
+        );
+
+    const gifs =
+        JSON.parse(
+            fs.readFileSync(
+                filePath,
+                'utf8'
+            )
+        );
+
+    const index =
+        Math.floor(
+            Math.random() * gifs.length
+        );
+
+    return {
+        url:
+            gifs[index],
+        index:
+            index + 1,
+        total:
+            gifs.length
+    };
+
+}
+
+function buildSceneEmbeds(
+    interaction,
+    cast,
+    parts
+) {
+
+    return parts.map(
+        (part, index) => {
+
+            const gif =
+                getRandomSceneGif(
+                    cast,
+                    part
+                );
+
+            return createEmbed({
+                color:
+                    getRandomColor(),
+                title:
+                    `Part ${index + 1}: ${phaseLabels[part]}`,
+                description:
+                    index === 0
+                        ? `Custom scene by <@${interaction.user.id}>\nCast: **${castLabels[cast] ?? cast}**`
+                        : null,
+                image:
+                    gif.url,
+                footerText:
+                    `GIF #${gif.index}/${gif.total}`,
+                timestamp:
+                    index === parts.length - 1
+            });
+
+        }
+    );
+
+}
+
+async function guardOwner(
+    interaction,
+    ownerId
+) {
+
+    if (
+        interaction.user.id === ownerId
+    )
+        return false;
+
+    await interaction.reply({
+        content:
+            'Only the user building this custom scene can use these buttons.',
+        flags: 64
+    });
+
+    return true;
+
+}
+
+module.exports = {
+
+    async execute(
+        interaction
+    ) {
+
+        const [
+            action,
+            ownerId,
+            cast,
+            rawParts = ''
+        ] =
+            interaction.customId.split(
+                ':'
+            );
+
+        if (
+            await guardOwner(
+                interaction,
+                ownerId
+            )
+        )
+            return;
+
+        const parts =
+            decodeParts(
+                rawParts
+            );
+
+        if (
+            action === 'customscene_cast' ||
+            action === 'customscene_part' ||
+            action === 'customscene_undo'
+        ) {
+
+            await interaction.update({
+                embeds: [
+                    buildBuilderEmbed(
+                        cast,
+                        parts
+                    )
+                ],
+                components:
+                    buildBuilderRows(
+                        ownerId,
+                        cast,
+                        parts
+                    )
+            });
+
+            return;
+
+        }
+
+        if (
+            action !== 'customscene_finish'
+        )
+            return;
+
+        if (
+            parts.length === 0
+        ) {
+
+            await interaction.reply({
+                content:
+                    'Pick at least one scene part before finishing.',
+                flags: 64
+            });
+
+            return;
+
+        }
+
+        const channel =
+            interaction.client.channels.cache.get(
+                CHANNELS.CUSTOM_SCENE
+            ) ??
+            await interaction.client.channels.fetch(
+                CHANNELS.CUSTOM_SCENE
+            );
+
+        if (
+            !channel
+        ) {
+
+            await interaction.reply({
+                content:
+                    'I could not find the custom-scene channel.',
+                flags: 64
+            });
+
+            return;
+
+        }
+
+        const message =
+            await channel.send({
+                embeds:
+                    buildSceneEmbeds(
+                        interaction,
+                        cast,
+                        parts
+                    )
+            });
+
+        const finalEmbed =
+            buildBuilderEmbed(
+                cast,
+                parts
+            );
+
+        finalEmbed.setDescription(
+`${finalEmbed.data.description}
+
+Posted in <#${CHANNELS.CUSTOM_SCENE}>.`
+        );
+
+        await interaction.update({
+            embeds: [finalEmbed],
+            components:
+                buildBuilderRows(
+                    ownerId,
+                    cast,
+                    parts,
+                    true
+                )
+        });
+
+        await interaction.followUp({
+            content:
+                `Custom scene posted: ${message.url}`,
+            flags: 64
+        });
+
+    }
+
+};

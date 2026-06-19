@@ -7,6 +7,9 @@ const handleBlowKiss =
 const handleHornyHelp =
     require('./buttons/hornyHelp');
 
+const customScene =
+    require('./buttons/customScene');
+
 const handleRelationshipAccept =
     require('./buttons/relationshipAccept');
 
@@ -75,6 +78,15 @@ module.exports = async (
 
             case 'horny_help':
                 await handleHornyHelp(
+                    interaction
+                );
+                return true;
+
+            case 'customscene_cast':
+            case 'customscene_part':
+            case 'customscene_undo':
+            case 'customscene_finish':
+                await customScene.execute(
                     interaction
                 );
                 return true;
