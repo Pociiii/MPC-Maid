@@ -10,6 +10,12 @@ const handleHornyHelp =
 const customScene =
     require('./buttons/customScene');
 
+const pornScene =
+    require('./buttons/pornScene');
+
+const commandsPornCareerInfo =
+    require('./buttons/commandsPornCareerInfo');
+
 const handleRelationshipAccept =
     require('./buttons/relationshipAccept');
 
@@ -17,7 +23,7 @@ const handleRelationshipDecline =
     require('./buttons/relationshipDecline');
 
 const gifSubmitScenes =
-    require('./buttons/gifSubmitScenes');
+    require('./buttons/gifSubmitSceneCategories');
 
 const gifSubmitInteractions =
     require('./buttons/gifSubmitInteractions');
@@ -87,6 +93,19 @@ module.exports = async (
             case 'customscene_undo':
             case 'customscene_finish':
                 await customScene.execute(
+                    interaction
+                );
+                return true;
+
+            case 'pornscene_accept':
+            case 'pornscene_decline':
+                await pornScene.execute(
+                    interaction
+                );
+                return true;
+
+            case 'commands_porncareer_info':
+                await commandsPornCareerInfo.execute(
                     interaction
                 );
                 return true;

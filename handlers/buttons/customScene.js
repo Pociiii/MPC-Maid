@@ -21,6 +21,9 @@ const {
 
 const maxParts = 8;
 
+const sceneDurationMs =
+    30 * 60 * 1000;
+
 const sceneRoot =
     path.join(
         __dirname,
@@ -149,7 +152,7 @@ Parts: **${parts.length}/${maxParts}**
 
 ${formatParts(parts)}`,
         footerText:
-            'Add up to 8 parts, then press Finish.',
+            '/customscene - Add up to 8 parts, then press Finish.',
         timestamp:
             true
     });
@@ -285,37 +288,99 @@ function getRandomSceneGif(
 
 }
 
-function buildSceneEmbeds(
+function buildSceneEmbed(
+    interaction,
+    cast,
+    part,
+    index,
+    totalParts
+) {
+
+    const gif =
+        getRandomSceneGif(
+            cast,
+            part
+        );
+
+    return createEmbed({
+        color:
+            getRandomColor(),
+        title:
+            `Part ${index + 1}`,
+        description:
+            `Custom scene from <@${interaction.user.id}>`,
+        image:
+            gif.url,
+        footerText:
+            `/customscene - Part ${index + 1}/${totalParts} - GIF #${gif.index}/${gif.total}`,
+        timestamp:
+            index === totalParts - 1
+    });
+
+}
+
+function getPartIntervalMs(
+    totalParts
+) {
+
+    if (
+        totalParts <= 1
+    )
+        return 0;
+
+    return Math.floor(
+        sceneDurationMs / (totalParts - 1)
+    );
+
+}
+
+function scheduleCustomScene(
+    channel,
     interaction,
     cast,
     parts
 ) {
 
-    return parts.map(
+    const intervalMs =
+        getPartIntervalMs(
+            parts.length
+        );
+
+    parts.forEach(
         (part, index) => {
 
-            const gif =
-                getRandomSceneGif(
-                    cast,
-                    part
-                );
+            setTimeout(
+                async () => {
 
-            return createEmbed({
-                color:
-                    getRandomColor(),
-                title:
-                    `Part ${index + 1}: ${phaseLabels[part]}`,
-                description:
-                    index === 0
-                        ? `Custom scene by <@${interaction.user.id}>\nCast: **${castLabels[cast] ?? cast}**`
-                        : null,
-                image:
-                    gif.url,
-                footerText:
-                    `GIF #${gif.index}/${gif.total}`,
-                timestamp:
-                    index === parts.length - 1
-            });
+                    try {
+
+                        await channel.send({
+                            embeds: [
+                                buildSceneEmbed(
+                                    interaction,
+                                    cast,
+                                    part,
+                                    index,
+                                    parts.length
+                                )
+                            ]
+                        });
+
+                    }
+                    catch (error) {
+
+                        console.error(
+                            'CUSTOM SCENE ERROR'
+                        );
+                        console.error(
+                            error
+                        );
+
+                    }
+
+                },
+                index * intervalMs
+            );
 
         }
     );
@@ -437,15 +502,12 @@ module.exports = {
 
         }
 
-        const message =
-            await channel.send({
-                embeds:
-                    buildSceneEmbeds(
-                        interaction,
-                        cast,
-                        parts
-                    )
-            });
+        scheduleCustomScene(
+            channel,
+            interaction,
+            cast,
+            parts
+        );
 
         const finalEmbed =
             buildBuilderEmbed(
@@ -456,7 +518,7 @@ module.exports = {
         finalEmbed.setDescription(
 `${finalEmbed.data.description}
 
-Posted in <#${CHANNELS.CUSTOM_SCENE}>.`
+Posting in <#${CHANNELS.CUSTOM_SCENE}> across 30 minutes.`
         );
 
         await interaction.update({
@@ -468,12 +530,6 @@ Posted in <#${CHANNELS.CUSTOM_SCENE}>.`
                     parts,
                     true
                 )
-        });
-
-        await interaction.followUp({
-            content:
-                `Custom scene posted: ${message.url}`,
-            flags: 64
         });
 
     }

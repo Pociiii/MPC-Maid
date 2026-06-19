@@ -118,6 +118,8 @@ module.exports = {
                     'Custom Scene',
                 description:
                     'Choose the cast for your custom scene.',
+                footerText:
+                    '/customscene',
                 timestamp:
                     true
             });
