@@ -48,7 +48,8 @@ require('./database/database');
 
 const client = new Client({
 intents: [
-GatewayIntentBits.Guilds
+GatewayIntentBits.Guilds,
+GatewayIntentBits.GuildMembers
 ]
 });
 

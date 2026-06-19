@@ -202,6 +202,24 @@ function addXP(userId, amount) {
     });
 }
 
+function removeXP(userId, amount) {
+    return new Promise((resolve, reject) => {
+
+        db.run(
+            'UPDATE users SET xp = xp - ? WHERE id = ?',
+            [amount, userId],
+            function(err) {
+
+                if (err)
+                    return reject(err);
+
+                resolve();
+            }
+        );
+
+    });
+}
+
 // Get performance
 async function getPerformance(userId) {
 
@@ -434,6 +452,7 @@ module.exports = {
 
     getXP,
     addXP,
+    removeXP,
 
     getPerformance,
     getStamina,

@@ -36,6 +36,7 @@ module.exports = {
 **Requests**
 - Use \`/pornscene partner:@user\` to send a DM request.
 - Request cooldown: **${minutes(COOLDOWNS.PORN_SCENE_REQUEST)}**.
+- Before the request is sent, you can spend one booster from \`/inventory\`.
 - Requests can wait. Busy is checked only when the partner presses Accept.
 - You can only have one pending request with the same target while the bot is running.
 
@@ -54,7 +55,8 @@ module.exports = {
 
 **Progression**
 - Completed scenes grant XP, coins, ranking points, and scenes completed.
-- XP will be used to train Performance, Stamina, and Fame.`,
+- Use \`/train\` to spend XP and coins on Performance, Stamina, and Fame.
+- Boosters are one-use scene bonuses. The shop command will sell them later.`,
                 footerText:
                     '/commands - Porn Career Info',
                 timestamp:

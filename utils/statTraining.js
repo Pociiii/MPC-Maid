@@ -4,6 +4,8 @@ const trainableStats = [
     'fame'
 ];
 
+const maxTrainableStat = 40;
+
 function isTrainableStat(
     stat
 ) {
@@ -30,8 +32,18 @@ function getStatUpgradeCost(
 
 }
 
+function getStatUpgradeCoinCost(
+    currentStat
+) {
+
+    return currentStat * 75;
+
+}
+
 module.exports = {
     trainableStats,
     isTrainableStat,
-    getStatUpgradeCost
+    maxTrainableStat,
+    getStatUpgradeCost,
+    getStatUpgradeCoinCost
 };

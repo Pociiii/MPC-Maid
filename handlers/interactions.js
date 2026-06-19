@@ -16,6 +16,14 @@ const pornScene =
 const commandsPornCareerInfo =
     require('./buttons/commandsPornCareerInfo');
 
+const {
+    buildLeaderboard
+} = require('../features/leaderboard/leaderboard');
+
+const {
+    sendPornSceneRequest
+} = require('../features/porn-career/pornSceneRequest');
+
 const handleRelationshipAccept =
     require('./buttons/relationshipAccept');
 
@@ -107,6 +115,23 @@ module.exports = async (
             case 'commands_porncareer_info':
                 await commandsPornCareerInfo.execute(
                     interaction
+                );
+                return true;
+
+            case 'leaderboard_ranking':
+            case 'leaderboard_scenes':
+            case 'leaderboard_coins':
+            case 'leaderboard_spanks':
+            case 'leaderboard_kisses':
+                await interaction.deferUpdate();
+
+                await interaction.editReply(
+                    await buildLeaderboard(
+                        interaction,
+                        action.split(
+                            '_'
+                        )[1]
+                    )
                 );
                 return true;
 
@@ -228,6 +253,83 @@ module.exports = async (
                 );
 
                 return true;
+
+            case 'pornscene_booster': {
+
+                const [
+                    ,
+                    targetId,
+                    sceneCategory
+                ] =
+                    interaction.customId.split(
+                        ':'
+                    );
+
+                const selected =
+                    interaction.values[0];
+
+                const booster =
+                    selected === 'none'
+                        ? null
+                        : (() => {
+
+                            const [
+                                stat,
+                                tier
+                            ] =
+                                selected.split(
+                                    ':'
+                                );
+
+                            return {
+                                stat,
+                                tier:
+                                    Number(
+                                        tier
+                                    )
+                            };
+
+                        })();
+
+                await interaction.deferUpdate();
+
+                try {
+
+                    await sendPornSceneRequest(
+                        interaction,
+                        targetId,
+                        sceneCategory,
+                        booster
+                    );
+
+                    await interaction.editReply({
+                        content:
+                            `<@${targetId}> has been sent the scene request.`,
+                        embeds:
+                            [],
+                        components:
+                            []
+                    });
+
+                }
+                catch (error) {
+
+                    await interaction.editReply({
+                        content:
+                            error.message === 'Booster is no longer available.'
+                                ? 'That booster is no longer in your inventory.'
+                                : 'I could not DM that user. They may have DMs closed.',
+                        embeds:
+                            [],
+                        components:
+                            []
+                    });
+
+                }
+
+                return true;
+
+            }
             
         }
 

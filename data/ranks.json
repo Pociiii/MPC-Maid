@@ -1,5 +1,9 @@
 [
     {
+        "title": "Struggling Amateur",
+        "minimum": -999999
+    },
+    {
         "title": "Amateur",
         "minimum": 0
     },

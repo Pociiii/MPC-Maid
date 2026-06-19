@@ -16,7 +16,12 @@ const db = new sqlite3.Database('./database.db', (err) => {
         'utf8'
     );
 
-    db.exec(usersSchema, (err) => {
+    const boostersSchema = fs.readFileSync(
+        path.join(__dirname, 'schemas', 'boosters.sql'),
+        'utf8'
+    );
+
+    db.exec(`${usersSchema}\n${boostersSchema}`, (err) => {
 
         if (err) {
             console.error(err);

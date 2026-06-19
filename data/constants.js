@@ -89,7 +89,8 @@ const COOLDOWNS = {
     FLEX: 600,
     HORNY: 900,
     CUSTOM_SCENE: 1800,
-    PORN_SCENE_REQUEST: 600
+    PORN_SCENE_REQUEST: 600,
+    MATCHME: 86400
 };
 
 module.exports = {

@@ -27,10 +27,19 @@ const {
 
 const {
     clearSceneBusy,
+    getPendingRequest,
     isBusy,
     removePendingRequest,
     setSceneBusy
 } = require('../../utils/pornScenes');
+
+const {
+    boosterTiers
+} = require('../../utils/boosters');
+
+const {
+    formatBooster
+} = require('./pornSceneRequest');
 
 const sceneRoot =
     path.join(
@@ -271,21 +280,81 @@ function buildPartEmbed(
 
 }
 
-function calculateScene(
-    requesterUser,
-    targetUser
+function getBoostValue(
+    booster,
+    stat
 ) {
 
-    const combinedPerformance =
+    if (
+        !booster ||
+        booster.stat !== stat
+    )
+        return 0;
+
+    return boosterTiers[booster.tier].value;
+
+}
+
+function formatStatValue(
+    value,
+    boost
+) {
+
+    if (
+        boost <= 0
+    )
+        return `${value}`;
+
+    return `${value}+${boost}`;
+
+}
+
+function calculateScene(
+    requesterUser,
+    targetUser,
+    booster = null
+) {
+
+    const requesterPerformanceBoost =
+        getBoostValue(
+            booster,
+            'performance'
+        );
+
+    const requesterStaminaBoost =
+        getBoostValue(
+            booster,
+            'stamina'
+        );
+
+    const requesterFameBoost =
+        getBoostValue(
+            booster,
+            'fame'
+        );
+
+    const requesterPerformance =
         requesterUser.performance +
+        requesterPerformanceBoost;
+
+    const requesterStamina =
+        requesterUser.stamina +
+        requesterStaminaBoost;
+
+    const requesterFame =
+        requesterUser.fame +
+        requesterFameBoost;
+
+    const combinedPerformance =
+        requesterPerformance +
         targetUser.performance;
 
     const combinedStamina =
-        requesterUser.stamina +
+        requesterStamina +
         targetUser.stamina;
 
     const combinedFame =
-        requesterUser.fame +
+        requesterFame +
         targetUser.fame;
 
     const performanceBonus =
@@ -377,7 +446,14 @@ function calculateScene(
         coins,
         combinedPerformance,
         combinedStamina,
-        combinedFame
+        combinedFame,
+        requesterPerformance,
+        requesterStamina,
+        requesterFame,
+        requesterPerformanceBoost,
+        requesterStaminaBoost,
+        requesterFameBoost,
+        booster
     };
 
 }
@@ -754,10 +830,20 @@ async function acceptScene(
             targetId
         );
 
+    const pendingRequest =
+        getPendingRequest(
+            requesterId,
+            targetId
+        );
+
+    const booster =
+        pendingRequest?.booster ?? null;
+
     const result =
         calculateScene(
             requesterUser,
-            targetUser
+            targetUser,
+            booster
         );
 
     const sceneTitle =
@@ -821,26 +907,49 @@ async function acceptScene(
 `<@${requesterId}> and <@${targetId}> are starting a scene.
 
 Parts: **${result.totalParts}**
-
-**${requesterMember.displayName}**
-- Performance: **${requesterUser.performance}**
-- Stamina: **${requesterUser.stamina}**
-- Fame: **${requesterUser.fame}**
-
-**${targetMember.displayName}**
-- Performance: **${targetUser.performance}**
-- Stamina: **${targetUser.stamina}**
-- Fame: **${targetUser.fame}**
-
-**Combined**
-- Performance: **${result.combinedPerformance}**
-- Stamina: **${result.combinedStamina}**
-- Fame: **${result.combinedFame}**`,
+Booster: **${formatBooster(
+    booster
+)}**`,
                     footerText:
                         '/pornscene',
                     timestamp:
                         true
                 })
+                    .addFields(
+                        {
+                            name:
+                                'Performance',
+                            value:
+                                `${formatStatValue(
+                                    requesterUser.performance,
+                                    result.requesterPerformanceBoost
+                                )} + ${targetUser.performance} = ${result.combinedPerformance}`,
+                            inline:
+                                true
+                        },
+                        {
+                            name:
+                                'Stamina',
+                            value:
+                                `${formatStatValue(
+                                    requesterUser.stamina,
+                                    result.requesterStaminaBoost
+                                )} + ${targetUser.stamina} = ${result.combinedStamina}`,
+                            inline:
+                                true
+                        },
+                        {
+                            name:
+                                'Fame',
+                            value:
+                                `${formatStatValue(
+                                    requesterUser.fame,
+                                    result.requesterFameBoost
+                                )} + ${targetUser.fame} = ${result.combinedFame}`,
+                            inline:
+                                true
+                        }
+                    )
             ]
         });
 

@@ -1,8 +1,7 @@
 const {
     SlashCommandBuilder,
     ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle
+    StringSelectMenuBuilder
 } = require('discord.js');
 
 const {
@@ -10,7 +9,6 @@ const {
 } = require('../../utils/embeds');
 
 const {
-    CHANNELS,
     COOLDOWNS,
     getRandomColor
 } = require('../../data/constants');
@@ -24,9 +22,19 @@ const {
 } = require('../../utils/userCategory');
 
 const {
-    addPendingRequest,
     hasPendingRequest
 } = require('../../utils/pornScenes');
+
+const {
+    boosterTiers,
+    getUserBoosters
+} = require('../../utils/boosters');
+
+const statLabels = {
+    performance: 'Performance',
+    stamina: 'Stamina',
+    fame: 'Fame'
+};
 
 function getSceneCategory(
     firstCategory,
@@ -213,28 +221,44 @@ module.exports = {
 
         }
 
+        const boosters =
+            await getUserBoosters(
+                interaction.user.id
+            );
+
+        const options = [
+            {
+                label:
+                    'No booster',
+                description:
+                    'Send the request without spending a booster.',
+                value:
+                    'none'
+            },
+            ...boosters.map(
+                (booster) => ({
+                    label:
+                        `${statLabels[booster.stat]} T${booster.tier}`,
+                    description:
+                        `+${boosterTiers[booster.tier].value} ${statLabels[booster.stat]} for this scene. Owned: ${booster.quantity}`,
+                    value:
+                        `${booster.stat}:${booster.tier}`
+                })
+            )
+        ];
+
         const row =
             new ActionRowBuilder()
                 .addComponents(
-                    new ButtonBuilder()
+                    new StringSelectMenuBuilder()
                         .setCustomId(
-                            `pornscene_accept:${interaction.user.id}:${target.id}`
+                            `pornscene_booster:${target.id}:${sceneCategory}`
                         )
-                        .setLabel(
-                            'Accept'
+                        .setPlaceholder(
+                            'Choose a booster for this scene'
                         )
-                        .setStyle(
-                            ButtonStyle.Success
-                        ),
-                    new ButtonBuilder()
-                        .setCustomId(
-                            `pornscene_decline:${interaction.user.id}:${target.id}`
-                        )
-                        .setLabel(
-                            'Decline'
-                        )
-                        .setStyle(
-                            ButtonStyle.Danger
+                        .addOptions(
+                            options
                         )
                 );
 
@@ -243,87 +267,24 @@ module.exports = {
                 color:
                     getRandomColor(),
                 title:
-                    'Porn Scene Request',
+                    'Choose Scene Booster',
                 description:
-                    `<@${interaction.user.id}> wants to make a porn scene with you.`,
+                    `Pick one booster to spend now for the request with ${target}, or choose no booster.`,
                 footerText:
                     '/pornscene',
                 timestamp:
                     true
             });
 
-        try {
-
-            const message =
-                await target.send({
-                    embeds: [embed],
-                    components: [row]
-                });
-
-            addPendingRequest(
-                interaction.user.id,
-                target.id,
-                {
-                    channelId:
-                        CHANNELS.PORN_CAREER,
-                    messageId:
-                        message.id,
-                    sceneCategory
-                }
-            );
-
-            const rumorsChannel =
-                interaction.client.channels.cache.get(
-                    CHANNELS.RUMORS
-                ) ??
-                await interaction.client.channels.fetch(
-                    CHANNELS.RUMORS
-                );
-
-            if (
-                rumorsChannel
-            ) {
-
-                await rumorsChannel.send({
-                    embeds: [
-                        createEmbed({
-                            color:
-                                getRandomColor(),
-                            authorName:
-                                interaction.member.displayName,
-                            authorIcon:
-                                interaction.user.displayAvatarURL(),
-                            title:
-                                'Porn Scene Rumor',
-                            description:
-                                `<@${interaction.user.id}> is talking scene with ${target}.`,
-                            footerText:
-                                '/pornscene',
-                            timestamp:
-                                true
-                        })
-                    ]
-                });
-
-            }
-
-        }
-        catch {
-
-            await interaction.reply({
-                content:
-                    'I could not DM that user. They may have DMs closed.',
-                flags: 64
-            });
-
-            return;
-
-        }
-
         await interaction.reply({
-            content:
-                `Scene request sent to ${target}.`,
-            flags: 64
+            embeds: [
+                embed
+            ],
+            components: [
+                row
+            ],
+            flags:
+                64
         });
 
     }
