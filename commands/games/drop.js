@@ -1,14 +1,10 @@
 const { SlashCommandBuilder } = require('discord.js');
 
-const { createEmbed } = require('../../utils/embeds');
 const {
-    adpLogoPath,
-    adpLogoAttachment
-} = require('../../utils/adpLogo');
-const { getRandomGif } = require('../../utils/gifs');
+    buildDropPost
+} = require('../../utils/dropPost');
 const {
     COOLDOWNS,
-    getRandomColor
 } = require('../../data/constants');
 const {
     handleCooldown
@@ -72,49 +68,33 @@ module.exports = {
 
         }
 
-        let imageUrl;
-        let footerText;
+        const dropOptions = {
+            authorName:
+                interaction.member.displayName,
+            thumbnail:
+                interaction.user.displayAvatarURL()
+        };
 
         if (attachment) {
 
-            imageUrl =
+            dropOptions.imageUrl =
                 attachment.url;
 
-            footerText =
+            dropOptions.footerText =
                 `Custom media by ${interaction.member.displayName}`;
 
         }
-        else {
 
-            const result =
-                getRandomGif(
-                    'titty_drop'
-                );
-
-            imageUrl =
-                result.url;
-
-            footerText =
-                `GIF #${result.index}/${result.total}`;
-
-        }
-        const embed = createEmbed({
-            color: getRandomColor(),
-            authorName: interaction.member.displayName,
-            authorIcon: adpLogoAttachment,
-            thumbnail: interaction.user.displayAvatarURL(),
-            title: 'Titty Drop',
-            image:
-                imageUrl,
-
-            footerText:
-                footerText,
-            timestamp: true
-        });
+        const reply =
+            buildDropPost(
+                dropOptions
+            );
 
         await interaction.reply({
-            embeds: [embed],
-            files: [adpLogoPath]
+            embeds:
+                reply.embeds,
+            files:
+                reply.files
         });
 
     }

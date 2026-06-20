@@ -43,6 +43,10 @@ const {
 const handleInteractions =
     require('./handlers/interactions');
 
+const {
+    startShowcaseAutoDrop
+} = require('./features/showcaseAutoDrop');
+
 // Initialize database
 require('./database/database');
 
@@ -144,6 +148,10 @@ readyClient => {
 
     console.log(
         `Logged in as ${readyClient.user.tag}`
+    );
+
+    startShowcaseAutoDrop(
+        readyClient
     );
 
 }

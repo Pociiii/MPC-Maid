@@ -29,6 +29,10 @@ const {
     getRankTitle
 } = require('../../utils/ranks');
 
+const {
+    formatPornCareerName
+} = require('../../utils/pornCareerTitles');
+
 const emojis =
     require('../../utils/emojis');
 
@@ -41,12 +45,15 @@ const {
 } = require('../../utils/pornScenes');
 
 const {
+    baseFlopChance,
+    formatBooster,
     boosterTiers
 } = require('../../utils/boosters');
 
 const {
-    formatBooster
-} = require('./pornSceneRequest');
+    adpLogoPath,
+    adpLogoAttachment
+} = require('../../utils/adpLogo');
 
 const sceneRoot =
     path.join(
@@ -56,18 +63,6 @@ const sceneRoot =
         'data',
         'scenes'
     );
-
-const adpLogoPath =
-    path.join(
-        __dirname,
-        '..',
-        '..',
-        'assets',
-        'ADP_logo.png'
-    );
-
-const adpLogoAttachment =
-    'attachment://ADP_logo.png';
 
 const sceneNames =
     require('../../data/scenes/sceneName.json');
@@ -316,6 +311,20 @@ function getBoostValue(
 
 }
 
+function getBoosterBurnoutRisk(
+    booster
+) {
+
+    if (
+        !booster
+    )
+        return 0;
+
+    return boosterTiers[booster.tier]
+        ?.burnoutRisk ?? 0;
+
+}
+
 function formatStatValue(
     value,
     boost
@@ -437,6 +446,17 @@ function calculateScene(
 
     let outcome = 'Awkward Scene';
     let rankingChange = -8;
+    const flopChance =
+        baseFlopChance +
+        getBoosterBurnoutRisk(
+            booster
+        );
+
+    const criticalFlop =
+        randomInt(
+            1,
+            100
+        ) <= flopChance;
 
     if (
         score >= 115
@@ -457,9 +477,20 @@ function calculateScene(
         rankingChange = 5;
     }
 
+    if (
+        criticalFlop
+    ) {
+
+        outcome = 'Awkward Scene';
+        rankingChange = -8;
+
+    }
+
     return {
         totalParts,
         score,
+        flopChance,
+        criticalFlop,
         outcome,
         rankingChange,
         xp,
@@ -926,9 +957,13 @@ async function acceptScene(
 
         const requesterAuthor = {
             name:
-                `${requesterMember.displayName} - ${getRankTitle(
-                    requesterUser.ranking
-                )} (${requesterUser.ranking})`,
+                formatPornCareerName(
+                    requesterMember.displayName,
+                    requesterUser,
+                    getRankTitle(
+                        requesterUser.ranking
+                    )
+                ),
             icon:
                 adpLogoAttachment,
             thumbnail:

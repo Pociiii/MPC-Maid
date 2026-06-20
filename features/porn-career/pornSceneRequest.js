@@ -4,9 +4,6 @@ const {
     ButtonStyle
 } = require('discord.js');
 
-const path =
-    require('path');
-
 const {
     CHANNELS,
     getRandomColor
@@ -29,41 +26,19 @@ const {
 } = require('../../utils/ranks');
 
 const {
+    formatPornCareerName
+} = require('../../utils/pornCareerTitles');
+
+const {
     addBooster,
-    boosterTiers,
+    formatBooster,
     removeBooster
 } = require('../../utils/boosters');
 
-const statLabels = {
-    performance: 'Performance',
-    stamina: 'Stamina',
-    fame: 'Fame'
-};
-
-const adpLogoPath =
-    path.join(
-        __dirname,
-        '..',
-        '..',
-        'assets',
-        'ADP_logo.png'
-    );
-
-const adpLogoAttachment =
-    'attachment://ADP_logo.png';
-
-function formatBooster(
-    booster
-) {
-
-    if (
-        !booster
-    )
-        return 'None';
-
-    return `${statLabels[booster.stat]} T${booster.tier} (+${boosterTiers[booster.tier].value})`;
-
-}
+const {
+    adpLogoPath,
+    adpLogoAttachment
+} = require('../../utils/adpLogo');
 
 async function sendPornSceneRequest(
     interaction,
@@ -88,7 +63,11 @@ async function sendPornSceneRequest(
         );
 
     const requesterName =
-        `${interaction.member.displayName} - ${requesterRank} (${requesterUser.ranking})`;
+        formatPornCareerName(
+            interaction.member.displayName,
+            requesterUser,
+            requesterRank
+        );
 
     const row =
         new ActionRowBuilder()
@@ -266,6 +245,5 @@ Booster: **${formatBooster(
 }
 
 module.exports = {
-    formatBooster,
     sendPornSceneRequest
 };

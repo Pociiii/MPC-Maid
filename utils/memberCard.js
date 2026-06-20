@@ -110,83 +110,6 @@ function drawFittedName(
 
 }
 
-async function drawAvatar(
-    ctx,
-    interaction,
-    x,
-    y,
-    size
-) {
-
-    const avatarUrl =
-        interaction.user.displayAvatarURL({
-            extension:
-                'png',
-            size:
-                256
-        });
-
-    const response =
-        await fetch(
-            avatarUrl
-        );
-
-    const avatarBuffer =
-        Buffer.from(
-            await response.arrayBuffer()
-        );
-
-    const avatar =
-        await Canvas.loadImage(
-            avatarBuffer
-        );
-
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(
-        x + size / 2,
-        y + size / 2,
-        size / 2,
-        0,
-        Math.PI * 2
-    );
-    ctx.closePath();
-    ctx.clip();
-    ctx.drawImage(
-        avatar,
-        x,
-        y,
-        size,
-        size
-    );
-    ctx.restore();
-
-    ctx.lineWidth =
-        5;
-
-    ctx.strokeStyle =
-        '#ffffff';
-
-    ctx.shadowColor =
-        '#00e5ff';
-
-    ctx.shadowBlur =
-        10;
-
-    ctx.beginPath();
-    ctx.arc(
-        x + size / 2,
-        y + size / 2,
-        size / 2 - 2,
-        0,
-        Math.PI * 2
-    );
-    ctx.stroke();
-    ctx.shadowBlur =
-        0;
-
-}
-
 async function generateMemberCard(
     interaction
 ) {
@@ -245,23 +168,6 @@ async function generateMemberCard(
         345,
         390
     );
-
-    try {
-
-        await drawAvatar(
-            ctx,
-            interaction,
-            360,
-            354,
-            110
-        );
-
-    }
-    catch {
-
-        // Keep generating the card even if Discord's avatar CDN is unavailable.
-
-    }
 
     return new AttachmentBuilder(
 

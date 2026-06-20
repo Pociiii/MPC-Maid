@@ -120,6 +120,8 @@ module.exports = {
                     getRandomColor(),
                 title:
                     'Custom Scene',
+                thumbnail:
+                    interaction.user.displayAvatarURL(),
                 description:
                     'Choose the cast for your custom scene.',
                 footerText:

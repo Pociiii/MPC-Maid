@@ -21,10 +21,6 @@ const {
 } = require('../features/leaderboard/leaderboard');
 
 const {
-    sendPornSceneRequest
-} = require('../features/porn-career/pornSceneRequest');
-
-const {
     trainStat
 } = require('../features/porn-career/training');
 
@@ -63,6 +59,9 @@ const gifFlexType =
 
 const gifHornyType =
     require('./menus/gifHornyType');
+
+const pornSceneBooster =
+    require('./menus/pornSceneBooster');
 
 const gifReject =
     require('./buttons/gifReject');
@@ -293,86 +292,13 @@ module.exports = async (
 
                 return true;
 
-            case 'pornscene_booster': {
+            case 'pornscene_booster':
 
-                const [
-                    ,
-                    targetId,
-                    sceneCategory
-                ] =
-                    interaction.customId.split(
-                        ':'
-                    );
-
-                const selected =
-                    interaction.values[0];
-
-                const booster =
-                    selected === 'none'
-                        ? null
-                        : (() => {
-
-                            const [
-                                stat,
-                                tier
-                            ] =
-                                selected.split(
-                                    ':'
-                                );
-
-                            return {
-                                stat,
-                                tier:
-                                    Number(
-                                        tier
-                                    )
-                            };
-
-                        })();
-
-                await interaction.deferUpdate();
-
-                try {
-
-                    await sendPornSceneRequest(
-                        interaction,
-                        targetId,
-                        sceneCategory,
-                        booster
-                    );
-
-                    await interaction.editReply({
-                        content:
-                            `<@${targetId}> has been sent the scene request.`,
-                        embeds:
-                            [],
-                        components:
-                            [],
-                        attachments:
-                            []
-                    });
-
-                }
-                catch (error) {
-
-                    await interaction.editReply({
-                        content:
-                            error.message === 'Booster is no longer available.'
-                                ? 'That booster is no longer in your inventory.'
-                                : 'I could not DM that user. They may have DMs closed.',
-                        embeds:
-                            [],
-                        components:
-                            [],
-                        attachments:
-                            []
-                    });
-
-                }
+                await pornSceneBooster.execute(
+                    interaction
+                );
 
                 return true;
-
-            }
             
         }
 

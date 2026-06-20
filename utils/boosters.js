@@ -7,24 +7,40 @@ const boosterStats = [
     'fame'
 ];
 
+const boosterStatLabels = {
+    performance:
+        'Performance',
+    stamina:
+        'Stamina',
+    fame:
+        'Fame'
+};
+
 const boosterTiers = {
     1: {
         value: 2,
-        cost: 150
+        cost: 150,
+        burnoutRisk: 1
     },
     2: {
         value: 4,
-        cost: 400
+        cost: 400,
+        burnoutRisk: 3
     },
     3: {
         value: 6,
-        cost: 800
+        cost: 800,
+        burnoutRisk: 6
     },
     4: {
         value: 8,
-        cost: 1400
+        cost: 1400,
+        burnoutRisk: 10
     }
 };
+
+const baseFlopChance =
+    5;
 
 function isValidBooster(
     stat,
@@ -37,6 +53,44 @@ function isValidBooster(
         Boolean(
             boosterTiers[tier]
         );
+
+}
+
+function formatBooster(
+    booster
+) {
+
+    if (
+        !booster
+    )
+        return 'None';
+
+    const tier =
+        boosterTiers[booster.tier];
+
+    return `${boosterStatLabels[booster.stat]} T${booster.tier} (+${tier.value}, +${tier.burnoutRisk}% burnout)`;
+
+}
+
+function formatBoosterInventoryLine(
+    booster
+) {
+
+    const tier =
+        boosterTiers[booster.tier];
+
+    return `- **${boosterStatLabels[booster.stat]} T${booster.tier}** (+${tier.value}, +${tier.burnoutRisk}% burnout) x${booster.quantity}`;
+
+}
+
+function formatBoosterSelectDescription(
+    booster
+) {
+
+    const tier =
+        boosterTiers[booster.tier];
+
+    return `+${tier.value} ${boosterStatLabels[booster.stat]}, +${tier.burnoutRisk}% burnout. Owned: ${booster.quantity}`;
 
 }
 
@@ -160,8 +214,13 @@ function removeBooster(
 }
 
 module.exports = {
+    baseFlopChance,
+    boosterStatLabels,
     boosterStats,
     boosterTiers,
+    formatBooster,
+    formatBoosterInventoryLine,
+    formatBoosterSelectDescription,
     isValidBooster,
     getUserBoosters,
     addBooster,

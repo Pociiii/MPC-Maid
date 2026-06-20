@@ -141,6 +141,7 @@ function formatParts(
 }
 
 function buildBuilderEmbed(
+    interaction,
     cast,
     parts
 ) {
@@ -150,6 +151,8 @@ function buildBuilderEmbed(
             getRandomColor(),
         title:
             'Custom Scene Builder',
+        thumbnail:
+            interaction.user.displayAvatarURL(),
         description:
 `Cast: **${castLabels[cast] ?? cast}**
 Parts: **${parts.length}/${maxParts}**
@@ -311,6 +314,8 @@ function buildSceneEmbed(
             getRandomColor(),
         title:
             `Part ${index + 1}`,
+        thumbnail:
+            interaction.user.displayAvatarURL(),
         description:
             `Custom scene from <@${interaction.user.id}>`,
         image:
@@ -449,6 +454,7 @@ module.exports = {
             await interaction.update({
                 embeds: [
                     buildBuilderEmbed(
+                        interaction,
                         cast,
                         parts
                     )
@@ -515,6 +521,7 @@ module.exports = {
 
         const finalEmbed =
             buildBuilderEmbed(
+                interaction,
                 cast,
                 parts
             );

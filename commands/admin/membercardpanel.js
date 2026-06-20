@@ -42,7 +42,7 @@ module.exports = {
 
 `Generate your official **Midnight Pleasure Club** membership card.
 
-The card style is picked from your MPC role, and your avatar is added to the card.
+The card style is picked from your MPC role.
 
 Remember to change your nick to your in-game name first.
 

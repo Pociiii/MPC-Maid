@@ -11,15 +11,9 @@ const {
 } = require('../../utils/embeds');
 
 const {
-    boosterTiers,
+    formatBoosterInventoryLine,
     getUserBoosters
 } = require('../../utils/boosters');
-
-const statLabels = {
-    performance: 'Performance',
-    stamina: 'Stamina',
-    fame: 'Fame'
-};
 
 function formatBoosters(
     boosters
@@ -30,16 +24,9 @@ function formatBoosters(
     )
         return 'Your booster inventory is empty. The shop command will fill this later.';
 
-    return boosters
+        return boosters
         .map(
-            (booster) => {
-
-                const tier =
-                    boosterTiers[booster.tier];
-
-                return `- **${statLabels[booster.stat]} T${booster.tier}** (+${tier.value}) x${booster.quantity}`;
-
-            }
+            formatBoosterInventoryLine
         )
         .join(
             '\n'

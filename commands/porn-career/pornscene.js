@@ -4,9 +4,6 @@ const {
     StringSelectMenuBuilder
 } = require('discord.js');
 
-const path =
-    require('path');
-
 const {
     createEmbed
 } = require('../../utils/embeds');
@@ -29,7 +26,8 @@ const {
 } = require('../../utils/pornScenes');
 
 const {
-    boosterTiers,
+    boosterStatLabels,
+    formatBoosterSelectDescription,
     getUserBoosters
 } = require('../../utils/boosters');
 
@@ -41,23 +39,14 @@ const {
     getRankTitle
 } = require('../../utils/ranks');
 
-const statLabels = {
-    performance: 'Performance',
-    stamina: 'Stamina',
-    fame: 'Fame'
-};
+const {
+    formatPornCareerName
+} = require('../../utils/pornCareerTitles');
 
-const adpLogoPath =
-    path.join(
-        __dirname,
-        '..',
-        '..',
-        'assets',
-        'ADP_logo.png'
-    );
-
-const adpLogoAttachment =
-    'attachment://ADP_logo.png';
+const {
+    adpLogoPath,
+    adpLogoAttachment
+} = require('../../utils/adpLogo');
 
 function getSceneCategory(
     firstCategory,
@@ -271,9 +260,11 @@ module.exports = {
             ...boosters.map(
                 (booster) => ({
                     label:
-                        `${statLabels[booster.stat]} T${booster.tier}`,
+                        `${boosterStatLabels[booster.stat]} T${booster.tier}`,
                     description:
-                        `+${boosterTiers[booster.tier].value} ${statLabels[booster.stat]} for this scene. Owned: ${booster.quantity}`,
+                        formatBoosterSelectDescription(
+                            booster
+                        ),
                     value:
                         `${booster.stat}:${booster.tier}`
                 })
@@ -300,7 +291,11 @@ module.exports = {
                 color:
                     getRandomColor(),
                 authorName:
-                    `${interaction.member.displayName} - ${requesterRank} (${requesterUser.ranking})`,
+                    formatPornCareerName(
+                        interaction.member.displayName,
+                        requesterUser,
+                        requesterRank
+                    ),
                 authorIcon:
                     adpLogoAttachment,
                 title:
