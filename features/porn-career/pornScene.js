@@ -26,6 +26,10 @@ const {
 } = require('../../utils/users');
 
 const {
+    getRankTitle
+} = require('../../utils/ranks');
+
+const {
     clearSceneBusy,
     getPendingRequest,
     isBusy,
@@ -265,6 +269,8 @@ function buildPartEmbed(
         authorName:
             requesterAuthor.name,
         authorIcon:
+            requesterAuthor.icon,
+        thumbnail:
             requesterAuthor.icon,
         title:
             sceneTitle,
@@ -552,39 +558,87 @@ async function finishScene(
                 ? '+'
                 : '';
 
+        const embed =
+            createEmbed({
+                color:
+                    getRandomColor(),
+                authorName:
+                    requesterAuthor.name,
+                authorIcon:
+                    requesterAuthor.icon,
+                thumbnail:
+                    requesterAuthor.icon,
+                title:
+                    'Porn Scene Finished',
+                description:
+                    `<@${requesterId}> and <@${targetId}> finished their scene.`,
+                footerText:
+                    '/pornscene',
+                timestamp:
+                    true
+            });
+
+        embed.addFields(
+            {
+                name:
+                    'Outcome',
+                value:
+                    `**${result.outcome}**`,
+                inline:
+                    true
+            },
+            {
+                name:
+                    'Viewers',
+                value:
+                    `**${result.viewers}**`,
+                inline:
+                    true
+            },
+            {
+                name:
+                    'Revenue',
+                value:
+                    `**${result.coins} coins each**`,
+                inline:
+                    true
+            },
+            {
+                name:
+                    'XP',
+                value:
+                    `**${result.xp} each**`,
+                inline:
+                    true
+            },
+            {
+                name:
+                    'Ranking',
+                value:
+                    `**${rankingPrefix}${result.rankingChange}**`,
+                inline:
+                    true
+            },
+            {
+                name:
+                    'Parts',
+                value:
+                    sceneLinks
+                        .map(
+                            (link, index) =>
+                                `Part ${index + 1}: ${link}`
+                        )
+                        .join(
+                            '\n'
+                        ),
+                inline:
+                    false
+            }
+        );
+
         await rumorsChannel.send({
             embeds: [
-                createEmbed({
-                    color:
-                        getRandomColor(),
-                    authorName:
-                        requesterAuthor.name,
-                    authorIcon:
-                        requesterAuthor.icon,
-                    title:
-                        'Porn Scene Finished',
-                    description:
-`<@${requesterId}> and <@${targetId}> finished their scene.
-
-Outcome: **${result.outcome}**
-Viewers: **${result.viewers}**
-Revenue: **${result.coins} coins each**
-XP: **${result.xp} each**
-Ranking: **${rankingPrefix}${result.rankingChange}**
-
-${sceneLinks
-    .map(
-        (link, index) =>
-            `Part ${index + 1}: ${link}`
-    )
-    .join(
-        '\n'
-    )}`,
-                    footerText:
-                        '/pornscene',
-                    timestamp:
-                        true
-                })
+                embed
             ]
         });
 
@@ -849,12 +903,14 @@ async function acceptScene(
     const sceneTitle =
         getRandomSceneName();
 
-    const requesterAuthor = {
-        name:
-            requesterMember.displayName,
-        icon:
-            requesterMember.user.displayAvatarURL()
-    };
+        const requesterAuthor = {
+            name:
+                `${requesterMember.displayName} - ${getRankTitle(
+                    requesterUser.ranking
+                )} (${requesterUser.ranking})`,
+            icon:
+                requesterMember.user.displayAvatarURL()
+        };
 
     setSceneBusy(
         requesterId,
@@ -900,6 +956,8 @@ async function acceptScene(
                     authorName:
                         requesterAuthor.name,
                     authorIcon:
+                        requesterAuthor.icon,
+                    thumbnail:
                         requesterAuthor.icon,
                     title:
                         sceneTitle,

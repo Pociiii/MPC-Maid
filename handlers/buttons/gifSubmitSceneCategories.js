@@ -1,11 +1,12 @@
 const {
-
     ActionRowBuilder,
     StringSelectMenuBuilder
+} = require('discord.js');
 
-} = require(
-    'discord.js'
-);
+const {
+    getSceneGroup,
+    getSceneGroupKey
+} = require('../../data/sceneSubmitGroups');
 
 module.exports = {
 
@@ -16,93 +17,52 @@ module.exports = {
         interaction
     ) {
 
+        const groupKey =
+            getSceneGroupKey(
+                interaction.customId.split(
+                    ':'
+                )[1]
+            );
+
+        const sceneGroup =
+            getSceneGroup(
+                groupKey
+            );
+
         const menu =
             new StringSelectMenuBuilder()
-
                 .setCustomId(
-                    'gif_scene_select'
+                    `gif_scene_select:${groupKey}`
                 )
-
                 .setPlaceholder(
-                    'Select scene category'
+                    `Select ${sceneGroup.label} category`
                 )
-
                 .addOptions(
-
-                    {
-                        label:
-                            '⚪White Male ⚪White Female',
-
-                        value:
-                            'wm_wf'
-                    },
-
-                    {
-                        label:
-                            '⚪White Male ⚫Black Female',
-
-                        value:
-                            'wm_bf'
-                    },
-
-                    {
-                        label:
-                            '⚫Black Male ⚪White Female',
-
-                        value:
-                            'bm_wf'
-                    },
-
-                    {
-                        label:
-                            '⚫Black Male ⚫Black Female',
-
-                        value:
-                            'bm_bf'
-                    },
-
-                    {
-                        label:
-                            '⚪White Female ⚪White Female',
-
-                        value:
-                            'wf_wf'
-                    },
-
-                    {
-                        label:
-                            '⚪White Female ⚫Black Female',
-
-                        value:
-                            'wf_bf'
-                    },
-
-                    {
-                        label:
-                            '⚫Black Female ⚫Black Female',
-
-                        value:
-                            'bf_bf'
-                    }
-
+                    ...Object.entries(
+                        sceneGroup.categories
+                    )
+                        .map(
+                            ([value, label]) => ({
+                                label,
+                                value
+                            })
+                        )
                 );
 
         const row =
             new ActionRowBuilder()
-
                 .addComponents(
                     menu
                 );
 
         await interaction.reply({
-
             content:
-                'Select the scene category:',
-
-            components: [row],
-
-            flags: 64
-
+                `Select the ${sceneGroup.label} category:`,
+            components: [
+                row
+            ],
+            flags:
+                64
         });
 
     }

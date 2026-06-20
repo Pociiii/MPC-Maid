@@ -22,42 +22,59 @@ const {
     '../../utils/gifApproval'
 );
 
+const {
+    getSceneCategoryName,
+    getSceneGroup,
+    getSceneGroupKey,
+    sceneGroups
+} = require(
+    '../../data/sceneSubmitGroups'
+);
+
 module.exports = {
 
     async execute(
         interaction
     ) {
 
-        const [
-
-            ,
-            category,
-            submitterId
-
-        ] =
+        const parts =
             interaction.customId.split(
                 ':'
             );
 
+        const hasSceneGroup =
+            parts.length >= 4 &&
+            Boolean(
+                sceneGroups[parts[1]]
+            );
+
+        const group =
+            hasSceneGroup
+                ? getSceneGroupKey(
+                    parts[1]
+                )
+                : 'mf';
+
+        const category =
+            hasSceneGroup
+                ? parts[2]
+                : parts[1];
+
+        const submitterId =
+            hasSceneGroup
+                ? parts[3]
+                : parts[2];
+
         //
         // Scene categories
         //
-        const sceneCategories = [
-
-            'wm_wf',
-            'wm_bf',
-            'bm_wf',
-            'bm_bf',
-            'wf_wf',
-            'wf_bf',
-            'bf_bf'
-
-        ];
+        const sceneGroup =
+            getSceneGroup(
+                group
+            );
 
         if (
-            sceneCategories.includes(
-                category
-            )
+            sceneGroup.categories[category]
         ) {
             const sceneFolder =
                 path.join(
@@ -65,7 +82,7 @@ module.exports = {
                     '..',
                     '..',
                     'data',
-                    'scenes',
+                    sceneGroup.folder,
                     category
                 );
 
@@ -105,7 +122,7 @@ module.exports = {
 
                     .setCustomId(
 
-                        `gif_scene_type:${category}:${submitterId}`
+                        `gif_scene_type:${group}:${category}:${submitterId}`
 
                     )
 
@@ -154,7 +171,10 @@ module.exports = {
             return interaction.update({
 
                 content:
-                    'Select scene type:',
+                    `Select ${getSceneCategoryName(
+                        group,
+                        category
+                    )} type:`,
 
                 embeds:
                     interaction.message.embeds,

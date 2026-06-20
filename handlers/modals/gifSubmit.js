@@ -21,6 +21,19 @@ const {
     '../../data/constants'
 );
 
+const {
+    getSceneCategoryName,
+    getSceneGroupKey
+} = require(
+    '../../data/sceneSubmitGroups'
+);
+
+const {
+    findGifInData
+} = require(
+    '../../utils/gifs'
+);
+
 module.exports = {
 
     customId:
@@ -30,15 +43,72 @@ module.exports = {
         interaction
     ) {
 
-        const category =
+        const customIdParts =
             interaction.customId.split(
                 ':'
-            )[1];
+            );
+
+        const isSceneSubmission =
+            customIdParts.length >= 3;
+
+        const group =
+            isSceneSubmission
+                ? getSceneGroupKey(
+                    customIdParts[1]
+                )
+                : null;
+
+        const category =
+            isSceneSubmission
+                ? customIdParts[2]
+                : customIdParts[1];
+
+        const categoryName =
+            isSceneSubmission
+                ? getSceneCategoryName(
+                    group,
+                    category
+                )
+                : category;
 
         const gifUrl =
             interaction.fields.getTextInputValue(
                 'gif_url'
             );
+
+        const existingGif =
+            findGifInData(
+                gifUrl
+            );
+
+        if (
+            existingGif
+        ) {
+
+            await interaction.reply({
+                embeds: [
+                    createEmbed({
+                        color:
+                            getRandomColor(),
+                        title:
+                            'Duplicate GIF',
+                        description:
+                            'This GIF already exists in the data folder, so it was not sent for review.',
+                        image:
+                            gifUrl,
+                        footerText:
+                            '/gifsubmit',
+                        timestamp:
+                            true
+                    })
+                ],
+                flags:
+                    64
+            });
+
+            return;
+
+        }
 
         const reviewChannel =
             interaction.client.channels.cache.get(
@@ -53,16 +123,6 @@ module.exports = {
 
                 title:
                     'GIF Submission',
-                footerText:
-                    gifUrl,
-
-                description:
-
-`**Submitted by**: <@${interaction.member.id}>
-
-**Category**: ${category}
-
-**URL**: ${gifUrl}`,
 
                 image:
                     gifUrl,
@@ -71,6 +131,33 @@ module.exports = {
                     true
 
             });
+
+        embed.addFields(
+            {
+                name:
+                    'Submitted By',
+                value:
+                    `<@${interaction.member.id}>`,
+                inline:
+                    true
+            },
+            {
+                name:
+                    'Category',
+                value:
+                    categoryName,
+                inline:
+                    true
+            },
+            {
+                name:
+                    'URL',
+                value:
+                    gifUrl,
+                inline:
+                    false
+            }
+        );
 
         const row =
             new ActionRowBuilder()
@@ -81,7 +168,9 @@ module.exports = {
 
                         .setCustomId(
 
-                            `gifapprove:${category}:${interaction.user.id}`
+                            isSceneSubmission
+                                ? `gifapprove:${group}:${category}:${interaction.user.id}`
+                                : `gifapprove:${category}:${interaction.user.id}`
 
                         )
 
@@ -97,7 +186,9 @@ module.exports = {
 
                         .setCustomId(
 
-                            `gifreject:${category}:${interaction.user.id}`
+                            isSceneSubmission
+                                ? `gifreject:${group}:${category}:${interaction.user.id}`
+                                : `gifreject:${category}:${interaction.user.id}`
 
                         )
 

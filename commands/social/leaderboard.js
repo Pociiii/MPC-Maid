@@ -21,7 +21,10 @@ module.exports = {
         interaction
     ) {
 
-        await interaction.deferReply();
+        await interaction.deferReply({
+            flags:
+                64
+        });
 
         await interaction.editReply(
             await buildLeaderboard(

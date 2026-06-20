@@ -18,11 +18,24 @@ const COMMAND_CONFIG = {
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('profile')
-        .setDescription('View your profile'),
+        .setDescription('View a user profile')
+        .addUserOption(
+            (option) =>
+                option
+                    .setName('user')
+                    .setDescription('The user profile to view')
+                    .setRequired(true)
+        ),
 
     async execute(interaction) {
 
-        const user = await getOrCreateUser(interaction.user.id);
+        const target =
+            interaction.options.getUser('user');
+
+        const member =
+            await interaction.guild.members.fetch(target.id);
+
+        const user = await getOrCreateUser(target.id);
 
         const rankTitle = getRankTitle(user.ranking);
 
@@ -30,8 +43,8 @@ module.exports = {
 
             color: COLORS.DEFAULT,
 
-            authorName: interaction.user.displayName,
-            thumbnail: interaction.user.displayAvatarURL(),
+            authorName: member.displayName,
+            thumbnail: target.displayAvatarURL(),
             title: 'Profile',
 
             description:

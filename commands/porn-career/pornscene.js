@@ -30,6 +30,14 @@ const {
     getUserBoosters
 } = require('../../utils/boosters');
 
+const {
+    getOrCreateUser
+} = require('../../utils/users');
+
+const {
+    getRankTitle
+} = require('../../utils/ranks');
+
 const statLabels = {
     performance: 'Performance',
     stamina: 'Stamina',
@@ -226,6 +234,16 @@ module.exports = {
                 interaction.user.id
             );
 
+        const requesterUser =
+            await getOrCreateUser(
+                interaction.user.id
+            );
+
+        const requesterRank =
+            getRankTitle(
+                requesterUser.ranking
+            );
+
         const options = [
             {
                 label:
@@ -266,10 +284,16 @@ module.exports = {
             createEmbed({
                 color:
                     getRandomColor(),
+                authorName:
+                    `${interaction.member.displayName} - ${requesterRank} (${requesterUser.ranking})`,
+                authorIcon:
+                    interaction.user.displayAvatarURL(),
                 title:
                     'Choose Scene Booster',
                 description:
                     `Pick one booster to spend now for the request with ${target}, or choose no booster.`,
+                thumbnail:
+                    interaction.user.displayAvatarURL(),
                 footerText:
                     '/pornscene',
                 timestamp:

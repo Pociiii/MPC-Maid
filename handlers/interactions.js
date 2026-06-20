@@ -24,6 +24,10 @@ const {
     sendPornSceneRequest
 } = require('../features/porn-career/pornSceneRequest');
 
+const {
+    trainStat
+} = require('../features/porn-career/training');
+
 const handleRelationshipAccept =
     require('./buttons/relationshipAccept');
 
@@ -134,6 +138,27 @@ module.exports = async (
                     )
                 );
                 return true;
+
+            case 'train': {
+
+                const [
+                    ,
+                    ownerId,
+                    stat
+                ] =
+                    interaction.customId.split(
+                        ':'
+                    );
+
+                await trainStat(
+                    interaction,
+                    ownerId,
+                    stat
+                );
+
+                return true;
+
+            }
 
             case 'relationship_accept':
 

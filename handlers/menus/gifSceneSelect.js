@@ -18,6 +18,11 @@ module.exports = {
         interaction
     ) {
 
+        const group =
+            interaction.customId.split(
+                ':'
+            )[1] ?? 'mf';
+
         const category =
             interaction.values[0];
 
@@ -25,7 +30,7 @@ module.exports = {
             new ModalBuilder()
 
                 .setCustomId(
-                    `gif_submit:${category}`
+                    `gif_submit:${group}:${category}`
                 )
 
                 .setTitle(

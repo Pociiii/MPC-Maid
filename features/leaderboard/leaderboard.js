@@ -15,6 +15,10 @@ const {
     getRandomColor
 } = require('../../data/constants');
 
+const {
+    getGuildMembers
+} = require('../../utils/memberCache');
+
 const ROLES =
     require('../../data/roles.json');
 
@@ -84,15 +88,16 @@ function allUsers() {
 
 function topBy(
     users,
-    stat
+    stat,
+    includeUser = () => true
 ) {
 
     return users
         .filter(
             (user) =>
-                Number(
-                    user[stat]
-                ) > 0
+                includeUser(
+                    user
+                )
         )
         .sort(
             (a, b) =>
@@ -117,7 +122,9 @@ async function filterByRole(
 ) {
 
     const members =
-        await interaction.guild.members.fetch();
+        await getGuildMembers(
+            interaction.guild
+        );
 
     return users.filter(
         (user) => {
@@ -251,7 +258,14 @@ async function buildRankingEmbed(
                 formatRows(
                     topBy(
                         maleUsers,
-                        'ranking'
+                        'ranking',
+                        (user) =>
+                            Number(
+                                user.scenes_completed
+                            ) > 0 ||
+                            Number(
+                                user.ranking
+                            ) !== 0
                     ),
                     'ranking'
                 ),
@@ -265,7 +279,14 @@ async function buildRankingEmbed(
                 formatRows(
                     topBy(
                         femaleUsers,
-                        'ranking'
+                        'ranking',
+                        (user) =>
+                            Number(
+                                user.scenes_completed
+                            ) > 0 ||
+                            Number(
+                                user.ranking
+                            ) !== 0
                     ),
                     'ranking'
                 ),
@@ -313,7 +334,11 @@ async function buildScenesEmbed(
                 formatRows(
                     topBy(
                         maleUsers,
-                        'scenes_completed'
+                        'scenes_completed',
+                        (user) =>
+                            Number(
+                                user.scenes_completed
+                            ) > 0
                     ),
                     'scenes_completed',
                     ' scenes'
@@ -328,7 +353,11 @@ async function buildScenesEmbed(
                 formatRows(
                     topBy(
                         femaleUsers,
-                        'scenes_completed'
+                        'scenes_completed',
+                        (user) =>
+                            Number(
+                                user.scenes_completed
+                            ) > 0
                     ),
                     'scenes_completed',
                     ' scenes'
@@ -362,7 +391,11 @@ async function buildCoinsEmbed(
             formatRows(
                 topBy(
                     users,
-                    'coins'
+                    'coins',
+                    (user) =>
+                        Number(
+                            user.coins
+                        ) > 0
                 ),
                 'coins',
                 ' coins'
@@ -394,7 +427,11 @@ async function buildSpanksEmbed(
                 formatRows(
                     topBy(
                         users,
-                        'spanks_given'
+                        'spanks_given',
+                        (user) =>
+                            Number(
+                                user.spanks_given
+                            ) > 0
                     ),
                     'spanks_given',
                     ' given'
@@ -409,7 +446,11 @@ async function buildSpanksEmbed(
                 formatRows(
                     topBy(
                         users,
-                        'spanks_taken'
+                        'spanks_taken',
+                        (user) =>
+                            Number(
+                                user.spanks_taken
+                            ) > 0
                     ),
                     'spanks_taken',
                     ' taken'
@@ -444,7 +485,11 @@ async function buildKissesEmbed(
                 formatRows(
                     topBy(
                         users,
-                        'kisses_given'
+                        'kisses_given',
+                        (user) =>
+                            Number(
+                                user.kisses_given
+                            ) > 0
                     ),
                     'kisses_given',
                     ' given'
@@ -459,7 +504,11 @@ async function buildKissesEmbed(
                 formatRows(
                     topBy(
                         users,
-                        'kisses_taken'
+                        'kisses_taken',
+                        (user) =>
+                            Number(
+                                user.kisses_taken
+                            ) > 0
                     ),
                     'kisses_taken',
                     ' taken'

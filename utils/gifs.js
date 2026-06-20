@@ -77,6 +77,105 @@ function addGifToFile(
     return true;
 
 }
+
+function getJsonFiles(
+    folder
+) {
+
+    if (
+        !fs.existsSync(
+            folder
+        )
+    )
+        return [];
+
+    return fs.readdirSync(
+        folder,
+        {
+            withFileTypes: true
+        }
+    )
+        .flatMap(
+            (entry) => {
+
+                const entryPath =
+                    path.join(
+                        folder,
+                        entry.name
+                    );
+
+                if (
+                    entry.isDirectory()
+                )
+                    return getJsonFiles(
+                        entryPath
+                    );
+
+                if (
+                    entry.isFile() &&
+                    entry.name.endsWith(
+                        '.json'
+                    )
+                )
+                    return [
+                        entryPath
+                    ];
+
+                return [];
+
+            }
+        );
+
+}
+
+function findGifInData(
+    url
+) {
+
+    const dataFolder =
+        path.join(
+            __dirname,
+            '..',
+            'data'
+        );
+
+    for (
+        const filePath of getJsonFiles(
+            dataFolder
+        )
+    ) {
+
+        try {
+
+            const gifs =
+                JSON.parse(
+                    fs.readFileSync(
+                        filePath,
+                        'utf8'
+                    )
+                );
+
+            if (
+                Array.isArray(
+                    gifs
+                ) &&
+                gifs.includes(
+                    url
+                )
+            )
+                return filePath;
+
+        }
+        catch {
+            // Ignore JSON files that are not GIF lists.
+        }
+
+    }
+
+    return null;
+
+}
+
 function getGifCount(
     filePath
 ) {
@@ -104,5 +203,6 @@ module.exports = {
     getRandomGif,
     addGifToFile,
     getGifList,
-    getGifCount
+    getGifCount,
+    findGifInData
 };

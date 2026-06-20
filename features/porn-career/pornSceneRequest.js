@@ -18,6 +18,14 @@ const {
 } = require('../../utils/pornScenes');
 
 const {
+    getOrCreateUser
+} = require('../../utils/users');
+
+const {
+    getRankTitle
+} = require('../../utils/ranks');
+
+const {
     addBooster,
     boosterTiers,
     removeBooster
@@ -54,6 +62,19 @@ async function sendPornSceneRequest(
             targetId
         );
 
+    const requesterUser =
+        await getOrCreateUser(
+            interaction.user.id
+        );
+
+    const requesterRank =
+        getRankTitle(
+            requesterUser.ranking
+        );
+
+    const requesterName =
+        `${interaction.member.displayName} - ${requesterRank} (${requesterUser.ranking})`;
+
     const row =
         new ActionRowBuilder()
             .addComponents(
@@ -83,6 +104,10 @@ async function sendPornSceneRequest(
         createEmbed({
             color:
                 getRandomColor(),
+            authorName:
+                requesterName,
+            authorIcon:
+                interaction.user.displayAvatarURL(),
             title:
                 'Porn Scene Request',
             description:
@@ -91,6 +116,8 @@ async function sendPornSceneRequest(
 Booster: **${formatBooster(
     booster
 )}**`,
+            thumbnail:
+                interaction.user.displayAvatarURL(),
             footerText:
                 '/pornscene',
             timestamp:
@@ -178,22 +205,24 @@ Booster: **${formatBooster(
                 embeds: [
                     createEmbed({
                         color:
-                            getRandomColor(),
-                        authorName:
-                            interaction.member.displayName,
-                        authorIcon:
-                            interaction.user.displayAvatarURL(),
-                        title:
-                            'Porn Scene Rumor',
+                        getRandomColor(),
+                    authorName:
+                        requesterName,
+                    authorIcon:
+                        interaction.user.displayAvatarURL(),
+                    title:
+                        'Porn Scene Rumor',
                         description:
 `<@${interaction.user.id}> is talking scene with <@${targetId}>.
 
 Booster: **${formatBooster(
     booster
 )}**`,
-                        footerText:
-                            '/pornscene',
-                        timestamp:
+                    thumbnail:
+                        interaction.user.displayAvatarURL(),
+                    footerText:
+                        '/pornscene',
+                    timestamp:
                             true
                     })
                 ]

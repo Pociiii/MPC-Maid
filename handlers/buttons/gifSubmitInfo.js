@@ -28,6 +28,12 @@ const {
     '../../utils/gifs'
 );
 
+const {
+    sceneGroups
+} = require(
+    '../../data/sceneSubmitGroups'
+);
+
 const dataFolder =
     path.join(
         __dirname,
@@ -35,18 +41,6 @@ const dataFolder =
         '..',
         'data'
     );
-
-const sceneLabels = {
-
-    wm_wf: 'WM / WF',
-    wm_bf: 'WM / BF',
-    bm_wf: 'BM / WF',
-    bm_bf: 'BM / BF',
-    wf_wf: 'WF / WF',
-    wf_bf: 'WF / BF',
-    bf_bf: 'BF / BF'
-
-};
 
 const interactionLabels = {
 
@@ -209,12 +203,15 @@ function buildInteractionLines() {
 
 }
 
-function buildSceneLines() {
+function buildSceneLines(
+    groupKey,
+    group
+) {
 
     const scenesFolder =
         path.join(
             dataFolder,
-            'scenes'
+            group.folder
         );
 
     return fs.readdirSync(
@@ -267,7 +264,7 @@ function buildSceneLines() {
                 return {
 
                     name:
-                        sceneLabels[entry.name] ?? entry.name,
+                        `${group.label}: ${group.categories[entry.name] ?? entry.name}`,
 
                     value:
                         subcategories.join(
@@ -300,7 +297,16 @@ module.exports = {
             buildInteractionLines();
 
         const sceneFields =
-            buildSceneLines();
+            Object.entries(
+                sceneGroups
+            )
+                .flatMap(
+                    ([groupKey, group]) =>
+                        buildSceneLines(
+                            groupKey,
+                            group
+                        )
+                );
 
         const embed =
             createEmbed({

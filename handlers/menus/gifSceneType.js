@@ -7,50 +7,64 @@ const {
     '../../utils/gifApproval'
 );
 
+const {
+    getSceneCategoryName,
+    getSceneGroup,
+    getSceneGroupKey
+} = require(
+    '../../data/sceneSubmitGroups'
+);
+
 module.exports = {
 
     async execute(
         interaction
     ) {
 
-        const [
-
-            ,
-            category
-
-        ] =
+        const parts =
             interaction.customId.split(
                 ':'
             );
 
+        const group =
+            parts.length >= 4
+                ? getSceneGroupKey(
+                    parts[1]
+                )
+                : 'mf';
+
+        const category =
+            parts.length >= 4
+                ? parts[2]
+                : parts[1];
+
         const sceneType =
             interaction.values[0];
 
+        const sceneGroup =
+            getSceneGroup(
+                group
+            );
+
         const filePath =
             path.join(
-
                 __dirname,
-
                 '..',
                 '..',
-
                 'data',
-                'scenes',
-
+                sceneGroup.folder,
                 category,
-
                 `${sceneType}.json`
-
             );
 
         return approveGif(
-
             interaction,
-
             filePath,
-
-            `${category} → ${sceneType}`
-
+            getSceneCategoryName(
+                group,
+                category,
+                sceneType
+            )
         );
 
     }

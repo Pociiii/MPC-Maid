@@ -15,6 +15,10 @@ const {
     handleCooldown
 } = require('../../utils/cooldowns');
 
+const {
+    getGuildMembers
+} = require('../../utils/memberCache');
+
 const ROLES =
     require('../../data/roles.json');
 
@@ -110,7 +114,9 @@ module.exports = {
                 : ROLES.MALE;
 
         const members =
-            await interaction.guild.members.fetch();
+            await getGuildMembers(
+                interaction.guild
+            );
 
         const candidates =
             members.filter(
@@ -168,7 +174,9 @@ Vibe: **${getRandomItem(vibes)}**`,
             });
 
         await interaction.reply({
-            embeds: [embed]
+            embeds: [
+                embed
+            ]
         });
 
     }
