@@ -4,6 +4,9 @@ const {
     StringSelectMenuBuilder
 } = require('discord.js');
 
+const path =
+    require('path');
+
 const {
     createEmbed
 } = require('../../utils/embeds');
@@ -43,6 +46,18 @@ const statLabels = {
     stamina: 'Stamina',
     fame: 'Fame'
 };
+
+const adpLogoPath =
+    path.join(
+        __dirname,
+        '..',
+        '..',
+        'assets',
+        'ADP_logo.png'
+    );
+
+const adpLogoAttachment =
+    'attachment://ADP_logo.png';
 
 function getSceneCategory(
     firstCategory,
@@ -287,7 +302,7 @@ module.exports = {
                 authorName:
                     `${interaction.member.displayName} - ${requesterRank} (${requesterUser.ranking})`,
                 authorIcon:
-                    interaction.user.displayAvatarURL(),
+                    adpLogoAttachment,
                 title:
                     'Choose Scene Booster',
                 description:
@@ -306,6 +321,9 @@ module.exports = {
             ],
             components: [
                 row
+            ],
+            files: [
+                adpLogoPath
             ],
             flags:
                 64

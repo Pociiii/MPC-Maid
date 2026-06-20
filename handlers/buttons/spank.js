@@ -27,80 +27,101 @@ module.exports = async (
     interaction
 ) => {
 
+    const [
+        action,
+        targetUserId
+    ] =
+        interaction.customId.split(
+            ':'
+        );
+
+    const requiredRole =
+        action === 'spank_female'
+            ? ROLES.FEMALE
+            : ROLES.MALE;
+
+    const roleLabel =
+        action === 'spank_female'
+            ? 'female'
+            : 'male';
+
     if (
         !interaction.member.roles.cache.has(
-            ROLES.MALE
+            requiredRole
         )
     ) {
 
         return interaction.reply({
-
             content:
-                '🚫 Only male users can spank.',
-
-            flags: 64
-
+                `Only ${roleLabel} users can use this spank button.`,
+            flags:
+                64
         });
 
     }
 
-    const targetUserId =
-        interaction.customId.split(':')[1];
+    if (
+        interaction.user.id === targetUserId
+    ) {
+
+        return interaction.reply({
+            content:
+                'You cannot spank yourself.',
+            flags:
+                64
+        });
+
+    }
 
     const spankGif =
-        getRandomGif('spank');
+        getRandomGif(
+            'spank'
+        );
 
     const embed =
         createEmbed({
-
             color:
                 getRandomColor(),
-
             authorName:
                 interaction.member.displayName,
-
             authorIcon:
                 interaction.user.displayAvatarURL(),
-
             title:
                 'Spank!',
-
             description:
                 `<@${interaction.user.id}> spanks <@${targetUserId}>.`,
-
             image:
                 spankGif.url,
-
             footerText:
                 `GIF #${spankGif.index}/${spankGif.total}`,
-
             timestamp:
                 true
-
         });
 
     const disabledRow =
         new ActionRowBuilder()
             .addComponents(
-
-                ButtonBuilder
-                    .from(
-                        interaction.message
-                            .components[0]
-                            .components[0]
+                ...interaction.message
+                    .components[0]
+                    .components
+                    .map(
+                        (component) =>
+                            ButtonBuilder
+                                .from(
+                                    component
+                                )
+                                .setDisabled(
+                                    true
+                                )
                     )
-                    .setDisabled(true)
-
             );
 
     await interaction.deferUpdate();
 
     await interaction.message.edit({
-
         components: [
             disabledRow
         ]
-
     });
 
     await addSpankGiven(
@@ -112,9 +133,9 @@ module.exports = async (
     );
 
     await interaction.followUp({
-
-        embeds: [embed]
-
+        embeds: [
+            embed
+        ]
     });
 
 };

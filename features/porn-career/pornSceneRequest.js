@@ -4,6 +4,9 @@ const {
     ButtonStyle
 } = require('discord.js');
 
+const path =
+    require('path');
+
 const {
     CHANNELS,
     getRandomColor
@@ -36,6 +39,18 @@ const statLabels = {
     stamina: 'Stamina',
     fame: 'Fame'
 };
+
+const adpLogoPath =
+    path.join(
+        __dirname,
+        '..',
+        '..',
+        'assets',
+        'ADP_logo.png'
+    );
+
+const adpLogoAttachment =
+    'attachment://ADP_logo.png';
 
 function formatBooster(
     booster
@@ -107,7 +122,7 @@ async function sendPornSceneRequest(
             authorName:
                 requesterName,
             authorIcon:
-                interaction.user.displayAvatarURL(),
+                adpLogoAttachment,
             title:
                 'Porn Scene Request',
             description:
@@ -155,6 +170,9 @@ Booster: **${formatBooster(
                 ],
                 components: [
                     row
+                ],
+                files: [
+                    adpLogoPath
                 ]
             });
 
@@ -209,7 +227,7 @@ Booster: **${formatBooster(
                     authorName:
                         requesterName,
                     authorIcon:
-                        interaction.user.displayAvatarURL(),
+                        adpLogoAttachment,
                     title:
                         'Porn Scene Rumor',
                         description:
@@ -225,6 +243,9 @@ Booster: **${formatBooster(
                     timestamp:
                             true
                     })
+                ],
+                files: [
+                    adpLogoPath
                 ]
             });
 

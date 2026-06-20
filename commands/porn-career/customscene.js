@@ -18,33 +18,37 @@ const {
     handleCooldown
 } = require('../../utils/cooldowns');
 
+const {
+    getSceneCategoryLabel
+} = require('../../data/sceneSubmitGroups');
+
 const castOptions = [
     {
-        label: 'WM / WF',
+        label: getSceneCategoryLabel('mf', 'wm_wf'),
         value: 'wm_wf'
     },
     {
-        label: 'WM / BF',
+        label: getSceneCategoryLabel('mf', 'wm_bf'),
         value: 'wm_bf'
     },
     {
-        label: 'BM / WF',
+        label: getSceneCategoryLabel('mf', 'bm_wf'),
         value: 'bm_wf'
     },
     {
-        label: 'BM / BF',
+        label: getSceneCategoryLabel('mf', 'bm_bf'),
         value: 'bm_bf'
     },
     {
-        label: 'WF / WF',
+        label: getSceneCategoryLabel('mf', 'wf_wf'),
         value: 'wf_wf'
     },
     {
-        label: 'WF / BF',
+        label: getSceneCategoryLabel('mf', 'wf_bf'),
         value: 'wf_bf'
     },
     {
-        label: 'BF / BF',
+        label: getSceneCategoryLabel('mf', 'bf_bf'),
         value: 'bf_bf'
     }
 ];

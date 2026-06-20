@@ -41,13 +41,14 @@ Scene buttons are split by cast type:
 - **Scene MF**: current 2-person scenes
 - **Scene MFM**: 2 males + 1 female
 - **Scene FMF**: 1 male + 2 females
+- **Scene FFF**: 3 females
 
 **Interactions** are used by Wiggle, Flex, Horny, Drop, and similar commands.`,
                 timestamp:
                     true
             });
 
-        const row =
+        const sceneRow =
             new ActionRowBuilder()
                 .addComponents(
                     new ButtonBuilder()
@@ -82,6 +83,21 @@ Scene buttons are split by cast type:
                         ),
                     new ButtonBuilder()
                         .setCustomId(
+                            'gifsubmit_scenes:fff'
+                        )
+                        .setLabel(
+                            'Scene FFF'
+                        )
+                        .setStyle(
+                            ButtonStyle.Primary
+                        )
+                );
+
+        const utilityRow =
+            new ActionRowBuilder()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setCustomId(
                             'gifsubmit_interactions'
                         )
                         .setLabel(
@@ -107,7 +123,8 @@ Scene buttons are split by cast type:
                 embed
             ],
             components: [
-                row
+                sceneRow,
+                utilityRow
             ]
         });
 

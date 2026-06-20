@@ -29,6 +29,9 @@ const {
     getRankTitle
 } = require('../../utils/ranks');
 
+const emojis =
+    require('../../utils/emojis');
+
 const {
     clearSceneBusy,
     getPendingRequest,
@@ -53,6 +56,18 @@ const sceneRoot =
         'data',
         'scenes'
     );
+
+const adpLogoPath =
+    path.join(
+        __dirname,
+        '..',
+        '..',
+        'assets',
+        'ADP_logo.png'
+    );
+
+const adpLogoAttachment =
+    'attachment://ADP_logo.png';
 
 const sceneNames =
     require('../../data/scenes/sceneName.json');
@@ -271,7 +286,7 @@ function buildPartEmbed(
         authorIcon:
             requesterAuthor.icon,
         thumbnail:
-            requesterAuthor.icon,
+            requesterAuthor.thumbnail,
         title:
             sceneTitle,
         description:
@@ -279,7 +294,7 @@ function buildPartEmbed(
         image:
             gif.url,
         footerText:
-            `/pornscene - Part ${partNumber}/${totalParts} - ${phaseLabels[phase]} GIF #${gif.index}/${gif.total}`,
+            `/pornscene - GIF #${gif.index}/${gif.total}`,
         timestamp:
             true
     });
@@ -567,7 +582,7 @@ async function finishScene(
                 authorIcon:
                     requesterAuthor.icon,
                 thumbnail:
-                    requesterAuthor.icon,
+                    requesterAuthor.thumbnail,
                 title:
                     'Porn Scene Finished',
                 description:
@@ -581,7 +596,7 @@ async function finishScene(
         embed.addFields(
             {
                 name:
-                    'Outcome',
+                    '🎬 Outcome',
                 value:
                     `**${result.outcome}**`,
                 inline:
@@ -589,7 +604,7 @@ async function finishScene(
             },
             {
                 name:
-                    'Viewers',
+                    '👀 Viewers',
                 value:
                     `**${result.viewers}**`,
                 inline:
@@ -597,7 +612,7 @@ async function finishScene(
             },
             {
                 name:
-                    'Revenue',
+                    `${emojis.coin} Revenue`,
                 value:
                     `**${result.coins} coins each**`,
                 inline:
@@ -605,7 +620,7 @@ async function finishScene(
             },
             {
                 name:
-                    'XP',
+                    '⭐ XP',
                 value:
                     `**${result.xp} each**`,
                 inline:
@@ -613,7 +628,7 @@ async function finishScene(
             },
             {
                 name:
-                    'Ranking',
+                    '🏆 Ranking',
                 value:
                     `**${rankingPrefix}${result.rankingChange}**`,
                 inline:
@@ -621,12 +636,12 @@ async function finishScene(
             },
             {
                 name:
-                    'Parts',
+                    '🎞️ Parts',
                 value:
                     sceneLinks
                         .map(
                             (link, index) =>
-                                `Part ${index + 1}: ${link}`
+                                `- Part ${index + 1}: ${link}`
                         )
                         .join(
                             '\n'
@@ -639,6 +654,9 @@ async function finishScene(
         await rumorsChannel.send({
             embeds: [
                 embed
+            ],
+            files: [
+                adpLogoPath
             ]
         });
 
@@ -694,6 +712,9 @@ function scheduleScene(
                                     sceneTitle,
                                     requesterAuthor
                                 )
+                            ],
+                            files: [
+                                adpLogoPath
                             ]
                         });
 
@@ -909,6 +930,8 @@ async function acceptScene(
                     requesterUser.ranking
                 )} (${requesterUser.ranking})`,
             icon:
+                adpLogoAttachment,
+            thumbnail:
                 requesterMember.user.displayAvatarURL()
         };
 
@@ -958,7 +981,7 @@ async function acceptScene(
                     authorIcon:
                         requesterAuthor.icon,
                     thumbnail:
-                        requesterAuthor.icon,
+                        requesterAuthor.thumbnail,
                     title:
                         sceneTitle,
                     description:
@@ -1008,6 +1031,9 @@ Booster: **${formatBooster(
                                 true
                         }
                     )
+            ],
+            files: [
+                adpLogoPath
             ]
         });
 

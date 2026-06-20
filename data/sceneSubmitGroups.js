@@ -9,38 +9,64 @@ const sceneGroups = {
     mf: {
         label: 'Scene MF',
         folder: 'scenes',
+        types: sceneTypes,
         categories: {
-            wm_wf: 'WM / WF',
-            wm_bf: 'WM / BF',
-            bm_wf: 'BM / WF',
-            bm_bf: 'BM / BF',
-            wf_wf: 'WF / WF',
-            wf_bf: 'WF / BF',
-            bf_bf: 'BF / BF'
+            wm_wf: '⚪ White Male / ⚪ White Female',
+            wm_bf: '⚪ White Male / ⚫ Black Female',
+            bm_wf: '⚫ Black Male / ⚪ White Female',
+            bm_bf: '⚫ Black Male / ⚫ Black Female',
+            wf_wf: '⚪ White Female / ⚪ White Female',
+            wf_bf: '⚪ White Female / ⚫ Black Female',
+            bf_bf: '⚫ Black Female / ⚫ Black Female'
         }
     },
     mfm: {
         label: 'Scene MFM',
         folder: 'scenes_mfm',
+        types: [
+            'foreplay',
+            'sex',
+            'finale'
+        ],
         categories: {
-            wm_wm_wf: 'WM / WM / WF',
-            wm_bm_wf: 'WM / BM / WF',
-            bm_bm_wf: 'BM / BM / WF',
-            wm_wm_bf: 'WM / WM / BF',
-            wm_bm_bf: 'WM / BM / BF',
-            bm_bm_bf: 'BM / BM / BF'
+            wm_wm_wf: '⚪ White Male / ⚪ White Male / ⚪ White Female',
+            wm_bm_wf: '⚪ White Male / ⚫ Black Male / ⚪ White Female',
+            bm_bm_wf: '⚫ Black Male / ⚫ Black Male / ⚪ White Female',
+            wm_wm_bf: '⚪ White Male / ⚪ White Male / ⚫ Black Female',
+            wm_bm_bf: '⚪ White Male / ⚫ Black Male / ⚫ Black Female',
+            bm_bm_bf: '⚫ Black Male / ⚫ Black Male / ⚫ Black Female'
         }
     },
     fmf: {
         label: 'Scene FMF',
         folder: 'scenes_fmf',
+        types: [
+            'foreplay',
+            'sex',
+            'finale'
+        ],
         categories: {
-            wm_wf_wf: 'WM / WF / WF',
-            wm_wf_bf: 'WM / WF / BF',
-            wm_bf_bf: 'WM / BF / BF',
-            bm_wf_wf: 'BM / WF / WF',
-            bm_wf_bf: 'BM / WF / BF',
-            bm_bf_bf: 'BM / BF / BF'
+            wm_wf_wf: '⚪ White Male / ⚪ White Female / ⚪ White Female',
+            wm_wf_bf: '⚪ White Male / ⚪ White Female / ⚫ Black Female',
+            wm_bf_bf: '⚪ White Male / ⚫ Black Female / ⚫ Black Female',
+            bm_wf_wf: '⚫ Black Male / ⚪ White Female / ⚪ White Female',
+            bm_wf_bf: '⚫ Black Male / ⚪ White Female / ⚫ Black Female',
+            bm_bf_bf: '⚫ Black Male / ⚫ Black Female / ⚫ Black Female'
+        }
+    },
+    fff: {
+        label: 'Scene FFF',
+        folder: 'scenes_fff',
+        types: [
+            'foreplay',
+            'sex',
+            'finale'
+        ],
+        categories: {
+            wf_wf_wf: '⚪ White Female / ⚪ White Female / ⚪ White Female',
+            wf_wf_bf: '⚪ White Female / ⚪ White Female / ⚫ Black Female',
+            wf_bf_bf: '⚪ White Female / ⚫ Black Female / ⚫ Black Female',
+            bf_bf_bf: '⚫ Black Female / ⚫ Black Female / ⚫ Black Female'
         }
     }
 };

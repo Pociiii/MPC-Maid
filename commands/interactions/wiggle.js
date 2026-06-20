@@ -115,9 +115,19 @@ module.exports = {
 
                 new ButtonBuilder()
                     .setCustomId(
-                        `spank:${interaction.user.id}`
+                        `spank_male:${interaction.user.id}`
                     )
-                    .setLabel('Spank')
+                    .setLabel('Guys Spank')
+                    .setEmoji('1486644512032948314')
+                    .setStyle(
+                        ButtonStyle.Secondary
+                    ),
+
+                new ButtonBuilder()
+                    .setCustomId(
+                        `spank_female:${interaction.user.id}`
+                    )
+                    .setLabel('Girls Spank')
                     .setEmoji('1486644512032948314')
                     .setStyle(
                         ButtonStyle.Secondary

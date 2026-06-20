@@ -1,367 +1,186 @@
-const fs =
-    require('fs');
-
-const path =
-    require('path');
+const fs = require('fs');
+const path = require('path');
 
 const {
+    ActionRowBuilder,
+    StringSelectMenuBuilder
+} = require('discord.js');
 
-    createEmbed
+const { createEmbed } = require('../../utils/embeds');
+const { getRandomColor } = require('../../data/constants');
+const { getGifCount } = require('../../utils/gifs');
+const { sceneGroups } = require('../../data/sceneSubmitGroups');
 
-} = require(
-    '../../utils/embeds'
-);
-
-const {
-
-    getRandomColor
-
-} = require(
-    '../../data/constants'
-);
-
-const {
-
-    getGifCount
-
-} = require(
-    '../../utils/gifs'
-);
-
-const {
-    sceneGroups
-} = require(
-    '../../data/sceneSubmitGroups'
-);
-
-const dataFolder =
-    path.join(
-        __dirname,
-        '..',
-        '..',
-        'data'
-    );
+const dataFolder = path.join(__dirname, '..', '..', 'data');
 
 const interactionLabels = {
-
     blowkiss: 'Blow Kiss',
     spank: 'Spank',
     titty_drop: 'Drop',
     wiggle: 'Wiggle'
-
 };
 
-function titleCase(
-    value
-) {
-
+function titleCase(value) {
     return value
-        .replace(
-            /\.json$/,
-            ''
-        )
-        .replace(
-            /_/g,
-            ' '
-        )
-        .replace(
-            /\b\w/g,
-            (letter) =>
-                letter.toUpperCase()
-        );
-
+        .replace(/\.json$/, '')
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function fileCountLine(
-    label,
-    filePath
-) {
-
+function fileCountLine(label, filePath) {
     return `- ${label} (${getGifCount(filePath)})`;
+}
 
+function shortSceneLabel(category) {
+    return category
+        .split('_')
+        .map((part) => part.toUpperCase())
+        .join(' / ');
 }
 
 function buildInteractionLines() {
+    const gifsFolder = path.join(dataFolder, 'gifs');
 
-    const gifsFolder =
-        path.join(
-            dataFolder,
-            'gifs'
-        );
-
-    const directFiles =
-        fs.readdirSync(
-            gifsFolder,
-            {
-                withFileTypes: true
-            }
+    const directFiles = fs.readdirSync(gifsFolder, { withFileTypes: true })
+        .filter((entry) =>
+            entry.isFile() &&
+            entry.name.endsWith('.json') &&
+            !entry.name.startsWith('flex_')
         )
-            .filter(
-                (entry) =>
-                    entry.isFile()
-                    && entry.name.endsWith(
-                        '.json'
-                    )
-                    && !entry.name.startsWith(
-                        'flex_'
-                    )
-            )
-            .map(
-                (entry) => {
+        .map((entry) => {
+            const category = entry.name.replace(/\.json$/, '');
 
-                    const category =
-                        entry.name.replace(
-                            /\.json$/,
-                            ''
-                        );
-
-                    return fileCountLine(
-                        interactionLabels[category]
-                            ?? titleCase(category),
-                        path.join(
-                            gifsFolder,
-                            entry.name
-                        )
-                    );
-
-                }
-            )
-            .sort();
+            return fileCountLine(
+                interactionLabels[category] ?? titleCase(category),
+                path.join(gifsFolder, entry.name)
+            );
+        })
+        .sort();
 
     const flexLines = [
-
-        fileCountLine(
-            'White Male',
-            path.join(
-                gifsFolder,
-                'flex_w.json'
-            )
-        ),
-
-        fileCountLine(
-            'Black Male',
-            path.join(
-                gifsFolder,
-                'flex_b.json'
-            )
-        )
-
+        fileCountLine('White Male', path.join(gifsFolder, 'flex_w.json')),
+        fileCountLine('Black Male', path.join(gifsFolder, 'flex_b.json'))
     ];
 
-    const hornyFolder =
-        path.join(
-            gifsFolder,
-            'horny'
-        );
+    const hornyFolder = path.join(gifsFolder, 'horny');
 
-    const hornyLines =
-        fs.readdirSync(
-            hornyFolder,
-            {
-                withFileTypes: true
-            }
+    const hornyLines = fs.readdirSync(hornyFolder, { withFileTypes: true })
+        .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
+        .map((entry) =>
+            fileCountLine(
+                entry.name.replace(/\.json$/, '').toUpperCase(),
+                path.join(hornyFolder, entry.name)
+            )
         )
-            .filter(
-                (entry) =>
-                    entry.isFile()
-                    && entry.name.endsWith(
-                        '.json'
-                    )
-            )
-            .map(
-                (entry) =>
-                    fileCountLine(
-                        entry.name
-                            .replace(
-                                /\.json$/,
-                                ''
-                            )
-                            .toUpperCase(),
-                        path.join(
-                            hornyFolder,
-                            entry.name
-                        )
-                    )
-            )
-            .sort();
+        .sort();
 
     return [
-
         ...directFiles,
         '- Flex',
-        ...flexLines.map(
-            (line) =>
-                `  ${line}`
-        ),
+        ...flexLines.map((line) => `  ${line}`),
         '- Horny',
-        ...hornyLines.map(
-            (line) =>
-                `  ${line}`
-        )
-
+        ...hornyLines.map((line) => `  ${line}`)
     ];
-
 }
 
-function buildSceneLines(
-    groupKey,
-    group
-) {
+function buildSceneLines(group) {
+    const scenesFolder = path.join(dataFolder, group.folder);
 
-    const scenesFolder =
-        path.join(
-            dataFolder,
-            group.folder
-        );
+    return fs.readdirSync(scenesFolder, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => {
+            const categoryFolder = path.join(scenesFolder, entry.name);
 
-    return fs.readdirSync(
-        scenesFolder,
-        {
-            withFileTypes: true
-        }
-    )
-        .filter(
-            (entry) =>
-                entry.isDirectory()
-        )
-        .map(
-            (entry) => {
-
-                const categoryFolder =
-                    path.join(
-                        scenesFolder,
-                        entry.name
-                    );
-
-                const subcategories =
-                    fs.readdirSync(
-                        categoryFolder,
-                        {
-                            withFileTypes: true
-                        }
+            const subcategories = fs.readdirSync(categoryFolder, { withFileTypes: true })
+                .filter((subEntry) => subEntry.isFile() && subEntry.name.endsWith('.json'))
+                .map((subEntry) =>
+                    fileCountLine(
+                        titleCase(subEntry.name),
+                        path.join(categoryFolder, subEntry.name)
                     )
-                        .filter(
-                            (subEntry) =>
-                                subEntry.isFile()
-                                && subEntry.name.endsWith(
-                                    '.json'
-                                )
-                        )
-                        .map(
-                            (subEntry) =>
-                                fileCountLine(
-                                    titleCase(
-                                        subEntry.name
-                                    ),
-                                    path.join(
-                                        categoryFolder,
-                                        subEntry.name
-                                    )
-                                )
-                        )
-                        .sort();
+                )
+                .sort();
 
-                return {
+            return {
+                name: shortSceneLabel(entry.name),
+                value: subcategories.join('\n')
+            };
+        })
+        .sort((a, b) => a.name.localeCompare(b.name));
+}
 
-                    name:
-                        `${group.label}: ${group.categories[entry.name] ?? entry.name}`,
+function buildInfoMenu(activeView) {
+    const options = [
+        {
+            label: 'Interactions',
+            value: 'interactions'
+        },
+        ...Object.entries(sceneGroups).map(([key, group]) => ({
+            label: group.label,
+            value: key
+        }))
+    ];
 
-                    value:
-                        subcategories.join(
-                            '\n'
-                        )
-
-                };
-
-            }
-        )
-        .sort(
-            (a, b) =>
-                a.name.localeCompare(
-                    b.name
+    return new ActionRowBuilder()
+        .addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId('gif_info_select')
+                .setPlaceholder('Choose GIF info group')
+                .addOptions(
+                    ...options.map((option) => ({
+                        ...option,
+                        default: option.value === activeView
+                    }))
                 )
         );
+}
 
+function buildGifInfoReply(view = 'interactions') {
+    const safeView =
+        view === 'interactions' || sceneGroups[view]
+            ? view
+            : 'interactions';
+
+    const embed = createEmbed({
+        color: getRandomColor(),
+        title:
+            safeView === 'interactions'
+                ? 'GIF Data Info - Interactions'
+                : `GIF Data Info - ${sceneGroups[safeView].label}`,
+        description: 'Current GIF counts.',
+        timestamp: true
+    });
+
+    if (safeView === 'interactions') {
+        embed.addFields({
+            name: 'Interactions',
+            value: buildInteractionLines().join('\n')
+        });
+    }
+    else {
+        embed.addFields(
+            ...buildSceneLines(sceneGroups[safeView]).map((field) => ({
+                name: field.name,
+                value: field.value,
+                inline: true
+            }))
+        );
+    }
+
+    return {
+        embeds: [embed],
+        components: [buildInfoMenu(safeView)]
+    };
 }
 
 module.exports = {
+    customId: 'gifsubmit_info',
+    buildGifInfoReply,
 
-    customId:
-        'gifsubmit_info',
-
-    async execute(
-        interaction
-    ) {
-
-        const interactionLines =
-            buildInteractionLines();
-
-        const sceneFields =
-            Object.entries(
-                sceneGroups
-            )
-                .flatMap(
-                    ([groupKey, group]) =>
-                        buildSceneLines(
-                            groupKey,
-                            group
-                        )
-                );
-
-        const embed =
-            createEmbed({
-
-                color:
-                    getRandomColor(),
-
-                title:
-                    'GIF Data Info',
-
-                description:
-                    'Current GIF counts by category and subcategory.',
-
-                timestamp:
-                    true
-
-            });
-
-        embed.addFields(
-
-            {
-                name:
-                    'Interactions',
-
-                value:
-                    interactionLines.join(
-                        '\n'
-                    )
-            },
-
-            ...sceneFields.map(
-                (field) => ({
-
-                    name:
-                        field.name,
-
-                    value:
-                        field.value,
-
-                    inline:
-                        true
-
-                })
-            )
-
-        );
-
+    async execute(interaction) {
         await interaction.reply({
-
-            embeds: [embed],
-
+            ...buildGifInfoReply(),
             flags: 64
-
         });
-
     }
-
 };

@@ -89,6 +89,8 @@ module.exports = async (
                 return true;
 
             case 'spank':
+            case 'spank_male':
+            case 'spank_female':
                 await handleSpank(
                     interaction
                 );
@@ -279,6 +281,18 @@ module.exports = async (
 
                 return true;
 
+            case 'gif_info_select':
+
+                await interaction.deferUpdate();
+
+                await interaction.editReply(
+                    gifSubmitInfo.buildGifInfoReply(
+                        interaction.values[0]
+                    )
+                );
+
+                return true;
+
             case 'pornscene_booster': {
 
                 const [
@@ -333,6 +347,8 @@ module.exports = async (
                         embeds:
                             [],
                         components:
+                            [],
+                        attachments:
                             []
                     });
 
@@ -347,6 +363,8 @@ module.exports = async (
                         embeds:
                             [],
                         components:
+                            [],
+                        attachments:
                             []
                     });
 

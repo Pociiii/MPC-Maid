@@ -86,37 +86,6 @@ module.exports = {
                     category
                 );
 
-            const foreplayCount =
-                getGifCount(
-                    path.join(
-                        sceneFolder,
-                        'foreplay.json'
-                    )
-                );
-
-            const oralCount =
-                getGifCount(
-                    path.join(
-                        sceneFolder,
-                        'oral.json'
-                    )
-                );
-
-            const sexCount =
-                getGifCount(
-                    path.join(
-                        sceneFolder,
-                        'sex.json'
-                    )
-                );
-
-            const finaleCount =
-                getGifCount(
-                    path.join(
-                        sceneFolder,
-                        'finale.json'
-                    )
-                );
             const menu =
                 new StringSelectMenuBuilder()
 
@@ -131,34 +100,19 @@ module.exports = {
                     )
 
                     .addOptions(
-
-                        {
-                            label: `Foreplay (${foreplayCount})`,
-
-                            value: 'foreplay'
-                        },
-
-                        {
-                            label: `Oral (${oralCount})`,
-
-                            value:
-                                'oral'
-                        },
-
-                        {
-                            label: `Sex (${sexCount})`,
-
-                            value:
-                                'sex'
-                        },
-
-                        {
-                            label: `Finale (${finaleCount})`,
-
-                            value:
-                                'finale'
-                        }
-
+                        ...sceneGroup.types.map(
+                            (sceneType) => ({
+                                label:
+                                    `${sceneType.charAt(0).toUpperCase()}${sceneType.slice(1)} (${getGifCount(
+                                        path.join(
+                                            sceneFolder,
+                                            `${sceneType}.json`
+                                        )
+                                    )})`,
+                                value:
+                                    sceneType
+                            })
+                        )
                     );
 
             const row =

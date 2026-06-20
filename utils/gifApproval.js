@@ -212,20 +212,49 @@ async function approveGif(
                 approvedEmbed
             )
                 .setTitle(
-                    'New GIF Added'
+                    '🎉 New GIF Added'
                 )
-                .spliceFields(
-                    0,
-                    1
+                .setFields(
+                    {
+                        name:
+                            '📁 Category',
+                        value:
+                            categoryName,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            '📊 Total GIFs',
+                        value:
+                            String(
+                                totalCount
+                            ),
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            '👤 Submitted By',
+                        value:
+                            submitter
+                                ? `<@${submitter}>`
+                                : 'Unknown',
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            '📤 Submit Your Own GIF',
+                        value:
+                            `<#${CHANNELS.GIFS}>`,
+                        inline:
+                            true
+                    }
                 )
-                .addFields({
-                    name:
-                        'Submit Your Own GIF',
-                    value:
-                        `<#${CHANNELS.GIFS}>`,
-                    inline:
-                        true
-                });
+                .setFooter(
+                    null
+                );
 
         await rumorsChannel.send({
             embeds: [

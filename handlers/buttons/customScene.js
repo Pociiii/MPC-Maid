@@ -19,6 +19,10 @@ const {
     getRandomColor
 } = require('../../data/constants');
 
+const {
+    getSceneCategoryLabel
+} = require('../../data/sceneSubmitGroups');
+
 const maxParts = 8;
 
 const sceneDurationMs =
@@ -34,13 +38,13 @@ const sceneRoot =
     );
 
 const castLabels = {
-    wm_wf: 'WM / WF',
-    wm_bf: 'WM / BF',
-    bm_wf: 'BM / WF',
-    bm_bf: 'BM / BF',
-    wf_wf: 'WF / WF',
-    wf_bf: 'WF / BF',
-    bf_bf: 'BF / BF'
+    wm_wf: getSceneCategoryLabel('mf', 'wm_wf'),
+    wm_bf: getSceneCategoryLabel('mf', 'wm_bf'),
+    bm_wf: getSceneCategoryLabel('mf', 'bm_wf'),
+    bm_bf: getSceneCategoryLabel('mf', 'bm_bf'),
+    wf_wf: getSceneCategoryLabel('mf', 'wf_wf'),
+    wf_bf: getSceneCategoryLabel('mf', 'wf_bf'),
+    bf_bf: getSceneCategoryLabel('mf', 'bf_bf')
 };
 
 const phaseLabels = {
