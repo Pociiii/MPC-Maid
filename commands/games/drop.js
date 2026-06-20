@@ -1,6 +1,10 @@
 const { SlashCommandBuilder } = require('discord.js');
 
 const { createEmbed } = require('../../utils/embeds');
+const {
+    adpLogoPath,
+    adpLogoAttachment
+} = require('../../utils/adpLogo');
 const { getRandomGif } = require('../../utils/gifs');
 const {
     COOLDOWNS,
@@ -97,7 +101,8 @@ module.exports = {
         const embed = createEmbed({
             color: getRandomColor(),
             authorName: interaction.member.displayName,
-            authorIcon: interaction.member.displayAvatarURL(),
+            authorIcon: adpLogoAttachment,
+            thumbnail: interaction.user.displayAvatarURL(),
             title: 'Titty Drop',
             image:
                 imageUrl,
@@ -108,7 +113,8 @@ module.exports = {
         });
 
         await interaction.reply({
-            embeds: [embed]
+            embeds: [embed],
+            files: [adpLogoPath]
         });
 
     }

@@ -14,6 +14,11 @@ const {
 } = require('../../utils/embeds');
 
 const {
+    adpLogoPath,
+    adpLogoAttachment
+} = require('../../utils/adpLogo');
+
+const {
     getRandomColor
 } = require('../../data/constants');
 
@@ -274,6 +279,9 @@ module.exports = async (
                 interaction.member.displayName,
 
             authorIcon:
+                adpLogoAttachment,
+
+            thumbnail:
                 interaction.user.displayAvatarURL(),
 
             title:
@@ -319,7 +327,9 @@ module.exports = async (
 
     await interaction.followUp({
 
-        embeds: [embed]
+        embeds: [embed],
+
+        files: [adpLogoPath]
 
     });
 

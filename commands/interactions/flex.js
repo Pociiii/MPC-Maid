@@ -1,6 +1,10 @@
 const { SlashCommandBuilder } = require('discord.js');
 
 const { createEmbed } = require('../../utils/embeds');
+const {
+    adpLogoPath,
+    adpLogoAttachment
+} = require('../../utils/adpLogo');
 const { getRandomGif } = require('../../utils/gifs');
 
 const {
@@ -123,7 +127,10 @@ module.exports = {
                 interaction.member.displayName,
 
             authorIcon:
-                interaction.member.displayAvatarURL(),
+                adpLogoAttachment,
+
+            thumbnail:
+                interaction.user.displayAvatarURL(),
 
             title: 'Flex',
 
@@ -168,7 +175,9 @@ module.exports = {
 
             embeds: [embed],
 
-            components: [row]
+            components: [row],
+
+            files: [adpLogoPath]
 
         });
 

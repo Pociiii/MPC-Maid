@@ -1,3 +1,30 @@
+const {
+    createEmbed
+} = require('../../utils/embeds');
+
+const {
+    getRandomColor
+} = require('../../data/constants');
+
+function getRejectedGifUrl(
+    interaction
+) {
+
+    const embed =
+        interaction.message?.embeds?.[0];
+
+    const urlField =
+        embed?.fields?.find(
+            (field) =>
+                field.name === 'URL'
+        );
+
+    return urlField?.value ||
+        embed?.image?.url ||
+        null;
+
+}
+
 module.exports = {
 
 
@@ -23,6 +50,11 @@ async execute(
             'reason'
         );
 
+    const rejectedGifUrl =
+        getRejectedGifUrl(
+            interaction
+        );
+
     let dmSent = true;
 
     try {
@@ -32,19 +64,55 @@ async execute(
                 submitterId
             );
 
-        await user.send(
+        const dmEmbed =
+            createEmbed({
+                color:
+                    getRandomColor(),
+                title:
+                    'GIF Submission Rejected',
+                description:
+                    'Your GIF submission was rejected. You can submit another GIF at any time.',
+                image:
+                    rejectedGifUrl,
+                footerText:
+                    '/gifsubmit',
+                timestamp:
+                    true
+            });
 
-
-`❌ Your GIF submission was rejected.
-
-📁 Category: ${category}
-
-📝 Reason: ${reason}
-
-You can submit another GIF at any time.`
-
-
+        dmEmbed.addFields(
+            {
+                name:
+                    'Category',
+                value:
+                    category,
+                inline:
+                    true
+            },
+            {
+                name:
+                    'Refused Link',
+                value:
+                    rejectedGifUrl ||
+                    'Link unavailable',
+                inline:
+                    false
+            },
+            {
+                name:
+                    'Reason',
+                value:
+                    reason,
+                inline:
+                    false
+            }
         );
+
+        await user.send({
+            embeds: [
+                dmEmbed
+            ]
+        });
 
     } catch {
 
@@ -57,11 +125,11 @@ You can submit another GIF at any time.`
         content:
 
 
-`❌ Rejected by ${interaction.user}
+`Rejected by ${interaction.user}
 
-📝 Reason: ${reason}
+Reason: ${reason}
 
-📨 DM: ${
+DM: ${
 dmSent
 ? 'Sent'
 : 'Failed (DMs closed)'

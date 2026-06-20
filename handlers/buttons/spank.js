@@ -10,6 +10,11 @@ const {
 } = require('../../utils/embeds');
 
 const {
+    adpLogoPath,
+    adpLogoAttachment
+} = require('../../utils/adpLogo');
+
+const {
     getRandomColor
 } = require('../../data/constants');
 
@@ -85,6 +90,8 @@ module.exports = async (
             authorName:
                 interaction.member.displayName,
             authorIcon:
+                adpLogoAttachment,
+            thumbnail:
                 interaction.user.displayAvatarURL(),
             title:
                 'Spank!',
@@ -111,7 +118,8 @@ module.exports = async (
                                     component
                                 )
                                 .setDisabled(
-                                    true
+                                    component.customId ===
+                                    interaction.customId
                                 )
                     )
             );
@@ -135,6 +143,9 @@ module.exports = async (
     await interaction.followUp({
         embeds: [
             embed
+        ],
+        files: [
+            adpLogoPath
         ]
     });
 

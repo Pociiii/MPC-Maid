@@ -955,8 +955,9 @@ async function acceptScene(
         content:
             'Scene accepted. Filming has started.',
         embeds:
-            interaction.message.embeds,
-        components: []
+            [],
+        components: [],
+        attachments: []
     });
 
     const rumorsChannel =
@@ -1080,8 +1081,9 @@ async function declineScene(
         content:
             'Scene request declined.',
         embeds:
-            interaction.message.embeds,
-        components: []
+            [],
+        components: [],
+        attachments: []
     });
 
 }
