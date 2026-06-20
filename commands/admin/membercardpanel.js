@@ -13,6 +13,9 @@ const {
     getRandomColor
 } = require('../../data/constants');
 
+const emojis =
+    require('../../utils/emojis');
+
 module.exports = {
 
     data:
@@ -33,13 +36,15 @@ module.exports = {
                     getRandomColor(),
 
                 title:
-                    '🪪 MPC Member Card',
+                    `${emojis.mpc_logo} MPC Member Card`,
 
                 description:
 
 `Generate your official **Midnight Pleasure Club** membership card.
 
-Rembember to change your nick to your in-game name first.
+The card style is picked from your MPC role, and your avatar is added to the card.
+
+Remember to change your nick to your in-game name first.
 
 -# Bot is not hosted on a server yet and buttons may not be working all the time, check if <@1510634400986042510> is online`,
 
@@ -63,7 +68,9 @@ Rembember to change your nick to your in-game name first.
                             'Get Card'
                         )
 
-                        .setEmoji('🪪')
+                        .setEmoji(
+                            emojis.mpc_logo
+                        )
 
                         .setStyle(
                             ButtonStyle.Primary
