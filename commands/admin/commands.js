@@ -11,7 +11,7 @@ const {
 
 const {
     CHANNELS,
-    COOLDOWNS,
+    COOLDOWNS
 } = require('../../data/constants');
 
 const ROLES =
@@ -71,7 +71,11 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
 `- \`/profile\` Stats and progress
 - \`/daily\` Personal daily quests, reset 12:00 UTC
 - \`/train\` Raise career stats
+- \`/shop\` Buy pornscene boosters
 - \`/inventory\` Your boosters
+- \`/achievements\` Achievement progress
+- \`/pregnancy\` Pregnancy and fertility status
+- \`/breed\` Send a pregnancy RP request
 - \`/leaderboard\` Server rankings
 - \`/matchme\` Random match - ${minutes(COOLDOWNS.MATCHME)}`,
                 inline:
@@ -110,12 +114,12 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
                     'Notes',
                 value:
 `- Media: image, GIF, or video.
-- Boosters: check \`/inventory\`, use with \`/pornscene\`.
+- Boosters: buy with \`/shop\`, check \`/inventory\`, use with \`/pornscene\`.
 - Daily quests and achievements announce completions in rumors.
 - Updates are posted in <#${CHANNELS.UPDATES}>.
-- More details: press **Porn Career Info**.
+- More details: press the info buttons below.
 
--# This bot is not hosted on a server yet, Check it's status before using it's features`,
+-# This bot is not hosted on a server yet, check its status before using its features.`,
                 inline:
                     false
             }
@@ -132,7 +136,20 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
                             'Porn Career Info'
                         )
                         .setEmoji(
-                            '🎬'
+                            '\uD83C\uDFAC'
+                        )
+                        .setStyle(
+                            ButtonStyle.Secondary
+                        ),
+                    new ButtonBuilder()
+                        .setCustomId(
+                            'commands_pregnancy_info'
+                        )
+                        .setLabel(
+                            'Pregnancy Info'
+                        )
+                        .setEmoji(
+                            '\uD83E\uDD30'
                         )
                         .setStyle(
                             ButtonStyle.Secondary

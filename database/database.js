@@ -35,7 +35,12 @@ const db = new sqlite3.Database('./database.db', (err) => {
         'utf8'
     );
 
-    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${achievementsSchema}`, async (err) => {
+    const pregnancySchema = fs.readFileSync(
+        path.join(__dirname, 'schemas', 'pregnancy.sql'),
+        'utf8'
+    );
+
+    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${achievementsSchema}\n${pregnancySchema}`, async (err) => {
 
         if (err) {
             console.error(err);

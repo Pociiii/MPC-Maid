@@ -5,12 +5,8 @@ const path =
     require('path');
 
 const {
-    createEmbed
+    createUserEmbed
 } = require('../../utils/embeds');
-
-const {
-    getRandomColor
-} = require('../../data/constants');
 
 const {
     logError
@@ -78,22 +74,21 @@ function buildSceneEmbed(
             part
         );
 
-    return createEmbed({
-        color:
-            getRandomColor(),
+    return createUserEmbed(
+        interaction,
+        {
+        command:
+            '/customscene',
+        footerDetail:
+            `Part ${index + 1}/${totalParts} - GIF #${gif.index}/${gif.total}`,
         title:
             `Part ${index + 1}`,
-        thumbnail:
-            interaction.user.displayAvatarURL(),
         description:
             `Custom scene from <@${interaction.user.id}>`,
         image:
-            gif.url,
-        footerText:
-            `/customscene - Part ${index + 1}/${totalParts} - GIF #${gif.index}/${gif.total}`,
-        timestamp:
-            index === totalParts - 1
-    });
+            gif.url
+        }
+    );
 
 }
 

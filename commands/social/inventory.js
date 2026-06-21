@@ -7,7 +7,7 @@ const {
 } = require('../../data/constants');
 
 const {
-    createEmbed
+    createUserEmbed
 } = require('../../utils/embeds');
 
 const {
@@ -22,7 +22,7 @@ function formatBoosters(
     if (
         boosters.length === 0
     )
-        return 'Your booster inventory is empty. The shop command will fill this later.';
+        return 'Your booster inventory is empty. Use `/shop` to buy boosters.';
 
         return boosters
         .map(
@@ -60,24 +60,21 @@ module.exports = {
             );
 
         const embed =
-            createEmbed({
+            createUserEmbed(
+                interaction,
+                {
                 color:
                     COLORS.DEFAULT,
-                authorName:
-                    interaction.member.displayName,
-                authorIcon:
-                    interaction.user.displayAvatarURL(),
+                command:
+                    '/inventory',
                 title:
                     'Inventory',
                 description:
                     formatBoosters(
                         boosters
-                    ),
-                footerText:
-                    '/inventory',
-                timestamp:
-                    true
-            });
+                    )
+                }
+            );
 
         await interaction.editReply({
             embeds: [

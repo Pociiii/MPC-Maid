@@ -16,6 +16,9 @@ const pornScene =
 const commandsPornCareerInfo =
     require('./buttons/commandsPornCareerInfo');
 
+const commandsPregnancyInfo =
+    require('./buttons/commandsPregnancyInfo');
+
 const {
     buildLeaderboard
 } = require('../features/leaderboard/leaderboard');
@@ -23,6 +26,19 @@ const {
 const {
     trainStat
 } = require('../features/porn-career/training');
+
+const {
+    buyShopBooster
+} = require('../features/shop/boosterShop');
+
+const {
+    handleAchievementsView
+} = require('../features/achievements/viewer');
+
+const {
+    handleBreedDecision,
+    handleCarrierChoice
+} = require('../features/pregnancy/pregnancyRequest');
 
 const handleRelationshipAccept =
     require('./buttons/relationshipAccept');
@@ -158,6 +174,12 @@ async function routeInteraction(
                 );
                 return true;
 
+            case 'commands_pregnancy_info':
+                await commandsPregnancyInfo.execute(
+                    interaction
+                );
+                return true;
+
             case 'leaderboard_ranking':
             case 'leaderboard_scenes':
             case 'leaderboard_coins':
@@ -196,6 +218,55 @@ async function routeInteraction(
                 return true;
 
             }
+
+            case 'shop_booster': {
+
+                const [
+                    ,
+                    ownerId,
+                    stat,
+                    tier
+                ] =
+                    interaction.customId.split(
+                        ':'
+                    );
+
+                await buyShopBooster(
+                    interaction,
+                    ownerId,
+                    stat,
+                    tier
+                );
+
+                return true;
+
+            }
+
+            case 'achievements_view':
+                await handleAchievementsView(
+                    interaction
+                );
+                return true;
+
+            case 'breed_carrier':
+                await handleCarrierChoice(
+                    interaction
+                );
+                return true;
+
+            case 'breed_accept':
+                await handleBreedDecision(
+                    interaction,
+                    true
+                );
+                return true;
+
+            case 'breed_decline':
+                await handleBreedDecision(
+                    interaction,
+                    false
+                );
+                return true;
 
             case 'relationship_accept':
 

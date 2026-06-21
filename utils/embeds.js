@@ -84,6 +84,7 @@ function createUserEmbed(
         color = getRandomColor(),
         command,
         description,
+        footerDetail,
         image,
         thumbnail,
         title
@@ -111,7 +112,8 @@ function createUserEmbed(
         footerText:
             command
                 ? commandFooter(
-                    command
+                    command,
+                    footerDetail
                 )
                 : undefined,
         timestamp:
@@ -125,6 +127,7 @@ function createTargetUserEmbed(
         color = getRandomColor(),
         command,
         description,
+        footerDetail,
         image,
         target,
         title
@@ -149,7 +152,8 @@ function createTargetUserEmbed(
         footerText:
             command
                 ? commandFooter(
-                    command
+                    command,
+                    footerDetail
                 )
                 : undefined,
         timestamp:
@@ -164,6 +168,7 @@ function createBotEmbed(
         color = getRandomColor(),
         command,
         description,
+        footerDetail,
         image,
         thumbnail,
         title
@@ -183,7 +188,8 @@ function createBotEmbed(
         footerText:
             command
                 ? commandFooter(
-                    command
+                    command,
+                    footerDetail
                 )
                 : undefined,
         timestamp:

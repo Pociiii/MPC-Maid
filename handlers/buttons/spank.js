@@ -126,6 +126,7 @@ module.exports = async (
                                     component
                                 )
                                 .setDisabled(
+                                    component.disabled ||
                                     component.customId ===
                                     interaction.customId
                                 )

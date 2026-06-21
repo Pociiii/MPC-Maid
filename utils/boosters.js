@@ -19,7 +19,7 @@ const boosterStatLabels = {
 const boosterTiers = {
     1: {
         value: 2,
-        cost: 150,
+        cost: 250,
         burnoutRisk: 1
     },
     2: {

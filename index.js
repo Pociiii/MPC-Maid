@@ -63,6 +63,10 @@ const {
 } = require('./utils/databaseBackup');
 
 const {
+    startPregnancyScheduler
+} = require('./features/pregnancy/scheduler');
+
+const {
     clearAllSceneBusy
 } = require('./utils/pornScenes');
 
@@ -204,6 +208,10 @@ async readyClient => {
     );
 
     startDatabaseBackups(
+        readyClient
+    );
+
+    startPregnancyScheduler(
         readyClient
     );
 

@@ -7,13 +7,9 @@ const {
 } = require('../../data/constants');
 
 const {
-    createEmbed,
+    createTargetUserEmbed,
     createUserEmbed
 } = require('../../utils/embeds');
-
-const {
-    commandFooter
-} = require('../../utils/version');
 
 const {
     addCoins,
@@ -644,6 +640,24 @@ function formatReward(
 
 }
 
+async function getAnnouncementTarget(
+    client,
+    userId
+) {
+
+    return await client.users.fetch(
+        userId
+    ).catch(
+        () => ({
+            displayName:
+                'MPC Member',
+            displayAvatarURL:
+                () => undefined
+        })
+    );
+
+}
+
 function buildDailyEmbed(
     interaction,
     quests
@@ -755,24 +769,27 @@ async function sendQuestCompleteRumor(
     )
         return;
 
+    const target =
+        await getAnnouncementTarget(
+            client,
+            userId
+        );
+
     const embed =
-        createEmbed({
+        createTargetUserEmbed({
             color:
                 getRandomColor(),
+            command:
+                '/daily',
+            target,
             title:
-                'Daily Quest Complete',
-            footerText:
-                commandFooter(
-                    '/daily'
-                ),
-            timestamp:
-                true
+                'Daily Quest Complete'
         });
 
     embed.addFields(
         {
             name:
-                'Quest',
+                '📋 Quest',
             value:
                 quest.label,
             inline:
@@ -780,7 +797,7 @@ async function sendQuestCompleteRumor(
         },
         {
             name:
-                'Progress',
+                '📈 Progress',
             value:
                 `${quest.target} / ${quest.target}`,
             inline:
@@ -788,7 +805,7 @@ async function sendQuestCompleteRumor(
         },
         {
             name:
-                'Reward',
+                `${emojis.coin} Reward`,
             value:
                 formatReward(
                     quest.reward_coins,
@@ -799,7 +816,7 @@ async function sendQuestCompleteRumor(
         },
         {
             name:
-                'Daily Progress',
+                '✅ Daily Progress',
             value:
                 `${Math.min(
                     completedCount,
@@ -835,24 +852,27 @@ async function sendDailySetCompleteRumor(
     )
         return;
 
+    const target =
+        await getAnnouncementTarget(
+            client,
+            userId
+        );
+
     const embed =
-        createEmbed({
+        createTargetUserEmbed({
             color:
                 getRandomColor(),
+            command:
+                '/daily',
+            target,
             title:
-                'Daily Set Complete',
-            footerText:
-                commandFooter(
-                    '/daily'
-                ),
-            timestamp:
-                true
+                'Daily Set Complete'
         });
 
     embed.addFields(
         {
             name:
-                'Completed',
+                '✅ Completed',
             value:
                 `${QUESTS_PER_DAY} / ${QUESTS_PER_DAY} daily quests`,
             inline:
@@ -860,7 +880,7 @@ async function sendDailySetCompleteRumor(
         },
         {
             name:
-                'Bonus Reward',
+                `${emojis.coin} Bonus Reward`,
             value:
                 formatReward(
                     DAILY_BONUS.coins,

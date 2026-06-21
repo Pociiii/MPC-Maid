@@ -6,12 +6,11 @@ const {
 } = require('discord.js');
 
 const {
-    createEmbed
+    createUserEmbed
 } = require('../../utils/embeds');
 
 const {
-    COOLDOWNS,
-    getRandomColor
+    COOLDOWNS
 } = require('../../data/constants');
 
 const {
@@ -68,7 +67,7 @@ function buildCastRows(
                         option.label
                     )
                     .setEmoji(
-                        '🎭'
+                        '\uD83C\uDFAD'
                     )
                     .setStyle(
                         ButtonStyle.Secondary
@@ -118,28 +117,28 @@ module.exports = {
             return;
 
         const embed =
-            createEmbed({
-                color:
-                    getRandomColor(),
-                title:
-                    'Custom Scene',
-                thumbnail:
-                    interaction.user.displayAvatarURL(),
-                description:
-                    'Choose the cast for your custom scene.',
-                footerText:
-                    '/customscene',
-                timestamp:
-                    true
-            });
+            createUserEmbed(
+                interaction,
+                {
+                    command:
+                        '/customscene',
+                    title:
+                        'Custom Scene',
+                    description:
+                        'Choose the cast for your custom scene.'
+                }
+            );
 
         await interaction.reply({
-            embeds: [embed],
+            embeds: [
+                embed
+            ],
             components:
                 buildCastRows(
                     interaction.user.id
                 ),
-            flags: 64
+            flags:
+                64
         });
 
     }

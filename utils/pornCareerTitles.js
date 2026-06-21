@@ -123,13 +123,14 @@ function getPornCareerTitle(
         );
 
     if (
-        highest - lowest <= 3
+        highest - lowest <= 1
     )
         return balancedTitles[tier];
 
     if (
-        highest >= 10 &&
-        stats[0].value - stats[1].value <= 3
+        highest >= 4 &&
+        stats[0].value - stats[1].value <= 2 &&
+        stats[1].value - lowest >= 2
     ) {
 
         const comboKey =

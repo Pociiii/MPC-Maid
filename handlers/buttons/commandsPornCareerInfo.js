@@ -53,12 +53,16 @@ module.exports = {
 - Stamina increases total scene parts.
 - Fame increases viewers and revenue.
 - Ranking changes based on the final scene outcome.
+- Partner stats are combined for the scene.
+- Every **10 combined points** in a stat gives an extra bonus.
+- Example: Performance **6 + 4 = 10**, so the scene gets the Performance threshold bonus.
+- Boosters count for that scene's combined stat check only.
 
 **Progression**
 - Completed scenes grant XP, coins, ranking points, and scenes completed.
 - Use \`/train\` to spend XP and coins on Performance, Stamina, and Fame.
-- Boosters are one-use scene bonuses for the requester only. They add to the selected stat for that scene's combined stat check.
-- The shop command will sell boosters later.`,
+- Boosters are one-use scene bonuses for the requester only.
+- Use \`/shop\` to buy boosters and \`/inventory\` to check owned boosters.`,
                 footerText:
                     '/commands - Porn Career Info',
                 timestamp:

@@ -27,6 +27,18 @@ const {
     addBooster
 } = require('../../utils/boosters');
 
+const {
+    clearActivePregnancy,
+    forceBirth,
+    forceGenderReveal,
+    forcePregnancy,
+    getPregnancyDate,
+    getPreviousPregnancyDate,
+    processPregnancyChecks,
+    resetDailyCheck,
+    resetDailyPartners
+} = require('../../database/pregnancy');
+
 function getOwnerIds() {
 
     return (process.env.OWNER_IDS ?? '')
@@ -154,6 +166,176 @@ module.exports = {
                         )
                         .setDescription(
                             'Create a database backup now'
+                        )
+            )
+            .addSubcommand(
+                (subcommand) =>
+                    subcommand
+                        .setName(
+                            'pregclear'
+                        )
+                        .setDescription(
+                            'Clear active pregnancy for a user'
+                        )
+                        .addUserOption(
+                            (option) =>
+                                option
+                                    .setName(
+                                        'user'
+                                    )
+                                    .setDescription(
+                                        'Carrier to clear'
+                                    )
+                                    .setRequired(
+                                        true
+                                    )
+                        )
+            )
+            .addSubcommand(
+                (subcommand) =>
+                    subcommand
+                        .setName(
+                            'pregforce'
+                        )
+                        .setDescription(
+                            'Force a pregnancy for testing'
+                        )
+                        .addUserOption(
+                            (option) =>
+                                option
+                                    .setName(
+                                        'carrier'
+                                    )
+                                    .setDescription(
+                                        'Carrier'
+                                    )
+                                    .setRequired(
+                                        true
+                                    )
+                        )
+                        .addUserOption(
+                            (option) =>
+                                option
+                                    .setName(
+                                        'father'
+                                    )
+                                    .setDescription(
+                                        'Father'
+                                    )
+                                    .setRequired(
+                                        true
+                                    )
+                        )
+                        .addIntegerOption(
+                            (option) =>
+                                option
+                                    .setName(
+                                        'day'
+                                    )
+                                    .setDescription(
+                                        'Pregnancy day'
+                                    )
+                                    .setMinValue(
+                                        1
+                                    )
+                                    .setMaxValue(
+                                        30
+                                    )
+                                    .setRequired(
+                                        false
+                                    )
+                        )
+            )
+            .addSubcommand(
+                (subcommand) =>
+                    subcommand
+                        .setName(
+                            'pregreveal'
+                        )
+                        .setDescription(
+                            'Force gender reveal for active pregnancy'
+                        )
+                        .addUserOption(
+                            (option) =>
+                                option
+                                    .setName(
+                                        'user'
+                                    )
+                                    .setDescription(
+                                        'Carrier'
+                                    )
+                                    .setRequired(
+                                        true
+                                    )
+                        )
+            )
+            .addSubcommand(
+                (subcommand) =>
+                    subcommand
+                        .setName(
+                            'pregbirth'
+                        )
+                        .setDescription(
+                            'Force birth for active pregnancy'
+                        )
+                        .addUserOption(
+                            (option) =>
+                                option
+                                    .setName(
+                                        'user'
+                                    )
+                                    .setDescription(
+                                        'Carrier'
+                                    )
+                                    .setRequired(
+                                        true
+                                    )
+                        )
+            )
+            .addSubcommand(
+                (subcommand) =>
+                    subcommand
+                        .setName(
+                            'pregresetpartners'
+                        )
+                        .setDescription(
+                            'Reset today pregnancy partners for a carrier'
+                        )
+                        .addUserOption(
+                            (option) =>
+                                option
+                                    .setName(
+                                        'user'
+                                    )
+                                    .setDescription(
+                                        'Carrier'
+                                    )
+                                    .setRequired(
+                                        true
+                                    )
+                        )
+            )
+            .addSubcommand(
+                (subcommand) =>
+                    subcommand
+                        .setName(
+                            'pregcheck'
+                        )
+                        .setDescription(
+                            'Force pregnancy check processing'
+                        )
+                        .addUserOption(
+                            (option) =>
+                                option
+                                    .setName(
+                                        'user'
+                                    )
+                                    .setDescription(
+                                        'Optional carrier to reroll previous check'
+                                    )
+                                    .setRequired(
+                                        false
+                                    )
                         )
             )
             .addSubcommand(
@@ -478,6 +660,104 @@ module.exports = {
 
         }
 
+        if (
+            subcommand === 'pregforce'
+        ) {
+
+            const carrier =
+                interaction.options.getUser(
+                    'carrier'
+                );
+
+            const father =
+                interaction.options.getUser(
+                    'father'
+                );
+
+            const day =
+                interaction.options.getInteger(
+                    'day'
+                ) ?? 1;
+
+            const pregnancy =
+                await forcePregnancy(
+                    carrier.id,
+                    father.id,
+                    day
+                );
+
+            await replyResult(
+                interaction,
+                'Pregnancy Forced',
+                `<@${carrier.id}> is pregnant with <@${father.id}> as father.\nDay: **${day}/30**\nBaby: **${pregnancy.baby_gender}**`
+            );
+
+            return;
+
+        }
+
+        if (
+            subcommand === 'pregcheck'
+        ) {
+
+            await interaction.deferReply({
+                flags:
+                    64
+            });
+
+            const carrier =
+                interaction.options.getUser(
+                    'user'
+                );
+
+            const date =
+                getPreviousPregnancyDate();
+
+            let resetCount = 0;
+
+            if (
+                carrier
+            )
+                resetCount =
+                    await resetDailyCheck(
+                        carrier.id,
+                        date
+                    );
+
+            const results =
+                await processPregnancyChecks(
+                    date
+                );
+
+            const successful =
+                results.filter(
+                    (result) =>
+                        result.success
+                );
+
+            await replyResult(
+                interaction,
+                'Pregnancy Check Processed',
+                [
+                    `Date checked: **${date}**`,
+                    carrier
+                        ? `Reset checks for <@${carrier.id}>: **${resetCount}**`
+                        : null,
+                    `Carriers processed: **${results.length}**`,
+                    `Pregnancies created: **${successful.length}**`
+                ]
+                    .filter(
+                        Boolean
+                    )
+                    .join(
+                        '\n'
+                    )
+            );
+
+            return;
+
+        }
+
         const target =
             interaction.options.getUser(
                 'user'
@@ -502,6 +782,92 @@ module.exports = {
                 busy
                     ? `<@${target.id}> and their linked partner were cleared.`
                     : `<@${target.id}> was not marked busy.`
+            );
+
+            return;
+
+        }
+
+        if (
+            subcommand === 'pregclear'
+        ) {
+
+            const changes =
+                await clearActivePregnancy(
+                    target.id
+                );
+
+            await replyResult(
+                interaction,
+                'Pregnancy Cleared',
+                changes
+                    ? `<@${target.id}> active pregnancy was cleared.`
+                    : `<@${target.id}> had no active pregnancy.`
+            );
+
+            return;
+
+        }
+
+        if (
+            subcommand === 'pregreveal'
+        ) {
+
+            const changes =
+                await forceGenderReveal(
+                    target.id
+                );
+
+            await replyResult(
+                interaction,
+                'Gender Reveal Forced',
+                changes
+                    ? `<@${target.id}> pregnancy gender is now revealed.`
+                    : `<@${target.id}> had no active pregnancy.`
+            );
+
+            return;
+
+        }
+
+        if (
+            subcommand === 'pregbirth'
+        ) {
+
+            const changes =
+                await forceBirth(
+                    target.id
+                );
+
+            await replyResult(
+                interaction,
+                'Birth Forced',
+                changes
+                    ? `<@${target.id}> active pregnancy was marked as born.`
+                    : `<@${target.id}> had no active pregnancy.`
+            );
+
+            return;
+
+        }
+
+        if (
+            subcommand === 'pregresetpartners'
+        ) {
+
+            const date =
+                getPregnancyDate();
+
+            const changes =
+                await resetDailyPartners(
+                    target.id,
+                    date
+                );
+
+            await replyResult(
+                interaction,
+                'Pregnancy Partners Reset',
+                `Removed **${changes}** partner entry${changes === 1 ? '' : 'ies'} for <@${target.id}> today.\nDate: **${date}**`
             );
 
             return;

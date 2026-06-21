@@ -5,12 +5,8 @@ const {
 } = require('discord.js');
 
 const {
-    createEmbed
+    createUserEmbed
 } = require('../../utils/embeds');
-
-const {
-    getRandomColor
-} = require('../../data/constants');
 
 const {
     castLabels,
@@ -21,10 +17,14 @@ const {
 } = require('./state');
 
 const phaseEmojis = {
-    foreplay: '✨',
-    oral: '💋',
-    sex: '🔥',
-    finale: '🏁'
+    foreplay:
+        '\u2728',
+    oral:
+        '\uD83D\uDC8B',
+    sex:
+        '\uD83D\uDD25',
+    finale:
+        '\uD83C\uDFC1'
 };
 
 function formatParts(
@@ -53,23 +53,22 @@ function buildBuilderEmbed(
     parts
 ) {
 
-    return createEmbed({
-        color:
-            getRandomColor(),
-        title:
-            'Custom Scene Builder',
-        thumbnail:
-            interaction.user.displayAvatarURL(),
-        description:
+    return createUserEmbed(
+        interaction,
+        {
+            command:
+                '/customscene',
+            footerDetail:
+                'Add up to 8 parts, then press Finish.',
+            title:
+                'Custom Scene Builder',
+            description:
 `Cast: **${castLabels[cast] ?? cast}**
 Parts: **${parts.length}/${maxParts}**
 
-${formatParts(parts)}`,
-        footerText:
-            '/customscene - Add up to 8 parts, then press Finish.',
-        timestamp:
-            true
-    });
+${formatParts(parts)}`
+        }
+    );
 
 }
 
@@ -127,7 +126,7 @@ function buildBuilderRows(
                 'Undo'
             )
             .setEmoji(
-                '↩️'
+                '\u21A9\uFE0F'
             )
             .setStyle(
                 ButtonStyle.Danger
@@ -151,7 +150,7 @@ function buildBuilderRows(
                 'Finish'
             )
             .setEmoji(
-                '✅'
+                '\u2705'
             )
             .setStyle(
                 ButtonStyle.Success
