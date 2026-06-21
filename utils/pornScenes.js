@@ -126,6 +126,54 @@ function clearSceneBusy(
 
 }
 
+function getBusyUser(
+    userId
+) {
+
+    return busyUsers.get(
+        userId
+    ) ?? null;
+
+}
+
+function clearUserBusy(
+    userId
+) {
+
+    const busy =
+        getBusyUser(
+            userId
+        );
+
+    busyUsers.delete(
+        userId
+    );
+
+    if (
+        busy?.partnerId
+    ) {
+
+        busyUsers.delete(
+            busy.partnerId
+        );
+
+    }
+
+    return busy;
+
+}
+
+function clearAllSceneBusy() {
+
+    const count =
+        busyUsers.size;
+
+    busyUsers.clear();
+
+    return count;
+
+}
+
 module.exports = {
     hasPendingRequest,
     addPendingRequest,
@@ -133,5 +181,8 @@ module.exports = {
     removePendingRequest,
     isBusy,
     setSceneBusy,
-    clearSceneBusy
+    clearSceneBusy,
+    getBusyUser,
+    clearUserBusy,
+    clearAllSceneBusy
 };

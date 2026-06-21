@@ -49,8 +49,24 @@ function removeXP(
 
 }
 
+function setXP(
+    userId,
+    amount
+) {
+
+    return runUserUpdate(
+        'UPDATE users SET xp = ? WHERE id = ?',
+        [
+            amount,
+            userId
+        ]
+    );
+
+}
+
 module.exports = {
     addXP,
     getXP,
-    removeXP
+    removeXP,
+    setXP
 };

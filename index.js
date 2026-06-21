@@ -1,5 +1,11 @@
 require('dotenv').config();
 
+const {
+    validateEnv
+} = require('./utils/env');
+
+validateEnv();
+
 const fs = require('fs');
 const path = require('path');
 
@@ -51,6 +57,14 @@ const {
     logBotEvent,
     logError
 } = require('./utils/inboxLogger');
+
+const {
+    startDatabaseBackups
+} = require('./utils/databaseBackup');
+
+const {
+    clearAllSceneBusy
+} = require('./utils/pornScenes');
 
 // Initialize database
 require('./database/database');
@@ -165,6 +179,14 @@ async readyClient => {
             fields: [
                 {
                     name:
+                        'Scene Busy Reset',
+                    value:
+                        `${clearAllSceneBusy()} in-memory busy entries cleared.`,
+                    inline:
+                        true
+                },
+                {
+                    name:
                         'Commands',
                     value:
                         String(
@@ -178,6 +200,10 @@ async readyClient => {
     );
 
     startShowcaseAutoDrop(
+        readyClient
+    );
+
+    startDatabaseBackups(
         readyClient
     );
 

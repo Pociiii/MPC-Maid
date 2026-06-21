@@ -75,7 +75,7 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`,
                     'All channels',
                 value:
 `- \`/profile\` Stats and progress
-- \`/daily\` Personal daily quests
+- \`/daily\` Personal daily quests, reset 12:00 UTC
 - \`/train\` Raise career stats
 - \`/inventory\` Your boosters
 - \`/leaderboard\` Server rankings
@@ -117,6 +117,8 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`,
                 value:
 `- Media: image, GIF, or video.
 - Boosters: check \`/inventory\`, use with \`/pornscene\`.
+- Daily quests and achievements announce completions in rumors.
+- Updates are posted in <#${CHANNELS.UPDATES}>.
 - More details: press **Porn Career Info**.
 
 -# This bot is not hosted on a server yet, Check it's status before using it's features`,
@@ -140,9 +142,46 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`,
                         )
                 );
 
+        const channel =
+            interaction.client.channels.cache.get(
+                CHANNELS.COMMANDS
+            ) ??
+            await interaction.client.channels.fetch(
+                CHANNELS.COMMANDS
+            ).catch(
+                () => null
+            );
+
+        if (
+            !channel?.send
+        ) {
+
+            await interaction.reply({
+                content:
+                    'I could not find the command channel.',
+                flags:
+                    64
+            });
+
+            return;
+
+        }
+
+        const message =
+            await channel.send({
+                embeds: [
+                    embed
+                ],
+                components: [
+                    row
+                ]
+            });
+
         await interaction.reply({
-            embeds: [embed],
-            components: [row]
+            content:
+                `Command guide posted in <#${CHANNELS.COMMANDS}>: ${message.url}`,
+            flags:
+                64
         });
 
     }
