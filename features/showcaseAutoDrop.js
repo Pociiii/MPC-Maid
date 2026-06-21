@@ -6,6 +6,12 @@ const {
     buildDropPost
 } = require('../utils/dropPost');
 
+const {
+    logBotEvent,
+    logError,
+    logWarning
+} = require('../utils/inboxLogger');
+
 const ONE_HOUR =
     60 * 60 * 1000;
 
@@ -25,8 +31,21 @@ async function sendAutoDrop(
 
         if (
             !channel?.isTextBased()
-        )
+        ) {
+
+            await logWarning(
+                client,
+                {
+                    title:
+                        'Auto Drop Channel Missing',
+                    description:
+                        `Showcase channel <#${CHANNELS.SHOWCASE}> was not available or was not text based.`
+                }
+            );
+
             return;
+
+        }
 
         await channel.send(
             buildDropPost()
@@ -40,6 +59,25 @@ async function sendAutoDrop(
         );
         console.error(
             error
+        );
+
+        await logError(
+            client,
+            {
+                title:
+                    'Auto Drop Failed',
+                error,
+                fields: [
+                    {
+                        name:
+                            'Channel',
+                        value:
+                            `<#${CHANNELS.SHOWCASE}>`,
+                        inline:
+                            true
+                    }
+                ]
+            }
         );
 
     }
@@ -63,6 +101,16 @@ function startShowcaseAutoDrop(
                 ),
             ONE_HOUR
         );
+
+    void logBotEvent(
+        client,
+        {
+            title:
+                'Auto Drop Started',
+            description:
+                `Automatic drops will post in <#${CHANNELS.SHOWCASE}> every hour.`
+        }
+    );
 
 }
 

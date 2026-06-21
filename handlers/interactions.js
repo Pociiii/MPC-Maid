@@ -71,9 +71,44 @@ const gifRejectModal =
 
 const memberCard =
     require('./buttons/memberCard');
-module.exports = async (
+
+const {
+    logError
+} = require('../utils/inboxLogger');
+
+async function replyInteractionError(
     interaction
-) => {
+) {
+
+    const payload = {
+        content:
+            'There was an error handling this interaction.',
+        flags:
+            64
+    };
+
+    if (
+        interaction.replied ||
+        interaction.deferred
+    ) {
+
+        await interaction.followUp(
+            payload
+        );
+
+        return;
+
+    }
+
+    await interaction.reply(
+        payload
+    );
+
+}
+
+async function routeInteraction(
+    interaction
+) {
 
     if (interaction.isButton()) {
 
@@ -339,5 +374,72 @@ module.exports = async (
     }
 
     return false;
+
+}
+
+module.exports = async (
+    interaction
+) => {
+
+    try {
+
+        return await routeInteraction(
+            interaction
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            'INTERACTION ERROR'
+        );
+        console.error(
+            error
+        );
+
+        await logError(
+            interaction.client,
+            {
+                title:
+                    'Interaction Error',
+                error,
+                fields: [
+                    {
+                        name:
+                            'Type',
+                        value:
+                            interaction.type?.toString() || 'Unknown',
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            'Custom ID',
+                        value:
+                            interaction.customId || 'None',
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            'User',
+                        value:
+                            `${interaction.user.tag} (${interaction.user.id})`,
+                        inline:
+                            false
+                    }
+                ]
+            }
+        );
+
+        await replyInteractionError(
+            interaction
+        ).catch(
+            () => null
+        );
+
+        return true;
+
+    }
 
 };

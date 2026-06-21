@@ -1,8 +1,4 @@
 const {
-    EmbedBuilder
-} = require('discord.js');
-
-const {
     addGifToFile,
     findGifInData,
     getGifCount
@@ -12,100 +8,23 @@ const {
     CHANNELS
 } = require('../data/constants');
 
-function getFieldValue(
-    embed,
-    fieldName
+const {
+    buildApprovalRumorEmbed,
+    buildApprovedEmbed,
+    getGifUrl,
+    getSubmitterId
+} = require('../features/gif-submit/approvalResult');
+
+function duplicateReply(
+    scope
 ) {
 
-    return embed.fields
-        ?.find(
-            (field) =>
-                field.name === fieldName
-        )
-        ?.value;
-
-}
-
-function getGifUrl(
-    embed
-) {
-
-    return getFieldValue(
-        embed,
-        'URL'
-    ) ?? embed.footer?.text;
-
-}
-
-function buildApprovedEmbed(
-    originalEmbed,
-    {
-        approvedBy,
-        categoryName,
-        gifUrl,
-        submitter,
-        totalCount
-    }
-) {
-
-    return EmbedBuilder.from(
-        originalEmbed
-    )
-        .setTitle(
-            'GIF Approved'
-        )
-        .setDescription(
-            null
-        )
-        .setFooter(
-            null
-        )
-        .setFields(
-            {
-                name:
-                    'Approved By',
-                value:
-                    `${approvedBy}`,
-                inline:
-                    true
-            },
-            {
-                name:
-                    'Submitted By',
-                value:
-                    submitter
-                        ? `<@${submitter}>`
-                        : 'Unknown',
-                inline:
-                    true
-            },
-            {
-                name:
-                    'Category',
-                value:
-                    categoryName,
-                inline:
-                    true
-            },
-            {
-                name:
-                    'Total GIFs',
-                value:
-                    String(
-                        totalCount
-                    ),
-                inline:
-                    true
-            },
-            {
-                name:
-                    'URL',
-                value:
-                    gifUrl,
-                inline:
-                    false
-            }
-        );
+    return {
+        content:
+            `This GIF already exists in ${scope}.`,
+        flags:
+            64
+    };
 
 }
 
@@ -124,13 +43,9 @@ async function approveGif(
         );
 
     const submitter =
-        getFieldValue(
-            originalEmbed,
-            'Submitted By'
-        )
-            ?.match(
-                /<@(\d+)>/
-            )?.[1];
+        getSubmitterId(
+            originalEmbed
+        );
 
     const existingGif =
         findGifInData(
@@ -142,12 +57,11 @@ async function approveGif(
         existingGif !== filePath
     ) {
 
-        return interaction.reply({
-            content:
-                'This GIF already exists in another data file.',
-            flags:
-                64
-        });
+        return interaction.reply(
+            duplicateReply(
+                'another data file'
+            )
+        );
 
     }
 
@@ -157,23 +71,22 @@ async function approveGif(
             gifUrl
         );
 
-    const totalCount =
-        getGifCount(
-            filePath
-        );
-
     if (
         !added
     ) {
 
-        return interaction.reply({
-            content:
-                'This GIF already exists in this category.',
-            flags:
-                64
-        });
+        return interaction.reply(
+            duplicateReply(
+                'this category'
+            )
+        );
 
     }
+
+    const totalCount =
+        getGifCount(
+            filePath
+        );
 
     const approvedEmbed =
         buildApprovedEmbed(
@@ -207,58 +120,18 @@ async function approveGif(
         rumorsChannel
     ) {
 
-        const rumorEmbed =
-            EmbedBuilder.from(
-                approvedEmbed
-            )
-                .setTitle(
-                    '🎉 New GIF Added'
-                )
-                .setFields(
-                    {
-                        name:
-                            '📁 Category',
-                        value:
-                            categoryName,
-                        inline:
-                            true
-                    },
-                    {
-                        name:
-                            '📊 Total GIFs',
-                        value:
-                            String(
-                                totalCount
-                            ),
-                        inline:
-                            true
-                    },
-                    {
-                        name:
-                            '👤 Submitted By',
-                        value:
-                            submitter
-                                ? `<@${submitter}>`
-                                : 'Unknown',
-                        inline:
-                            true
-                    },
-                    {
-                        name:
-                            '📤 Submit Your Own GIF',
-                        value:
-                            `<#${CHANNELS.GIFS}>`,
-                        inline:
-                            true
-                    }
-                )
-                .setFooter(
-                    null
-                );
-
         await rumorsChannel.send({
             embeds: [
-                rumorEmbed
+                buildApprovalRumorEmbed(
+                    approvedEmbed,
+                    {
+                        categoryName,
+                        gifChannelId:
+                            CHANNELS.GIFS,
+                        submitter,
+                        totalCount
+                    }
+                )
             ]
         });
 

@@ -40,6 +40,10 @@ const {
     adpLogoAttachment
 } = require('../../utils/adpLogo');
 
+const {
+    logWarning
+} = require('../../utils/inboxLogger');
+
 async function sendPornSceneRequest(
     interaction,
     targetId,
@@ -167,6 +171,42 @@ Booster: **${formatBooster(
                 booster.tier
             );
 
+        await logWarning(
+            interaction.client,
+            {
+                title:
+                    'Porn Scene Request DM Failed',
+                description:
+                    'The request DM could not be delivered. Any consumed booster was returned.',
+                fields: [
+                    {
+                        name:
+                            'Requester',
+                        value:
+                            `<@${interaction.user.id}>`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            'Target',
+                        value:
+                            `<@${targetId}>`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            'Reason',
+                        value:
+                            error.message || 'Unknown error',
+                        inline:
+                            false
+                    }
+                ]
+            }
+        );
+
         throw error;
 
     }
@@ -192,6 +232,8 @@ Booster: **${formatBooster(
             ) ??
             await interaction.client.channels.fetch(
                 CHANNELS.RUMORS
+            ).catch(
+                () => null
             );
 
         if (
@@ -229,6 +271,37 @@ Booster: **${formatBooster(
             });
 
         }
+        else {
+
+            await logWarning(
+                interaction.client,
+                {
+                    title:
+                        'Porn Scene Request Rumor Missing',
+                    description:
+                        `Could not post the request rumor because <#${CHANNELS.RUMORS}> was unavailable.`,
+                    fields: [
+                        {
+                            name:
+                                'Requester',
+                            value:
+                                `<@${interaction.user.id}>`,
+                            inline:
+                                true
+                        },
+                        {
+                            name:
+                                'Target',
+                            value:
+                                `<@${targetId}>`,
+                            inline:
+                                true
+                        }
+                    ]
+                }
+            );
+
+        }
 
     }
     catch (error) {
@@ -238,6 +311,42 @@ Booster: **${formatBooster(
         );
         console.error(
             error
+        );
+
+        await logWarning(
+            interaction.client,
+            {
+                title:
+                    'Porn Scene Request Rumor Failed',
+                description:
+                    `Could not post the request rumor in <#${CHANNELS.RUMORS}>.`,
+                fields: [
+                    {
+                        name:
+                            'Requester',
+                        value:
+                            `<@${interaction.user.id}>`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            'Target',
+                        value:
+                            `<@${targetId}>`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            'Reason',
+                        value:
+                            error.message || 'Unknown error',
+                        inline:
+                            false
+                    }
+                ]
+            }
         );
 
     }

@@ -47,6 +47,11 @@ const {
     startShowcaseAutoDrop
 } = require('./features/showcaseAutoDrop');
 
+const {
+    logBotEvent,
+    logError
+} = require('./utils/inboxLogger');
+
 // Initialize database
 require('./database/database');
 
@@ -144,10 +149,32 @@ version: '10'
 // Bot ready
 client.once(
 Events.ClientReady,
-readyClient => {
+async readyClient => {
 
     console.log(
         `Logged in as ${readyClient.user.tag}`
+    );
+
+    await logBotEvent(
+        readyClient,
+        {
+            title:
+                'Bot Started',
+            description:
+                `${readyClient.user.tag} is online.`,
+            fields: [
+                {
+                    name:
+                        'Commands',
+                    value:
+                        String(
+                            commands.length
+                        ),
+                    inline:
+                        true
+                }
+            ]
+        }
     );
 
     startShowcaseAutoDrop(
@@ -158,6 +185,36 @@ readyClient => {
 
 
 );
+
+async function replyCommandError(
+    interaction
+) {
+
+    const payload = {
+        content:
+            'There was an error executing this command.',
+        flags:
+            64
+    };
+
+    if (
+        interaction.replied ||
+        interaction.deferred
+    ) {
+
+        await interaction.followUp(
+            payload
+        );
+
+        return;
+
+    }
+
+    await interaction.reply(
+        payload
+    );
+
+}
 
 // Command handler
 client.on(
@@ -195,52 +252,73 @@ async interaction => {
         console.error('COMMAND ERROR');
         console.error(error);
 
+        await logError(
+            interaction.client,
+            {
+                title:
+                    'Command Error',
+                error,
+                fields: [
+                    {
+                        name:
+                            'Command',
+                        value:
+                            `/${interaction.commandName}`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            'User',
+                        value:
+                            `${interaction.user.tag} (${interaction.user.id})`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            'Channel',
+                        value:
+                            interaction.channelId
+                                ? `<#${interaction.channelId}>`
+                                : 'Unknown',
+                        inline:
+                            true
+                    }
+                ]
+            }
+        );
+
         try {
 
-            if (interaction.replied ||
-                interaction.deferred) {
-
-                await interaction.followUp({
-                    content: 'There was an error executing this command.'
-                });
-
-            } else {
-
-                await interaction.reply({
-                    content: 'There was an error executing this command.'
-                });
-
-            }
+            await replyCommandError(
+                interaction
+            );
 
         } catch (err) {
 
-            console.error('COMMAND ERROR');
-            console.error(error);
+            console.error('COMMAND ERROR REPLY FAILED');
+            console.error(err);
 
-            try {
-
-                if (interaction.replied ||
-                    interaction.deferred) {
-
-                    await interaction.followUp({
-                        content: 'There was an error executing this command.'
-                    });
-
-                } else {
-
-                    await interaction.reply({
-                        content: 'There was an error executing this command.'
-                    });
-
+            await logError(
+                interaction.client,
+                {
+                    title:
+                        'Command Error Reply Failed',
+                    error:
+                        err,
+                    fields: [
+                        {
+                            name:
+                                'Original Command',
+                            value:
+                                `/${interaction.commandName}`,
+                            inline:
+                                true
+                        }
+                    ]
                 }
-
-            } catch (error) {
-
-                console.error('COMMAND ERROR');
-                console.error(error);
-
-            }
-
+            );
 
         }
     }

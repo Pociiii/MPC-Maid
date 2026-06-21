@@ -1,38 +1,20 @@
 const {
-
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle
-
-} = require(
-    'discord.js'
-);
-
-const {
-    createEmbed
-} = require(
-    '../../utils/embeds'
-);
-
-const {
-    CHANNELS,
-    getRandomColor
-} = require(
-    '../../data/constants'
-);
-
-const {
-    getSceneCategoryName,
-    getSceneGroupKey
-} = require(
-    '../../data/sceneSubmitGroups'
-);
-
-const {
     findGifInData
-} = require(
-    '../../utils/gifs'
-);
+} = require('../../utils/gifs');
+
+const {
+    logWarning
+} = require('../../utils/inboxLogger');
+
+const {
+    buildDuplicateEmbed,
+    buildReviewChannelMissingEmbed,
+    buildReviewComponents,
+    buildReviewEmbed,
+    buildSubmittedEmbed,
+    getReviewChannel,
+    parseSubmissionCustomId
+} = require('../../features/gif-submit/submissionFlow');
 
 module.exports = {
 
@@ -43,64 +25,27 @@ module.exports = {
         interaction
     ) {
 
-        const customIdParts =
-            interaction.customId.split(
-                ':'
+        const submission =
+            parseSubmissionCustomId(
+                interaction.customId
             );
-
-        const isSceneSubmission =
-            customIdParts.length >= 3;
-
-        const group =
-            isSceneSubmission
-                ? getSceneGroupKey(
-                    customIdParts[1]
-                )
-                : null;
-
-        const category =
-            isSceneSubmission
-                ? customIdParts[2]
-                : customIdParts[1];
-
-        const categoryName =
-            isSceneSubmission
-                ? getSceneCategoryName(
-                    group,
-                    category
-                )
-                : category;
 
         const gifUrl =
             interaction.fields.getTextInputValue(
                 'gif_url'
             );
 
-        const existingGif =
+        if (
             findGifInData(
                 gifUrl
-            );
-
-        if (
-            existingGif
+            )
         ) {
 
             await interaction.reply({
                 embeds: [
-                    createEmbed({
-                        color:
-                            getRandomColor(),
-                        title:
-                            'Duplicate GIF',
-                        description:
-                            'This GIF already exists in the data folder, so it was not sent for review.',
-                        image:
-                            gifUrl,
-                        footerText:
-                            '/gifsubmit',
-                        timestamp:
-                            true
-                    })
+                    buildDuplicateEmbed(
+                        gifUrl
+                    )
                 ],
                 flags:
                     64
@@ -111,127 +56,79 @@ module.exports = {
         }
 
         const reviewChannel =
-            interaction.client.channels.cache.get(
-                CHANNELS.GIF_REVIEW
+            getReviewChannel(
+                interaction.client
             );
 
-        const embed =
-            createEmbed({
+        if (
+            !reviewChannel
+        ) {
 
-                color:
-                    getRandomColor(),
-
-                title:
-                    'GIF Submission',
-
-                image:
-                    gifUrl,
-
-                timestamp:
-                    true
-
+            await interaction.reply({
+                embeds: [
+                    buildReviewChannelMissingEmbed()
+                ],
+                flags:
+                    64
             });
 
-        embed.addFields(
-            {
-                name:
-                    'Submitted By',
-                value:
-                    `<@${interaction.member.id}>`,
-                inline:
-                    true
-            },
-            {
-                name:
-                    'Category',
-                value:
-                    categoryName,
-                inline:
-                    true
-            },
-            {
-                name:
-                    'URL',
-                value:
-                    gifUrl,
-                inline:
-                    false
-            }
-        );
+            await logWarning(
+                interaction.client,
+                {
+                    title:
+                        'GIF Review Channel Missing',
+                    description:
+                        'A GIF submission could not be sent for review because the review channel was unavailable.',
+                    fields: [
+                        {
+                            name:
+                                'User',
+                            value:
+                                `<@${interaction.user.id}>`,
+                            inline:
+                                true
+                        },
+                        {
+                            name:
+                                'Category',
+                            value:
+                                submission.categoryName,
+                            inline:
+                                true
+                        }
+                    ]
+                }
+            );
 
-        const row =
-            new ActionRowBuilder()
+            return;
 
-                .addComponents(
-
-                    new ButtonBuilder()
-
-                        .setCustomId(
-
-                            isSceneSubmission
-                                ? `gifapprove:${group}:${category}:${interaction.user.id}`
-                                : `gifapprove:${category}:${interaction.user.id}`
-
-                        )
-
-                        .setLabel(
-                            'Approve'
-                        )
-
-                        .setStyle(
-                            ButtonStyle.Success
-                        ),
-
-                    new ButtonBuilder()
-
-                        .setCustomId(
-
-                            isSceneSubmission
-                                ? `gifreject:${group}:${category}:${interaction.user.id}`
-                                : `gifreject:${category}:${interaction.user.id}`
-
-                        )
-
-                        .setLabel(
-                            'Reject'
-                        )
-
-                        .setStyle(
-                            ButtonStyle.Danger
-                        )
-
-                );
+        }
 
         await reviewChannel.send({
-
-            embeds: [embed],
-
-            components: [row]
-
+            embeds: [
+                buildReviewEmbed({
+                    categoryName:
+                        submission.categoryName,
+                    gifUrl,
+                    submitterId:
+                        interaction.user.id
+                })
+            ],
+            components:
+                buildReviewComponents({
+                    ...submission,
+                    submitterId:
+                        interaction.user.id
+                })
         });
 
         await interaction.reply({
-
-    embeds: [
-
-        createEmbed({
-
-            color:
-                getRandomColor(),
-
-            description:
-                '✅ GIF submitted for review.',
-
-            image:
-                gifUrl
-
-        })
-
-    ],
-
-    flags: 64
-
-});
+            embeds: [
+                buildSubmittedEmbed()
+            ],
+            flags:
+                64
+        });
 
     }
 
