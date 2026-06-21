@@ -24,6 +24,10 @@ const {
     incrementAchievementProgress
 } = require('../../features/achievements/achievements');
 
+const {
+    commandFooter
+} = require('../../utils/version');
+
 const ROLES =
     require('../../data/roles.json');
 
@@ -149,7 +153,10 @@ module.exports = {
                 imageUrl,
 
             footerText:
-                footerText,
+                commandFooter(
+                    '/flex',
+                    footerText
+                ),
 
             timestamp:
                 true

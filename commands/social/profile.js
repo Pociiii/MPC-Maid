@@ -2,14 +2,18 @@ const { SlashCommandBuilder } = require('discord.js');
 const { COLORS } = require('../../data/constants');
 const { getOrCreateUser } = require('../../utils/users');
 const {
-    createEmbed,
-    createReply
+    createReply,
+    createTargetUserEmbed
 } = require('../../utils/embeds');
 
 const emojis = require('../../utils/emojis');
 
 const { getRankTitle } =
     require('../../utils/ranks');
+
+const {
+    getAchievementPoints
+} = require('../../features/achievements/achievements');
 
 const COMMAND_CONFIG = {
     ephemeral: true
@@ -39,14 +43,19 @@ module.exports = {
 
         const rankTitle = getRankTitle(user.ranking);
 
-        const embed = createEmbed({
+        const achievementPoints =
+            await getAchievementPoints(
+                target.id
+            );
 
+        const embed = createTargetUserEmbed({
             color: COLORS.DEFAULT,
-
-            authorName: member.displayName,
-            thumbnail: target.displayAvatarURL(),
-            title: 'Profile',
-
+            command:
+                '/profile',
+            target:
+                member,
+            title:
+                'Profile',
             description:
 `- ${emojis.coin} Coins: **${user.coins}**
 - ${emojis.xp} XP: **${user.xp}**
@@ -57,14 +66,12 @@ module.exports = {
 
 - ${emojis.ranking} Ranking: **${rankTitle} (${user.ranking})**
 - ${emojis.scene_completed} Scenes Completed: **${user.scenes_completed}**
+- 🏅 Achievement Points: **${achievementPoints}**
 
 - ${emojis.spank_given} Spanks Given: **${user.spanks_given}**
 - ${emojis.spank_taken} Spanks Taken: **${user.spanks_taken}**
 - ${emojis.kiss_given} Kisses Given: **${user.kisses_given}**
 - ${emojis.kiss_taken} Kisses Taken: **${user.kisses_taken}**`,
-
-            footerText: 'MPC Maid',
-            timestamp: true
 
         });
 

@@ -2,6 +2,10 @@ const {
     EmbedBuilder
 } = require('discord.js');
 
+const {
+    commandFooter
+} = require('../../utils/version');
+
 function getFieldValue(
     embed,
     fieldName
@@ -61,13 +65,16 @@ function buildApprovedEmbed(
         .setDescription(
             null
         )
-        .setFooter(
-            null
-        )
+        .setFooter({
+            text:
+                commandFooter(
+                    '/gifsubmit'
+                )
+        })
         .setFields(
             {
                 name:
-                    'Approved By',
+                    '✅ Approved By',
                 value:
                     `${approvedBy}`,
                 inline:
@@ -75,7 +82,7 @@ function buildApprovedEmbed(
             },
             {
                 name:
-                    'Submitted By',
+                    '👤 Submitted By',
                 value:
                     submitter
                         ? `<@${submitter}>`
@@ -85,7 +92,7 @@ function buildApprovedEmbed(
             },
             {
                 name:
-                    'Category',
+                    '📁 Category',
                 value:
                     categoryName,
                 inline:
@@ -93,7 +100,7 @@ function buildApprovedEmbed(
             },
             {
                 name:
-                    'Total GIFs',
+                    '📊 Total GIFs',
                 value:
                     String(
                         totalCount
@@ -103,7 +110,7 @@ function buildApprovedEmbed(
             },
             {
                 name:
-                    'URL',
+                    '🔗 URL',
                 value:
                     gifUrl,
                 inline:
@@ -132,7 +139,7 @@ function buildApprovalRumorEmbed(
         .setFields(
             {
                 name:
-                    'Category',
+                    '📁 Category',
                 value:
                     categoryName,
                 inline:
@@ -140,7 +147,7 @@ function buildApprovalRumorEmbed(
             },
             {
                 name:
-                    'Total GIFs',
+                    '📊 Total GIFs',
                 value:
                     String(
                         totalCount
@@ -150,7 +157,7 @@ function buildApprovalRumorEmbed(
             },
             {
                 name:
-                    'Submitted By',
+                    '👤 Submitted By',
                 value:
                     submitter
                         ? `<@${submitter}>`
@@ -160,16 +167,19 @@ function buildApprovalRumorEmbed(
             },
             {
                 name:
-                    'Submit Your Own GIF',
+                    '📤 Submit Your Own GIF',
                 value:
                     `<#${gifChannelId}>`,
                 inline:
                     true
             }
         )
-        .setFooter(
-            null
-        );
+        .setFooter({
+            text:
+                commandFooter(
+                    '/gifsubmit'
+                )
+        });
 
 }
 

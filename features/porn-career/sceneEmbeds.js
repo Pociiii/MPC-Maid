@@ -9,6 +9,10 @@ const {
 } = require('../../utils/embeds');
 
 const {
+    commandFooter
+} = require('../../utils/version');
+
+const {
     getRandomColor
 } = require('../../data/constants');
 
@@ -109,7 +113,10 @@ function buildPartEmbed(
         image:
             gif.url,
         footerText:
-            `/pornscene - GIF #${gif.index}/${gif.total}`,
+            commandFooter(
+                '/pornscene',
+                `GIF #${gif.index}/${gif.total}`
+            ),
         timestamp:
             true
     });
@@ -144,7 +151,9 @@ function buildFinalEmbed(
             description:
                 `<@${requesterId}> and <@${targetId}> finished their scene.`,
             footerText:
-                '/pornscene',
+                commandFooter(
+                    '/pornscene'
+                ),
             timestamp:
                 true
         });
@@ -242,7 +251,9 @@ Booster: **${formatBooster(
     booster
 )}**`,
         footerText:
-            '/pornscene',
+            commandFooter(
+                '/pornscene'
+            ),
         timestamp:
             true
     })

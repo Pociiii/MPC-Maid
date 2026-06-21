@@ -12,7 +12,7 @@ const {
 } = require('../../data/achievementDefinitions');
 
 const {
-    createEmbed
+    createTargetUserEmbed
 } = require('../../utils/embeds');
 
 const categoryLabels = {
@@ -129,6 +129,24 @@ async function getProgress(
         );
 
     return row?.current_value ?? 0;
+
+}
+
+async function getAchievementPoints(
+    userId
+) {
+
+    const row =
+        await dbGet(
+            `SELECT COALESCE(SUM(points), 0) AS points
+             FROM user_achievements
+             WHERE user_id = ?`,
+            [
+                userId
+            ]
+        );
+
+    return row?.points ?? 0;
 
 }
 
@@ -252,22 +270,34 @@ async function announceAchievement(
     )
         return;
 
+    const user =
+        await client.users.fetch(
+            userId
+        ).catch(
+            () => null
+        );
+
     const embed =
-        createEmbed({
+        createTargetUserEmbed({
             color:
                 getRandomColor(),
-            title:
-                'Achievement Unlocked',
-            footerText:
+            command:
                 '/profile',
-            timestamp:
-                true
+            target:
+                user ?? {
+                    displayName:
+                        'MPC Member',
+                    displayAvatarURL:
+                        () => undefined
+                },
+            title:
+                'Achievement Unlocked'
         });
 
     embed.addFields(
         {
             name:
-                'Achievement',
+                '🏅 Achievement',
             value:
                 achievement.label,
             inline:
@@ -275,7 +305,7 @@ async function announceAchievement(
         },
         {
             name:
-                'Category',
+                '📁 Category',
             value:
                 categoryLabels[achievement.key] ??
                 achievement.key,
@@ -284,9 +314,17 @@ async function announceAchievement(
         },
         {
             name:
-                'Progress',
+                '📈 Progress',
             value:
                 `${progress}`,
+            inline:
+                true
+        },
+        {
+            name:
+                '⭐ Points',
+            value:
+                `+${achievement.points ?? 0}`,
             inline:
                 true
         }
@@ -315,13 +353,15 @@ async function unlockAchievement(
                 user_id,
                 achievement_id,
                 achievement_key,
-                milestone
-            ) VALUES (?, ?, ?, ?)`,
+                milestone,
+                points
+            ) VALUES (?, ?, ?, ?, ?)`,
             [
                 userId,
                 achievement.id,
                 achievement.key,
-                achievement.milestone
+                achievement.milestone,
+                achievement.points ?? 0
             ]
         );
 
@@ -465,6 +505,7 @@ async function incrementAchievementProgress(
 }
 
 module.exports = {
+    getAchievementPoints,
     getMilestonesCrossed,
     incrementAchievementProgress,
     setAchievementProgress

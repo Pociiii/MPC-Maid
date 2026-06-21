@@ -15,6 +15,10 @@ const {
     adpLogoAttachment
 } = require('./adpLogo');
 
+const {
+    commandFooter
+} = require('./version');
+
 function buildDropPost(
     options = {}
 ) {
@@ -49,12 +53,15 @@ function buildDropPost(
                 'Titty Drop',
             description:
                 options.description,
-            image:
-                imageUrl,
-            footerText:
-                footerText,
-            timestamp:
-                true
+        image:
+            imageUrl,
+        footerText:
+            commandFooter(
+                '/drop',
+                footerText
+            ),
+        timestamp:
+            true
         });
 
     return {

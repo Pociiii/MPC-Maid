@@ -55,6 +55,9 @@ function buildRows(
                         .setLabel(
                             data.label
                         )
+                        .setEmoji(
+                            data.emoji
+                        )
                         .setStyle(
                             view === activeView
                                 ? ButtonStyle.Primary
@@ -62,12 +65,27 @@ function buildRows(
                         )
             );
 
-    return [
-        new ActionRowBuilder()
-            .addComponents(
-                buttons
-            )
-    ];
+    const rows = [];
+
+    for (
+        let index = 0;
+        index < buttons.length;
+        index += 5
+    ) {
+
+        rows.push(
+            new ActionRowBuilder()
+                .addComponents(
+                    buttons.slice(
+                        index,
+                        index + 5
+                    )
+                )
+        );
+
+    }
+
+    return rows;
 
 }
 

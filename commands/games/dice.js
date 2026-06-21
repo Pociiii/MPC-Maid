@@ -8,7 +8,7 @@ const {
 } = require('../../data/constants');
 
 const {
-    createEmbed
+    createUserEmbed
 } = require('../../utils/embeds');
 
 const {
@@ -221,25 +221,19 @@ module.exports = {
             user.coins + result.coins;
 
         const embed =
-            createEmbed({
+            createUserEmbed(
+                interaction,
+                {
                 color:
                     result.color,
-                authorName:
-                    interaction.member?.displayName ??
-                    interaction.user.displayName,
-                authorIcon:
-                    interaction.user.displayAvatarURL(),
-                thumbnail:
-                    interaction.user.displayAvatarURL(),
+                command:
+                    '/dice',
                 title:
                     result.title,
                 description:
-                    result.text,
-                footerText:
-                    '/dice',
-                timestamp:
-                    true
-            });
+                    result.text
+                }
+            );
 
         embed.addFields(
             {

@@ -163,6 +163,7 @@ async function routeInteraction(
             case 'leaderboard_coins':
             case 'leaderboard_spanks':
             case 'leaderboard_kisses':
+            case 'leaderboard_achievements':
                 await interaction.deferUpdate();
 
                 await interaction.editReply(

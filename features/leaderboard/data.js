@@ -38,6 +38,35 @@ function allUsers() {
 
 }
 
+function achievementUsers() {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            db.all(
+                `SELECT
+                    users.id,
+                    COALESCE(SUM(user_achievements.points), 0) AS achievement_points
+                 FROM users
+                 LEFT JOIN user_achievements
+                    ON users.id = user_achievements.user_id
+                 GROUP BY users.id`,
+                [],
+                (error, rows) =>
+                    error
+                        ? reject(
+                            error
+                        )
+                        : resolve(
+                            rows
+                        )
+            );
+
+        }
+    );
+
+}
+
 function topBy(
     users,
     stat,
@@ -99,6 +128,7 @@ async function filterByRole(
 }
 
 module.exports = {
+    achievementUsers,
     allUsers,
     filterByRole,
     topBy

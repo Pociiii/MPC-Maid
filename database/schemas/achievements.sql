@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS user_achievements (
     achievement_id TEXT NOT NULL,
     achievement_key TEXT NOT NULL,
     milestone INTEGER NOT NULL,
+    points INTEGER DEFAULT 0,
     unlocked_at TEXT DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (user_id, achievement_id)

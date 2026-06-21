@@ -43,6 +43,12 @@ const statLabels = {
     fame: 'Fame'
 };
 
+const statEmojis = {
+    performance: '💪',
+    stamina: '❤️',
+    fame: '👑'
+};
+
 const statSetters = {
     performance: setPerformance,
     stamina: setStamina,
@@ -184,6 +190,9 @@ Pick a stat to train.`,
                             )
                             .setLabel(
                                 statLabels[stat]
+                            )
+                            .setEmoji(
+                                statEmojis[stat]
                             )
                             .setStyle(
                                 ButtonStyle.Primary

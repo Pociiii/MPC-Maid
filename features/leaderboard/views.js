@@ -2,6 +2,7 @@ const ROLES =
     require('../../data/roles.json');
 
 const {
+    achievementUsers,
     allUsers,
     filterByRole,
     topBy
@@ -324,6 +325,41 @@ async function buildKissesEmbed(
 
 }
 
+async function buildAchievementsEmbed(
+    interaction
+) {
+
+    const users =
+        await achievementUsers();
+
+    const embed =
+        baseEmbed(
+            interaction,
+            'achievements'
+        );
+
+    embed.addFields({
+        name:
+            'Achievement Points',
+        value:
+            formatRows(
+                topBy(
+                    users,
+                    'achievement_points',
+                    (user) =>
+                        Number(
+                            user.achievement_points
+                        ) > 0
+                ),
+                'achievement_points',
+                ' pts'
+            )
+    });
+
+    return embed;
+
+}
+
 const builders = {
     ranking:
         buildRankingEmbed,
@@ -334,7 +370,9 @@ const builders = {
     spanks:
         buildSpanksEmbed,
     kisses:
-        buildKissesEmbed
+        buildKissesEmbed,
+    achievements:
+        buildAchievementsEmbed
 };
 
 module.exports = {

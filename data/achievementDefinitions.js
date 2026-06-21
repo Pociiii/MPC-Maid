@@ -40,7 +40,8 @@ const statMilestones =
 function milestoneDefinition(
     key,
     milestone,
-    label
+    label,
+    points
 ) {
 
     return {
@@ -48,11 +49,72 @@ function milestoneDefinition(
             `${key}_${milestone}`,
         key,
         milestone,
+        points,
         label:
             label(
                 milestone
             )
     };
+
+}
+
+function progressionPoints(
+    milestone
+) {
+
+    if (
+        milestone >= 1000
+    )
+        return 500;
+
+    if (
+        milestone >= 500
+    )
+        return 250;
+
+    if (
+        milestone >= 250
+    )
+        return 150;
+
+    if (
+        milestone >= 100
+    )
+        return 100;
+
+    if (
+        milestone >= 50
+    )
+        return 75;
+
+    if (
+        milestone >= 25
+    )
+        return 50;
+
+    if (
+        milestone >= 10
+    )
+        return 25;
+
+    return 10;
+
+}
+
+function statPoints(
+    milestone
+) {
+
+    return {
+        10:
+            25,
+        20:
+            50,
+        30:
+            100,
+        40:
+            200
+    }[milestone] ?? milestone * 5;
 
 }
 
@@ -64,6 +126,10 @@ const sceneAchievements =
                 milestone,
                 (value) =>
                     `Complete ${value} porn scene${value === 1 ? '' : 's'}`
+                ,
+                progressionPoints(
+                    milestone
+                )
             )
     );
 
@@ -77,6 +143,10 @@ const statAchievements =
                         milestone,
                         (value) =>
                             `${stat.charAt(0).toUpperCase()}${stat.slice(1)} reaches ${value}`
+                        ,
+                        statPoints(
+                            milestone
+                        )
                     )
             )
     );
@@ -89,6 +159,10 @@ const showcaseAchievements =
                 milestone,
                 (value) =>
                     `Use showcase commands ${value} time${value === 1 ? '' : 's'}`
+                ,
+                progressionPoints(
+                    milestone
+                )
             )
     );
 
@@ -100,6 +174,10 @@ const buttonAchievements =
                 milestone,
                 (value) =>
                     `Click interaction buttons ${value} time${value === 1 ? '' : 's'}`
+                ,
+                progressionPoints(
+                    milestone
+                )
             )
     );
 
@@ -111,6 +189,10 @@ const gifSubmissionAchievements =
                 milestone,
                 (value) =>
                     `Submit ${value} GIF${value === 1 ? '' : 's'}`
+                ,
+                progressionPoints(
+                    milestone
+                )
             )
     );
 
@@ -130,7 +212,9 @@ const endlessAchievements = {
             100,
         label:
             (value) =>
-                `Complete ${value} porn scenes`
+                `Complete ${value} porn scenes`,
+        points:
+            50
     },
     button_interactions: {
         startsAfter:
@@ -139,7 +223,9 @@ const endlessAchievements = {
             100,
         label:
             (value) =>
-                `Click interaction buttons ${value} times`
+                `Click interaction buttons ${value} times`,
+        points:
+            50
     },
     gif_submissions: {
         startsAfter:
@@ -148,7 +234,9 @@ const endlessAchievements = {
             100,
         label:
             (value) =>
-                `Submit ${value} GIFs`
+                `Submit ${value} GIFs`,
+        points:
+            50
     }
 };
 
@@ -158,6 +246,7 @@ module.exports = {
     endlessAchievements,
     fixedSceneMilestones,
     gifSubmissionAchievements,
+    progressionPoints,
     sceneAchievements,
     showcaseAchievements,
     socialMilestones,

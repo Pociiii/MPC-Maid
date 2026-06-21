@@ -60,6 +60,9 @@ Scene buttons are split by cast type:
                         .setLabel(
                             'Scene MF'
                         )
+                        .setEmoji(
+                            '🎬'
+                        )
                         .setStyle(
                             ButtonStyle.Primary
                         ),
@@ -69,6 +72,9 @@ Scene buttons are split by cast type:
                         )
                         .setLabel(
                             'Scene FF'
+                        )
+                        .setEmoji(
+                            '🎬'
                         )
                         .setStyle(
                             ButtonStyle.Primary
@@ -80,6 +86,9 @@ Scene buttons are split by cast type:
                         .setLabel(
                             'Scene MFM'
                         )
+                        .setEmoji(
+                            '🎬'
+                        )
                         .setStyle(
                             ButtonStyle.Primary
                         ),
@@ -90,6 +99,9 @@ Scene buttons are split by cast type:
                         .setLabel(
                             'Scene FMF'
                         )
+                        .setEmoji(
+                            '🎬'
+                        )
                         .setStyle(
                             ButtonStyle.Primary
                         ),
@@ -99,6 +111,9 @@ Scene buttons are split by cast type:
                         )
                         .setLabel(
                             'Scene FFF'
+                        )
+                        .setEmoji(
+                            '🎬'
                         )
                         .setStyle(
                             ButtonStyle.Primary
@@ -115,6 +130,9 @@ Scene buttons are split by cast type:
                         .setLabel(
                             'Interactions'
                         )
+                        .setEmoji(
+                            '✨'
+                        )
                         .setStyle(
                             ButtonStyle.Success
                         ),
@@ -124,6 +142,9 @@ Scene buttons are split by cast type:
                         )
                         .setLabel(
                             'GIF Info'
+                        )
+                        .setEmoji(
+                            'ℹ️'
                         )
                         .setStyle(
                             ButtonStyle.Secondary

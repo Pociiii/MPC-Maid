@@ -20,6 +20,13 @@ const {
     phaseValues
 } = require('./state');
 
+const phaseEmojis = {
+    foreplay: '✨',
+    oral: '💋',
+    sex: '🔥',
+    finale: '🏁'
+};
+
 function formatParts(
     parts
 ) {
@@ -91,6 +98,9 @@ function buildBuilderRows(
                     .setLabel(
                         phaseLabels[phase]
                     )
+                    .setEmoji(
+                        phaseEmojis[phase]
+                    )
                     .setStyle(
                         ButtonStyle.Secondary
                     )
@@ -116,6 +126,9 @@ function buildBuilderRows(
             .setLabel(
                 'Undo'
             )
+            .setEmoji(
+                '↩️'
+            )
             .setStyle(
                 ButtonStyle.Danger
             )
@@ -136,6 +149,9 @@ function buildBuilderRows(
             )
             .setLabel(
                 'Finish'
+            )
+            .setEmoji(
+                '✅'
             )
             .setStyle(
                 ButtonStyle.Success

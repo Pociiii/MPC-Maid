@@ -4,11 +4,7 @@ const {
 } = require('discord.js');
 
 const {
-    getRandomColor
-} = require('../../data/constants');
-
-const {
-    createEmbed
+    createUserEmbed
 } = require('../../utils/embeds');
 
 const {
@@ -93,20 +89,15 @@ function buildResultEmbed(
     description
 ) {
 
-    return createEmbed({
-        color:
-            getRandomColor(),
-        authorName:
-            interaction.user.displayName,
-        authorIcon:
-            interaction.user.displayAvatarURL(),
-        title,
-        description,
-        footerText:
-            '/recovery',
-        timestamp:
-            true
-    });
+    return createUserEmbed(
+        interaction,
+        {
+            command:
+                '/recovery',
+            title,
+            description
+        }
+    );
 
 }
 

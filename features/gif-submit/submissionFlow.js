@@ -21,6 +21,10 @@ const {
     createEmbed
 } = require('../../utils/embeds');
 
+const {
+    commandFooter
+} = require('../../utils/version');
+
 function parseSubmissionCustomId(
     customId
 ) {
@@ -114,6 +118,10 @@ function buildReviewEmbed(
                 'GIF Submission',
             image:
                 gifUrl,
+            footerText:
+                commandFooter(
+                    '/gifsubmit'
+                ),
             timestamp:
                 true
         });
@@ -173,6 +181,9 @@ function buildReviewComponents(
                     .setLabel(
                         'Approve'
                     )
+                    .setEmoji(
+                        '✅'
+                    )
                     .setStyle(
                         ButtonStyle.Success
                     ),
@@ -182,6 +193,9 @@ function buildReviewComponents(
                     )
                     .setLabel(
                         'Reject'
+                    )
+                    .setEmoji(
+                        '❌'
                     )
                     .setStyle(
                         ButtonStyle.Danger
@@ -205,7 +219,9 @@ function buildDuplicateEmbed(
         image:
             gifUrl,
         footerText:
-            '/gifsubmit',
+            commandFooter(
+                '/gifsubmit'
+            ),
         timestamp:
             true
     });
@@ -224,7 +240,9 @@ function buildSubmittedEmbed(
         image:
             gifUrl,
         footerText:
-            '/gifsubmit',
+            commandFooter(
+                '/gifsubmit'
+            ),
         timestamp:
             true
     });
@@ -241,7 +259,9 @@ function buildReviewChannelMissingEmbed() {
         description:
             'The GIF review channel is not available right now, so the submission was not sent.',
         footerText:
-            '/gifsubmit',
+            commandFooter(
+                '/gifsubmit'
+            ),
         timestamp:
             true
     });

@@ -1,4 +1,14 @@
-const { EmbedBuilder } = require('discord.js');
+const {
+    EmbedBuilder
+} = require('discord.js');
+
+const {
+    getRandomColor
+} = require('../data/constants');
+
+const {
+    commandFooter
+} = require('./version');
 
 function createEmbed(options = {}) {
 
@@ -51,7 +61,141 @@ function createReply(embed, ephemeral = false) {
     };
 }
 
+function getUserDisplayName(
+    interaction
+) {
+
+    return interaction.member?.displayName ??
+        interaction.user.displayName;
+
+}
+
+function getUserAvatar(
+    user
+) {
+
+    return user.displayAvatarURL();
+
+}
+
+function createUserEmbed(
+    interaction,
+    {
+        color = getRandomColor(),
+        command,
+        description,
+        image,
+        thumbnail,
+        title
+    }
+) {
+
+    return createEmbed({
+        color,
+        authorName:
+            getUserDisplayName(
+                interaction
+            ),
+        authorIcon:
+            getUserAvatar(
+                interaction.user
+            ),
+        thumbnail:
+            thumbnail ??
+            getUserAvatar(
+                interaction.user
+            ),
+        title,
+        description,
+        image,
+        footerText:
+            command
+                ? commandFooter(
+                    command
+                )
+                : undefined,
+        timestamp:
+            true
+    });
+
+}
+
+function createTargetUserEmbed(
+    {
+        color = getRandomColor(),
+        command,
+        description,
+        image,
+        target,
+        title
+    }
+) {
+
+    return createEmbed({
+        color,
+        authorName:
+            target.displayName,
+        authorIcon:
+            getUserAvatar(
+                target
+            ),
+        thumbnail:
+            getUserAvatar(
+                target
+            ),
+        title,
+        description,
+        image,
+        footerText:
+            command
+                ? commandFooter(
+                    command
+                )
+                : undefined,
+        timestamp:
+            true
+    });
+
+}
+
+function createBotEmbed(
+    interaction,
+    {
+        color = getRandomColor(),
+        command,
+        description,
+        image,
+        thumbnail,
+        title
+    }
+) {
+
+    return createEmbed({
+        color,
+        authorName:
+            interaction.client.user.username,
+        authorIcon:
+            interaction.client.user.displayAvatarURL(),
+        thumbnail,
+        title,
+        description,
+        image,
+        footerText:
+            command
+                ? commandFooter(
+                    command
+                )
+                : undefined,
+        timestamp:
+            true
+    });
+
+}
+
 module.exports = {
+    createBotEmbed,
     createEmbed,
-    createReply
+    createReply,
+    createTargetUserEmbed,
+    createUserEmbed
 };

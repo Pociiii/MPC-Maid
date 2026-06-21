@@ -67,6 +67,9 @@ function buildCastRows(
                     .setLabel(
                         option.label
                     )
+                    .setEmoji(
+                        '🎭'
+                    )
                     .setStyle(
                         ButtonStyle.Secondary
                     )

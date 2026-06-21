@@ -323,7 +323,7 @@ async function acceptScene(
 
     await interaction.update({
         content:
-            'Scene accepted. Filming has started.',
+            `Scene accepted. Filming has started in <#${CHANNELS.PORN_CAREER}>.`,
         embeds:
             [],
         components:

@@ -2,6 +2,10 @@ const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 const path = require('path');
 
+const {
+    runMigrations
+} = require('./migrations');
+
 const db = new sqlite3.Database('./database.db', (err) => {
 
     if (err) {
@@ -31,12 +35,16 @@ const db = new sqlite3.Database('./database.db', (err) => {
         'utf8'
     );
 
-    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${achievementsSchema}`, (err) => {
+    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${achievementsSchema}`, async (err) => {
 
         if (err) {
             console.error(err);
             return;
         }
+
+        await runMigrations(
+            db
+        );
 
         console.log('Database tables ready.');
     });

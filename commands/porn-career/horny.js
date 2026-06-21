@@ -40,6 +40,10 @@ const {
     incrementAchievementProgress
 } = require('../../features/achievements/achievements');
 
+const {
+    commandFooter
+} = require('../../utils/version');
+
 module.exports = {
 
     data: new SlashCommandBuilder()
@@ -114,7 +118,10 @@ module.exports = {
                     result.url,
 
                 footerText:
-                    `GIF #${result.index}/${result.total}`,
+                    commandFooter(
+                        '/horny',
+                        `GIF #${result.index}/${result.total}`
+                    ),
 
                 timestamp:
                     true
@@ -140,6 +147,9 @@ module.exports = {
 
                         .setLabel(
                             helpLabel
+                        )
+                        .setEmoji(
+                            '🤝'
                         )
 
                         .setStyle(

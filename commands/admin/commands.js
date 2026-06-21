@@ -6,13 +6,12 @@ const {
 } = require('discord.js');
 
 const {
-    createEmbed
+    createBotEmbed
 } = require('../../utils/embeds');
 
 const {
     CHANNELS,
     COOLDOWNS,
-    getRandomColor
 } = require('../../data/constants');
 
 const ROLES =
@@ -50,24 +49,19 @@ module.exports = {
     ) {
 
         const embed =
-            createEmbed({
-                color:
-                    getRandomColor(),
-                authorName:
-                    interaction.client.user.username,
-                authorIcon:
-                    interaction.client.user.displayAvatarURL(),
-                title:
-                    'Commands',
-                description:
+            createBotEmbed(
+                interaction,
+                {
+                    command:
+                        '/commands',
+                    title:
+                        'Commands',
+                    description:
 `Role-based GIFs use:
 Gender: <@&${ROLES.MALE}> / <@&${ROLES.FEMALE}>
-Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`,
-                footerText:
-                    '/commands',
-                timestamp:
-                    true
-            });
+Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
+                }
+            );
 
         embed.addFields(
             {
@@ -136,6 +130,9 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`,
                         )
                         .setLabel(
                             'Porn Career Info'
+                        )
+                        .setEmoji(
+                            '🎬'
                         )
                         .setStyle(
                             ButtonStyle.Secondary

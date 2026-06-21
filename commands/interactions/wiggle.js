@@ -23,6 +23,10 @@ const {
 } = require('../../features/achievements/achievements');
 
 const {
+    commandFooter
+} = require('../../utils/version');
+
+const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle
@@ -120,7 +124,11 @@ module.exports = {
             title: 'Wiggle',
             description: `<@${interaction.user.id}> wiggles teasingly.`,
             image: imageUrl,
-            footerText: footerText,
+            footerText:
+                commandFooter(
+                    '/wiggle',
+                    footerText
+                ),
             timestamp: true
         });
 

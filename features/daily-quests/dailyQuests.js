@@ -7,8 +7,13 @@ const {
 } = require('../../data/constants');
 
 const {
-    createEmbed
+    createEmbed,
+    createUserEmbed
 } = require('../../utils/embeds');
+
+const {
+    commandFooter
+} = require('../../utils/version');
 
 const {
     addCoins,
@@ -21,6 +26,9 @@ const emojis =
 
 const QUESTS_PER_DAY =
     3;
+
+const assignmentLocks =
+    new Map();
 
 const RESET_HOUR_UTC =
     12;
@@ -364,6 +372,38 @@ function getDailyQuestDate(
 
 }
 
+function getNextResetTimestamp(
+    now = new Date()
+) {
+
+    const nextReset =
+        new Date(
+            now
+        );
+
+    nextReset.setUTCHours(
+        RESET_HOUR_UTC,
+        0,
+        0,
+        0
+    );
+
+    if (
+        nextReset <= now
+    ) {
+
+        nextReset.setUTCDate(
+            nextReset.getUTCDate() + 1
+        );
+
+    }
+
+    return Math.floor(
+        nextReset.getTime() / 1000
+    );
+
+}
+
 function shuffle(
     items
 ) {
@@ -414,30 +454,68 @@ function pickDailyQuests() {
 
 }
 
-async function getDailyQuests(
-    userId
+async function getStoredDailyQuests(
+    userId,
+    questDate
 ) {
 
-    const questDate =
-        getDailyQuestDate();
+    return dbAll(
+        `SELECT rowid AS row_id, *
+         FROM daily_quests
+         WHERE user_id = ?
+         AND quest_date = ?
+         ORDER BY rowid`,
+        [
+            userId,
+            questDate
+        ]
+    );
 
-    const existing =
-        await dbAll(
-            `SELECT *
-             FROM daily_quests
-             WHERE user_id = ?
-             AND quest_date = ?
-             ORDER BY quest_id`,
-            [
-                userId,
-                questDate
-            ]
-        );
+}
+
+async function normalizeDailyQuests(
+    userId,
+    questDate,
+    quests
+) {
 
     if (
-        existing.length
+        quests.length <= QUESTS_PER_DAY
     )
-        return existing;
+        return quests;
+
+    const keep =
+        quests.slice(
+            0,
+            QUESTS_PER_DAY
+        );
+
+    const remove =
+        quests.slice(
+            QUESTS_PER_DAY
+        );
+
+    await Promise.all(
+        remove.map(
+            (quest) =>
+                dbRun(
+                    `DELETE FROM daily_quests
+                     WHERE rowid = ?`,
+                    [
+                        quest.row_id
+                    ]
+                )
+        )
+    );
+
+    return keep;
+
+}
+
+async function createDailyQuests(
+    userId,
+    questDate
+) {
 
     await getOrCreateUser(
         userId
@@ -450,7 +528,7 @@ async function getDailyQuests(
         quests.map(
             (quest) =>
                 dbRun(
-                    `INSERT INTO daily_quests (
+                    `INSERT OR IGNORE INTO daily_quests (
                         user_id,
                         quest_date,
                         quest_id,
@@ -476,17 +554,84 @@ async function getDailyQuests(
         )
     );
 
-    return dbAll(
-        `SELECT *
-         FROM daily_quests
-         WHERE user_id = ?
-         AND quest_date = ?
-         ORDER BY quest_id`,
-        [
+}
+
+async function ensureDailyQuests(
+    userId
+) {
+
+    const questDate =
+        getDailyQuestDate();
+
+    let existing =
+        await getStoredDailyQuests(
             userId,
             questDate
-        ]
+        );
+
+    if (
+        existing.length
+    )
+        return normalizeDailyQuests(
+            userId,
+            questDate,
+            existing
+        );
+
+    await createDailyQuests(
+        userId,
+        questDate
     );
+
+    existing =
+        await getStoredDailyQuests(
+            userId,
+            questDate
+        );
+
+    return normalizeDailyQuests(
+        userId,
+        questDate,
+        existing
+    );
+
+}
+
+async function getDailyQuests(
+    userId
+) {
+
+    const questDate =
+        getDailyQuestDate();
+
+    const lockKey =
+        `${userId}:${questDate}`;
+
+    if (
+        assignmentLocks.has(
+            lockKey
+        )
+    )
+        return assignmentLocks.get(
+            lockKey
+        );
+
+    const assignment =
+        ensureDailyQuests(
+            userId
+        ).finally(
+            () =>
+                assignmentLocks.delete(
+                    lockKey
+                )
+        );
+
+    assignmentLocks.set(
+        lockKey,
+        assignment
+    );
+
+    return assignment;
 
 }
 
@@ -505,31 +650,31 @@ function buildDailyEmbed(
 ) {
 
     const completed =
-        quests.filter(
+        Math.min(
+            quests.filter(
             (quest) =>
                 quest.completed
-        ).length;
+            ).length,
+            QUESTS_PER_DAY
+        );
+
+    const nextReset =
+        getNextResetTimestamp();
 
     const embed =
-        createEmbed({
+        createUserEmbed(
+            interaction,
+            {
             color:
                 getRandomColor(),
-            authorName:
-                interaction.member?.displayName ??
-                interaction.user.displayName,
-            authorIcon:
-                interaction.user.displayAvatarURL(),
-            thumbnail:
-                interaction.user.displayAvatarURL(),
+            command:
+                '/daily',
             title:
                 'Daily Quests',
             description:
-                `Daily quests reset at **12:00 UTC**.\nCompleted: **${completed}/${QUESTS_PER_DAY}**`,
-            footerText:
-                '/daily',
-            timestamp:
-                true
-        });
+                `Next reset: <t:${nextReset}:F> (<t:${nextReset}:R>)\nCompleted: **${completed}/${QUESTS_PER_DAY}**`
+            }
+        );
 
     embed.addFields(
         ...quests.map(
@@ -617,7 +762,9 @@ async function sendQuestCompleteRumor(
             title:
                 'Daily Quest Complete',
             footerText:
-                '/daily',
+                commandFooter(
+                    '/daily'
+                ),
             timestamp:
                 true
         });
@@ -654,7 +801,10 @@ async function sendQuestCompleteRumor(
             name:
                 'Daily Progress',
             value:
-                `${completedCount} / ${QUESTS_PER_DAY} quests completed`,
+                `${Math.min(
+                    completedCount,
+                    QUESTS_PER_DAY
+                )} / ${QUESTS_PER_DAY} quests completed`,
             inline:
                 false
         }
@@ -692,7 +842,9 @@ async function sendDailySetCompleteRumor(
             title:
                 'Daily Set Complete',
             footerText:
-                '/daily',
+                commandFooter(
+                    '/daily'
+                ),
             timestamp:
                 true
         });
@@ -766,10 +918,16 @@ async function maybeGrantDailyBonus(
             ]
         );
 
+    const completedCount =
+        Math.min(
+            completedCountRow.count,
+            QUESTS_PER_DAY
+        );
+
     if (
-        completedCountRow.count < QUESTS_PER_DAY
+        completedCount < QUESTS_PER_DAY
     )
-        return completedCountRow.count;
+        return completedCount;
 
     const bonus =
         await dbGet(
@@ -786,7 +944,7 @@ async function maybeGrantDailyBonus(
     if (
         bonus?.completed
     )
-        return completedCountRow.count;
+        return completedCount;
 
     await Promise.all([
         addCoins(
@@ -817,7 +975,7 @@ async function maybeGrantDailyBonus(
         userId
     );
 
-    return completedCountRow.count;
+    return completedCount;
 
 }
 
@@ -839,7 +997,10 @@ async function getCompletedQuestCount(
             ]
         );
 
-    return row.count;
+    return Math.min(
+        row.count,
+        QUESTS_PER_DAY
+    );
 
 }
 

@@ -83,6 +83,9 @@ async function sendPornSceneRequest(
                     .setLabel(
                         'Accept'
                     )
+                    .setEmoji(
+                        '✅'
+                    )
                     .setStyle(
                         ButtonStyle.Success
                     ),
@@ -92,6 +95,9 @@ async function sendPornSceneRequest(
                     )
                     .setLabel(
                         'Decline'
+                    )
+                    .setEmoji(
+                        '❌'
                     )
                     .setStyle(
                         ButtonStyle.Danger
