@@ -212,13 +212,17 @@ function buildDuplicateEmbed(
 
 }
 
-function buildSubmittedEmbed() {
+function buildSubmittedEmbed(
+    gifUrl
+) {
 
     return createEmbed({
         color:
             getRandomColor(),
         description:
             'GIF submitted for review.',
+        image:
+            gifUrl,
         footerText:
             '/gifsubmit',
         timestamp:

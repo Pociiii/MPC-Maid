@@ -10,6 +10,7 @@ const {
 } = require('../../utils/embeds');
 
 const {
+    CHANNELS,
     getRandomColor
 } = require('../../data/constants');
 
@@ -39,6 +40,7 @@ module.exports = {
 
 Scene buttons are split by cast type:
 - **Scene MF**: current 2-person scenes
+- **Scene FF**: 2 female scenes
 - **Scene MFM**: 2 males + 1 female
 - **Scene FMF**: 1 male + 2 females
 - **Scene FFF**: 3 females
@@ -57,6 +59,16 @@ Scene buttons are split by cast type:
                         )
                         .setLabel(
                             'Scene MF'
+                        )
+                        .setStyle(
+                            ButtonStyle.Primary
+                        ),
+                    new ButtonBuilder()
+                        .setCustomId(
+                            'gifsubmit_scenes:ff'
+                        )
+                        .setLabel(
+                            'Scene FF'
                         )
                         .setStyle(
                             ButtonStyle.Primary
@@ -118,7 +130,33 @@ Scene buttons are split by cast type:
                         )
                 );
 
-        await interaction.reply({
+        const channel =
+            interaction.client.channels.cache.get(
+                CHANNELS.GIFS
+            ) ??
+            await interaction.client.channels.fetch(
+                CHANNELS.GIFS
+            ).catch(
+                () => null
+            );
+
+        if (
+            !channel?.send
+        ) {
+
+            await interaction.reply({
+                content:
+                    'I could not find the GIF submission channel.',
+                flags:
+                    64
+            });
+
+            return;
+
+        }
+
+        const message =
+            await channel.send({
             embeds: [
                 embed
             ],
@@ -126,6 +164,13 @@ Scene buttons are split by cast type:
                 sceneRow,
                 utilityRow
             ]
+        });
+
+        await interaction.reply({
+            content:
+                `GIF submission panel posted in <#${CHANNELS.GIFS}>: ${message.url}`,
+            flags:
+                64
         });
 
     }

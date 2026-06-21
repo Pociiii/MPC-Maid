@@ -75,6 +75,7 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`,
                     'All channels',
                 value:
 `- \`/profile\` Stats and progress
+- \`/daily\` Personal daily quests
 - \`/train\` Raise career stats
 - \`/inventory\` Your boosters
 - \`/leaderboard\` Server rankings

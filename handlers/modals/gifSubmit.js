@@ -7,6 +7,10 @@ const {
 } = require('../../utils/inboxLogger');
 
 const {
+    incrementAchievementProgress
+} = require('../../features/achievements/achievements');
+
+const {
     buildDuplicateEmbed,
     buildReviewChannelMissingEmbed,
     buildReviewComponents,
@@ -15,6 +19,56 @@ const {
     getReviewChannel,
     parseSubmissionCustomId
 } = require('../../features/gif-submit/submissionFlow');
+
+async function confirmSubmission(
+    interaction,
+    gifUrl
+) {
+
+    const payload = {
+        content:
+            null,
+        embeds: [
+            buildSubmittedEmbed(
+                gifUrl
+            )
+        ],
+        components:
+            []
+    };
+
+    if (
+        interaction.message &&
+        typeof interaction.update === 'function'
+    ) {
+
+        try {
+
+            await interaction.update(
+                payload
+            );
+
+            return;
+
+        }
+        catch {
+
+            // Fall back to a private reply if Discord does not allow editing
+            // the component message from this modal submit.
+
+        }
+
+
+    }
+
+    await interaction.reply({
+        embeds:
+            payload.embeds,
+        flags:
+            64
+    });
+
+}
 
 module.exports = {
 
@@ -122,13 +176,16 @@ module.exports = {
                 })
         });
 
-        await interaction.reply({
-            embeds: [
-                buildSubmittedEmbed()
-            ],
-            flags:
-                64
-        });
+        await confirmSubmission(
+            interaction,
+            gifUrl
+        );
+
+        await incrementAchievementProgress(
+            interaction.client,
+            interaction.user.id,
+            'gif_submissions'
+        );
 
     }
 

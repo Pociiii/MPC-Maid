@@ -16,6 +16,14 @@ const {
 } = require('../../utils/inboxLogger');
 
 const {
+    trackDailyQuest
+} = require('../daily-quests/dailyQuests');
+
+const {
+    incrementAchievementProgress
+} = require('../achievements/achievements');
+
+const {
     buildPhaseOrder,
     getIntervalMs
 } = require('./sceneMath');
@@ -43,6 +51,29 @@ async function finishScene(
         targetId,
         result
     );
+
+    await Promise.all([
+        trackDailyQuest(
+            channel.client,
+            requesterId,
+            'porn_scene'
+        ),
+        trackDailyQuest(
+            channel.client,
+            targetId,
+            'porn_scene'
+        ),
+        incrementAchievementProgress(
+            channel.client,
+            requesterId,
+            'porn_scenes'
+        ),
+        incrementAchievementProgress(
+            channel.client,
+            targetId,
+            'porn_scenes'
+        )
+    ]);
 
     const rumorsChannel =
         channel.client.channels.cache.get(

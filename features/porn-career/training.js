@@ -22,6 +22,14 @@ const {
 } = require('../../utils/users');
 
 const {
+    trackDailyQuest
+} = require('../daily-quests/dailyQuests');
+
+const {
+    setAchievementProgress
+} = require('../achievements/achievements');
+
+const {
     getStatUpgradeCoinCost,
     getStatUpgradeCost,
     isTrainableStat,
@@ -326,6 +334,19 @@ async function trainStat(
                     `${statLabels[stat]} trained from **${currentValue}** to **${currentValue + 1}**.`
             }
         )
+    );
+
+    await trackDailyQuest(
+        interaction.client,
+        interaction.user.id,
+        'train'
+    );
+
+    await setAchievementProgress(
+        interaction.client,
+        interaction.user.id,
+        stat,
+        currentValue + 1
     );
 
 }

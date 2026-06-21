@@ -21,7 +21,17 @@ const db = new sqlite3.Database('./database.db', (err) => {
         'utf8'
     );
 
-    db.exec(`${usersSchema}\n${boostersSchema}`, (err) => {
+    const dailyQuestsSchema = fs.readFileSync(
+        path.join(__dirname, 'schemas', 'daily_quests.sql'),
+        'utf8'
+    );
+
+    const achievementsSchema = fs.readFileSync(
+        path.join(__dirname, 'schemas', 'achievements.sql'),
+        'utf8'
+    );
+
+    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${achievementsSchema}`, (err) => {
 
         if (err) {
             console.error(err);

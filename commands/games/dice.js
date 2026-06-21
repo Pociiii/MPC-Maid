@@ -21,6 +21,10 @@ const {
     removeCoins
 } = require('../../utils/users');
 
+const {
+    trackDailyQuest
+} = require('../../features/daily-quests/dailyQuests');
+
 const emojis =
     require('../../utils/emojis');
 
@@ -283,6 +287,12 @@ module.exports = {
                 embed
             ]
         });
+
+        await trackDailyQuest(
+            interaction.client,
+            interaction.user.id,
+            'dice'
+        );
 
     }
 

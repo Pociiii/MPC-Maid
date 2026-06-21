@@ -19,6 +19,10 @@ const {
     getGuildMembers
 } = require('../../utils/memberCache');
 
+const {
+    trackDailyQuest
+} = require('../../features/daily-quests/dailyQuests');
+
 const ROLES =
     require('../../data/roles.json');
 
@@ -178,6 +182,12 @@ Vibe: **${getRandomItem(vibes)}**`,
                 embed
             ]
         });
+
+        await trackDailyQuest(
+            interaction.client,
+            interaction.user.id,
+            'matchme'
+        );
 
     }
 

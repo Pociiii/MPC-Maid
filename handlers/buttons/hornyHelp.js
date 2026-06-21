@@ -23,6 +23,14 @@ const {
 } = require('../../data/constants');
 
 const {
+    trackDailyQuest
+} = require('../../features/daily-quests/dailyQuests');
+
+const {
+    incrementAchievementProgress
+} = require('../../features/achievements/achievements');
+
+const {
     getMemberCategory
 } = require('../../utils/userCategory');
 
@@ -332,5 +340,28 @@ module.exports = async (
         files: [adpLogoPath]
 
     });
+
+    await Promise.all([
+        trackDailyQuest(
+            interaction.client,
+            interaction.user.id,
+            'horny_help'
+        ),
+        trackDailyQuest(
+            interaction.client,
+            interaction.user.id,
+            'social_interaction'
+        ),
+        trackDailyQuest(
+            interaction.client,
+            targetUserId,
+            'social_interaction'
+        ),
+        incrementAchievementProgress(
+            interaction.client,
+            interaction.user.id,
+            'button_interactions'
+        )
+    ]);
 
 };

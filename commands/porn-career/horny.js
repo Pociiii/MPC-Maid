@@ -32,6 +32,14 @@ const {
     getRandomColor
 } = require('../../data/constants');
 
+const {
+    trackDailyQuest
+} = require('../../features/daily-quests/dailyQuests');
+
+const {
+    incrementAchievementProgress
+} = require('../../features/achievements/achievements');
+
 module.exports = {
 
     data: new SlashCommandBuilder()
@@ -149,6 +157,18 @@ module.exports = {
             files: [adpLogoPath]
 
         });
+
+        await trackDailyQuest(
+            interaction.client,
+            interaction.user.id,
+            'showcase'
+        );
+
+        await incrementAchievementProgress(
+            interaction.client,
+            interaction.user.id,
+            'showcase_posts'
+        );
 
     }
 

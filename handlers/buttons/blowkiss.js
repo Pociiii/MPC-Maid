@@ -30,6 +30,14 @@ const {
 
 } = require('../../utils/users');
 
+const {
+    trackDailyQuest
+} = require('../../features/daily-quests/dailyQuests');
+
+const {
+    incrementAchievementProgress
+} = require('../../features/achievements/achievements');
+
 module.exports = async (
     interaction
 ) => {
@@ -126,5 +134,23 @@ module.exports = async (
         files: [adpLogoPath]
 
     });
+
+    await Promise.all([
+        trackDailyQuest(
+            interaction.client,
+            interaction.user.id,
+            'social_interaction'
+        ),
+        trackDailyQuest(
+            interaction.client,
+            targetUserId,
+            'social_interaction'
+        ),
+        incrementAchievementProgress(
+            interaction.client,
+            interaction.user.id,
+            'button_interactions'
+        )
+    ]);
 
 };

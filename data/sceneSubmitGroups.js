@@ -14,7 +14,14 @@ const sceneGroups = {
             wm_wf: '⚪ White Male / ⚪ White Female',
             wm_bf: '⚪ White Male / ⚫ Black Female',
             bm_wf: '⚫ Black Male / ⚪ White Female',
-            bm_bf: '⚫ Black Male / ⚫ Black Female',
+            bm_bf: '⚫ Black Male / ⚫ Black Female'
+        }
+    },
+    ff: {
+        label: 'Scene FF',
+        folder: 'scenes',
+        types: sceneTypes,
+        categories: {
             wf_wf: '⚪ White Female / ⚪ White Female',
             wf_bf: '⚪ White Female / ⚫ Black Female',
             bf_bf: '⚫ Black Female / ⚫ Black Female'

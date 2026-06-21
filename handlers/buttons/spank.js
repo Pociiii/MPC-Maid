@@ -24,6 +24,14 @@ const {
 } = require('../../utils/users');
 
 const {
+    trackDailyQuest
+} = require('../../features/daily-quests/dailyQuests');
+
+const {
+    incrementAchievementProgress
+} = require('../../features/achievements/achievements');
+
+const {
     ActionRowBuilder,
     ButtonBuilder
 } = require('discord.js');
@@ -148,5 +156,23 @@ module.exports = async (
             adpLogoPath
         ]
     });
+
+    await Promise.all([
+        trackDailyQuest(
+            interaction.client,
+            interaction.user.id,
+            'social_interaction'
+        ),
+        trackDailyQuest(
+            interaction.client,
+            targetUserId,
+            'social_interaction'
+        ),
+        incrementAchievementProgress(
+            interaction.client,
+            interaction.user.id,
+            'button_interactions'
+        )
+    ]);
 
 };

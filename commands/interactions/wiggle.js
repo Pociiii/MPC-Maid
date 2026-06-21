@@ -13,6 +13,15 @@ const {
 const {
     handleCooldown
 } = require('../../utils/cooldowns');
+
+const {
+    trackDailyQuest
+} = require('../../features/daily-quests/dailyQuests');
+
+const {
+    incrementAchievementProgress
+} = require('../../features/achievements/achievements');
+
 const {
     ActionRowBuilder,
     ButtonBuilder,
@@ -145,6 +154,18 @@ module.exports = {
             components: [row],
             files: [adpLogoPath]
         });
+
+        await trackDailyQuest(
+            interaction.client,
+            interaction.user.id,
+            'showcase'
+        );
+
+        await incrementAchievementProgress(
+            interaction.client,
+            interaction.user.id,
+            'showcase_posts'
+        );
 
     }
 
