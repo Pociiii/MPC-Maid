@@ -9,7 +9,7 @@ const views = {
         label:
             'Ranking',
         emoji:
-            '🏆',
+            '\uD83C\uDFC6',
         title:
             'Ranking Leaderboard'
     },
@@ -17,7 +17,7 @@ const views = {
         label:
             'Scenes',
         emoji:
-            '🎬',
+            '\uD83C\uDFAC',
         title:
             'Scenes Leaderboard'
     },
@@ -45,11 +45,19 @@ const views = {
         title:
             'Kisses Leaderboard'
     },
+    helps: {
+        label:
+            'Helps',
+        emoji:
+            '\uD83E\uDD1D',
+        title:
+            'Horny Help Leaderboard'
+    },
     achievements: {
         label:
             'Achievements',
         emoji:
-            '🏅',
+            '\uD83C\uDFC5',
         title:
             'Achievement Points'
     }

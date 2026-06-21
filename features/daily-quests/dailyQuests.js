@@ -132,18 +132,6 @@ const questPool = [
     },
     {
         id:
-            'train_1',
-        action:
-            'train',
-        label:
-            'Train 1 stat',
-        target:
-            1,
-        tier:
-            'easy'
-    },
-    {
-        id:
             'dice_1',
         action:
             'dice',
@@ -177,18 +165,6 @@ const questPool = [
             3,
         tier:
             'hard'
-    },
-    {
-        id:
-            'matchme_1',
-        action:
-            'matchme',
-        label:
-            'Use matchme 1 time',
-        target:
-            1,
-        tier:
-            'easy'
     },
     {
         id:

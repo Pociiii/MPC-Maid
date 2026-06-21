@@ -105,7 +105,8 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
                 name:
                     'Games',
                 value:
-                    `- \`/dice\` Bet up to 50 coins, 2d6 vs bot - ${minutes(COOLDOWNS.DICE)}`,
+`- \`/dice\` Bet up to 50 coins, 2d6 vs bot - ${minutes(COOLDOWNS.DICE)}
+- \`/blackjack\` Bet up to 100 coins, play the dealer - ${minutes(COOLDOWNS.BLACKJACK)}`,
                 inline:
                     false
             },

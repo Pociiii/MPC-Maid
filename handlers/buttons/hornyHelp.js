@@ -34,6 +34,10 @@ const {
     getMemberCategory
 } = require('../../utils/userCategory');
 
+const {
+    addHornyHelp
+} = require('../../utils/users');
+
 const sceneRoot =
     path.join(
         __dirname,
@@ -361,6 +365,9 @@ module.exports = async (
             interaction.client,
             interaction.user.id,
             'button_interactions'
+        ),
+        addHornyHelp(
+            interaction.user.id
         )
     ]);
 

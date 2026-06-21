@@ -1,7 +1,6 @@
 const {
     ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle
+    StringSelectMenuBuilder
 } = require('discord.js');
 
 const {
@@ -42,50 +41,35 @@ function buildRows(
     activeView
 ) {
 
-    const buttons =
-        Object.entries(
-            views
-        )
-            .map(
-                ([view, data]) =>
-                    new ButtonBuilder()
-                        .setCustomId(
-                            `leaderboard_${view}`
-                        )
-                        .setLabel(
-                            data.label
-                        )
-                        .setEmoji(
-                            data.emoji
-                        )
-                        .setStyle(
-                            view === activeView
-                                ? ButtonStyle.Primary
-                                : ButtonStyle.Secondary
-                        )
-            );
-
-    const rows = [];
-
-    for (
-        let index = 0;
-        index < buttons.length;
-        index += 5
-    ) {
-
-        rows.push(
-            new ActionRowBuilder()
-                .addComponents(
-                    buttons.slice(
-                        index,
-                        index + 5
+    return [
+        new ActionRowBuilder()
+            .addComponents(
+                new StringSelectMenuBuilder()
+                    .setCustomId(
+                        'leaderboard_select'
                     )
-                )
-        );
-
-    }
-
-    return rows;
+                    .setPlaceholder(
+                        'Choose leaderboard'
+                    )
+                    .addOptions(
+                        Object.entries(
+                            views
+                        )
+                            .map(
+                                ([view, data]) => ({
+                                    default:
+                                        view === activeView,
+                                    emoji:
+                                        data.emoji,
+                                    label:
+                                        data.label,
+                                    value:
+                                        view
+                                })
+                            )
+                    )
+            )
+    ];
 
 }
 

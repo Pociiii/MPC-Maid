@@ -15,6 +15,9 @@
 - Added first pregnancy system with `/breed`, `/pregnancy`, and one daily automatic check.
 - Added Pregnancy Info button to the command guide.
 - Added pregnancy recovery tools for testing and cleanup.
+- Switched `/leaderboard` navigation from buttons to a dropdown menu.
+- Added horny Help counter and leaderboard view.
+- Added `/blackjack` casino command with Hit/Stand buttons.
 
 ## Next
 

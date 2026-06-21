@@ -360,6 +360,41 @@ async function buildAchievementsEmbed(
 
 }
 
+async function buildHelpsEmbed(
+    interaction
+) {
+
+    const users =
+        await allUsers();
+
+    const embed =
+        baseEmbed(
+            interaction,
+            'helps'
+        );
+
+    embed.addFields({
+        name:
+            'Top Helpers',
+        value:
+            formatRows(
+                topBy(
+                    users,
+                    'horny_helps',
+                    (user) =>
+                        Number(
+                            user.horny_helps
+                        ) > 0
+                ),
+                'horny_helps',
+                ' helps'
+            )
+    });
+
+    return embed;
+
+}
+
 const builders = {
     ranking:
         buildRankingEmbed,
@@ -371,6 +406,8 @@ const builders = {
         buildSpanksEmbed,
     kisses:
         buildKissesEmbed,
+    helps:
+        buildHelpsEmbed,
     achievements:
         buildAchievementsEmbed
 };

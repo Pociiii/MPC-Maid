@@ -60,7 +60,19 @@ function addKissTaken(
 
 }
 
+function addHornyHelp(
+    userId
+) {
+
+    return incrementColumn(
+        userId,
+        'horny_helps'
+    );
+
+}
+
 module.exports = {
+    addHornyHelp,
     addKissGiven,
     addKissTaken,
     addSpankGiven,

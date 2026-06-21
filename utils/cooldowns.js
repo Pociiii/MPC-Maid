@@ -1,27 +1,51 @@
-const cooldowns = new Map();
+const cooldowns =
+    new Map();
 
-function checkCooldown(userId, command, seconds) {
+function checkCooldown(
+    userId,
+    command,
+    seconds
+) {
 
-    const key = `${userId}-${command}`;
+    const key =
+        `${userId}-${command}`;
 
-    const now = Date.now();
+    const now =
+        Date.now();
 
-    const expiresAt = cooldowns.get(key);
+    const expiresAt =
+        cooldowns.get(
+            key
+        );
 
-    if (expiresAt && now < expiresAt) {
-
+    if (
+        expiresAt &&
+        now < expiresAt
+    )
         return Math.ceil(
             (expiresAt - now) / 1000
         );
 
-    }
-
     cooldowns.set(
         key,
-        now + (seconds * 1000)
+        now + seconds * 1000
     );
 
     return 0;
+
+}
+
+function formatCooldownTimestamp(
+    remaining
+) {
+
+    const unlockAt =
+        Math.floor(
+            (Date.now() + remaining * 1000) / 1000
+        );
+
+    return `<t:${unlockAt}:R>`;
+
 }
 
 async function handleCooldown(
@@ -37,7 +61,9 @@ async function handleCooldown(
             seconds
         );
 
-    if (remaining <= 0)
+    if (
+        remaining <= 0
+    )
         return false;
 
     const minutes =
@@ -50,14 +76,19 @@ async function handleCooldown(
 
     await interaction.reply({
         content:
-            `⏳ You must wait ${minutes}m ${secs}s before using /${command} again.`,
-        flags: 64
+            `\u23F3 /${command} is still on cooldown. Try again ${formatCooldownTimestamp(
+                remaining
+            )}. (${minutes}m ${secs}s)`,
+        flags:
+            64
     });
 
     return true;
+
 }
 
 module.exports = {
     checkCooldown,
+    formatCooldownTimestamp,
     handleCooldown
 };

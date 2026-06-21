@@ -40,6 +40,10 @@ const {
     handleCarrierChoice
 } = require('../features/pregnancy/pregnancyRequest');
 
+const {
+    handleBlackjackAction
+} = require('../features/casino/blackjack');
+
 const handleRelationshipAccept =
     require('./buttons/relationshipAccept');
 
@@ -152,6 +156,26 @@ async function routeInteraction(
                 );
                 return true;
 
+            case 'blackjack_hit':
+                await handleBlackjackAction(
+                    interaction,
+                    'hit',
+                    interaction.customId.split(
+                        ':'
+                    )[1]
+                );
+                return true;
+
+            case 'blackjack_stand':
+                await handleBlackjackAction(
+                    interaction,
+                    'stand',
+                    interaction.customId.split(
+                        ':'
+                    )[1]
+                );
+                return true;
+
             case 'customscene_cast':
             case 'customscene_part':
             case 'customscene_undo':
@@ -185,6 +209,7 @@ async function routeInteraction(
             case 'leaderboard_coins':
             case 'leaderboard_spanks':
             case 'leaderboard_kisses':
+            case 'leaderboard_helps':
             case 'leaderboard_achievements':
                 await interaction.deferUpdate();
 
@@ -403,6 +428,19 @@ async function routeInteraction(
 
                 await pornSceneBooster.execute(
                     interaction
+                );
+
+                return true;
+
+            case 'leaderboard_select':
+
+                await interaction.deferUpdate();
+
+                await interaction.editReply(
+                    await buildLeaderboard(
+                        interaction,
+                        interaction.values[0]
+                    )
                 );
 
                 return true;

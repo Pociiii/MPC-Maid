@@ -15,5 +15,8 @@
   - Gender reveal happens on Day 7.
   - Birth happens on Day 30.
 - Added a Pregnancy Info button to `/commands`.
+- `/leaderboard` now uses a dropdown menu instead of a row of buttons.
+- Added a Helps leaderboard for users pressing Help on `/horny`.
+- Added `/blackjack` for casino coin bets against the dealer.
 
 More pregnancy, booster, and shop stuff is planned, but not live yet.

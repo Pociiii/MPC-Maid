@@ -81,6 +81,13 @@ async function runMigrations(
         'INTEGER DEFAULT 0'
     );
 
+    await addColumnIfMissing(
+        db,
+        'users',
+        'horny_helps',
+        'INTEGER DEFAULT 0'
+    );
+
 }
 
 module.exports = {
