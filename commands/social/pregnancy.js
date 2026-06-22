@@ -23,20 +23,7 @@ module.exports = {
                 'pregnancy'
             )
             .setDescription(
-                'Check pregnancy and fertility status'
-            )
-            .addUserOption(
-                (option) =>
-                    option
-                        .setName(
-                            'user'
-                        )
-                        .setDescription(
-                            'The user to inspect'
-                        )
-                        .setRequired(
-                            false
-                        )
+                'Check your pregnancy and fertility status'
             ),
 
     async execute(
@@ -49,9 +36,6 @@ module.exports = {
         });
 
         const target =
-            interaction.options.getUser(
-                'user'
-            ) ??
             interaction.user;
 
         const targetMember =

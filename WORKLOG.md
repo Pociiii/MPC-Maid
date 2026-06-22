@@ -15,9 +15,15 @@
 - Added first pregnancy system with `/breed`, `/pregnancy`, and one daily automatic check.
 - Added Pregnancy Info button to the command guide.
 - Added pregnancy recovery tools for testing and cleanup.
+- Added pregnancy history counters for pregnancies, births, successful partners, and timestamps.
 - Switched `/leaderboard` navigation from buttons to a dropdown menu.
 - Added horny Help counter and leaderboard view.
 - Added `/blackjack` casino command with Hit/Stand buttons.
+- Added blackjack to the daily quest pool.
+- Routed daily quest, achievement, and GIF approval notices to Maid Feed.
+- Converted crowded customscene cast buttons to a dropdown menu.
+- Added `/eventpost` for staff event announcements.
+- Reworked pornscene Performance into outcome score plus critical scene chance.
 
 ## Next
 

@@ -32,10 +32,66 @@ const sceneRoot =
         'scenes'
     );
 
-const sceneNames =
-    require('../../data/scenes/sceneName.json');
+const sceneNamesByCast =
+    require('../../data/scenes/sceneNamesByCast.json');
 
-function getRandomSceneName() {
+function getSceneNameType(
+    sceneCategory
+) {
+
+    if (
+        !sceneCategory
+    )
+        return 'shared';
+
+    const cast =
+        sceneCategory.split(
+            '_'
+        );
+
+    if (
+        cast.every(
+            (part) =>
+                part.endsWith(
+                    'f'
+                )
+        )
+    )
+        return 'ff';
+
+    if (
+        cast.some(
+            (part) =>
+                part.endsWith(
+                    'm'
+                )
+        ) &&
+        cast.some(
+            (part) =>
+                part.endsWith(
+                    'f'
+                )
+        )
+    )
+        return 'mf';
+
+    return 'shared';
+
+}
+
+function getRandomSceneName(
+    sceneCategory
+) {
+
+    const type =
+        getSceneNameType(
+            sceneCategory
+        );
+
+    const sceneNames = [
+        ...(sceneNamesByCast[type] ?? []),
+        ...(sceneNamesByCast.shared ?? [])
+    ];
 
     return sceneNames[
         Math.floor(
@@ -163,7 +219,9 @@ function buildFinalEmbed(
             name:
                 '🎬 Outcome',
             value:
-                `**${result.outcome}**`,
+                result.criticalScene
+                    ? `**${result.outcome}**\n\uD83C\uDFB2 Critical Scene`
+                    : `**${result.outcome}**`,
             inline:
                 true
         },
@@ -187,7 +245,9 @@ function buildFinalEmbed(
             name:
                 '⭐ XP',
             value:
-                `**${result.xp} each**`,
+                result.criticalScene
+                    ? `**${result.xp} each**\n+10 crit bonus`
+                    : `**${result.xp} each**`,
             inline:
                 true
         },
@@ -265,7 +325,8 @@ Booster: **${formatBooster(
                     `${formatStatValue(
                         requesterUser.performance,
                         result.requesterPerformanceBoost
-                    )} + ${targetUser.performance} = ${result.combinedPerformance}`,
+                    )} + ${targetUser.performance} = ${result.combinedPerformance}
+Crit chance: **${result.critChance}%**`,
                 inline:
                     true
             },
@@ -276,7 +337,8 @@ Booster: **${formatBooster(
                     `${formatStatValue(
                         requesterUser.stamina,
                         result.requesterStaminaBoost
-                    )} + ${targetUser.stamina} = ${result.combinedStamina}`,
+                    )} + ${targetUser.stamina} = ${result.combinedStamina}
+Parts: **${result.totalParts}**`,
                 inline:
                     true
             },
@@ -287,7 +349,8 @@ Booster: **${formatBooster(
                     `${formatStatValue(
                         requesterUser.fame,
                         result.requesterFameBoost
-                    )} + ${targetUser.fame} = ${result.combinedFame}`,
+                    )} + ${targetUser.fame} = ${result.combinedFame}
+Viewers: **${result.viewers}**`,
                 inline:
                     true
             }

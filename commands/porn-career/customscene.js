@@ -1,8 +1,7 @@
 const {
     SlashCommandBuilder,
     ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle
+    StringSelectMenuBuilder
 } = require('discord.js');
 
 const {
@@ -56,37 +55,28 @@ function buildCastRows(
     userId
 ) {
 
-    const buttons =
-        castOptions.map(
-            (option) =>
-                new ButtonBuilder()
-                    .setCustomId(
-                        `customscene_cast:${userId}:${option.value}`
-                    )
-                    .setLabel(
-                        option.label
-                    )
-                    .setEmoji(
-                        '\uD83C\uDFAD'
-                    )
-                    .setStyle(
-                        ButtonStyle.Secondary
-                    )
-        );
-
     return [
         new ActionRowBuilder()
             .addComponents(
-                buttons.slice(
-                    0,
-                    4
-                )
-            ),
-        new ActionRowBuilder()
-            .addComponents(
-                buttons.slice(
-                    4
-                )
+                new StringSelectMenuBuilder()
+                    .setCustomId(
+                        `customscene_cast:${userId}`
+                    )
+                    .setPlaceholder(
+                        'Choose cast'
+                    )
+                    .addOptions(
+                        castOptions.map(
+                            (option) => ({
+                                label:
+                                    option.label,
+                                value:
+                                    option.value,
+                                emoji:
+                                    '\uD83C\uDFAD'
+                            })
+                        )
+                    )
             )
     ];
 

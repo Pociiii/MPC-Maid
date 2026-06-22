@@ -153,13 +153,12 @@ function getPornCareerTitle(
 
 function formatPornCareerName(
     displayName,
-    user,
-    rankTitle
+    user
 ) {
 
     return `${displayName} - ${getPornCareerTitle(
         user
-    )} - ${rankTitle} (${user.ranking})`;
+    )}`;
 
 }
 

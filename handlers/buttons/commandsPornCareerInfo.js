@@ -49,17 +49,19 @@ module.exports = {
 - Custom scenes post in <#${CHANNELS.CUSTOM_SCENE}> over 30 minutes.
 
 **Stats**
-- Performance increases XP output.
+- Performance improves scene score and critical scene chance.
 - Stamina increases total scene parts.
 - Fame increases viewers and revenue.
 - Ranking changes based on the final scene outcome.
 - Partner stats are combined for the scene.
-- Every **10 combined points** in a stat gives an extra bonus.
-- Example: Performance **6 + 4 = 10**, so the scene gets the Performance threshold bonus.
+- Stamina and Fame get a bigger bonus every **10 combined points**.
+- Performance gets more critical chance every **20 combined points**, capped at **15%**.
+- A critical scene upgrades the outcome by one tier and adds a small XP bonus.
 - Boosters count for that scene's combined stat check only.
 
 **Progression**
-- Completed scenes grant XP, coins, ranking points, and scenes completed.
+- Completed scenes grant XP based on outcome, plus coins, ranking points, and scenes completed.
+- Scene XP: Awkward **10**, Solid **20**, Hot **35**, Viral **55**. Critical scenes add **+10 XP**.
 - Use \`/train\` to spend XP and coins on Performance, Stamina, and Fame.
 - Boosters are one-use scene bonuses for the requester only.
 - Use \`/shop\` to buy boosters and \`/inventory\` to check owned boosters.`,

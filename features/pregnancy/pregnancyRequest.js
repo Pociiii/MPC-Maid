@@ -27,6 +27,9 @@ const {
     buildBreedRequestEmbed
 } = require('./pregnancyEmbeds');
 
+const emojis =
+    require('../../utils/emojis');
+
 async function getRumorsChannel(
     client
 ) {
@@ -480,7 +483,7 @@ async function handleBreedDecision(
                         color:
                             getRandomColor(),
                         title:
-                            'Breed Accepted',
+                            `${emojis.breed} Breed Accepted`,
                         description:
 `<@${requesterId}> and <@${targetId}> spent some private time together.
 

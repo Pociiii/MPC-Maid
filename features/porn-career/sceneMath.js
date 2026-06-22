@@ -124,6 +124,81 @@ function formatStatValue(
 
 }
 
+const outcomeOrder = [
+    'Awkward Scene',
+    'Solid Scene',
+    'Hot Scene',
+    'Viral Hit'
+];
+
+const outcomeRewards = {
+    'Awkward Scene': {
+        ranking:
+            -8,
+        xp:
+            10
+    },
+    'Solid Scene': {
+        ranking:
+            5,
+        xp:
+            20
+    },
+    'Hot Scene': {
+        ranking:
+            12,
+        xp:
+            35
+    },
+    'Viral Hit': {
+        ranking:
+            20,
+        xp:
+            55
+    }
+};
+
+function getOutcomeFromScore(
+    score
+) {
+
+    if (
+        score >= 115
+    )
+        return 'Viral Hit';
+
+    if (
+        score >= 85
+    )
+        return 'Hot Scene';
+
+    if (
+        score >= 55
+    )
+        return 'Solid Scene';
+
+    return 'Awkward Scene';
+
+}
+
+function upgradeOutcome(
+    outcome
+) {
+
+    const index =
+        outcomeOrder.indexOf(
+            outcome
+        );
+
+    return outcomeOrder[
+        Math.min(
+            outcomeOrder.length - 1,
+            index + 1
+        )
+    ];
+
+}
+
 function calculateScene(
     requesterUser,
     targetUser,
@@ -172,11 +247,6 @@ function calculateScene(
         requesterFame +
         targetUser.fame;
 
-    const performanceBonus =
-        Math.floor(
-            combinedPerformance / 10
-        );
-
     const staminaBonus =
         Math.floor(
             combinedStamina / 10
@@ -193,11 +263,6 @@ function calculateScene(
             4,
             8
         );
-
-    const xp =
-        25 +
-        (combinedPerformance * 3) +
-        (performanceBonus * 25);
 
     const viewers =
         100 +
@@ -222,15 +287,13 @@ function calculateScene(
             100
         ) +
         Math.floor(
-            xp / 10
+            combinedPerformance / 2
         ) +
         (totalParts * 4) +
         Math.floor(
             viewers / 100
         );
 
-    let outcome = 'Awkward Scene';
-    let rankingChange = -8;
     const flopChance =
         baseFlopChance +
         getBoosterBurnoutRisk(
@@ -243,39 +306,61 @@ function calculateScene(
             100
         ) <= flopChance;
 
+    const critChance =
+        clamp(
+            3 + (Math.floor(
+                combinedPerformance / 20
+            ) * 2),
+            3,
+            15
+        );
+
+    const criticalScene =
+        !criticalFlop &&
+        randomInt(
+            1,
+            100
+        ) <= critChance;
+
+    let outcome =
+        getOutcomeFromScore(
+            score
+        );
+
     if (
-        score >= 115
-    ) {
-        outcome = 'Viral Hit';
-        rankingChange = 20;
-    }
-    else if (
-        score >= 85
-    ) {
-        outcome = 'Hot Scene';
-        rankingChange = 12;
-    }
-    else if (
-        score >= 55
-    ) {
-        outcome = 'Solid Scene';
-        rankingChange = 5;
-    }
+        criticalScene
+    )
+        outcome =
+            upgradeOutcome(
+                outcome
+            );
 
     if (
         criticalFlop
     ) {
 
         outcome = 'Awkward Scene';
-        rankingChange = -8;
 
     }
+
+    const xp =
+        outcomeRewards[outcome].xp +
+        (
+            criticalScene
+                ? 10
+                : 0
+        );
+
+    const rankingChange =
+        outcomeRewards[outcome].ranking;
 
     return {
         totalParts,
         score,
         flopChance,
+        critChance,
         criticalFlop,
+        criticalScene,
         outcome,
         rankingChange,
         xp,

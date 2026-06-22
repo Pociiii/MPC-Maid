@@ -24,6 +24,10 @@ const {
     registerSession
 } = require('../../features/casino/blackjack');
 
+const {
+    trackDailyQuest
+} = require('../../features/daily-quests/dailyQuests');
+
 const emojis =
     require('../../utils/emojis');
 
@@ -150,6 +154,12 @@ module.exports = {
                     session.done
                 )
         });
+
+        await trackDailyQuest(
+            interaction.client,
+            interaction.user.id,
+            'blackjack'
+        );
 
     }
 

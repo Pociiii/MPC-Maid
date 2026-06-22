@@ -45,7 +45,7 @@ module.exports = {
 - Full pregnancy lasts **30 days**.
 - Gender reveal happens on **Day 7**.
 - Birth happens on **Day 30**.
-- Use \`/pregnancy user:@user\` to check status.`,
+- Use \`/pregnancy\` to check your own private status.`,
                 footerText:
                     '/commands - Pregnancy Info',
                 timestamp:

@@ -444,6 +444,17 @@ async function routeInteraction(
                 );
 
                 return true;
+
+            case 'customscene_cast':
+
+                interaction.customId =
+                    `${interaction.customId}:${interaction.values[0]}`;
+
+                await customScene.execute(
+                    interaction
+                );
+
+                return true;
             
         }
 

@@ -120,7 +120,7 @@ function buildApprovedEmbed(
 
 }
 
-function buildApprovalRumorEmbed(
+function buildApprovalFeedEmbed(
     approvedEmbed,
     {
         categoryName,
@@ -184,7 +184,7 @@ function buildApprovalRumorEmbed(
 }
 
 module.exports = {
-    buildApprovalRumorEmbed,
+    buildApprovalFeedEmbed,
     buildApprovedEmbed,
     getGifUrl,
     getSubmitterId

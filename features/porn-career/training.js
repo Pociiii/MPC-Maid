@@ -55,6 +55,15 @@ const statSetters = {
     fame: setFame
 };
 
+const statDescriptions = {
+    performance:
+        'Better scene score and critical scene chance.',
+    stamina:
+        'More scene parts, up to 8.',
+    fame:
+        'More viewers, coins, and score.'
+};
+
 function getStatCost(
     value
 ) {
@@ -99,7 +108,7 @@ function formatStatField(
     if (
         value >= maxTrainableStat
     )
-        return `Level **${value}**\nCurrent cap reached.`;
+        return `${statDescriptions[stat]}\nLevel **${value}**\nCurrent cap reached.`;
 
     const cost =
         getStatCost(
@@ -122,7 +131,7 @@ function formatStatField(
             `${cost.coins - user.coins} coins`
         );
 
-    return `Level **${value} -> ${value + 1}**\nCost: **${cost.xp} XP** + **${cost.coins} coins**${
+    return `${statDescriptions[stat]}\nLevel **${value} -> ${value + 1}**\nCost: **${cost.xp} XP** + **${cost.coins} coins**${
         missing.length > 0
             ? `\nMissing: **${missing.join(
                 ' + '
@@ -156,7 +165,7 @@ async function buildTrainingPanel(
                 'Training',
             description:
 `${notice?.text ? `${notice.text}\n\n` : ''}Balance: **${user.xp} XP** and **${user.coins} coins**
-Pick a stat to train.`,
+Pick a stat to train. Stamina and Fame bonus every **10 combined points**. Performance crit chance rises every **20 combined points**.`,
             footerText:
                 '/train',
             timestamp:
@@ -167,7 +176,7 @@ Pick a stat to train.`,
         ...trainableStats.map(
             (stat) => ({
                 name:
-                    statLabels[stat],
+                    `${statEmojis[stat]} ${statLabels[stat]}`,
                 value:
                     formatStatField(
                         user,
@@ -283,7 +292,7 @@ async function trainStat(
                     success:
                         false,
                     text:
-                        `${statLabels[stat]} is already at the cap.`
+                        `${statEmojis[stat]} ${statLabels[stat]} is already at the cap.`
                 }
             )
         );
@@ -309,7 +318,7 @@ async function trainStat(
                     success:
                         false,
                     text:
-                        `Not enough resources for ${statLabels[stat]}. Check the missing amount below.`
+                        `Not enough resources for ${statEmojis[stat]} ${statLabels[stat]}. Check the missing amount below.`
                 }
             )
         );
@@ -340,7 +349,7 @@ async function trainStat(
                 success:
                     true,
                 text:
-                    `${statLabels[stat]} trained from **${currentValue}** to **${currentValue + 1}**.`
+                    `${statEmojis[stat]} ${statLabels[stat]} trained from **${currentValue}** to **${currentValue + 1}**.`
             }
         )
     );

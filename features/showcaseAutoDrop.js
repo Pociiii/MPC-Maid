@@ -26,7 +26,7 @@ async function sendAutoDrop(
 
         const channel =
             await client.channels.fetch(
-                CHANNELS.SHOWCASE
+                CHANNELS.TITTY_DROP
             );
 
         if (
@@ -39,7 +39,7 @@ async function sendAutoDrop(
                     title:
                         'Auto Drop Channel Missing',
                     description:
-                        `Showcase channel <#${CHANNELS.SHOWCASE}> was not available or was not text based.`
+                        `Titty Drop channel <#${CHANNELS.TITTY_DROP}> was not available or was not text based.`
                 }
             );
 
@@ -72,7 +72,7 @@ async function sendAutoDrop(
                         name:
                             'Channel',
                         value:
-                            `<#${CHANNELS.SHOWCASE}>`,
+                            `<#${CHANNELS.TITTY_DROP}>`,
                         inline:
                             true
                     }
@@ -108,7 +108,7 @@ function startShowcaseAutoDrop(
             title:
                 'Auto Drop Started',
             description:
-                `Automatic drops will post in <#${CHANNELS.SHOWCASE}> every hour.`
+                `Automatic drops will post in <#${CHANNELS.TITTY_DROP}> every hour.`
         }
     );
 

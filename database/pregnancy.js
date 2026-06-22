@@ -212,6 +212,71 @@ async function getOrCreatePregnancyProfile(
 
 }
 
+async function markPregnancyStarted(
+    carrierId,
+    fatherId,
+    startedAt
+) {
+
+    await Promise.all([
+        getOrCreatePregnancyProfile(
+            carrierId
+        ),
+        getOrCreatePregnancyProfile(
+            fatherId
+        )
+    ]);
+
+    await Promise.all([
+        dbRun(
+            `UPDATE pregnancy_profiles
+             SET pregnancy_count = COALESCE(pregnancy_count, 0) + 1,
+                 last_pregnancy_at = ?,
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE user_id = ?`,
+            [
+                startedAt,
+                carrierId
+            ]
+        ),
+        dbRun(
+            `UPDATE pregnancy_profiles
+             SET pregnancy_partner_count = COALESCE(pregnancy_partner_count, 0) + 1,
+                 last_pregnancy_at = ?,
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE user_id = ?`,
+            [
+                startedAt,
+                fatherId
+            ]
+        )
+    ]);
+
+}
+
+async function markBirthComplete(
+    carrierId,
+    birthAt
+) {
+
+    await getOrCreatePregnancyProfile(
+        carrierId
+    );
+
+    await dbRun(
+        `UPDATE pregnancy_profiles
+         SET children_born = COALESCE(children_born, 0) + 1,
+             last_birth_at = ?,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE user_id = ?`,
+        [
+            birthAt,
+            carrierId
+        ]
+    );
+
+}
+
 async function getDailyCarrierFertility(
     userId,
     date = getPregnancyDate()
@@ -353,7 +418,10 @@ async function getPregnancyStatus(
     return {
         activePregnancy,
         children:
-            childrenRow?.count ?? 0,
+            Math.max(
+                profile.children_born ?? 0,
+                childrenRow?.count ?? 0
+            ),
         profile
     };
 
@@ -423,6 +491,12 @@ async function createPregnancy(
                 babyGender
             ]
         );
+
+    await markPregnancyStarted(
+        carrierId,
+        fatherId,
+        startedAt
+    );
 
     return dbGet(
         `SELECT *
@@ -514,6 +588,12 @@ async function forcePregnancy(
             ]
         );
 
+    await markPregnancyStarted(
+        carrierId,
+        fatherId,
+        startedAt
+    );
+
     return dbGet(
         `SELECT *
          FROM pregnancies
@@ -548,6 +628,9 @@ async function forceBirth(
     carrierId
 ) {
 
+    const birthAt =
+        new Date().toISOString();
+
     const result =
         await dbRun(
             `UPDATE pregnancies
@@ -558,6 +641,14 @@ async function forceBirth(
             [
                 carrierId
             ]
+        );
+
+    if (
+        result.changes > 0
+    )
+        await markBirthComplete(
+            carrierId,
+            birthAt
         );
 
     return result.changes;
@@ -830,6 +921,9 @@ async function getPregnancyMilestones(
             !pregnancy.birth_announced
         ) {
 
+            const birthAt =
+                now.toISOString();
+
             await dbRun(
                 `UPDATE pregnancies
                  SET birth_announced = 1,
@@ -838,6 +932,11 @@ async function getPregnancyMilestones(
                 [
                     pregnancy.id
                 ]
+            );
+
+            await markBirthComplete(
+                pregnancy.carrier_id,
+                birthAt
             );
 
             births.push({

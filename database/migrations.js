@@ -88,6 +88,55 @@ async function runMigrations(
         'INTEGER DEFAULT 0'
     );
 
+    await addColumnIfMissing(
+        db,
+        'pregnancy_profiles',
+        'pregnancy_count',
+        'INTEGER DEFAULT 0'
+    );
+
+    await addColumnIfMissing(
+        db,
+        'pregnancy_profiles',
+        'children_born',
+        'INTEGER DEFAULT 0'
+    );
+
+    await addColumnIfMissing(
+        db,
+        'pregnancy_profiles',
+        'pregnancy_partner_count',
+        'INTEGER DEFAULT 0'
+    );
+
+    await addColumnIfMissing(
+        db,
+        'pregnancy_profiles',
+        'last_pregnancy_at',
+        'TEXT'
+    );
+
+    await addColumnIfMissing(
+        db,
+        'pregnancy_profiles',
+        'last_birth_at',
+        'TEXT'
+    );
+
+    await addColumnIfMissing(
+        db,
+        'pregnancy_profiles',
+        'pregnancy_opt_in',
+        'INTEGER DEFAULT 1'
+    );
+
+    await addColumnIfMissing(
+        db,
+        'pregnancy_profiles',
+        'pregnancy_public_announcements',
+        'INTEGER DEFAULT 1'
+    );
+
 }
 
 module.exports = {

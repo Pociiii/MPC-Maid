@@ -238,15 +238,15 @@ function getMilestonesCrossed(
 
 }
 
-async function getRumorsChannel(
+async function getMaidFeedChannel(
     client
 ) {
 
     return client.channels.cache.get(
-        CHANNELS.RUMORS
+        CHANNELS.MAID_FEED
     ) ||
         await client.channels.fetch(
-            CHANNELS.RUMORS
+            CHANNELS.MAID_FEED
         ).catch(
             () => null
         );
@@ -261,7 +261,7 @@ async function announceAchievement(
 ) {
 
     const channel =
-        await getRumorsChannel(
+        await getMaidFeedChannel(
             client
         );
 

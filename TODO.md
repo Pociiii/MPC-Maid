@@ -4,6 +4,15 @@ This file tracks planned systems and bigger follow-up work. Keep it practical:
 write the idea, the first playable version, and anything that must wait until
 the database is stable.
 
+## Server Context
+
+- MPC is a 3DXChat adult production server that also hosts private events.
+- Staff/host/organizer commands should focus on production flow, event prep,
+  cast coordination, announcements, and tracking. Moderation is handled by
+  MEE6.
+- Never list admin/staff-only commands in the public `/commands` guide.
+- Never add admin/staff-only commands to the public changelog.
+
 ## Before Hosting
 
 - Keep testing daily quests, achievements, leaderboard, and versioned embeds.
@@ -12,7 +21,49 @@ the database is stable.
 - Keep `.env` private and rotate the Discord bot token before hosting.
 - Check cooldowns again after more live testing.
 
-## Booster System
+## High Priority
+
+### Balance And Live Testing
+
+- Rebalance daily quest rewards after live testing.
+- Add or remove daily quest types based on actual command usage.
+- Keep every assigned daily quest possible for all supported genders.
+- Test `/shop` booster prices against live coin income.
+- Check cooldowns again after more users play for a few days.
+- Keep an eye on pornscene XP now that Performance gives crit chance instead
+  of raw XP.
+
+### Embed And UI Consistency
+
+Current direction:
+- Use shared embed helpers where possible.
+- Use user avatar thumbnails for user-centered embeds.
+- Use versioned footers on command embeds.
+- Add clear emoji feedback to buttons and fields.
+- If buttons start feeling cramped, use a dropdown menu instead.
+
+Future:
+- Continue converting older command groups.
+- Keep rumor announcements visually consistent.
+- Keep command text short because Discord users do not read walls of text.
+
+### Channel Routing
+
+Current:
+- Rumors stays focused on sexy/story RP moments.
+- Maid Feed carries progress/system notices: `1518308768335528187`.
+
+Current routing plan:
+- Keep Rumors for sexy/story RP moments: pornscene final results, pregnancy
+  confirmed, gender reveal, birth, and bigger RP hooks.
+- Move game/system spam to Maid Feed: daily quest completions, achievement
+  unlocks, GIF approvals, and similar progress notices.
+- Keep porn career channel for scene parts only.
+- Keep custom scene channel for custom scene parts only.
+
+## Medium Priority
+
+### Booster System
 
 Goal:
 - Boosters are consumable scene items that improve one pornscene stat for one
@@ -33,7 +84,7 @@ Needed later:
 - SQL/inventory structure review before hosting.
 - Higher booster tiers, only after Tier 1 feels balanced.
 
-## Shop System
+### Shop System
 
 Goal:
 - Give coins meaningful sinks beyond training fees.
@@ -55,7 +106,7 @@ Balance notes:
 - Shop prices should make users think before buying many boosters.
 - Avoid pay-to-win feeling for ranking.
 
-## Pregnancy System
+### Pregnancy System
 
 Goal:
 - Standalone long-term RP system, separate from porn career.
@@ -102,9 +153,12 @@ Fertile window:
   day.
 - Failed pregnancy rolls are silent.
 
-First commands:
-- `/breed @user` sends a consent request. Live in first version.
-- `/pregnancy @user` shows pregnancy state and daily fertility. Live in first version.
+Current commands:
+- `/breed @user` sends a consent request.
+- `/pregnancy` shows only your own pregnancy state and daily fertility.
+- Pregnancy profiles store simple long-term counters: pregnancies, children
+  born, successful breeding partner count, last pregnancy, last birth, opt-in,
+  and public announcement preference.
 
 Announcement ideas:
 - Breed accepted: small rumor post.
@@ -125,10 +179,10 @@ Do not add yet:
 - Large family tree.
 - Endless child list.
 
-## Achievements
+### Achievements
 
 Current:
-- Achievements unlock automatically and post in rumors.
+- Achievements unlock automatically and post in Maid Feed.
 - Achievement points exist and can be shown on leaderboard.
 - `/achievements` shows private progress with category buttons.
 
@@ -136,50 +190,19 @@ Future:
 - Add milestones for pregnancy only after the first pregnancy version is tested.
 - Keep endless milestones for long-term actions, but avoid spammy rewards.
 
-## Daily Quests
+## Low Priority
 
-Current:
-- Users receive daily quests automatically.
-- `/daily` shows personal quests privately.
-- Rumors channel announces completed quests and full daily set completion.
-
-Future:
-- Rebalance rewards after live testing.
-- Add or remove quest types based on actual command usage.
-- Keep every assigned quest possible for all supported genders.
-- Move daily quest completion posts to Maid Feed when channel routing is updated.
-
-## Channel Routing
-
-Current:
-- Rumors carries too much bot output.
-- Maid Feed channel created: `1518308768335528187`.
-
-Future routing plan:
-- Keep Rumors for sexy/story RP moments: pornscene final results, pregnancy
-  confirmed, gender reveal, birth, and bigger RP hooks.
-- Move game/system spam to Maid Feed: daily quest completions, achievement
-  unlocks, GIF approvals, and similar progress notices.
-- Keep porn career channel for scene parts only.
-- Keep custom scene channel for custom scene parts only.
-
-## Embed And UI Consistency
-
-Current direction:
-- Use shared embed helpers where possible.
-- Use user avatar thumbnails for user-centered embeds.
-- Use versioned footers on command embeds.
-- Add clear emoji feedback to buttons and fields.
-
-Future:
-- Continue converting older command groups.
-- Keep rumor announcements visually consistent.
-- Keep command text short because Discord users do not read walls of text.
-
-## Relationship System
+### Relationship System
 
 Status:
 - Leave this for last.
 - User wants to rework how it works.
 
 Do not touch unless specifically requested.
+
+### Automatic X Repost Watcher
+
+- Staff command to add/remove watched X users.
+- Requires `X_BEARER_TOKEN` in `.env`.
+- Repost text, creator name, link, and timestamp only by default.
+- Avoid scraping or bypassing sensitive-media walls.

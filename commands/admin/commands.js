@@ -14,6 +14,10 @@ const {
     COOLDOWNS
 } = require('../../data/constants');
 
+const {
+    getNextResetTimestamp
+} = require('../../features/daily-quests/dailyQuests');
+
 const ROLES =
     require('../../data/roles.json');
 
@@ -30,6 +34,14 @@ function minutes(
     return `${Math.floor(
         seconds / 60
     )} min`;
+
+}
+
+function timestamp(
+    unixTimestamp
+) {
+
+    return `<t:${unixTimestamp}:t> (<t:${unixTimestamp}:R>)`;
 
 }
 
@@ -69,7 +81,9 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
                     'All channels',
                 value:
 `- \`/profile\` Stats and progress
-- \`/daily\` Personal daily quests, reset 12:00 UTC
+- \`/daily\` Personal daily quests, resets ${timestamp(
+    getNextResetTimestamp()
+)}
 - \`/train\` Raise career stats
 - \`/shop\` Buy pornscene boosters
 - \`/inventory\` Your boosters
@@ -103,7 +117,7 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
             },
             {
                 name:
-                    'Games',
+                    `<#${CHANNELS.CASINO}>`,
                 value:
 `- \`/dice\` Bet up to 50 coins, 2d6 vs bot - ${minutes(COOLDOWNS.DICE)}
 - \`/blackjack\` Bet up to 100 coins, play the dealer - ${minutes(COOLDOWNS.BLACKJACK)}`,
@@ -116,7 +130,7 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
                 value:
 `- Media: image, GIF, or video.
 - Boosters: buy with \`/shop\`, check \`/inventory\`, use with \`/pornscene\`.
-- Daily quests and achievements announce completions in rumors.
+- Daily quests, achievements, and GIF approvals post in <#${CHANNELS.MAID_FEED}>.
 - Updates are posted in <#${CHANNELS.UPDATES}>.
 - More details: press the info buttons below.
 

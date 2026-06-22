@@ -3,6 +3,13 @@ CREATE TABLE IF NOT EXISTS pregnancy_profiles (
     partner_fertility TEXT DEFAULT 'normal',
     carrier_fertility TEXT,
     fertility_date TEXT,
+    pregnancy_count INTEGER DEFAULT 0,
+    children_born INTEGER DEFAULT 0,
+    pregnancy_partner_count INTEGER DEFAULT 0,
+    last_pregnancy_at TEXT,
+    last_birth_at TEXT,
+    pregnancy_opt_in INTEGER DEFAULT 1,
+    pregnancy_public_announcements INTEGER DEFAULT 1,
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 

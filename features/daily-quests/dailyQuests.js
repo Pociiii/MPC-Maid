@@ -168,6 +168,42 @@ const questPool = [
     },
     {
         id:
+            'blackjack_1',
+        action:
+            'blackjack',
+        label:
+            'Play blackjack 1 time',
+        target:
+            1,
+        tier:
+            'easy'
+    },
+    {
+        id:
+            'blackjack_2',
+        action:
+            'blackjack',
+        label:
+            'Play blackjack 2 times',
+        target:
+            2,
+        tier:
+            'medium'
+    },
+    {
+        id:
+            'blackjack_3',
+        action:
+            'blackjack',
+        label:
+            'Play blackjack 3 times',
+        target:
+            3,
+        tier:
+            'hard'
+    },
+    {
+        id:
             'showcase_1',
         action:
             'showcase',
@@ -713,22 +749,22 @@ async function buildDailyReply(
 
 }
 
-async function getRumorsChannel(
+async function getMaidFeedChannel(
     client
 ) {
 
     return client.channels.cache.get(
-        CHANNELS.RUMORS
+        CHANNELS.MAID_FEED
     ) ||
         await client.channels.fetch(
-            CHANNELS.RUMORS
+            CHANNELS.MAID_FEED
         ).catch(
             () => null
         );
 
 }
 
-async function sendQuestCompleteRumor(
+async function sendQuestCompleteFeed(
     client,
     userId,
     quest,
@@ -736,7 +772,7 @@ async function sendQuestCompleteRumor(
 ) {
 
     const channel =
-        await getRumorsChannel(
+        await getMaidFeedChannel(
             client
         );
 
@@ -805,7 +841,7 @@ async function sendQuestCompleteRumor(
 
     await channel.send({
         content:
-            `<@${userId}> completed a daily quest!`,
+            null,
         embeds: [
             embed
         ]
@@ -813,13 +849,13 @@ async function sendQuestCompleteRumor(
 
 }
 
-async function sendDailySetCompleteRumor(
+async function sendDailySetCompleteFeed(
     client,
     userId
 ) {
 
     const channel =
-        await getRumorsChannel(
+        await getMaidFeedChannel(
             client
         );
 
@@ -966,7 +1002,7 @@ async function maybeGrantDailyBonus(
         )
     ]);
 
-    await sendDailySetCompleteRumor(
+    await sendDailySetCompleteFeed(
         client,
         userId
     );
@@ -1090,7 +1126,7 @@ async function updateDailyQuestProgress(
                 questDate
             );
 
-        await sendQuestCompleteRumor(
+        await sendQuestCompleteFeed(
             client,
             userId,
             completedQuest,
@@ -1141,6 +1177,7 @@ module.exports = {
     buildDailyReply,
     getDailyQuestDate,
     getDailyQuests,
+    getNextResetTimestamp,
     questPool,
     trackDailyQuest
 };

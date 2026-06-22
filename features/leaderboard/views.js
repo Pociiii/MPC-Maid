@@ -367,29 +367,61 @@ async function buildHelpsEmbed(
     const users =
         await allUsers();
 
+    const {
+        maleUsers,
+        femaleUsers
+    } =
+        await getGenderGroups(
+            interaction,
+            users
+        );
+
     const embed =
         baseEmbed(
             interaction,
             'helps'
         );
 
-    embed.addFields({
-        name:
-            'Top Helpers',
-        value:
-            formatRows(
-                topBy(
-                    users,
+    const hasHelps =
+        (user) =>
+            Number(
+                user.horny_helps
+            ) > 0;
+
+    embed.addFields(
+        {
+            name:
+                'Male Helpers',
+            value:
+                formatRows(
+                    topBy(
+                        maleUsers,
+                        'horny_helps',
+                        hasHelps
+                    ),
                     'horny_helps',
-                    (user) =>
-                        Number(
-                            user.horny_helps
-                        ) > 0
+                    ' helps'
                 ),
-                'horny_helps',
-                ' helps'
-            )
-    });
+            inline:
+                true
+        },
+        {
+            name:
+                'Female Helpers',
+            value:
+                formatRows(
+                    topBy(
+                        femaleUsers,
+                        'horny_helps',
+                        hasHelps
+                    ),
+                    'horny_helps',
+                    ' helps'
+                ),
+            inline:
+                true
+        }
+    );
 
     return embed;
 

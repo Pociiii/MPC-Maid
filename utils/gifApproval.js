@@ -9,7 +9,7 @@ const {
 } = require('../data/constants');
 
 const {
-    buildApprovalRumorEmbed,
+    buildApprovalFeedEmbed,
     buildApprovedEmbed,
     getGifUrl,
     getSubmitterId
@@ -111,18 +111,23 @@ async function approveGif(
             []
     });
 
-    const rumorsChannel =
+    const maidFeedChannel =
         interaction.client.channels.cache.get(
-            CHANNELS.RUMORS
+            CHANNELS.MAID_FEED
+        ) ||
+        await interaction.client.channels.fetch(
+            CHANNELS.MAID_FEED
+        ).catch(
+            () => null
         );
 
     if (
-        rumorsChannel
+        maidFeedChannel?.send
     ) {
 
-        await rumorsChannel.send({
+        await maidFeedChannel.send({
             embeds: [
-                buildApprovalRumorEmbed(
+                buildApprovalFeedEmbed(
                     approvedEmbed,
                     {
                         categoryName,

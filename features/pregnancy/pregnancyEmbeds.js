@@ -46,6 +46,25 @@ function formatTimestamp(
 
 }
 
+function formatDateTimestamp(
+    value
+) {
+
+    if (
+        !value
+    )
+        return 'Never';
+
+    return formatTimestamp(
+        Math.floor(
+            new Date(
+                value
+            ).getTime() / 1000
+        )
+    );
+
+}
+
 function getRevealTimestamp(
     pregnancy
 ) {
@@ -163,10 +182,40 @@ function buildPregnancyStatusEmbed(
         },
         {
             name:
+                '\uD83E\uDD30 Pregnancies',
+            value:
+                String(
+                    status.profile.pregnancy_count ?? 0
+                ),
+            inline:
+                true
+        },
+        {
+            name:
+                '\uD83D\uDD25 Successful Breeds',
+            value:
+                String(
+                    status.profile.pregnancy_partner_count ?? 0
+                ),
+            inline:
+                true
+        },
+        {
+            name:
                 '\u23F3 Next Check',
             value:
                 formatTimestamp(
                     getNextPregnancyCheckTimestamp()
+                ),
+            inline:
+                false
+        },
+        {
+            name:
+                '\uD83D\uDCC5 Last Pregnancy',
+            value:
+                formatDateTimestamp(
+                    status.profile.last_pregnancy_at
                 ),
             inline:
                 false

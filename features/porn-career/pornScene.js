@@ -288,7 +288,9 @@ async function acceptScene(
         );
 
     const sceneTitle =
-        getRandomSceneName();
+        getRandomSceneName(
+            sceneCategory
+        );
 
     const requesterAuthor = {
         name:
