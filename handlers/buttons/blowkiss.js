@@ -12,9 +12,9 @@ const {
 } = require('../../utils/embeds');
 
 const {
-    adpLogoPath,
-    adpLogoAttachment
-} = require('../../utils/adpLogo');
+    mpcLogoPath,
+    mpcLogoAttachment
+} = require('../../utils/mpcLogo');
 
 const {
     getRandomColor
@@ -73,7 +73,7 @@ module.exports = async (
                 interaction.member.displayName,
 
             authorIcon:
-                adpLogoAttachment,
+                mpcLogoAttachment,
 
             thumbnail:
                 interaction.user.displayAvatarURL(),
@@ -131,7 +131,7 @@ module.exports = async (
 
         embeds: [embed],
 
-        files: [adpLogoPath]
+        files: [mpcLogoPath]
 
     });
 

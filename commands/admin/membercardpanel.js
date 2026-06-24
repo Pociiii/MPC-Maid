@@ -78,11 +78,22 @@ Remember to change your nick to your in-game name first.
 
                 );
 
+        const post =
+            await interaction.channel.send({
+
+                embeds: [embed],
+
+                components: [row]
+
+            });
+
         await interaction.reply({
 
-            embeds: [embed],
+            content:
+                `Member card panel posted: ${post.url}`,
 
-            components: [row]
+            flags:
+                64
 
         });
 

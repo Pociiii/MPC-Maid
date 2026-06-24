@@ -44,9 +44,9 @@ const {
 } = require('../../utils/pornCareerTitles');
 
 const {
-    adpLogoPath,
-    adpLogoAttachment
-} = require('../../utils/adpLogo');
+    mpcLogoPath,
+    mpcLogoAttachment
+} = require('../../utils/mpcLogo');
 
 function getSceneCategory(
     firstCategory,
@@ -297,7 +297,7 @@ module.exports = {
                         requesterRank
                     ),
                 authorIcon:
-                    adpLogoAttachment,
+                    mpcLogoAttachment,
                 title:
                     'Choose Scene Booster',
                 description:
@@ -318,7 +318,7 @@ module.exports = {
                 row
             ],
             files: [
-                adpLogoPath
+                mpcLogoPath
             ],
             flags:
                 64

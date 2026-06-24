@@ -11,9 +11,9 @@ const {
 } = require('../data/constants');
 
 const {
-    adpLogoPath,
-    adpLogoAttachment
-} = require('./adpLogo');
+    mpcLogoPath,
+    mpcLogoAttachment
+} = require('./mpcLogo');
 
 const {
     commandFooter
@@ -46,7 +46,7 @@ function buildDropPost(
                 options.authorName ||
                 'MPC Maid',
             authorIcon:
-                adpLogoAttachment,
+                mpcLogoAttachment,
             thumbnail:
                 options.thumbnail,
             title:
@@ -69,7 +69,7 @@ function buildDropPost(
             embed
         ],
         files: [
-            adpLogoPath
+            mpcLogoPath
         ]
     };
 

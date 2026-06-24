@@ -45,6 +45,29 @@ function timestamp(
 
 }
 
+function commandLine(
+    name,
+    channel,
+    cooldown,
+    description
+) {
+
+    return `\`${name}\` • ${channel} • ${cooldown}\n${description}`;
+
+}
+
+function cooldownLabel(
+    seconds
+) {
+
+    return seconds
+        ? minutes(
+            seconds
+        )
+        : 'No CD';
+
+}
+
 module.exports = {
 
     data:
@@ -75,66 +98,200 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
                 }
             );
 
+        const dailyReset =
+            timestamp(
+                getNextResetTimestamp()
+            );
+
         embed.addFields(
             {
                 name:
-                    'All channels',
+                    'General',
                 value:
-`- \`/profile\` Stats and progress
-- \`/daily\` Personal daily quests, resets ${timestamp(
-    getNextResetTimestamp()
-)}
-- \`/train\` Raise career stats
-- \`/shop\` Buy pornscene boosters
-- \`/inventory\` Your boosters
-- \`/achievements\` Achievement progress
-- \`/pregnancy\` Pregnancy and fertility status
-- \`/breed\` Send a pregnancy RP request
-- \`/leaderboard\` Server rankings
-- \`/matchme\` Random match - ${minutes(COOLDOWNS.MATCHME)}`,
+[
+    commandLine(
+        '/profile',
+        'Any',
+        'No CD',
+        'View a member profile.'
+    ),
+    commandLine(
+        '/daily',
+        'Any',
+        `Reset ${dailyReset}`,
+        'Check your personal daily quests.'
+    ),
+    commandLine(
+        '/leaderboard',
+        'Any',
+        'No CD',
+        'Browse server ladders.'
+    ),
+    commandLine(
+        '/achievements',
+        'Any',
+        'No CD',
+        'Check achievement progress.'
+    )
+].join(
+    '\n'
+),
                 inline:
                     false
             },
             {
                 name:
-                    `<#${CHANNELS.SHOWCASE}>`,
+                    'Porn Career',
                 value:
-`- \`/drop\` Boobies - ${minutes(COOLDOWNS.DROP)}
-- \`/wiggle\` Spank button - ${minutes(COOLDOWNS.WIGGLE)}
-- \`/flex\` Blow kiss button - ${minutes(COOLDOWNS.FLEX)}
-- \`/horny\` Solo + Help button - ${minutes(COOLDOWNS.HORNY)}`,
+[
+    commandLine(
+        '/pornscene',
+        `<#${CHANNELS.PORN_CAREER}>`,
+        cooldownLabel(
+            COOLDOWNS.PORN_SCENE_REQUEST
+        ),
+        'Make a shared career scene.'
+    ),
+    commandLine(
+        '/customscene',
+        `Any, posts in <#${CHANNELS.CUSTOM_SCENE}>`,
+        cooldownLabel(
+            COOLDOWNS.CUSTOM_SCENE
+        ),
+        'Build a solo custom scene.'
+    ),
+    commandLine(
+        '/train',
+        'Any',
+        'No CD',
+        'Spend XP and coins on stats.'
+    ),
+    commandLine(
+        '/shop',
+        'Any',
+        'No CD',
+        'Buy scene boosters.'
+    ),
+    commandLine(
+        '/inventory',
+        'Any',
+        'No CD',
+        'Check your boosters.'
+    )
+].join(
+    '\n'
+),
                 inline:
                     false
             },
             {
                 name:
-                    `<#${CHANNELS.PORN_CAREER}>`,
+                    'Showcase',
                 value:
-`- \`/pornscene\` Shared career scene - ${minutes(COOLDOWNS.PORN_SCENE_REQUEST)}
-- \`/customscene\` Solo custom scene - ${minutes(COOLDOWNS.CUSTOM_SCENE)}`,
+[
+    commandLine(
+        '/drop',
+        `<#${CHANNELS.SHOWCASE}>`,
+        cooldownLabel(
+            COOLDOWNS.DROP
+        ),
+        'Post a titty drop.'
+    ),
+    commandLine(
+        '/wiggle',
+        `<#${CHANNELS.SHOWCASE}>`,
+        cooldownLabel(
+            COOLDOWNS.WIGGLE
+        ),
+        'Post a wiggle with spank buttons.'
+    ),
+    commandLine(
+        '/flex',
+        `<#${CHANNELS.SHOWCASE}>`,
+        cooldownLabel(
+            COOLDOWNS.FLEX
+        ),
+        'Post a flex with kiss button.'
+    ),
+    commandLine(
+        '/horny',
+        `<#${CHANNELS.SHOWCASE}>`,
+        cooldownLabel(
+            COOLDOWNS.HORNY
+        ),
+        'Post solo horny GIF with Help button.'
+    )
+].join(
+    '\n'
+),
                 inline:
                     false
             },
             {
                 name:
-                    `<#${CHANNELS.CASINO}>`,
+                    'Social / RP',
                 value:
-`- \`/dice\` Bet up to 50 coins, 2d6 vs bot - ${minutes(COOLDOWNS.DICE)}
-- \`/blackjack\` Bet up to 100 coins, play the dealer - ${minutes(COOLDOWNS.BLACKJACK)}`,
+[
+    commandLine(
+        '/matchme',
+        'Any',
+        cooldownLabel(
+            COOLDOWNS.MATCHME
+        ),
+        'Get matched with another member.'
+    ),
+    commandLine(
+        '/breed',
+        'Any',
+        'No CD',
+        'Send a pregnancy RP request.'
+    ),
+    commandLine(
+        '/pregnancy',
+        'Any',
+        'No CD',
+        'Check your own fertility and pregnancy status.'
+    )
+].join(
+    '\n'
+),
                 inline:
                     false
             },
             {
                 name:
-                    'Notes',
+                    'Casino',
                 value:
-`- Media: image, GIF, or video.
-- Boosters: buy with \`/shop\`, check \`/inventory\`, use with \`/pornscene\`.
-- Daily quests, achievements, and GIF approvals post in <#${CHANNELS.MAID_FEED}>.
-- Updates are posted in <#${CHANNELS.UPDATES}>.
-- More details: press the info buttons below.
-
--# This bot is not hosted on a server yet, check its status before using its features.`,
+[
+    commandLine(
+        '/dice',
+        `<#${CHANNELS.CASINO}>`,
+        cooldownLabel(
+            COOLDOWNS.DICE
+        ),
+        'Bet up to 50 coins, 2d6 vs bot.'
+    ),
+    commandLine(
+        '/blackjack',
+        `<#${CHANNELS.CASINO}>`,
+        cooldownLabel(
+            COOLDOWNS.BLACKJACK
+        ),
+        'Bet up to 100 coins, play the dealer.'
+    )
+].join(
+    '\n'
+),
+                inline:
+                    false
+            },
+            {
+                name:
+                    'Bot Feed',
+                value:
+`Daily quests, achievements, and GIF approvals post in <#${CHANNELS.MAID_FEED}>.
+Updates are posted in <#${CHANNELS.UPDATES}>.
+More details: press the info buttons below.`,
                 inline:
                     false
             }
@@ -172,14 +329,7 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
                 );
 
         const channel =
-            interaction.client.channels.cache.get(
-                CHANNELS.COMMANDS
-            ) ??
-            await interaction.client.channels.fetch(
-                CHANNELS.COMMANDS
-            ).catch(
-                () => null
-            );
+            interaction.channel;
 
         if (
             !channel?.send
@@ -187,7 +337,7 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
 
             await interaction.reply({
                 content:
-                    'I could not find the command channel.',
+                    'I could not post the command guide in this channel.',
                 flags:
                     64
             });
@@ -208,7 +358,7 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
 
         await interaction.reply({
             content:
-                `Command guide posted in <#${CHANNELS.COMMANDS}>: ${message.url}`,
+                `Command guide posted here: ${message.url}`,
             flags:
                 64
         });

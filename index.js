@@ -30,6 +30,7 @@ const {
 } = require('./utils/embeds');
 
 const {
+    CHANNELS,
     getRandomColor
 } = require('./data/constants');
 
@@ -70,6 +71,60 @@ const {
     clearAllSceneBusy
 } = require('./utils/pornScenes');
 
+process.on(
+    'unhandledRejection',
+    error => {
+        console.error(
+            'UNHANDLED REJECTION'
+        );
+        console.error(
+            error
+        );
+    }
+);
+
+process.on(
+    'uncaughtException',
+    error => {
+        console.error(
+            'UNCAUGHT EXCEPTION'
+        );
+        console.error(
+            error
+        );
+    }
+);
+
+async function sendGameChatMessage(
+    client,
+    content
+) {
+
+    const channel =
+        client.channels.cache.get(
+            CHANNELS.GAME_CHAT
+        ) ??
+        await client.channels.fetch(
+            CHANNELS.GAME_CHAT
+        ).catch(
+            () => null
+        );
+
+    if (
+        !channel?.send
+    )
+        return false;
+
+    return Boolean(
+        await channel.send({
+            content
+        }).catch(
+            () => null
+        )
+    );
+
+}
+
 // Initialize database
 require('./database/database');
 
@@ -79,6 +134,13 @@ GatewayIntentBits.Guilds,
 GatewayIntentBits.GuildMembers
 ]
 });
+
+client.sendGameChatMessage =
+    (content) =>
+        sendGameChatMessage(
+            client,
+            content
+        );
 
 client.commands = new Collection();
 
@@ -169,51 +231,73 @@ client.once(
 Events.ClientReady,
 async readyClient => {
 
-    console.log(
-        `Logged in as ${readyClient.user.tag}`
-    );
+    try {
 
-    await logBotEvent(
-        readyClient,
-        {
-            title:
-                'Bot Started',
-            description:
-                `${readyClient.user.tag} is online.`,
-            fields: [
-                {
-                    name:
-                        'Scene Busy Reset',
-                    value:
-                        `${clearAllSceneBusy()} in-memory busy entries cleared.`,
-                    inline:
-                        true
-                },
-                {
-                    name:
-                        'Commands',
-                    value:
-                        String(
-                            commands.length
-                        ),
-                    inline:
-                        true
-                }
-            ]
-        }
-    );
+        console.log(
+            `Logged in as ${readyClient.user.tag}`
+        );
 
-    startShowcaseAutoDrop(
-        readyClient
-    );
+        void sendGameChatMessage(
+            readyClient,
+            'MPC Maid is online and ready.'
+        );
 
-    startDatabaseBackups(
-        readyClient
-    );
+        const clearedBusy =
+            clearAllSceneBusy();
 
-    startPregnancyScheduler(
-        readyClient
-    );
+        void logBotEvent(
+            readyClient,
+            {
+                title:
+                    'Bot Started',
+                description:
+                    `${readyClient.user.tag} is online.`,
+                fields: [
+                    {
+                        name:
+                            'Scene Busy Reset',
+                        value:
+                            `${clearedBusy} in-memory busy entries cleared.`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            'Commands',
+                        value:
+                            String(
+                                commands.length
+                            ),
+                        inline:
+                            true
+                    }
+                ]
+            }
+        );
+
+        startShowcaseAutoDrop(
+            readyClient
+        );
+
+        startDatabaseBackups(
+            readyClient
+        );
+
+        startPregnancyScheduler(
+            readyClient
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            'READY ERROR'
+        );
+        console.error(
+            error
+        );
+
+    }
 
 }
 
@@ -250,18 +334,103 @@ async function replyCommandError(
 
 }
 
+async function safeReplyInteractionError(
+    interaction,
+    label
+) {
+
+    try {
+
+        await replyCommandError(
+            interaction
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            `${label} REPLY FAILED`
+        );
+        console.error(
+            error
+        );
+
+    }
+
+}
+
 // Command handler
 client.on(
 Events.InteractionCreate,
 async interaction => {
     
 
-    if (
-    await handleInteractions(
-        interaction
-    )
-)
-    return;
+    try {
+
+        if (
+            await handleInteractions(
+                interaction
+            )
+        )
+            return;
+
+    }
+    catch (error) {
+
+        console.error(
+            'INTERACTION HANDLER ERROR'
+        );
+        console.error(
+            error
+        );
+
+        await safeReplyInteractionError(
+            interaction,
+            'INTERACTION HANDLER ERROR'
+        );
+
+        void logError(
+            interaction.client,
+            {
+                title:
+                    'Interaction Handler Error',
+                error,
+                fields: [
+                    {
+                        name:
+                            'Interaction',
+                        value:
+                            interaction.customId ??
+                            interaction.commandName ??
+                            interaction.type,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            'User',
+                        value:
+                            `${interaction.user.tag} (${interaction.user.id})`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            'Channel',
+                        value:
+                            interaction.channelId
+                                ? `<#${interaction.channelId}>`
+                                : 'Unknown',
+                        inline:
+                            true
+                    }
+                ]
+            }
+        );
+
+        return;
+
+    }
 
     if (!interaction.isChatInputCommand())
         return;
@@ -286,7 +455,12 @@ async interaction => {
         console.error('COMMAND ERROR');
         console.error(error);
 
-        await logError(
+        await safeReplyInteractionError(
+            interaction,
+            'COMMAND ERROR'
+        );
+
+        void logError(
             interaction.client,
             {
                 title:
@@ -322,39 +496,6 @@ async interaction => {
                 ]
             }
         );
-
-        try {
-
-            await replyCommandError(
-                interaction
-            );
-
-        } catch (err) {
-
-            console.error('COMMAND ERROR REPLY FAILED');
-            console.error(err);
-
-            await logError(
-                interaction.client,
-                {
-                    title:
-                        'Command Error Reply Failed',
-                    error:
-                        err,
-                    fields: [
-                        {
-                            name:
-                                'Original Command',
-                            value:
-                                `/${interaction.commandName}`,
-                            inline:
-                                true
-                        }
-                    ]
-                }
-            );
-
-        }
     }
 }
 

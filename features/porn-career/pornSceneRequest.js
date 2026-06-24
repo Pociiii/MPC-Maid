@@ -36,9 +36,9 @@ const {
 } = require('../../utils/boosters');
 
 const {
-    adpLogoPath,
-    adpLogoAttachment
-} = require('../../utils/adpLogo');
+    mpcLogoPath,
+    mpcLogoAttachment
+} = require('../../utils/mpcLogo');
 
 const {
     logWarning
@@ -111,7 +111,7 @@ async function sendPornSceneRequest(
             authorName:
                 requesterName,
             authorIcon:
-                adpLogoAttachment,
+                mpcLogoAttachment,
             title:
                 'Porn Scene Request',
             description:
@@ -161,7 +161,7 @@ Booster: **${formatBooster(
                     row
                 ],
                 files: [
-                    adpLogoPath
+                    mpcLogoPath
                 ]
             });
 
@@ -254,7 +254,7 @@ Booster: **${formatBooster(
                     authorName:
                         requesterName,
                     authorIcon:
-                        adpLogoAttachment,
+                        mpcLogoAttachment,
                     title:
                         'Porn Scene Rumor',
                         description:
@@ -272,7 +272,7 @@ Booster: **${formatBooster(
                     })
                 ],
                 files: [
-                    adpLogoPath
+                    mpcLogoPath
                 ]
             });
 

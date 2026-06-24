@@ -24,6 +24,8 @@
 - Converted crowded customscene cast buttons to a dropdown menu.
 - Added `/eventpost` for staff event announcements.
 - Reworked pornscene Performance into outcome score plus critical scene chance.
+- Updated member card panel posting and moved card names into the new bottom name space.
+- Added `/quitbot` and game chat online/offline notices.
 
 ## Next
 

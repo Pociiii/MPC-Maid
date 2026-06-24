@@ -7,25 +7,11 @@ const {
     'discord.js'
 );
 
-const { registerFont } =
-    require('canvas');
-
 const path =
     require('path');
 
 const ROLES =
     require('../data/roles.json');
-
-registerFont(
-
-    './assets/fonts/BrittanySignature.ttf',
-
-    {
-        family:
-            'Signature'
-    }
-
-);
 
 const cardAssets = {
     member:
@@ -85,12 +71,12 @@ function drawFittedName(
 ) {
 
     let fontSize =
-        52;
+        72;
 
     do {
 
         ctx.font =
-            `${fontSize}px Signature`;
+            `bold ${fontSize}px Arial`;
 
         fontSize -=
             2;
@@ -99,7 +85,7 @@ function drawFittedName(
         ctx.measureText(
             username
         ).width > maxWidth &&
-        fontSize > 30
+        fontSize > 34
     );
 
     ctx.fillText(
@@ -156,17 +142,17 @@ async function generateMemberCard(
         '#ffffff';
 
     ctx.shadowColor =
-        '#00e5ff';
+        '#ff2ec4';
 
     ctx.shadowBlur =
-        18;
+        22;
 
     drawFittedName(
         ctx,
         username,
         canvas.width / 2,
-        345,
-        390
+        1125,
+        760
     );
 
     return new AttachmentBuilder(

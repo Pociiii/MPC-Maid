@@ -2,9 +2,9 @@ const { SlashCommandBuilder } = require('discord.js');
 
 const { createEmbed } = require('../../utils/embeds');
 const {
-    adpLogoPath,
-    adpLogoAttachment
-} = require('../../utils/adpLogo');
+    mpcLogoPath,
+    mpcLogoAttachment
+} = require('../../utils/mpcLogo');
 const { getRandomGif } = require('../../utils/gifs');
 
 const {
@@ -139,7 +139,7 @@ module.exports = {
                 interaction.member.displayName,
 
             authorIcon:
-                adpLogoAttachment,
+                mpcLogoAttachment,
 
             thumbnail:
                 interaction.user.displayAvatarURL(),
@@ -192,7 +192,7 @@ module.exports = {
 
             components: [row],
 
-            files: [adpLogoPath]
+            files: [mpcLogoPath]
 
         });
 

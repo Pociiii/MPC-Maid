@@ -2,9 +2,9 @@ const { SlashCommandBuilder } = require('discord.js');
 
 const { createEmbed } = require('../../utils/embeds');
 const {
-    adpLogoPath,
-    adpLogoAttachment
-} = require('../../utils/adpLogo');
+    mpcLogoPath,
+    mpcLogoAttachment
+} = require('../../utils/mpcLogo');
 const { getRandomGif } = require('../../utils/gifs');
 const {
     COOLDOWNS,
@@ -119,7 +119,7 @@ module.exports = {
         const embed = createEmbed({
             color: getRandomColor(),
             authorName: interaction.member.displayName,
-            authorIcon: adpLogoAttachment,
+            authorIcon: mpcLogoAttachment,
             thumbnail: interaction.user.displayAvatarURL(),
             title: 'Wiggle',
             description: `<@${interaction.user.id}> wiggles teasingly.`,
@@ -160,7 +160,7 @@ module.exports = {
         await interaction.reply({
             embeds: [embed],
             components: [row],
-            files: [adpLogoPath]
+            files: [mpcLogoPath]
         });
 
         await trackDailyQuest(

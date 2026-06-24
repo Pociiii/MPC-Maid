@@ -7,8 +7,8 @@ const {
 } = require('../../utils/pornScenes');
 
 const {
-    adpLogoPath
-} = require('../../utils/adpLogo');
+    mpcLogoPath
+} = require('../../utils/mpcLogo');
 
 const {
     logError,
@@ -102,7 +102,7 @@ async function finishScene(
                     )
                 ],
                 files: [
-                    adpLogoPath
+                    mpcLogoPath
                 ]
             });
 
@@ -205,7 +205,7 @@ function scheduleScene(
                                     )
                                 ],
                                 files: [
-                                    adpLogoPath
+                                    mpcLogoPath
                                 ]
                             });
 

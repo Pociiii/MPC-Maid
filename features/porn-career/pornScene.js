@@ -27,9 +27,9 @@ const {
 } = require('../../utils/pornScenes');
 
 const {
-    adpLogoAttachment,
-    adpLogoPath
-} = require('../../utils/adpLogo');
+    mpcLogoAttachment,
+    mpcLogoPath
+} = require('../../utils/mpcLogo');
 
 const {
     logWarning
@@ -302,7 +302,7 @@ async function acceptScene(
                 )
             ),
         icon:
-            adpLogoAttachment,
+            mpcLogoAttachment,
         thumbnail:
             requesterMember.user.displayAvatarURL()
     };
@@ -363,7 +363,7 @@ async function acceptScene(
                 )
             ],
             files: [
-                adpLogoPath
+                mpcLogoPath
             ]
         });
 
