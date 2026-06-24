@@ -10,16 +10,19 @@ module.exports = {
         interaction
     ) {
 
+        await interaction.deferReply({
+            flags:
+                64
+        });
+
         const card =
             await generateMemberCard(
                 interaction
             );
 
-        await interaction.reply({
+        await interaction.editReply({
 
-            files: [card],
-
-            flags: 64
+            files: [card]
 
         });
 

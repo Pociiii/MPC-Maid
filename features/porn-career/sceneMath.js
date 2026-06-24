@@ -131,6 +131,12 @@ const outcomeOrder = [
     'Viral Hit'
 ];
 
+const baseSceneScoreBonus =
+    16;
+
+const scorePerStatThreshold =
+    3;
+
 const outcomeRewards = {
     'Awkward Scene': {
         ranking:
@@ -252,6 +258,11 @@ function calculateScene(
             combinedStamina / 10
         );
 
+    const performanceBonus =
+        Math.floor(
+            combinedPerformance / 10
+        );
+
     const fameBonus =
         Math.floor(
             combinedFame / 10
@@ -263,6 +274,20 @@ function calculateScene(
             4,
             8
         );
+
+    const performanceScoreBonus =
+        performanceBonus * scorePerStatThreshold;
+
+    const staminaScoreBonus =
+        staminaBonus * scorePerStatThreshold;
+
+    const fameScoreBonus =
+        fameBonus * scorePerStatThreshold;
+
+    const statScoreBonus =
+        performanceScoreBonus +
+        staminaScoreBonus +
+        fameScoreBonus;
 
     const viewers =
         100 +
@@ -286,13 +311,8 @@ function calculateScene(
             1,
             100
         ) +
-        Math.floor(
-            combinedPerformance / 2
-        ) +
-        (totalParts * 4) +
-        Math.floor(
-            viewers / 100
-        );
+        baseSceneScoreBonus +
+        statScoreBonus;
 
     const flopChance =
         baseFlopChance +
@@ -309,8 +329,8 @@ function calculateScene(
     const critChance =
         clamp(
             3 + (Math.floor(
-                combinedPerformance / 20
-            ) * 2),
+                combinedPerformance / 10
+            ) * 1),
             3,
             15
         );
@@ -369,6 +389,10 @@ function calculateScene(
         combinedPerformance,
         combinedStamina,
         combinedFame,
+        performanceScoreBonus,
+        staminaScoreBonus,
+        fameScoreBonus,
+        statScoreBonus,
         requesterPerformance,
         requesterStamina,
         requesterFame,

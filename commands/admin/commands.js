@@ -83,6 +83,11 @@ module.exports = {
         interaction
     ) {
 
+        await interaction.deferReply({
+            flags:
+                64
+        });
+
         const embed =
             createBotEmbed(
                 interaction,
@@ -191,7 +196,7 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
 [
     commandLine(
         '/drop',
-        `<#${CHANNELS.SHOWCASE}>`,
+        `<#${CHANNELS.TITTY_DROP}>`,
         cooldownLabel(
             COOLDOWNS.DROP
         ),
@@ -272,6 +277,14 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
         'Bet up to 50 coins, 2d6 vs bot.'
     ),
     commandLine(
+        '/slots',
+        `<#${CHANNELS.CASINO}>`,
+        cooldownLabel(
+            COOLDOWNS.SLOTS
+        ),
+        'Bet up to 75 coins, spin for multipliers.'
+    ),
+    commandLine(
         '/blackjack',
         `<#${CHANNELS.CASINO}>`,
         cooldownLabel(
@@ -335,11 +348,9 @@ More details: press the info buttons below.`,
             !channel?.send
         ) {
 
-            await interaction.reply({
+            await interaction.editReply({
                 content:
-                    'I could not post the command guide in this channel.',
-                flags:
-                    64
+                    'I could not post the command guide in this channel.'
             });
 
             return;
@@ -356,11 +367,9 @@ More details: press the info buttons below.`,
                 ]
             });
 
-        await interaction.reply({
+        await interaction.editReply({
             content:
-                `Command guide posted here: ${message.url}`,
-            flags:
-                64
+                `Command guide posted here: ${message.url}`
         });
 
     }

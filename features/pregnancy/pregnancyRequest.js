@@ -30,6 +30,33 @@ const {
 const emojis =
     require('../../utils/emojis');
 
+async function respond(
+    interaction,
+    payload
+) {
+
+    if (
+        interaction.deferred ||
+        interaction.replied
+    ) {
+
+        const {
+            flags,
+            ...editablePayload
+        } = payload;
+
+        return interaction.editReply(
+            editablePayload
+        );
+
+    }
+
+    return interaction.reply(
+        payload
+    );
+
+}
+
 async function getRumorsChannel(
     client
 ) {
@@ -144,12 +171,15 @@ async function sendBreedRequest(
         active
     ) {
 
-        await interaction.reply({
+        await respond(
+            interaction,
+            {
             content:
                 `<@${carrierId}> is already pregnant.`,
             flags:
                 64
-        });
+            }
+        );
 
         return;
 
@@ -178,12 +208,15 @@ async function sendBreedRequest(
     if (
         confirm
     )
-        await interaction.reply({
+        await respond(
+            interaction,
+            {
             content:
                 `Breed request sent to ${target}.`,
             flags:
                 64
-        });
+            }
+        );
 
 }
 
@@ -207,12 +240,15 @@ async function startBreedRequest(
         !roles.valid
     ) {
 
-        await interaction.reply({
+        await respond(
+            interaction,
+            {
             content:
                 roles.reason,
             flags:
                 64
-        });
+            }
+        );
 
         return;
 
@@ -238,7 +274,9 @@ async function startBreedRequest(
                     true
             });
 
-        await interaction.reply({
+        await respond(
+            interaction,
+            {
             embeds: [
                 embed
             ],
@@ -249,7 +287,8 @@ async function startBreedRequest(
                 ),
             flags:
                 64
-        });
+            }
+        );
 
         return;
 
@@ -293,6 +332,8 @@ async function handleCarrierChoice(
 
     }
 
+    await interaction.deferUpdate();
+
     const target =
         await interaction.client.users.fetch(
             targetId
@@ -314,7 +355,7 @@ async function handleCarrierChoice(
         !roles.valid
     ) {
 
-        await interaction.update({
+        await interaction.editReply({
             content:
                 roles.reason,
             embeds:
@@ -336,7 +377,7 @@ async function handleCarrierChoice(
         active
     ) {
 
-        await interaction.update({
+        await interaction.editReply({
             content:
                 `<@${roles.carrierId}> is already pregnant.`,
             embeds:
@@ -348,8 +389,6 @@ async function handleCarrierChoice(
         return;
 
     }
-
-    await interaction.deferUpdate();
 
     await sendBreedRequest(
         interaction,

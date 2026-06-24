@@ -29,6 +29,11 @@ module.exports = {
         interaction
     ) {
 
+        await interaction.deferReply({
+            flags:
+                64
+        });
+
         const embed =
             createEmbed({
                 color:
@@ -165,11 +170,9 @@ Scene buttons are split by cast type:
             !channel?.send
         ) {
 
-            await interaction.reply({
+            await interaction.editReply({
                 content:
-                    'I could not find the GIF submission channel.',
-                flags:
-                    64
+                    'I could not find the GIF submission channel.'
             });
 
             return;
@@ -187,11 +190,9 @@ Scene buttons are split by cast type:
             ]
         });
 
-        await interaction.reply({
+        await interaction.editReply({
             content:
-                `GIF submission panel posted in <#${CHANNELS.GIFS}>: ${message.url}`,
-            flags:
-                64
+                `GIF submission panel posted in <#${CHANNELS.GIFS}>: ${message.url}`
         });
 
     }

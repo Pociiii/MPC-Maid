@@ -117,6 +117,8 @@ module.exports = {
                 ? ROLES.FEMALE
                 : ROLES.MALE;
 
+        await interaction.deferReply();
+
         const members =
             await getGuildMembers(
                 interaction.guild
@@ -136,10 +138,9 @@ module.exports = {
             candidates.size === 0
         ) {
 
-            await interaction.reply({
+            await interaction.editReply({
                 content:
-                    'I could not find an available opposite-gender match right now.',
-                flags: 64
+                    'I could not find an available opposite-gender match right now.'
             });
 
             return;
@@ -177,7 +178,7 @@ Vibe: **${getRandomItem(vibes)}**`,
                     true
             });
 
-        await interaction.reply({
+        await interaction.editReply({
             embeds: [
                 embed
             ]

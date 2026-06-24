@@ -7,10 +7,6 @@ const {
 } = require('../../utils/pornScenes');
 
 const {
-    mpcLogoPath
-} = require('../../utils/mpcLogo');
-
-const {
     logError,
     logWarning
 } = require('../../utils/inboxLogger');
@@ -20,7 +16,8 @@ const {
 } = require('../daily-quests/dailyQuests');
 
 const {
-    incrementAchievementProgress
+    incrementAchievementProgress,
+    setAchievementProgress
 } = require('../achievements/achievements');
 
 const {
@@ -52,6 +49,13 @@ async function finishScene(
         result
     );
 
+    const highestCombinedStat =
+        Math.max(
+            result.combinedPerformance,
+            result.combinedStamina,
+            result.combinedFame
+        );
+
     await Promise.all([
         trackDailyQuest(
             channel.client,
@@ -72,6 +76,18 @@ async function finishScene(
             channel.client,
             targetId,
             'porn_scenes'
+        ),
+        setAchievementProgress(
+            channel.client,
+            requesterId,
+            'scene_combined_stat',
+            highestCombinedStat
+        ),
+        setAchievementProgress(
+            channel.client,
+            targetId,
+            'scene_combined_stat',
+            highestCombinedStat
         )
     ]);
 
@@ -100,9 +116,6 @@ async function finishScene(
                         sceneLinks,
                         requesterAuthor
                     )
-                ],
-                files: [
-                    mpcLogoPath
                 ]
             });
 
@@ -203,9 +216,6 @@ function scheduleScene(
                                         sceneTitle,
                                         requesterAuthor
                                     )
-                                ],
-                                files: [
-                                    mpcLogoPath
                                 ]
                             });
 

@@ -11,7 +11,6 @@ const {
 } = require('../../utils/embeds');
 
 const {
-    mpcLogoPath,
     mpcLogoAttachment
 } = require('../../utils/mpcLogo');
 
@@ -65,6 +64,8 @@ module.exports = {
         )
             return;
 
+        await interaction.deferReply();
+
         let category;
 
         try {
@@ -77,12 +78,10 @@ module.exports = {
         }
         catch (error) {
 
-            return interaction.reply({
+            return interaction.editReply({
 
                 content:
                     `❌ ${error.message}`,
-
-                flags: 64
 
             });
 
@@ -158,13 +157,11 @@ module.exports = {
 
                 );
 
-        await interaction.reply({
+        await interaction.editReply({
 
             embeds: [embed],
 
-            components: [row],
-
-            files: [mpcLogoPath]
+            components: [row]
 
         });
 

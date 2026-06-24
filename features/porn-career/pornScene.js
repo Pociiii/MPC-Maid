@@ -27,8 +27,7 @@ const {
 } = require('../../utils/pornScenes');
 
 const {
-    mpcLogoAttachment,
-    mpcLogoPath
+    mpcLogoAttachment
 } = require('../../utils/mpcLogo');
 
 const {
@@ -161,6 +160,8 @@ async function acceptScene(
 
     }
 
+    await interaction.deferUpdate();
+
     const requesterMember =
         await fetchGuildMember(
             interaction,
@@ -190,11 +191,13 @@ async function acceptScene(
     }
     catch (error) {
 
-        await interaction.reply({
+        await interaction.editReply({
             content:
                 `Missing role info: ${error.message}`,
-            flags:
-                64
+            embeds:
+                [],
+            components:
+                []
         });
 
         return;
@@ -205,11 +208,13 @@ async function acceptScene(
         !sceneCategory
     ) {
 
-        await interaction.reply({
+        await interaction.editReply({
             content:
                 'No matching scene category exists for this role combination.',
-            flags:
-                64
+            embeds:
+                [],
+            components:
+                []
         });
 
         return;
@@ -230,11 +235,13 @@ async function acceptScene(
         !channel
     ) {
 
-        await interaction.reply({
+        await interaction.editReply({
             content:
                 'I could not find the porn career channel.',
-            flags:
-                64
+            embeds:
+                [],
+            components:
+                []
         });
 
         await logWarning(
@@ -323,7 +330,7 @@ async function acceptScene(
         targetId
     );
 
-    await interaction.update({
+    await interaction.editReply({
         content:
             `Scene accepted. Filming has started in <#${CHANNELS.PORN_CAREER}>.`,
         embeds:
@@ -361,9 +368,6 @@ async function acceptScene(
                     requesterAuthor,
                     formatStatValue
                 )
-            ],
-            files: [
-                mpcLogoPath
             ]
         });
 

@@ -2,7 +2,6 @@ const { SlashCommandBuilder } = require('discord.js');
 
 const { createEmbed } = require('../../utils/embeds');
 const {
-    mpcLogoPath,
     mpcLogoAttachment
 } = require('../../utils/mpcLogo');
 const { getRandomGif } = require('../../utils/gifs');
@@ -68,6 +67,8 @@ module.exports = {
         )
             return;
 
+        await interaction.deferReply();
+
         const attachment =
             interaction.options.getAttachment(
                 'media'
@@ -83,12 +84,10 @@ module.exports = {
             )
         ) {
 
-            return interaction.reply({
+            return interaction.editReply({
 
                 content:
                     '❌ Please upload an image, GIF, or video.',
-
-                flags: 64
 
             });
 
@@ -186,13 +185,11 @@ module.exports = {
 
         );
 
-        await interaction.reply({
+        await interaction.editReply({
 
             embeds: [embed],
 
-            components: [row],
-
-            files: [mpcLogoPath]
+            components: [row]
 
         });
 

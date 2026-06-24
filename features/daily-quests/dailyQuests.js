@@ -204,6 +204,42 @@ const questPool = [
     },
     {
         id:
+            'slots_1',
+        action:
+            'slots',
+        label:
+            'Play slots 1 time',
+        target:
+            1,
+        tier:
+            'easy'
+    },
+    {
+        id:
+            'slots_2',
+        action:
+            'slots',
+        label:
+            'Play slots 2 times',
+        target:
+            2,
+        tier:
+            'medium'
+    },
+    {
+        id:
+            'slots_3',
+        action:
+            'slots',
+        label:
+            'Play slots 3 times',
+        target:
+            3,
+        tier:
+            'hard'
+    },
+    {
+        id:
             'showcase_1',
         action:
             'showcase',

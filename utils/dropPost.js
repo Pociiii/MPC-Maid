@@ -11,7 +11,6 @@ const {
 } = require('../data/constants');
 
 const {
-    mpcLogoPath,
     mpcLogoAttachment
 } = require('./mpcLogo');
 
@@ -67,9 +66,6 @@ function buildDropPost(
     return {
         embeds: [
             embed
-        ],
-        files: [
-            mpcLogoPath
         ]
     };
 

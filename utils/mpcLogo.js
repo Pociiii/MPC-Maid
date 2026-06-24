@@ -1,18 +1,6 @@
-const path =
-    require('path');
-
-const mpcLogoPath =
-    path.join(
-        __dirname,
-        '..',
-        'assets',
-        'MPC_logo.png'
-    );
-
 const mpcLogoAttachment =
-    'attachment://MPC_logo.png';
+    'https://images2.imgbox.com/ab/7f/GQrEFG9V_o.png';
 
 module.exports = {
-    mpcLogoAttachment,
-    mpcLogoPath
+    mpcLogoAttachment
 };

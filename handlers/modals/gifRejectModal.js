@@ -55,6 +55,8 @@ async execute(
             interaction
         );
 
+    await interaction.deferUpdate();
+
     let dmSent = true;
 
     try {
@@ -120,7 +122,7 @@ async execute(
 
     }
 
-    await interaction.update({
+    await interaction.editReply({
 
         content:
 

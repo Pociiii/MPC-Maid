@@ -69,6 +69,11 @@ module.exports = {
 
         }
 
+        await interaction.deferReply({
+            flags:
+                64
+        });
+
         await startBreedRequest(
             interaction,
             target

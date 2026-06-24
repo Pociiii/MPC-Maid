@@ -44,7 +44,6 @@ const {
 } = require('../../utils/pornCareerTitles');
 
 const {
-    mpcLogoPath,
     mpcLogoAttachment
 } = require('../../utils/mpcLogo');
 
@@ -187,6 +186,11 @@ module.exports = {
 
         }
 
+        await interaction.deferReply({
+            flags:
+                64
+        });
+
         const targetMember =
             await interaction.guild.members.fetch(
                 target.id
@@ -209,10 +213,9 @@ module.exports = {
         }
         catch (error) {
 
-            await interaction.reply({
+            await interaction.editReply({
                 content:
-                    `Missing role info: ${error.message}`,
-                flags: 64
+                    `Missing role info: ${error.message}`
             });
 
             return;
@@ -223,10 +226,9 @@ module.exports = {
             !sceneCategory
         ) {
 
-            await interaction.reply({
+            await interaction.editReply({
                 content:
-                    'No matching scene category exists for this role combination.',
-                flags: 64
+                    'No matching scene category exists for this role combination.'
             });
 
             return;
@@ -310,18 +312,13 @@ module.exports = {
                     true
             });
 
-        await interaction.reply({
+        await interaction.editReply({
             embeds: [
                 embed
             ],
             components: [
                 row
-            ],
-            files: [
-                mpcLogoPath
-            ],
-            flags:
-                64
+            ]
         });
 
     }

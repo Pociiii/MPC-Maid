@@ -12,7 +12,6 @@ const {
 } = require('../../utils/embeds');
 
 const {
-    mpcLogoPath,
     mpcLogoAttachment
 } = require('../../utils/mpcLogo');
 
@@ -119,6 +118,12 @@ module.exports = async (
 
     });
 
+    await interaction.followUp({
+
+        embeds: [embed]
+
+    });
+
     await addKissGiven(
         interaction.user.id
     );
@@ -126,14 +131,6 @@ module.exports = async (
     await addKissTaken(
         targetUserId
     );
-
-    await interaction.followUp({
-
-        embeds: [embed],
-
-        files: [mpcLogoPath]
-
-    });
 
     await Promise.all([
         trackDailyQuest(

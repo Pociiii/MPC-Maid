@@ -39,6 +39,23 @@ async function confirmSubmission(
 
     if (
         interaction.message &&
+        (
+            interaction.deferred ||
+            interaction.replied
+        ) &&
+        typeof interaction.editReply === 'function'
+    ) {
+
+        await interaction.editReply(
+            payload
+        );
+
+        return;
+
+    }
+
+    if (
+        interaction.message &&
         typeof interaction.update === 'function'
     ) {
 
@@ -157,6 +174,8 @@ module.exports = {
             return;
 
         }
+
+        await interaction.deferUpdate();
 
         await reviewChannel.send({
             embeds: [

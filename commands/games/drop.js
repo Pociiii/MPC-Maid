@@ -49,6 +49,8 @@ module.exports = {
         )
             return;
 
+        await interaction.deferReply();
+
 
         const attachment =
             interaction.options.getAttachment(
@@ -65,12 +67,10 @@ module.exports = {
             )
         ) {
 
-            return interaction.reply({
+            return interaction.editReply({
 
                 content:
                     '❌ Please upload an image, GIF, or video.',
-
-                flags: 64
 
             });
 
@@ -98,7 +98,7 @@ module.exports = {
                 dropOptions
             );
 
-        await interaction.reply({
+        await interaction.editReply({
             embeds:
                 reply.embeds,
             files:

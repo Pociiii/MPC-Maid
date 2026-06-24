@@ -326,7 +326,7 @@ Booster: **${formatBooster(
                         requesterUser.performance,
                         result.requesterPerformanceBoost
                     )} + ${targetUser.performance} = ${result.combinedPerformance}
-Crit chance: **${result.critChance}%**`,
+Crit: **${result.critChance}%** | Score: **+${result.performanceScoreBonus}**`,
                 inline:
                     true
             },
@@ -338,7 +338,7 @@ Crit chance: **${result.critChance}%**`,
                         requesterUser.stamina,
                         result.requesterStaminaBoost
                     )} + ${targetUser.stamina} = ${result.combinedStamina}
-Parts: **${result.totalParts}**`,
+Parts: **${result.totalParts}** | Score: **+${result.staminaScoreBonus}**`,
                 inline:
                     true
             },
@@ -350,7 +350,7 @@ Parts: **${result.totalParts}**`,
                         requesterUser.fame,
                         result.requesterFameBoost
                     )} + ${targetUser.fame} = ${result.combinedFame}
-Viewers: **${result.viewers}**`,
+Viewers: **${result.viewers}** | Score: **+${result.fameScoreBonus}**`,
                 inline:
                     true
             }

@@ -54,10 +54,14 @@ module.exports = {
 - Fame increases viewers and revenue.
 - Ranking changes based on the final scene outcome.
 - Partner stats are combined for the scene.
-- Stamina and Fame get a bigger bonus every **10 combined points**.
-- Performance gets more critical chance every **20 combined points**, capped at **15%**.
+- Every stat adds the same scene score bonus every **10 combined points**.
+- Performance gets more critical chance every **10 combined points**, capped at **15%**.
+- Stamina adds scene parts every **10 combined points**, up to **8 parts**.
+- Fame gets a bigger viewer/revenue bonus every **10 combined points**.
 - A critical scene upgrades the outcome by one tier and adds a small XP bonus.
 - Boosters count for that scene's combined stat check only.
+- Stats keep counting after **40**, but training costs get much steeper.
+- Scene stat achievements unlock at combined stat thresholds like **10**, **20**, **30**, and beyond.
 
 **Progression**
 - Completed scenes grant XP based on outcome, plus coins, ranking points, and scenes completed.

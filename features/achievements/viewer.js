@@ -34,6 +34,7 @@ const views = {
         keys:
             [
                 'porn_scenes',
+                'scene_combined_stat',
                 'performance',
                 'stamina',
                 'fame',
@@ -51,7 +52,8 @@ const views = {
             'Porn Career Achievements',
         keys:
             [
-                'porn_scenes'
+                'porn_scenes',
+                'scene_combined_stat'
             ]
     },
     stats: {
@@ -117,6 +119,8 @@ const categoryLabels = {
         'Performance',
     porn_scenes:
         'Porn Career',
+    scene_combined_stat:
+        'Scene Stat Thresholds',
     showcase_posts:
         'Showcase Commands',
     stamina:

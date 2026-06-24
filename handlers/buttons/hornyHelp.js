@@ -14,7 +14,6 @@ const {
 } = require('../../utils/embeds');
 
 const {
-    mpcLogoPath,
     mpcLogoAttachment
 } = require('../../utils/mpcLogo');
 
@@ -188,6 +187,8 @@ module.exports = async (
 
     }
 
+    await interaction.deferUpdate();
+
     let targetMember;
 
     try {
@@ -200,7 +201,7 @@ module.exports = async (
     }
     catch {
 
-        return interaction.reply({
+        return interaction.followUp({
 
             content:
                 'I could not find the user who started this horny scene.',
@@ -229,7 +230,7 @@ module.exports = async (
     }
     catch (error) {
 
-        return interaction.reply({
+        return interaction.followUp({
 
             content:
                 `Missing role info: ${error.message}`,
@@ -250,7 +251,7 @@ module.exports = async (
         !sceneCategory
     ) {
 
-        return interaction.reply({
+        return interaction.followUp({
 
             content:
                 'No matching help scene category exists for this role combination.',
@@ -270,7 +271,7 @@ module.exports = async (
         !scene
     ) {
 
-        return interaction.reply({
+        return interaction.followUp({
 
             content:
                 `No oral or sex GIFs were found for ${sceneCategory}.`,
@@ -327,8 +328,6 @@ module.exports = async (
 
             );
 
-    await interaction.deferUpdate();
-
     await interaction.message.edit({
 
         components: [
@@ -339,9 +338,7 @@ module.exports = async (
 
     await interaction.followUp({
 
-        embeds: [embed],
-
-        files: [mpcLogoPath]
+        embeds: [embed]
 
     });
 

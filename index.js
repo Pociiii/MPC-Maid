@@ -452,7 +452,9 @@ async interaction => {
     }
     catch (error) {
 
-        console.error('COMMAND ERROR');
+        console.error(
+            `COMMAND ERROR /${interaction.commandName}`
+        );
         console.error(error);
 
         await safeReplyInteractionError(

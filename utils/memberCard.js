@@ -71,12 +71,12 @@ function drawFittedName(
 ) {
 
     let fontSize =
-        72;
+        124;
 
     do {
 
         ctx.font =
-            `bold ${fontSize}px Arial`;
+            `italic ${fontSize}px "Segoe Script", "Brush Script MT", cursive`;
 
         fontSize -=
             2;
@@ -85,8 +85,43 @@ function drawFittedName(
         ctx.measureText(
             username
         ).width > maxWidth &&
-        fontSize > 34
+        fontSize > 58
     );
+
+    ctx.lineJoin =
+        'round';
+
+    ctx.lineWidth =
+        Math.max(
+            5,
+            Math.floor(
+                fontSize / 12
+            )
+        );
+
+    ctx.shadowColor =
+        '#00f7ff';
+
+    ctx.shadowBlur =
+        18;
+
+    ctx.strokeStyle =
+        'rgba(12, 0, 25, 0.82)';
+
+    ctx.strokeText(
+        username,
+        x,
+        y
+    );
+
+    ctx.shadowColor =
+        '#ff2ec4';
+
+    ctx.shadowBlur =
+        28;
+
+    ctx.fillStyle =
+        '#ffffff';
 
     ctx.fillText(
         username,
@@ -138,21 +173,12 @@ async function generateMemberCard(
     ctx.textAlign =
         'center';
 
-    ctx.fillStyle =
-        '#ffffff';
-
-    ctx.shadowColor =
-        '#ff2ec4';
-
-    ctx.shadowBlur =
-        22;
-
     drawFittedName(
         ctx,
         username,
         canvas.width / 2,
-        1125,
-        760
+        1138,
+        880
     );
 
     return new AttachmentBuilder(

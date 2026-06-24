@@ -33,7 +33,7 @@ const {
     getStatUpgradeCoinCost,
     getStatUpgradeCost,
     isTrainableStat,
-    maxTrainableStat,
+    prestigeStatStart,
     trainableStats
 } = require('../../utils/statTraining');
 
@@ -81,20 +81,6 @@ function getStatCost(
 
 }
 
-function isCapped(
-    user,
-    stat
-) {
-
-    const value =
-        Number(
-            user[stat]
-        );
-
-    return value >= maxTrainableStat;
-
-}
-
 function formatStatField(
     user,
     stat
@@ -104,11 +90,6 @@ function formatStatField(
         Number(
             user[stat]
         );
-
-    if (
-        value >= maxTrainableStat
-    )
-        return `${statDescriptions[stat]}\nLevel **${value}**\nCurrent cap reached.`;
 
     const cost =
         getStatCost(
@@ -131,7 +112,12 @@ function formatStatField(
             `${cost.coins - user.coins} coins`
         );
 
-    return `${statDescriptions[stat]}\nLevel **${value} -> ${value + 1}**\nCost: **${cost.xp} XP** + **${cost.coins} coins**${
+    const prestigeText =
+        value >= prestigeStatStart
+            ? `\nPrestige training: costs rise hard after **${prestigeStatStart}**, but the stat still counts.`
+            : '';
+
+    return `${statDescriptions[stat]}\nLevel **${value} -> ${value + 1}**\nCost: **${cost.xp} XP** + **${cost.coins} coins**${prestigeText}${
         missing.length > 0
             ? `\nMissing: **${missing.join(
                 ' + '
@@ -165,7 +151,7 @@ async function buildTrainingPanel(
                 'Training',
             description:
 `${notice?.text ? `${notice.text}\n\n` : ''}Balance: **${user.xp} XP** and **${user.coins} coins**
-Pick a stat to train. Stamina and Fame bonus every **10 combined points**. Performance crit chance rises every **20 combined points**.`,
+Pick a stat to train. Stats keep counting in scenes, but training gets much more expensive after **${prestigeStatStart}**.`,
             footerText:
                 '/train',
             timestamp:
@@ -205,12 +191,6 @@ Pick a stat to train. Stamina and Fame bonus every **10 combined points**. Perfo
                             )
                             .setStyle(
                                 ButtonStyle.Primary
-                            )
-                            .setDisabled(
-                                isCapped(
-                                    user,
-                                    stat
-                                )
                             )
                 )
             );
@@ -280,26 +260,6 @@ async function trainStat(
         Number(
             user[stat]
         );
-
-    if (
-        currentValue >= maxTrainableStat
-    ) {
-
-        await interaction.editReply(
-            await buildTrainingPanel(
-                interaction,
-                {
-                    success:
-                        false,
-                    text:
-                        `${statEmojis[stat]} ${statLabels[stat]} is already at the cap.`
-                }
-            )
-        );
-
-        return;
-
-    }
 
     const cost =
         getStatCost(

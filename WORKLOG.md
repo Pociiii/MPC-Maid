@@ -22,10 +22,9 @@
 - Added blackjack to the daily quest pool.
 - Routed daily quest, achievement, and GIF approval notices to Maid Feed.
 - Converted crowded customscene cast buttons to a dropdown menu.
-- Added `/eventpost` for staff event announcements.
 - Reworked pornscene Performance into outcome score plus critical scene chance.
 - Updated member card panel posting and moved card names into the new bottom name space.
-- Added `/quitbot` and game chat online/offline notices.
+- Replaced `/quitbot` with `/botcontrol` for restart/shutdown and kept game chat online/offline notices.
 
 ## Next
 

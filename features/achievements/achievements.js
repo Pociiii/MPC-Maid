@@ -26,6 +26,8 @@ const categoryLabels = {
         'Performance',
     porn_scenes:
         'Porn Career',
+    scene_combined_stat:
+        'Scene Stat Thresholds',
     showcase_posts:
         'Showcase Commands',
     stamina:
@@ -229,7 +231,9 @@ function getMilestonesCrossed(
             label:
                 endless.label(
                     milestone
-                )
+                ),
+            points:
+                endless.points
         });
 
     }

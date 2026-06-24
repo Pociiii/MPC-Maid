@@ -13,6 +13,13 @@ const {
     formatRows
 } = require('./ui');
 
+const ranks =
+    require('../../data/ranks.json');
+
+const {
+    getRankTitle
+} = require('../../utils/ranks');
+
 function hasCareerActivity(
     user
 ) {
@@ -23,6 +30,32 @@ function hasCareerActivity(
     Number(
         user.ranking
     ) !== 0;
+
+}
+
+function formatRankingRows(
+    users
+) {
+
+    if (
+        users.length === 0
+    )
+        return 'No entries yet.';
+
+    return users
+        .slice(
+            0,
+            8
+        )
+        .map(
+            (user, index) =>
+                `${index + 1}. <@${user.id}> - **${Number(
+                    user.ranking
+                ).toLocaleString()}**`
+        )
+        .join(
+            '\n'
+        );
 
 }
 
@@ -53,16 +86,19 @@ async function buildRankingEmbed(
 ) {
 
     const users =
-        await allUsers();
-
-    const {
-        maleUsers,
-        femaleUsers
-    } =
-        await getGenderGroups(
-            interaction,
-            users
-        );
+        (await allUsers())
+            .filter(
+                hasCareerActivity
+            )
+            .sort(
+                (a, b) =>
+                    Number(
+                        b.ranking
+                    ) -
+                    Number(
+                        a.ranking
+                    )
+            );
 
     const embed =
         baseEmbed(
@@ -71,36 +107,25 @@ async function buildRankingEmbed(
         );
 
     embed.addFields(
-        {
-            name:
-                'Male Ranking',
-            value:
-                formatRows(
-                    topBy(
-                        maleUsers,
-                        'ranking',
-                        hasCareerActivity
+        ...ranks.map(
+            (rank) => ({
+                name:
+                    rank.title,
+                value:
+                    formatRankingRows(
+                        users.filter(
+                            (user) =>
+                                getRankTitle(
+                                    Number(
+                                        user.ranking
+                                    )
+                                ) === rank.title
+                        )
                     ),
-                    'ranking'
-                ),
-            inline:
-                true
-        },
-        {
-            name:
-                'Female Ranking',
-            value:
-                formatRows(
-                    topBy(
-                        femaleUsers,
-                        'ranking',
-                        hasCareerActivity
-                    ),
-                    'ranking'
-                ),
-            inline:
-                true
-        }
+                inline:
+                    true
+            })
+        )
     );
 
     return embed;

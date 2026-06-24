@@ -36,7 +36,6 @@ const {
 } = require('../../utils/boosters');
 
 const {
-    mpcLogoPath,
     mpcLogoAttachment
 } = require('../../utils/mpcLogo');
 
@@ -159,9 +158,6 @@ Booster: **${formatBooster(
                 ],
                 components: [
                     row
-                ],
-                files: [
-                    mpcLogoPath
                 ]
             });
 
@@ -270,9 +266,6 @@ Booster: **${formatBooster(
                     timestamp:
                             true
                     })
-                ],
-                files: [
-                    mpcLogoPath
                 ]
             });
 

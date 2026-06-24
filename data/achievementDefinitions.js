@@ -1,5 +1,5 @@
 const {
-    maxTrainableStat,
+    prestigeStatStart,
     trainableStats
 } = require('../utils/statTraining');
 
@@ -30,8 +30,18 @@ const statMilestones =
         {
             length:
                 Math.floor(
-                    maxTrainableStat / 10
+                    prestigeStatStart / 10
                 )
+        },
+        (_, index) =>
+            (index + 1) * 10
+    );
+
+const combinedSceneStatMilestones =
+    Array.from(
+        {
+            length:
+                10
         },
         (_, index) =>
             (index + 1) * 10
@@ -151,6 +161,20 @@ const statAchievements =
             )
     );
 
+const combinedSceneStatAchievements =
+    combinedSceneStatMilestones.map(
+        (milestone) =>
+            milestoneDefinition(
+                'scene_combined_stat',
+                milestone,
+                (value) =>
+                    `Be part of a scene with a combined stat of ${value}`,
+                statPoints(
+                    milestone
+                )
+            )
+    );
+
 const showcaseAchievements =
     socialMilestones.map(
         (milestone) =>
@@ -198,6 +222,7 @@ const gifSubmissionAchievements =
 
 const achievementDefinitions = [
     ...sceneAchievements,
+    ...combinedSceneStatAchievements,
     ...statAchievements,
     ...showcaseAchievements,
     ...buttonAchievements,
@@ -237,12 +262,25 @@ const endlessAchievements = {
                 `Submit ${value} GIFs`,
         points:
             50
+    },
+    scene_combined_stat: {
+        startsAfter:
+            100,
+        step:
+            10,
+        label:
+            (value) =>
+                `Be part of a scene with a combined stat of ${value}`,
+        points:
+            50
     }
 };
 
 module.exports = {
     achievementDefinitions,
     buttonAchievements,
+    combinedSceneStatAchievements,
+    combinedSceneStatMilestones,
     endlessAchievements,
     fixedSceneMilestones,
     gifSubmissionAchievements,

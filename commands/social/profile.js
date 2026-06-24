@@ -15,13 +15,16 @@ const {
 } = require('../../utils/embeds');
 
 const {
-    mpcLogoAttachment,
-    mpcLogoPath
+    mpcLogoAttachment
 } = require('../../utils/mpcLogo');
 
 const {
     getRankTitle
 } = require('../../utils/ranks');
+
+const {
+    formatPornCareerName
+} = require('../../utils/pornCareerTitles');
 
 const {
     getOrCreateUser
@@ -66,6 +69,13 @@ module.exports = {
         interaction
     ) {
 
+        await interaction.deferReply({
+            flags:
+                COMMAND_CONFIG.ephemeral
+                    ? 64
+                    : 0
+        });
+
         const target =
             interaction.options.getUser(
                 'user'
@@ -96,7 +106,10 @@ module.exports = {
                 color:
                     COLORS.DEFAULT,
                 authorName:
-                    member.displayName,
+                    formatPornCareerName(
+                        member.displayName,
+                        user
+                    ),
                 authorIcon:
                     mpcLogoAttachment,
                 thumbnail:
@@ -154,17 +167,10 @@ ${emojis.kiss_taken} Kisses Taken: **${user.kisses_taken}**`,
             }
         );
 
-        await interaction.reply({
+        await interaction.editReply({
             embeds: [
                 embed
-            ],
-            files: [
-                mpcLogoPath
-            ],
-            flags:
-                COMMAND_CONFIG.ephemeral
-                    ? 64
-                    : 0
+            ]
         });
 
     }

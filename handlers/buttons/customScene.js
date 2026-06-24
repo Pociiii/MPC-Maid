@@ -115,6 +115,8 @@ module.exports = {
 
         }
 
+        await interaction.deferUpdate();
+
         const channel =
             interaction.client.channels.cache.get(
                 CHANNELS.CUSTOM_SCENE
@@ -129,11 +131,13 @@ module.exports = {
             !channel
         ) {
 
-            await interaction.reply({
+            await interaction.editReply({
                 content:
                     'I could not find the custom-scene channel.',
-                flags:
-                    64
+                embeds:
+                    [],
+                components:
+                    []
             });
 
             await logWarning(
@@ -190,7 +194,7 @@ module.exports = {
 Posting in <#${CHANNELS.CUSTOM_SCENE}> across 30 minutes.`
         );
 
-        await interaction.update({
+        await interaction.editReply({
             embeds: [
                 finalEmbed
             ],

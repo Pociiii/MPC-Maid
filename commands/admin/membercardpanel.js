@@ -29,6 +29,13 @@ module.exports = {
 
     async execute(interaction) {
 
+        await interaction.deferReply({
+
+            flags:
+                64
+
+        });
+
         const embed =
             createEmbed({
 
@@ -87,13 +94,10 @@ Remember to change your nick to your in-game name first.
 
             });
 
-        await interaction.reply({
+        await interaction.editReply({
 
             content:
-                `Member card panel posted: ${post.url}`,
-
-            flags:
-                64
+                `Member card panel posted: ${post.url}`
 
         });
 
