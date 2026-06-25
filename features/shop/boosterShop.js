@@ -53,7 +53,7 @@ function formatShopItem(
     const tier =
         boosterTiers[tierKey];
 
-    return `${statEmojis[stat]} **${boosterStatLabels[stat]}**: +${tier.value}, ${emojis.coin} **${tier.cost}**, burnout **+${tier.burnoutRisk}%**`;
+    return `**${boosterStatLabels[stat]}**: +${tier.value}, **${tier.cost} coins**, burnout **+${tier.burnoutRisk}%**`;
 
 }
 
@@ -146,7 +146,7 @@ async function buildShopReply(
                 title:
                     'Booster Shop',
                 description:
-`${notice?.text ? `${notice.text}\n\n` : ''}Balance: ${emojis.coin} **${user.coins} coins**
+`${notice?.text ? `${notice.text}\n\n` : ''}Balance: **${user.coins} coins**
 Buy boosters for future \`/pornscene\` requests. One booster can be spent per scene.
 Best use: push a combined stat over a **10 / 20 / 30** threshold. Stronger tiers add more burnout risk.`
             }
@@ -275,7 +275,7 @@ async function buyShopBooster(
                         stat,
                         tier:
                             numericTier
-                    })}** for ${emojis.coin} **${cost} coins**.`
+                    })}** for **${cost} coins**.`
             }
         )
     );

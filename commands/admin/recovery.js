@@ -28,6 +28,10 @@ const {
 } = require('../../utils/boosters');
 
 const {
+    removeAllRelationshipsBetween
+} = require('../../utils/relationships');
+
+const {
     clearActivePregnancy,
     forceBirth,
     forceGenderReveal,
@@ -355,6 +359,42 @@ module.exports = {
                                     )
                                     .setDescription(
                                         'User to clear'
+                                    )
+                                    .setRequired(
+                                        true
+                                    )
+                        )
+            )
+            .addSubcommand(
+                (subcommand) =>
+                    subcommand
+                        .setName(
+                            'breakrelationship'
+                        )
+                        .setDescription(
+                            'Quietly remove any relationship links between two users'
+                        )
+                        .addUserOption(
+                            (option) =>
+                                option
+                                    .setName(
+                                        'user1'
+                                    )
+                                    .setDescription(
+                                        'First user'
+                                    )
+                                    .setRequired(
+                                        true
+                                    )
+                        )
+                        .addUserOption(
+                            (option) =>
+                                option
+                                    .setName(
+                                        'user2'
+                                    )
+                                    .setDescription(
+                                        'Second user'
                                     )
                                     .setRequired(
                                         true
@@ -752,6 +792,40 @@ module.exports = {
                     .join(
                         '\n'
                     )
+            );
+
+            return;
+
+        }
+
+        if (
+            subcommand === 'breakrelationship'
+        ) {
+
+            const firstUser =
+                interaction.options.getUser(
+                    'user1'
+                );
+
+            const secondUser =
+                interaction.options.getUser(
+                    'user2'
+                );
+
+            const removed =
+                await removeAllRelationshipsBetween(
+                    firstUser.id,
+                    secondUser.id
+                );
+
+            await replyResult(
+                interaction,
+                removed
+                    ? 'Relationship Links Removed'
+                    : 'Relationship Links Not Found',
+                removed
+                    ? `Removed **${removed}** relationship link${removed === 1 ? '' : 's'} between <@${firstUser.id}> and <@${secondUser.id}>.`
+                    : `No relationship links were found between <@${firstUser.id}> and <@${secondUser.id}>.`
             );
 
             return;

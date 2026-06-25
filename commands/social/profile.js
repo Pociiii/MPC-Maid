@@ -78,13 +78,12 @@ function getStatDelta(
 }
 
 function formatStatCompareLine(
-    emoji,
     label,
     first,
     second
 ) {
 
-    return `${emoji} ${label}: **${first}** vs **${second}** (${getStatDelta(
+    return `${label}: **${first}** vs **${second}** (${getStatDelta(
         first,
         second
     )})`;
@@ -132,8 +131,8 @@ function buildProfileEmbed(
             name:
                 `${emojis.coin} Wallet`,
             value:
-`${emojis.coin} Coins: **${user.coins}**
-${emojis.xp} XP: **${user.xp}**`,
+`Coins: **${user.coins}**
+XP: **${user.xp}**`,
             inline:
                 true
         },
@@ -141,9 +140,9 @@ ${emojis.xp} XP: **${user.xp}**`,
             name:
                 `${emojis.performance} Stats`,
             value:
-`${emojis.performance} Performance: **${user.performance}**
-${emojis.stamina} Stamina: **${user.stamina}**
-${emojis.fame} Fame: **${user.fame}**`,
+`Performance: **${user.performance}**
+Stamina: **${user.stamina}**
+Fame: **${user.fame}**`,
             inline:
                 true
         },
@@ -151,9 +150,9 @@ ${emojis.fame} Fame: **${user.fame}**`,
             name:
                 `${emojis.ranking} Career`,
             value:
-`${emojis.ranking} Ranking: **${rankTitle} (${user.ranking})**
-${emojis.scene_completed} Scenes: **${user.scenes_completed}**
-\uD83C\uDFC5 Achievements: **${achievementPoints}**`,
+`Ranking: **${rankTitle} (${user.ranking})**
+Scenes: **${user.scenes_completed}**
+Achievements: **${achievementPoints}**`,
             inline:
                 true
         },
@@ -161,12 +160,12 @@ ${emojis.scene_completed} Scenes: **${user.scenes_completed}**
             name:
                 `${emojis.spank_given} Interactions`,
             value:
-`${emojis.spank_given} Spanks Given: **${user.spanks_given}**
-${emojis.spank_taken} Spanks Taken: **${user.spanks_taken}**
-${emojis.kiss_given} Kisses Given: **${user.kisses_given}**
-${emojis.kiss_taken} Kisses Taken: **${user.kisses_taken}**
-${emojis.help} Helps Given: **${user.horny_helps ?? 0}**
-${emojis.help} Helps Received: **${user.horny_helped ?? 0}**`,
+`Spanks Given: **${user.spanks_given}**
+Spanks Taken: **${user.spanks_taken}**
+Kisses Given: **${user.kisses_given}**
+Kisses Taken: **${user.kisses_taken}**
+Helps Given: **${user.horny_helps ?? 0}**
+Helps Received: **${user.horny_helped ?? 0}**`,
             inline:
                 false
         }
@@ -215,6 +214,12 @@ function buildCompareEmbed(
             8
         );
 
+    const staminaXpBonus =
+        Math.max(
+            0,
+            totalParts - 4
+        ) * 2;
+
     const fameBonus =
         Math.floor(
             combinedFame / 10
@@ -259,9 +264,9 @@ function buildCompareEmbed(
             name:
                 firstMember.displayName,
             value:
-`${emojis.performance} Performance: **${firstUser.performance}**
-${emojis.stamina} Stamina: **${firstUser.stamina}**
-${emojis.fame} Fame: **${firstUser.fame}**`,
+`Performance: **${firstUser.performance}**
+Stamina: **${firstUser.stamina}**
+Fame: **${firstUser.fame}**`,
             inline:
                 true
         },
@@ -269,9 +274,9 @@ ${emojis.fame} Fame: **${firstUser.fame}**`,
             name:
                 secondMember.displayName,
             value:
-`${emojis.performance} Performance: **${secondUser.performance}**
-${emojis.stamina} Stamina: **${secondUser.stamina}**
-${emojis.fame} Fame: **${secondUser.fame}**`,
+`Performance: **${secondUser.performance}**
+Stamina: **${secondUser.stamina}**
+Fame: **${secondUser.fame}**`,
             inline:
                 true
         },
@@ -280,19 +285,16 @@ ${emojis.fame} Fame: **${secondUser.fame}**`,
                 'Difference',
             value:
 `${formatStatCompareLine(
-    emojis.performance,
     'Performance',
     firstUser.performance,
     secondUser.performance
 )}
 ${formatStatCompareLine(
-    emojis.stamina,
     'Stamina',
     firstUser.stamina,
     secondUser.stamina
 )}
 ${formatStatCompareLine(
-    emojis.fame,
     'Fame',
     firstUser.fame,
     secondUser.fame
@@ -302,11 +304,11 @@ ${formatStatCompareLine(
         },
         {
             name:
-                'Combined Scene Stats',
+                `${emojis.performance} Combined Scene Stats`,
             value:
-`${emojis.performance} Performance: **${combinedPerformance}** | Crit: **${critChance}%**
-${emojis.stamina} Stamina: **${combinedStamina}** | Parts: **${totalParts}/8**
-${emojis.fame} Fame: **${combinedFame}** | Fame bonus: **+${fameBonus}**
+`Performance: **${combinedPerformance}** | Crit: **${critChance}%**
+Stamina: **${combinedStamina}** | Parts: **${totalParts}/8** | XP bonus: **+${staminaXpBonus}**
+Fame: **${combinedFame}** | Fame bonus: **+${fameBonus}**
 Scene score bonus: **+${scoreBonus}**`,
             inline:
                 false

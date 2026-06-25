@@ -5,7 +5,6 @@ const {
 } = require('discord.js');
 
 const {
-    CHANNELS,
     getRandomColor
 } = require('../../data/constants');
 
@@ -22,6 +21,10 @@ const {
 const {
     getBreedingRoles
 } = require('../../utils/pregnancy');
+
+const {
+    postRumor
+} = require('../../utils/rumors');
 
 const {
     buildBreedRequestEmbed
@@ -54,21 +57,6 @@ async function respond(
     return interaction.reply(
         payload
     );
-
-}
-
-async function getRumorsChannel(
-    client
-) {
-
-    return client.channels.cache.get(
-        CHANNELS.RUMORS
-    ) ||
-        await client.channels.fetch(
-            CHANNELS.RUMORS
-        ).catch(
-            () => null
-        );
 
 }
 
@@ -508,33 +496,39 @@ async function handleBreedDecision(
         result.added
     ) {
 
-        const rumors =
-            await getRumorsChannel(
-                interaction.client
-            );
-
-        if (
-            rumors?.send
-        )
-            await rumors.send({
-                embeds: [
-                    createEmbed({
-                        color:
-                            getRandomColor(),
-                        title:
-                            `${emojis.breed} Breed Accepted`,
-                        description:
-`<@${requesterId}> and <@${targetId}> spent some private time together.
-
-Carrier: <@${carrierId}>
-Next pregnancy check: <t:${nextCheck}:F> (<t:${nextCheck}:R>)`,
-                        footerText:
-                            '/breed',
-                        timestamp:
+        await postRumor(
+            interaction.client,
+            {
+                type:
+                    'breed_accepted',
+                color:
+                    getRandomColor(),
+                title:
+                    `${emojis.breed} Breed Accepted`,
+                flavor:
+`<@${requesterId}> and <@${targetId}> spent some private time together.`,
+                command:
+                    '/breed',
+                fields: [
+                    {
+                        name:
+                            'Carrier',
+                        value:
+                            `<@${carrierId}>`,
+                        inline:
                             true
-                    })
+                    },
+                    {
+                        name:
+                            'Next Check',
+                        value:
+                            `<t:${nextCheck}:F>\n<t:${nextCheck}:R>`,
+                        inline:
+                            true
+                    }
                 ]
-            });
+            }
+        );
 
     }
 

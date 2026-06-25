@@ -1,3 +1,8 @@
+const {
+    getRelationshipRequest,
+    setRelationshipRequestStatus
+} = require('../../utils/relationships');
+
 module.exports = {
 
     customId:
@@ -7,30 +12,58 @@ module.exports = {
         interaction
     ) {
 
-        const [
-
-            ,
-            type
-
-        ] =
+        const requestId =
             interaction.customId.split(
                 ':'
+            )[1];
+
+        const request =
+            await getRelationshipRequest(
+                requestId
             );
 
-        const label =
-            type.charAt(0).toUpperCase() +
-            type.slice(1);
+        if (
+            !request
+        ) {
+
+            await interaction.reply({
+                content:
+                    'This relationship request no longer exists.',
+                flags:
+                    64
+            });
+
+            return;
+
+        }
+
+        if (
+            interaction.user.id !== request.target_id
+        ) {
+
+            await interaction.reply({
+                content:
+                    'This relationship request is not for you.',
+                flags:
+                    64
+            });
+
+            return;
+
+        }
+
+        await setRelationshipRequestStatus(
+            request.id,
+            'declined'
+        );
 
         await interaction.update({
-
             content:
-                `❌ ${label} relationship declined.`,
-
+                'Relationship request declined.',
             embeds:
                 interaction.message.embeds,
-
-            components: []
-
+            components:
+                []
         });
 
     }

@@ -39,6 +39,10 @@ const {
     logWarning
 } = require('../../utils/inboxLogger');
 
+const {
+    postRumor
+} = require('../../utils/rumors');
+
 async function sendPornSceneRequest(
     interaction,
     targetId,
@@ -221,49 +225,46 @@ Tip: use \`/train\` to raise stats and help your scene partner get better outcom
 
     try {
 
-        const rumorsChannel =
-            interaction.client.channels.cache.get(
-                CHANNELS.RUMORS
-            ) ??
-            await interaction.client.channels.fetch(
-                CHANNELS.RUMORS
-            ).catch(
-                () => null
-            );
-
-        if (
-            rumorsChannel
-        ) {
-
-            await rumorsChannel.send({
-                embeds: [
-                    createEmbed({
-                        color:
+        const rumorMessage =
+            await postRumor(
+                interaction.client,
+                {
+                    type:
+                        'scene_request',
+                    color:
                         getRandomColor(),
                     authorName:
                         requesterName,
                     authorIcon:
                         mpcLogoAttachment,
-                    title:
-                        'Porn Scene Rumor',
-                        description:
-`<@${interaction.user.id}> is talking scene with <@${targetId}>.
-
-Booster: **${formatBooster(
-    booster
-)}**`,
                     thumbnail:
                         interaction.user.displayAvatarURL(),
-                    footerText:
-                        '/pornscene',
-                    timestamp:
-                            true
-                    })
-                ]
-            });
+                    title:
+                        'Porn Scene Rumor',
+                    flavor:
+`A new production is being whispered about backstage.
 
-        }
-        else {
+<@${interaction.user.id}> is talking scene with <@${targetId}>.`,
+                    command:
+                        '/pornscene',
+                    fields: [
+                        {
+                            name:
+                                'Booster',
+                            value:
+                                formatBooster(
+                                    booster
+                                ),
+                            inline:
+                                true
+                        }
+                    ]
+                }
+            );
+
+        if (
+            !rumorMessage
+        ) {
 
             await logWarning(
                 interaction.client,

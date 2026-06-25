@@ -37,26 +37,6 @@ async function getRumorsChannel(
 
 }
 
-async function fetchUserTarget(
-    client,
-    userId
-) {
-
-    return await client.users.fetch(
-        userId
-    ).catch(
-        () => ({
-            id:
-                userId,
-            displayName:
-                'MPC Member',
-            displayAvatarURL:
-                () => undefined
-        })
-    );
-
-}
-
 async function announcePregnancyResults(
     client,
     results
@@ -82,19 +62,10 @@ async function announcePregnancyResults(
         )
             continue;
 
-        const carrier =
-            await fetchUserTarget(
-                client,
-                result.carrierId
-            );
-
         await channel.send({
-            content:
-                `<@${result.carrierId}> is pregnant!`,
             embeds: [
                 buildPregnancyConfirmedEmbed(
-                    result.pregnancy,
-                    carrier
+                    result.pregnancy
                 )
             ]
         });
@@ -127,19 +98,10 @@ async function announceMilestones(
         const pregnancy of reveals
     ) {
 
-        const carrier =
-            await fetchUserTarget(
-                client,
-                pregnancy.carrier_id
-            );
-
         await channel.send({
-            content:
-                `<@${pregnancy.carrier_id}> had a gender reveal!`,
             embeds: [
                 buildGenderRevealEmbed(
-                    pregnancy,
-                    carrier
+                    pregnancy
                 )
             ]
         });
@@ -150,19 +112,10 @@ async function announceMilestones(
         const pregnancy of births
     ) {
 
-        const carrier =
-            await fetchUserTarget(
-                client,
-                pregnancy.carrier_id
-            );
-
         await channel.send({
-            content:
-                `<@${pregnancy.carrier_id}> gave birth!`,
             embeds: [
                 buildBirthEmbed(
-                    pregnancy,
-                    carrier
+                    pregnancy
                 )
             ]
         });

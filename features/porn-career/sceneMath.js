@@ -137,6 +137,9 @@ const baseSceneScoreBonus =
 const scorePerStatThreshold =
     3;
 
+const xpPerExtraPart =
+    2;
+
 const outcomeRewards = {
     'Awkward Scene': {
         ranking:
@@ -275,6 +278,15 @@ function calculateScene(
             8
         );
 
+    const extraParts =
+        Math.max(
+            0,
+            totalParts - 4
+        );
+
+    const staminaXpBonus =
+        extraParts * xpPerExtraPart;
+
     const performanceScoreBonus =
         performanceBonus * scorePerStatThreshold;
 
@@ -296,6 +308,37 @@ function calculateScene(
         randomInt(
             0,
             250
+        );
+
+    const partViewers =
+        Array.from(
+            {
+                length:
+                    totalParts
+            },
+            (_value, index) => {
+
+                const progress =
+                    (index + 1) / totalParts;
+
+                if (
+                    index === totalParts - 1
+                )
+                    return viewers;
+
+                return clamp(
+                    Math.round(
+                        (viewers * (0.45 + (progress * 0.5))) +
+                        randomInt(
+                            -35,
+                            35
+                        )
+                    ),
+                    25,
+                    viewers
+                );
+
+            }
         );
 
     const coins =
@@ -369,7 +412,8 @@ function calculateScene(
             criticalScene
                 ? 10
                 : 0
-        );
+        ) +
+        staminaXpBonus;
 
     const rankingChange =
         outcomeRewards[outcome].ranking;
@@ -384,7 +428,9 @@ function calculateScene(
         outcome,
         rankingChange,
         xp,
+        staminaXpBonus,
         viewers,
+        partViewers,
         coins,
         combinedPerformance,
         combinedStamina,

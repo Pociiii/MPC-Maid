@@ -4,7 +4,7 @@ Use this file as the quick context handoff when discussing bot design in
 ChatGPT or another planning thread. Keep it updated when major systems,
 balance rules, channels, or design principles change.
 
-Current bot version: `0.13.0`
+Current bot version: `0.14.0`
 
 ## Server Context
 
@@ -22,11 +22,20 @@ Current bot version: `0.13.0`
 
 - Discord users do not read walls of text, so embeds should stay short.
 - Use fields, emoji, buttons, and dropdown menus for visual feedback.
+- In embeds, keep emoji mostly in titles, author text, field titles, and
+  buttons. Avoid repeating emoji inside field values or dense description
+  lines unless the emoji is the actual content, such as slot reels or cards.
 - If buttons get cramped, use a dropdown menu.
+- `/commands` should stay as a compact public directory. Exact command details
+  belong in private dropdown replies, with separate info buttons for big
+  systems.
 - Use user avatars as thumbnails for user-centered embeds.
 - Use consistent command footers with the bot version where applicable.
 - Keep Rumors sexy/story-focused.
 - Keep Maid Feed for progress/system notices.
+- Rumors should be flavor plus useful fields, not flavor-only. Keep key data
+  such as outcome, ranking, XP, Reputation, viewers, parts, and critical state
+  where it helps users understand the event.
 - Avoid making the bot feel like a generic economy bot. Systems should feel
   like they belong to Midnight Pleasure Club / After Dinner Productions.
 
@@ -92,6 +101,7 @@ Showcase:
 Social / RP:
 
 - `/matchme` publicly matches the user with an opposite-gender member.
+- `/relationship` manages consent-based RP relationship links.
 - `/breed` sends a pregnancy RP consent request.
 - `/pregnancy` privately shows the user their own pregnancy/fertility state.
 
@@ -116,8 +126,9 @@ Scene request flow:
 - Busy status starts only after the partner accepts.
 - Accepted scenes post parts in the Porn Career channel.
 - Start and final notices post in Rumors.
-- Final result includes outcome, viewers, revenue, XP, ranking, and links to
-  parts.
+- Scene parts show live viewer counts to make the posts feel like an ongoing
+  recording.
+- Final result includes outcome, revenue, XP, ranking, and links to parts.
 
 Scene pacing:
 
@@ -129,12 +140,14 @@ Scene pacing:
 Scene stats:
 
 - Performance improves scene score and critical scene chance.
-- Stamina increases total scene parts and score.
+- Stamina increases total scene parts, score, and gives a small XP bonus for
+  extra parts.
 - Fame increases viewers, revenue, and score.
 - Partner stats are combined.
 - Every stat adds a score bonus every 10 combined points.
 - Performance adds critical chance every 10 combined points, capped at 15%.
 - Stamina adds scene parts every 10 combined points, capped at 8 parts.
+- Each stamina-created extra part gives +2 XP each.
 - Fame gives bigger viewer/revenue value every 10 combined points.
 - Ranking can go negative.
 
@@ -152,12 +165,118 @@ XP by outcome:
 - Hot: 35 XP
 - Viral: 55 XP
 - Critical scenes add +10 XP.
+- Stamina adds +2 XP per extra scene part above 4.
 
 Colors:
 
 - `/pornscene` public embeds now use one deterministic color for the same pair.
 - Color is based on the two user IDs sorted together.
 - Rank should stay in text/title areas, not control the embed color.
+
+## Reputation And Rumors Planned
+
+Reputation is planned as a social participation layer, not a solo command spam
+reward.
+
+Core rule:
+
+- Porn Career remains the main gameplay/progression system.
+- Relationships remain pure RP flavor.
+- Pregnancy remains pure RP flavor.
+- Relationships and pregnancy must never give coins, XP, Reputation, rank,
+  achievements, or gameplay advantages.
+- Rumors is the RP story/newspaper layer.
+- Maid Feed is the progression/system notice layer.
+
+Reputation is separate from:
+
+- Porn career rank
+- XP
+- Coins
+- Fame
+- Achievement points
+
+Initial Reputation reward targets:
+
+- Porn Career outcomes:
+  - Awkward: +4
+  - Solid: +8
+  - Hot: +14
+  - Viral: +25
+  - Critical bonus: +10
+- Daily quests:
+  - completed quest: +3
+  - full daily set: +10
+  - weekly streak: +25
+- Achievements:
+  - normal: +15
+  - major: +30
+  - endless: +5 with anti-spam protection
+- Casino:
+  - no normal win/loss Reputation
+  - notable jackpot/special win: +10
+- Daily WYR later:
+  - first vote of the day: +2
+
+Showcase interaction Reputation:
+
+- Do not award Reputation just for running `/drop`, `/wiggle`, `/flex`, or
+  `/horny`.
+- Award Reputation to the user who clicks a valid public interaction button.
+- Valid button clicks give +2 Reputation to the clicker.
+- The clicker cannot earn Reputation from their own post.
+- Existing gender/role validation must pass first.
+- Daily rewarded click caps by source:
+  - Spank: 5/day
+  - Kiss: 5/day
+  - Brofist: 5/day
+  - Horny Help: 5/day
+- The button can still be used after the cap, but no more Reputation is awarded.
+
+Badge display:
+
+- Reputation badges should support external image URLs.
+- Badge config should include `key`, `name`, `minReputation`, `imageUrl`, and
+  `color`.
+- Initial badge tiers:
+  - Unknown: 0
+  - Fresh Face: 250
+  - Local Favorite: 750
+  - Rising Name: 1500
+  - Midnight Regular: 3000
+  - Club Icon: 5000
+  - MPC Star: 8000
+  - Living Legend: 12000
+- Profile embeds should keep the user avatar as thumbnail.
+- The current Reputation badge image should use the profile embed's main image
+  slot when an `imageUrl` exists.
+- If no `imageUrl` exists, show only the badge name as text.
+- Badge upgrade announcements go to Maid Feed, not Rumors.
+
+Rumors:
+
+- Rumors should feel alive with short RP flavor text, but keep useful fields.
+- Use title + flavor description + data fields.
+- Add a shared Rumor helper before refactoring current Rumors posts.
+- The helper should support randomized flavor, stable data fields, optional
+  mentions, optional anonymity, embed color, and optional image support.
+- Scene final Rumors should keep fields such as Outcome, Ranking, Revenue, XP,
+  Reputation, Viewers, Parts, and Critical.
+- Relationship Rumors stay mostly flavor because relationships have no rewards,
+  but can keep fields such as Bond and Since.
+- Pregnancy Rumors must remain RP-safe:
+  - pregnancy whispers: no names, stats, or chance values
+  - reveal: Stage and Day
+  - birth: Stage, Gender, and Journey
+- Career milestones and big casino stories can include Reputation fields when
+  applicable.
+
+Routing:
+
+- Maid Feed is for progression notices, quest completions, badge upgrades, and
+  achievement unlocks.
+- Rumors is for story events: scene starts/finals, relationship beats,
+  pregnancy beats, big casino stories, and career milestones.
 
 ## Boosters
 
@@ -218,6 +337,7 @@ Current design:
 
 - Users get 3 daily quests.
 - `/daily` shows personal progress privately.
+- `/daily` shows weekly streak progress.
 - Quest completion posts to Maid Feed.
 - User mention is only used when all 3 quests are completed.
 - Assigned quests must be possible for all supported genders.
@@ -239,6 +359,9 @@ Rewards:
 - Medium: 75 coins + 35 XP.
 - Hard: 120 coins + 60 XP.
 - Full daily set bonus: 100 coins + 50 XP.
+- Each completed quest has a 5% chance to drop 1 random T1 booster.
+- Weekly streak reward: complete all 3 daily quests for 7 consecutive quest
+  days to receive 1 random T2/T3 booster.
 
 ## Daily Would You Rather Planned
 
@@ -358,6 +481,48 @@ Design notes:
 - Kisses and spanks need gender logic because interaction direction is not
   symmetrical.
 
+## Relationship System
+
+Relationships are RP flavor only. They do not give coins, XP, quests, ranking,
+or achievements.
+
+Current rules:
+
+- Relationship creation uses consent requests with Accept and Decline buttons.
+- Removal commands remove only the exact selected link.
+- No removal cascades into other relationship types.
+- Family-style links:
+  - Mother
+  - Father
+  - Children
+  - Siblings
+- Two users can only have one family-style link displayed between them. A pair
+  cannot be parent/child and siblings at the same time.
+- Romantic links remain separate and can still exist between the same users.
+- A user can have max 1 Mother and max 1 Father.
+- Children and siblings are unlimited.
+- Sibling links are stored directly, not calculated dynamically.
+- When adoption is accepted, existing children of that parent become direct
+  siblings with the new child.
+- Romantic links:
+  - Marriage, shown as Husband or Wife based on the other user's gender role.
+  - Dating, shown as Boyfriend or Girlfriend based on the other user's gender role.
+- A user can have max 1 spouse total.
+- Dating partners are unlimited.
+- Being married does not block dating other users. This is intentional for
+  swinger/open-RP use.
+- Romantic links store a start date. Family and Bestie links do not.
+- Social links:
+  - Besties
+  - Max 3 Besties per user.
+- Gender validation uses the existing Male/Female roles and requires exactly
+  one clear gender role where the command needs gender.
+- `/relationship view` is private and uses the user's avatar as thumbnail.
+- Accepted relationship requests post a compact embed in Rumors so public RP
+  links feel visible without adding rewards or progression pressure.
+- Broken relationship links also post a compact Rumors embed, but only after
+  the removal actually succeeds.
+
 ## Pregnancy System
 
 Pregnancy is standalone RP, separate from porn career.
@@ -456,6 +621,8 @@ GIF randomness:
 - Every GIF in a category should appear once before that bag repeats.
 - The picker also keeps a small in-memory recent history per user.
 - Current recent history target: last 30 GIF URLs per user.
+- For small folders, the effective recent-history check scales down so folders
+  with fewer than 30 GIFs still rotate naturally.
 - When possible, the picker avoids GIFs recently seen by any involved user.
 - If a category is too small and every option is recent, it falls back to the
   next bag item instead of failing.
@@ -539,7 +706,8 @@ of the bot.
 Current:
 
 - `/dice`: max 50 coins.
-- `/slots`: max 75 coins.
+- `/slots`: max 25 coins per spin, 1-minute opener cooldown, then Spin Again
+  and Leave buttons control the slot session.
 - `/blackjack`: max 100 coins, uses one standard deck.
 - Blackjack card display uses suit emoji.
 - Spank Dilli has a fixed embed in its own channel and public GIF replies.
@@ -591,6 +759,5 @@ Next update currently includes:
 - Decide when to implement `/privatescene`.
 - Decide whether private scene end stats should go to Maid Feed or Rumors.
 - Keep pregnancy meaningful without turning it into a child-list bot.
-- Rework relationships later; leave it for last.
 - Low-priority future idea: X/Twitter watcher using `X_BEARER_TOKEN`, text/link
   only, no scraping or bypassing adult-media walls.

@@ -28,7 +28,7 @@ const views = {
         label:
             'Overview',
         emoji:
-            '🏅',
+            '\uD83C\uDFC5',
         title:
             'Achievements',
         keys:
@@ -49,7 +49,7 @@ const views = {
         label:
             'Porn',
         emoji:
-            '🎬',
+            '\uD83C\uDFAC',
         title:
             'Porn Career Achievements',
         keys:
@@ -64,7 +64,7 @@ const views = {
         label:
             'Stats',
         emoji:
-            '📈',
+            '\uD83D\uDCC8',
         title:
             'Stat Achievements',
         keys:
@@ -78,7 +78,7 @@ const views = {
         label:
             'Social',
         emoji:
-            '✨',
+            '\u2728',
         title:
             'Social Achievements',
         keys:
@@ -90,7 +90,7 @@ const views = {
         label:
             'Showcase',
         emoji:
-            '🔥',
+            '\uD83D\uDD25',
         title:
             'Showcase Achievements',
         keys:
@@ -102,7 +102,7 @@ const views = {
         label:
             'GIFs',
         emoji:
-            '🖼️',
+            '\uD83D\uDDBC\uFE0F',
         title:
             'GIF Achievements',
         keys:
@@ -430,20 +430,20 @@ function formatKeySummary(
             )
             .map(
                 (achievement) =>
-                    `✅ ${getAchievementLabel(
+                    getAchievementLabel(
                         achievement
-                    )}`
+                    )
             );
 
     return [
-        `${emojis.xp} Progress: **${current}**`,
-        `🏅 Unlocked: **${unlocked.length}**`,
+        `Progress: **${current}**`,
+        `Unlocked: **${unlocked.length}**`,
         next
-            ? `➡️ Next: **${next.label}** (${formatProgress(
+            ? `Next: **${next.label}** (${formatProgress(
                 current,
                 next.milestone
             )})`
-            : '✅ All fixed milestones complete.',
+            : 'All fixed milestones complete.',
         latest.length
             ? `Latest: ${latest.join(
                 ', '
@@ -458,7 +458,6 @@ function formatKeySummary(
         );
 
 }
-
 function formatOverviewField(
     key,
     data
@@ -563,16 +562,16 @@ async function buildAchievementsReply(
             title:
                 views[activeView].title,
             description:
-`${emojis.xp} Achievement Points: **${Number(
+`Achievement Points: **${Number(
     data.points
 ).toLocaleString()}**
-🏅 Fixed Unlocked: **${data.unlocked.filter(
+Fixed Unlocked: **${data.unlocked.filter(
     (achievement) =>
         definitionsById.has(
             achievement.achievement_id
         )
 ).length}/${achievementDefinitions.length}**
-✨ Total Unlocked: **${data.unlocked.length}**`
+Total Unlocked: **${data.unlocked.length}**`
         });
 
     if (

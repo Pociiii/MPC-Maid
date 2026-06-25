@@ -62,7 +62,7 @@ const statDescriptions = {
     performance:
         'Better scene score and critical scene chance.',
     stamina:
-        'More scene parts, up to 8.',
+        'More scene parts, up to 8, with small XP bonuses.',
     fame:
         'More viewers, coins, and score.'
 };
@@ -153,7 +153,7 @@ async function buildTrainingPanel(
             title:
                 'Training',
             description:
-`${notice?.text ? `${notice.text}\n\n` : ''}Balance: ${emojis.xp} **${user.xp} XP** + ${emojis.coin} **${user.coins} coins**
+`${notice?.text ? `${notice.text}\n\n` : ''}Balance: **${user.xp} XP** + **${user.coins} coins**
 Pick a stat to train. Stats keep counting in scenes, but training gets much more expensive after **${prestigeStatStart}**.`,
             footerText:
                 '/train',

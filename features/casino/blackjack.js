@@ -278,19 +278,19 @@ function getResultText(
     if (
         session.outcome === 'blackjack'
     )
-        return `Blackjack. You won ${emojis.coin} **${session.payout - session.bet} coins**.`;
+        return `Blackjack. You won **${session.payout - session.bet} coins**.`;
 
     if (
         session.outcome === 'win'
     )
-        return `You won ${emojis.coin} **${session.payout - session.bet} coins**.`;
+        return `You won **${session.payout - session.bet} coins**.`;
 
     if (
         session.outcome === 'push'
     )
         return 'Push. Your bet was returned.';
 
-    return `You lost ${emojis.coin} **${session.bet} coins**.`;
+    return `You lost **${session.bet} coins**.`;
 
 }
 

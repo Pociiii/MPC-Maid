@@ -17,6 +17,12 @@ const {
     getOrCreateUser
 } = require('../../utils/users');
 
+const {
+    addBooster,
+    boosterStats,
+    formatBooster
+} = require('../../utils/boosters');
+
 const emojis =
     require('../../utils/emojis');
 
@@ -35,6 +41,30 @@ const DAILY_BONUS = {
     xp:
         50
 };
+
+const WEEKLY_STREAK_TARGET =
+    7;
+
+const DAILY_QUEST_BOOSTER_CHANCE =
+    0.05;
+
+const DAILY_QUEST_BOOSTER_TIER =
+    1;
+
+const weeklyRewardTiers = [
+    {
+        tier:
+            2,
+        weight:
+            70
+    },
+    {
+        tier:
+            3,
+        weight:
+            30
+    }
+];
 
 const rewardByTier = {
     easy: {
@@ -448,6 +478,29 @@ function getNextResetTimestamp(
 
 }
 
+function addDays(
+    dateText,
+    amount
+) {
+
+    const date =
+        new Date(
+            `${dateText}T00:00:00.000Z`
+        );
+
+    date.setUTCDate(
+        date.getUTCDate() + amount
+    );
+
+    return date
+        .toISOString()
+        .slice(
+            0,
+            10
+        );
+
+}
+
 function shuffle(
     items
 ) {
@@ -684,7 +737,215 @@ function formatReward(
     xp
 ) {
 
-    return `${emojis.coin} **${coins} coins** + ${emojis.xp} **${xp} XP**`;
+    return `**${coins} coins** + **${xp} XP**`;
+
+}
+
+function formatWeeklyStreakProgress(
+    streak,
+    questDate
+) {
+
+    if (
+        streak.lastCompletedDate === questDate &&
+        streak.streakCount === 0 &&
+        streak.weeklyRewardsClaimed > 0
+    )
+        return `${WEEKLY_STREAK_TARGET}/${WEEKLY_STREAK_TARGET} - reward claimed today`;
+
+    return `${streak.streakCount}/${WEEKLY_STREAK_TARGET}`;
+
+}
+
+function pickBooster(
+    tier
+) {
+
+    const stat =
+        boosterStats[
+            Math.floor(
+                Math.random() *
+                boosterStats.length
+            )
+        ];
+
+    return {
+        stat,
+        tier
+    };
+
+}
+
+function pickWeightedTier(
+    weightedTiers
+) {
+
+    const totalWeight =
+        weightedTiers.reduce(
+            (sum, item) =>
+                sum + item.weight,
+            0
+        );
+
+    let roll =
+        Math.random() *
+        totalWeight;
+
+    for (
+        const item of weightedTiers
+    ) {
+
+        roll -= item.weight;
+
+        if (
+            roll <= 0
+        )
+            return item.tier;
+
+    }
+
+    return weightedTiers[
+        weightedTiers.length - 1
+    ].tier;
+
+}
+
+function pickDailyQuestBooster() {
+
+    return pickBooster(
+        DAILY_QUEST_BOOSTER_TIER
+    );
+
+}
+
+function pickWeeklyBooster() {
+
+    return pickBooster(
+        pickWeightedTier(
+            weeklyRewardTiers
+        )
+    );
+
+}
+
+async function getWeeklyStreak(
+    userId
+) {
+
+    const streak =
+        await dbGet(
+            `SELECT *
+             FROM daily_quest_weekly_streaks
+             WHERE user_id = ?`,
+            [
+                userId
+            ]
+        );
+
+    return {
+        lastCompletedDate:
+            streak?.last_completed_date ?? null,
+        streakCount:
+            Number(
+                streak?.streak_count ?? 0
+            ),
+        weeklyRewardsClaimed:
+            Number(
+                streak?.weekly_rewards_claimed ?? 0
+            )
+    };
+
+}
+
+async function updateWeeklyStreak(
+    userId,
+    questDate
+) {
+
+    const streak =
+        await getWeeklyStreak(
+            userId
+        );
+
+    if (
+        streak.lastCompletedDate === questDate
+    )
+        return {
+            awarded:
+                false,
+            booster:
+                null,
+            streakCount:
+                streak.streakCount
+        };
+
+    const expectedNextDate =
+        streak.lastCompletedDate
+            ? addDays(
+                streak.lastCompletedDate,
+                1
+            )
+            : null;
+
+    let nextStreakCount =
+        expectedNextDate === questDate
+            ? streak.streakCount + 1
+            : 1;
+
+    let awarded =
+        false;
+
+    let booster =
+        null;
+
+    let rewardsClaimed =
+        streak.weeklyRewardsClaimed;
+
+    if (
+        nextStreakCount >= WEEKLY_STREAK_TARGET
+    ) {
+
+        booster =
+            pickWeeklyBooster();
+
+        await addBooster(
+            userId,
+            booster.stat,
+            booster.tier
+        );
+
+        nextStreakCount = 0;
+        rewardsClaimed += 1;
+        awarded = true;
+
+    }
+
+    await dbRun(
+        `INSERT INTO daily_quest_weekly_streaks (
+            user_id,
+            last_completed_date,
+            streak_count,
+            weekly_rewards_claimed
+        ) VALUES (?, ?, ?, ?)
+        ON CONFLICT(user_id)
+        DO UPDATE SET
+            last_completed_date = excluded.last_completed_date,
+            streak_count = excluded.streak_count,
+            weekly_rewards_claimed = excluded.weekly_rewards_claimed`,
+        [
+            userId,
+            questDate,
+            nextStreakCount,
+            rewardsClaimed
+        ]
+    );
+
+    return {
+        awarded,
+        booster,
+        streakCount:
+            nextStreakCount
+    };
 
 }
 
@@ -706,7 +967,7 @@ async function getAnnouncementTarget(
 
 }
 
-function buildDailyEmbed(
+async function buildDailyEmbed(
     interaction,
     quests
 ) {
@@ -723,6 +984,14 @@ function buildDailyEmbed(
     const nextReset =
         getNextResetTimestamp();
 
+    const weeklyStreak =
+        await getWeeklyStreak(
+            interaction.user.id
+        );
+
+    const questDate =
+        getDailyQuestDate();
+
     const embed =
         createUserEmbed(
             interaction,
@@ -734,7 +1003,10 @@ function buildDailyEmbed(
             title:
                 'Daily Quests',
             description:
-                `Next reset: <t:${nextReset}:F> (<t:${nextReset}:R>)\nCompleted: **${completed}/${QUESTS_PER_DAY}**`
+                `Next reset: <t:${nextReset}:F> (<t:${nextReset}:R>)\nCompleted: **${completed}/${QUESTS_PER_DAY}**\nWeekly streak: **${formatWeeklyStreakProgress(
+                    weeklyStreak,
+                    questDate
+                )}**`
             }
         );
 
@@ -774,7 +1046,7 @@ async function buildDailyReply(
 
     return {
         embeds: [
-            buildDailyEmbed(
+            await buildDailyEmbed(
                 interaction,
                 quests
             )
@@ -804,7 +1076,8 @@ async function sendQuestCompleteFeed(
     client,
     userId,
     quest,
-    completedCount
+    completedCount,
+    luckyBooster = null
 ) {
 
     const channel =
@@ -837,7 +1110,7 @@ async function sendQuestCompleteFeed(
     embed.addFields(
         {
             name:
-                '📋 Quest',
+                '\uD83D\uDCCB Quest',
             value:
                 quest.label,
             inline:
@@ -845,7 +1118,7 @@ async function sendQuestCompleteFeed(
         },
         {
             name:
-                '📈 Progress',
+                '\uD83D\uDCC8 Progress',
             value:
                 `${quest.target} / ${quest.target}`,
             inline:
@@ -864,7 +1137,7 @@ async function sendQuestCompleteFeed(
         },
         {
             name:
-                '✅ Daily Progress',
+                '\u2705 Daily Progress',
             value:
                 `${Math.min(
                     completedCount,
@@ -874,6 +1147,20 @@ async function sendQuestCompleteFeed(
                 false
         }
     );
+
+    if (
+        luckyBooster
+    )
+        embed.addFields({
+            name:
+                '\uD83C\uDFB2 Lucky Drop',
+            value:
+                `You also found **${formatBooster(
+                    luckyBooster
+                )}**.`,
+            inline:
+                false
+        });
 
     await channel.send({
         content:
@@ -887,7 +1174,8 @@ async function sendQuestCompleteFeed(
 
 async function sendDailySetCompleteFeed(
     client,
-    userId
+    userId,
+    weeklyResult = null
 ) {
 
     const channel =
@@ -920,7 +1208,7 @@ async function sendDailySetCompleteFeed(
     embed.addFields(
         {
             name:
-                '✅ Completed',
+                '\u2705 Completed',
             value:
                 `${QUESTS_PER_DAY} / ${QUESTS_PER_DAY} daily quests`,
             inline:
@@ -939,9 +1227,40 @@ async function sendDailySetCompleteFeed(
         }
     );
 
+    if (
+        weeklyResult
+    )
+        embed.addFields({
+            name:
+                '\uD83D\uDCC5 Weekly Streak',
+            value:
+                weeklyResult.awarded
+                    ? `${WEEKLY_STREAK_TARGET} / ${WEEKLY_STREAK_TARGET} days complete`
+                    : `${weeklyResult.streakCount} / ${WEEKLY_STREAK_TARGET} days complete`,
+            inline:
+                true
+        });
+
+    if (
+        weeklyResult?.awarded &&
+        weeklyResult.booster
+    )
+        embed.addFields({
+            name:
+                '\uD83C\uDF81 Weekly Reward',
+            value:
+                `Random booster: **${formatBooster(
+                    weeklyResult.booster
+                )}**\nUse it with \`/pornscene\`.`,
+            inline:
+                false
+        });
+
     await channel.send({
         content:
-            `<@${userId}> completed all daily quests!`,
+            weeklyResult?.awarded
+                ? `<@${userId}> completed a full weekly streak!`
+                : `<@${userId}> completed all daily quests!`,
         embeds: [
             embed
         ]
@@ -964,6 +1283,28 @@ async function grantQuestReward(
             quest.reward_xp
         )
     ]);
+
+}
+
+async function maybeGrantDailyQuestBooster(
+    userId
+) {
+
+    if (
+        Math.random() >= DAILY_QUEST_BOOSTER_CHANCE
+    )
+        return null;
+
+    const booster =
+        pickDailyQuestBooster();
+
+    await addBooster(
+        userId,
+        booster.stat,
+        booster.tier
+    );
+
+    return booster;
 
 }
 
@@ -1038,9 +1379,16 @@ async function maybeGrantDailyBonus(
         )
     ]);
 
+    const weeklyResult =
+        await updateWeeklyStreak(
+            userId,
+            questDate
+        );
+
     await sendDailySetCompleteFeed(
         client,
-        userId
+        userId,
+        weeklyResult
     );
 
     return completedCount;
@@ -1156,6 +1504,11 @@ async function updateDailyQuestProgress(
             completedQuest
         );
 
+        const luckyBooster =
+            await maybeGrantDailyQuestBooster(
+                userId
+            );
+
         const completedCount =
             await getCompletedQuestCount(
                 userId,
@@ -1166,7 +1519,8 @@ async function updateDailyQuestProgress(
             client,
             userId,
             completedQuest,
-            completedCount
+            completedCount,
+            luckyBooster
         );
 
         await maybeGrantDailyBonus(

@@ -8,6 +8,14 @@ const {
 } = require('../../utils/embeds');
 
 const {
+    commandFooter
+} = require('../../utils/version');
+
+const {
+    pickFlavor
+} = require('../../utils/rumors');
+
+const {
     CARRIER_FERTILITY_STATES,
     PARTNER_FERTILITY_STATES,
     PREGNANCY
@@ -282,30 +290,48 @@ function buildPregnancyConfirmedEmbed(
     carrier
 ) {
 
-    return createTargetUserEmbed({
+    const embed =
+        createEmbed({
         color:
             getRandomColor(),
-        command:
-            '/pregnancy',
         description:
-`<@${pregnancy.carrier_id}> is pregnant.
-
-Father: <@${pregnancy.father_id}>
-Gender reveal: ${formatTimestamp(
-    getRevealTimestamp(
-        pregnancy
-    )
-)}
-Due: ${formatTimestamp(
-    getDueTimestamp(
-        pregnancy
-    )
-)}`,
-        target:
-            carrier,
+            pickFlavor(
+                'pregnancy_confirmed'
+            ),
         title:
-            'Pregnancy Confirmed'
+            'Pregnancy Whisper',
+        footerText:
+            commandFooter(
+                '/pregnancy'
+            ),
+        timestamp:
+            true
     });
+
+    embed.addFields(
+        {
+            name:
+                'Stage',
+            value:
+                'Confirmed',
+            inline:
+                true
+        },
+        {
+            name:
+                'Reveal',
+            value:
+                formatTimestamp(
+                    getRevealTimestamp(
+                        pregnancy
+                    )
+                ),
+            inline:
+                true
+        }
+    );
+
+    return embed;
 
 }
 
@@ -314,25 +340,52 @@ function buildGenderRevealEmbed(
     carrier
 ) {
 
-    return createTargetUserEmbed({
+    const embed =
+        createEmbed({
         color:
             getRandomColor(),
-        command:
-            '/pregnancy',
         description:
-`<@${pregnancy.carrier_id}> reached Day ${PREGNANCY.GENDER_REVEAL_DAY}.
-
-The baby is a **${pregnancy.baby_gender}**.
-Due: ${formatTimestamp(
-    getDueTimestamp(
-        pregnancy
-    )
-)}`,
-        target:
-            carrier,
+            pickFlavor(
+                'pregnancy_reveal'
+            ),
         title:
-            'Gender Reveal'
+            'Gender Reveal',
+        footerText:
+            commandFooter(
+                '/pregnancy'
+            ),
+        timestamp:
+            true
     });
+
+    embed.addFields(
+        {
+            name:
+                'Stage',
+            value:
+                'Reveal',
+            inline:
+                true
+        },
+        {
+            name:
+                'Day',
+            value:
+                `${PREGNANCY.GENDER_REVEAL_DAY}/${PREGNANCY.DURATION_DAYS}`,
+            inline:
+                true
+        },
+        {
+            name:
+                'Gender',
+            value:
+                pregnancy.baby_gender,
+            inline:
+                true
+        }
+    );
+
+    return embed;
 
 }
 
@@ -341,21 +394,52 @@ function buildBirthEmbed(
     carrier
 ) {
 
-    return createTargetUserEmbed({
+    const embed =
+        createEmbed({
         color:
             getRandomColor(),
-        command:
-            '/pregnancy',
         description:
-`<@${pregnancy.carrier_id}> gave birth.
-
-Father: <@${pregnancy.father_id}>
-Baby: **${pregnancy.baby_gender}**`,
-        target:
-            carrier,
+            pickFlavor(
+                'birth'
+            ),
         title:
-            'Birth Announcement'
+            'Birth Announcement',
+        footerText:
+            commandFooter(
+                '/pregnancy'
+            ),
+        timestamp:
+            true
     });
+
+    embed.addFields(
+        {
+            name:
+                'Stage',
+            value:
+                'Birth',
+            inline:
+                true
+        },
+        {
+            name:
+                'Gender',
+            value:
+                pregnancy.baby_gender,
+            inline:
+                true
+        },
+        {
+            name:
+                'Journey',
+            value:
+                `${PREGNANCY.DURATION_DAYS} days`,
+            inline:
+                true
+        }
+    );
+
+    return embed;
 
 }
 

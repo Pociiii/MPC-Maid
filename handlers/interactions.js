@@ -48,6 +48,10 @@ const {
 } = require('../features/casino/blackjack');
 
 const {
+    handleSlotsAction
+} = require('../features/casino/slots');
+
+const {
     handleSpankDilli
 } = require('../features/casino/spankDilli');
 
@@ -71,6 +75,9 @@ const gifSceneSelect =
 
 const gifInteractionSelect =
     require('./menus/gifInteractionSelect');
+
+const commandsSection =
+    require('./menus/commandsSection');
 
 const gifSubmitModal =
     require('./modals/gifSubmit');
@@ -183,6 +190,26 @@ async function routeInteraction(
                 await handleBlackjackAction(
                     interaction,
                     'stand',
+                    interaction.customId.split(
+                        ':'
+                    )[1]
+                );
+                return true;
+
+            case 'slots_spin':
+                await handleSlotsAction(
+                    interaction,
+                    'spin',
+                    interaction.customId.split(
+                        ':'
+                    )[1]
+                );
+                return true;
+
+            case 'slots_leave':
+                await handleSlotsAction(
+                    interaction,
+                    'leave',
                     interaction.customId.split(
                         ':'
                     )[1]
@@ -395,6 +422,14 @@ async function routeInteraction(
             case 'gif_scene_select':
 
                 await gifSceneSelect.execute(
+                    interaction
+                );
+
+                return true;
+
+            case 'commands_section':
+
+                await commandsSection.execute(
                     interaction
                 );
 

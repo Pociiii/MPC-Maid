@@ -20,3 +20,10 @@ CREATE TABLE IF NOT EXISTS daily_quest_bonus (
 
     PRIMARY KEY (user_id, quest_date)
 );
+
+CREATE TABLE IF NOT EXISTS daily_quest_weekly_streaks (
+    user_id TEXT PRIMARY KEY,
+    last_completed_date TEXT,
+    streak_count INTEGER DEFAULT 0,
+    weekly_rewards_claimed INTEGER DEFAULT 0
+);

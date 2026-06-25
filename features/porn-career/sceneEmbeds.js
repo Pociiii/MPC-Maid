@@ -6,6 +6,10 @@ const {
 } = require('../../utils/embeds');
 
 const {
+    pickFlavor
+} = require('../../utils/rumors');
+
+const {
     commandFooter
 } = require('../../utils/version');
 
@@ -274,6 +278,26 @@ function getRandomSceneGif(
 
 }
 
+function getPhaseFlavor(
+    phase
+) {
+
+    const flavors = {
+        foreplay:
+            'The cameras are live and the scene is warming up.',
+        oral:
+            'The room is locked in and the viewers are climbing.',
+        sex:
+            'The recording hits its main act.',
+        finale:
+            'The last take is rolling.'
+    };
+
+    return flavors[phase] ??
+        'The recording keeps rolling.';
+
+}
+
 function buildPartEmbed(
     requesterId,
     targetId,
@@ -281,7 +305,9 @@ function buildPartEmbed(
     phase,
     sceneTitle,
     requesterAuthor,
-    sceneColor
+    sceneColor,
+    result,
+    partIndex
 ) {
 
     const gif =
@@ -294,7 +320,23 @@ function buildPartEmbed(
             ]
         );
 
-    return createEmbed({
+    const totalParts =
+        result?.totalParts ?? 1;
+
+    const viewerCount =
+        result?.partViewers?.[partIndex] ??
+        result?.viewers ??
+        0;
+
+    const phaseLabel =
+        `${phase.charAt(
+            0
+        ).toUpperCase()}${phase.slice(
+            1
+        )}`;
+
+    const embed =
+        createEmbed({
         color:
             sceneColor,
         authorName:
@@ -306,7 +348,9 @@ function buildPartEmbed(
         title:
             sceneTitle,
         description:
-            `<@${requesterId}> and <@${targetId}> are filming a porn scene.`,
+            `<@${requesterId}> and <@${targetId}> are recording part ${partIndex + 1}/${totalParts}.\n${getPhaseFlavor(
+                phase
+            )}`,
         image:
             gif.url,
         footerText:
@@ -317,6 +361,27 @@ function buildPartEmbed(
         timestamp:
             true
     });
+
+    embed.addFields(
+        {
+            name:
+                'Viewers',
+            value:
+                `**${viewerCount}** watching now`,
+            inline:
+                true
+        },
+        {
+            name:
+                'Scene Part',
+            value:
+                phaseLabel,
+            inline:
+                true
+        }
+    );
+
+    return embed;
 
 }
 
@@ -334,6 +399,11 @@ function buildFinalEmbed(
             ? '+'
             : '';
 
+    const finalTitle =
+        result.criticalScene
+            ? 'Midnight Headline'
+            : 'Porn Scene Finished';
+
     const embed =
         createEmbed({
             color:
@@ -345,9 +415,11 @@ function buildFinalEmbed(
             thumbnail:
                 requesterAuthor.thumbnail,
             title:
-                'Porn Scene Finished',
+                finalTitle,
             description:
-                `<@${requesterId}> and <@${targetId}> finished their scene.`,
+                `${pickFlavor(
+                    'scene_final'
+                )}\n\n<@${requesterId}> and <@${targetId}> finished their scene.`,
             footerText:
                 commandFooter(
                     '/pornscene'
@@ -369,14 +441,6 @@ function buildFinalEmbed(
         },
         {
             name:
-                '👀 Viewers',
-            value:
-                `**${result.viewers}**`,
-            inline:
-                true
-        },
-        {
-            name:
                 `${emojis.coin} Revenue`,
             value:
                 `**${result.coins} coins each**`,
@@ -387,9 +451,21 @@ function buildFinalEmbed(
             name:
                 '⭐ XP',
             value:
-                result.criticalScene
-                    ? `**${result.xp} each**\n+10 crit bonus`
-                    : `**${result.xp} each**`,
+                [
+                    `**${result.xp} each**`,
+                    result.criticalScene
+                        ? '+10 crit bonus'
+                        : null,
+                    result.staminaXpBonus > 0
+                        ? `+${result.staminaXpBonus} stamina bonus`
+                        : null
+                ]
+                    .filter(
+                        Boolean
+                    )
+                    .join(
+                        '\n'
+                    ),
             inline:
                 true
         },
@@ -447,7 +523,11 @@ function buildStartEmbed(
         title:
             sceneTitle,
         description:
-`<@${requesterId}> and <@${targetId}> are starting a scene.
+`${pickFlavor(
+    'scene_start'
+)}
+
+<@${requesterId}> and <@${targetId}> are starting a scene.
 
 Parts: **${result.totalParts}**
 Booster: **${formatBooster(
@@ -469,7 +549,7 @@ Booster: **${formatBooster(
                         requesterUser.performance,
                         result.requesterPerformanceBoost
                     )} + ${targetUser.performance} = ${result.combinedPerformance}
-Crit: **${result.critChance}%** | Score: **+${result.performanceScoreBonus}**`,
+Score: **+${result.performanceScoreBonus}**`,
                 inline:
                     true
             },
@@ -481,7 +561,7 @@ Crit: **${result.critChance}%** | Score: **+${result.performanceScoreBonus}**`,
                         requesterUser.stamina,
                         result.requesterStaminaBoost
                     )} + ${targetUser.stamina} = ${result.combinedStamina}
-Parts: **${result.totalParts}** | Score: **+${result.staminaScoreBonus}**`,
+Score: **+${result.staminaScoreBonus}**`,
                 inline:
                     true
             },
@@ -493,7 +573,7 @@ Parts: **${result.totalParts}** | Score: **+${result.staminaScoreBonus}**`,
                         requesterUser.fame,
                         result.requesterFameBoost
                     )} + ${targetUser.fame} = ${result.combinedFame}
-Viewers: **${result.viewers}** | Score: **+${result.fameScoreBonus}**`,
+Score: **+${result.fameScoreBonus}**`,
                 inline:
                     true
             }

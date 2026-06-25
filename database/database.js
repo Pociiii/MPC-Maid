@@ -40,12 +40,17 @@ const db = new sqlite3.Database('./database.db', (err) => {
         'utf8'
     );
 
+    const relationshipsSchema = fs.readFileSync(
+        path.join(__dirname, 'schemas', 'relationships.sql'),
+        'utf8'
+    );
+
     const spankDilliSchema = fs.readFileSync(
         path.join(__dirname, 'schemas', 'spank_dilli.sql'),
         'utf8'
     );
 
-    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${achievementsSchema}\n${pregnancySchema}\n${spankDilliSchema}`, async (err) => {
+    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${achievementsSchema}\n${pregnancySchema}\n${relationshipsSchema}\n${spankDilliSchema}`, async (err) => {
 
         if (err) {
             console.error(err);

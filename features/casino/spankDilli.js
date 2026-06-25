@@ -189,7 +189,7 @@ function buildPanelEmbed(
 
     const lastWinner =
         state.last_winner_id
-            ? `<@${state.last_winner_id}> won ${emojis.coin} **${state.last_win_amount} coins**`
+            ? `<@${state.last_winner_id}> won **${state.last_win_amount} coins**`
             : 'No winner yet';
 
     const embed =
@@ -213,11 +213,11 @@ function buildPanelEmbed(
     embed.addFields(
         {
             name:
-                'Stats',
+                `${emojis.spank_given} Stats`,
             value:
-`${emojis.spank_given} Total spanks: **${Number(state.total_spanks).toLocaleString()}**
+`Total spanks: **${Number(state.total_spanks).toLocaleString()}**
 Queue: **${queue.length}**
-Current prize: ${emojis.coin} **${prize.toLocaleString()} coins**
+Current prize: **${prize.toLocaleString()} coins**
 Win chance: **${getWinChance(prize)}%**`,
             inline:
                 false
@@ -233,10 +233,10 @@ Last winner: ${lastWinner}`,
         },
         {
             name:
-                'Rules',
+                `${emojis.coin} Rules`,
             value:
-`Cost: ${emojis.coin} **${COST} coins**
-Adds ${emojis.coin} **${PRIZE_ADD} coins** to the prize
+`Cost: **${COST} coins**
+Adds **${PRIZE_ADD} coins** to the prize
 Plays a spank GIF for **10 sec**
 Each spank rolls for the current prize`,
             inline:
@@ -552,7 +552,7 @@ async function handleSpankDilli(
 
         await interaction.followUp({
             content:
-                `${emojis.coin} <@${interaction.user.id}> won the Spank Dilli prize: **${prizeAfterSpank} coins**!`
+                `<@${interaction.user.id}> won the Spank Dilli prize: **${prizeAfterSpank} coins**!`
         });
 
         void announceWinner(

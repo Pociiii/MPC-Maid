@@ -76,6 +76,110 @@ async function runMigrations(
 
     await run(
         db,
+        `CREATE TABLE IF NOT EXISTS daily_quest_weekly_streaks (
+            user_id TEXT PRIMARY KEY,
+            last_completed_date TEXT,
+            streak_count INTEGER DEFAULT 0,
+            weekly_rewards_claimed INTEGER DEFAULT 0
+        )`
+    );
+
+    await run(
+        db,
+        `CREATE TABLE IF NOT EXISTS relationships (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_a_id TEXT NOT NULL,
+            user_b_id TEXT NOT NULL,
+            type TEXT NOT NULL,
+            started_at TEXT,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )`
+    );
+
+    await run(
+        db,
+        `CREATE UNIQUE INDEX IF NOT EXISTS idx_relationships_unique
+         ON relationships(type, user_a_id, user_b_id)`
+    );
+
+    await run(
+        db,
+        `CREATE INDEX IF NOT EXISTS idx_relationships_user_a
+         ON relationships(user_a_id)`
+    );
+
+    await run(
+        db,
+        `CREATE INDEX IF NOT EXISTS idx_relationships_user_b
+         ON relationships(user_b_id)`
+    );
+
+    await run(
+        db,
+        `CREATE TABLE IF NOT EXISTS relationship_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            guild_id TEXT NOT NULL DEFAULT '',
+            requester_id TEXT NOT NULL,
+            target_id TEXT NOT NULL,
+            type TEXT NOT NULL,
+            started_at TEXT,
+            status TEXT NOT NULL DEFAULT 'pending',
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            expires_at TEXT
+        )`
+    );
+
+    await run(
+        db,
+        `CREATE INDEX IF NOT EXISTS idx_relationship_requests_target
+         ON relationship_requests(target_id, status)`
+    );
+
+    await run(
+        db,
+        `CREATE INDEX IF NOT EXISTS idx_relationship_requests_pair
+         ON relationship_requests(requester_id, target_id, type, status)`
+    );
+
+    await addColumnIfMissing(
+        db,
+        'relationship_requests',
+        'guild_id',
+        "TEXT NOT NULL DEFAULT ''"
+    );
+
+    await run(
+        db,
+        `INSERT OR IGNORE INTO relationships (
+            user_a_id,
+            user_b_id,
+            type
+        )
+        SELECT mother_id,
+               id,
+               'mother'
+        FROM users
+        WHERE mother_id IS NOT NULL
+        AND mother_id != ''`
+    );
+
+    await run(
+        db,
+        `INSERT OR IGNORE INTO relationships (
+            user_a_id,
+            user_b_id,
+            type
+        )
+        SELECT father_id,
+               id,
+               'father'
+        FROM users
+        WHERE father_id IS NOT NULL
+        AND father_id != ''`
+    );
+
+    await run(
+        db,
         `CREATE TABLE IF NOT EXISTS spank_dilli_state (
             id INTEGER PRIMARY KEY CHECK (id = 1),
             total_spanks INTEGER DEFAULT 0,

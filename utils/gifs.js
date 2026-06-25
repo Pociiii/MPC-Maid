@@ -4,6 +4,9 @@ const path = require('path');
 const recentHistorySize =
     30;
 
+const recentHistoryCategoryRatio =
+    0.7;
+
 const shuffleBags =
     new Map();
 
@@ -102,11 +105,17 @@ function normalizeUserIds(
 }
 
 function getRecentSet(
-    userIds
+    userIds,
+    limit = recentHistorySize
 ) {
 
     const recent =
         new Set();
+
+    if (
+        limit <= 0
+    )
+        return recent;
 
     for (
         const userId of normalizeUserIds(
@@ -115,9 +124,14 @@ function getRecentSet(
     ) {
 
         for (
-            const url of userGifHistory.get(
-                userId
-            ) ?? []
+            const url of (
+                userGifHistory.get(
+                    userId
+                ) ?? []
+            ).slice(
+                0,
+                limit
+            )
         )
             recent.add(
                 url
@@ -126,6 +140,27 @@ function getRecentSet(
     }
 
     return recent;
+
+}
+
+function getEffectiveRecentHistorySize(
+    total
+) {
+
+    if (
+        total <= 1
+    )
+        return 0;
+
+    return Math.min(
+        recentHistorySize,
+        Math.max(
+            1,
+            Math.floor(
+                total * recentHistoryCategoryRatio
+            )
+        )
+    );
 
 }
 
@@ -224,7 +259,10 @@ function pickFromBag(
 
     const recent =
         getRecentSet(
-            userIds
+            userIds,
+            getEffectiveRecentHistorySize(
+                gifs.length
+            )
         );
 
     const preferredIndex =

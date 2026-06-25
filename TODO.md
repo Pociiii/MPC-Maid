@@ -151,6 +151,321 @@ Current routing plan:
 - Keep porn career channel for scene parts only.
 - Keep custom scene channel for custom scene parts only.
 
+### Reputation And Rumors
+
+Goal:
+- Add a social Reputation layer that rewards visible participation and club
+  complicity, without turning showcase commands into solo spam farms.
+- Make Rumors feel more alive with RP flavor while keeping useful data fields
+  so users understand what happened and why stats matter.
+
+Reputation rules:
+- Do not award Reputation just for running showcase commands.
+- Ignore/remove earlier ideas:
+  - `/drop`: +2 Reputation
+  - `/wiggle`: +2 Reputation for posting
+  - `/flex`: +2 Reputation for posting
+  - `/horny`: +2 Reputation for posting
+- Showcase/interactions Reputation goes to the user who clicks a valid public
+  interaction button, not the original poster.
+- Poster still gets the normal command result/GIF.
+- Clicker gets +2 Reputation for a valid interaction.
+- Clicker cannot gain Reputation by clicking their own post.
+- Interaction must pass the existing gender/role validation before Reputation
+  is awarded.
+- Same clicker should only gain Reputation from the same interaction source a
+  limited number of times per day.
+
+Button Reputation sources:
+- `/wiggle` Spank button: +2 Reputation, max 5 rewarded clicks/day.
+- `/flex` Kiss button: +2 Reputation, max 5 rewarded clicks/day.
+- `/flex` Brofist button: +2 Reputation, max 5 rewarded clicks/day.
+- `/horny` Help button: +2 Reputation, max 5 rewarded clicks/day.
+- Any future public interaction button should follow the same pattern unless
+  explicitly designed otherwise.
+- Commands/buttons can still be used after the daily Reputation cap, but no
+  extra Reputation is awarded.
+
+Initial Reputation rewards:
+- Porn Career:
+  - Awkward Scene: +4 Reputation
+  - Solid Scene: +8 Reputation
+  - Hot Scene: +14 Reputation
+  - Viral Hit: +25 Reputation
+  - Critical Scene bonus: +10 Reputation
+- Daily quests:
+  - Each completed quest: +3 Reputation
+  - Full daily set completed: +10 Reputation
+  - Weekly streak completed: +25 Reputation
+- Achievements:
+  - Normal achievement unlock: +15 Reputation
+  - Major milestone achievement: +30 Reputation
+  - Endless achievement: +5 Reputation, with anti-spam protection
+- Showcase interactions:
+  - Button interaction rewards only, using the caps above.
+  - No posting rewards for `/drop`, `/wiggle`, `/flex`, or `/horny`.
+- Casino:
+  - No Reputation for normal wins/losses.
+  - Big jackpot/special win: +10 Reputation, if the event is notable enough to
+    post.
+- Daily Would You Rather, when implemented:
+  - First vote of the day: +2 Reputation.
+
+Data needed:
+- Reputation total per user.
+- Helper functions:
+  - `getReputation(userId)`
+  - `addReputation(userId, amount, reason, options?)`
+  - `getReputationBadge(reputation)`
+- `addReputation` should:
+  - ignore zero/negative values unless explicitly allowed
+  - update the user row
+  - optionally return old/new Reputation
+  - detect badge threshold changes
+  - return badge changes so callers can post Maid Feed upgrades
+- Daily rewarded interaction counts by user and source:
+  - `spank`
+  - `kiss`
+  - `brofist`
+  - `horny_help`
+- Optional later history table for audit/recovery if needed.
+- This likely needs SQL before launch because Reputation should survive
+  restarts.
+- Suggested SQL:
+  - `users.reputation INTEGER NOT NULL DEFAULT 0`
+  - optional `reputation_events` for history/audit
+  - optional `daily_rep_claims` for daily caps
+- `daily_rep_claims` can be used for:
+  - showcase interaction Reputation caps
+  - WYR vote Reputation cap
+  - any future daily Reputation source
+
+Badge config:
+- Reputation badges should support external image URLs.
+- Do not require local badge image files.
+- Badge config shape:
+  - `key`
+  - `name`
+  - `minReputation`
+  - `imageUrl`
+  - `color`
+- Example:
+  - `key`: `club_icon`
+  - `name`: `Club Icon`
+  - `minReputation`: `5000`
+  - `imageUrl`: external image URL
+  - `color`: `#FF2EF9`
+
+Profile badge display:
+- Keep the user avatar as thumbnail when the profile already uses it.
+- Show the current Reputation badge image as the main embed image using
+  `imageUrl`.
+- If no `imageUrl` exists, show only the badge name as text.
+- Badge image URLs will be provided later.
+
+Initial badge tiers:
+- 0 Reputation: Unknown, key `unknown`
+- 250 Reputation: Fresh Face, key `fresh_face`
+- 750 Reputation: Local Favorite, key `local_favorite`
+- 1500 Reputation: Rising Name, key `rising_name`
+- 3000 Reputation: Midnight Regular, key `midnight_regular`
+- 5000 Reputation: Club Icon, key `club_icon`
+- 8000 Reputation: MPC Star, key `mpc_star`
+- 12000 Reputation: Living Legend, key `living_legend`
+
+Badge upgrade announcements:
+- When a user crosses into a new Reputation badge tier, post a short public
+  notice in Maid Feed, not Rumors.
+- Example fields:
+  - New Badge
+  - Reputation
+- Badge upgrades are progression/system moments, not story rumors.
+
+Profile update:
+- Add a Reputation section to `/profile`.
+- Keep existing porn career Rank display.
+- Rank and Reputation should both show.
+- Suggested profile group:
+  - Porn Career: rank, scenes, stats
+  - Reputation: Reputation number and badge name/image
+  - Social: interactions, helps, relationships later if needed
+
+Rumors design:
+- Rumors should not become pure flavor text only.
+- Rumors should have:
+  - Title: rumor/event title.
+  - Description: short RP flavor text.
+  - Fields: actual useful data.
+- Useful data stays in Rumors for story events; the goal is flavor plus clarity,
+  not hiding numbers.
+
+Scene final rumor examples:
+- Normal:
+  - Title: `Studio Buzz`
+  - Description: a short release/chemistry flavor line.
+  - Fields:
+    - Outcome
+    - Ranking
+    - Revenue
+    - XP
+    - Reputation
+    - Viewers
+    - Parts
+    - Critical
+- Viral critical:
+  - Title: `Midnight Headline`
+  - Description: special performance flavor.
+  - Same fields as normal final, with stronger numbers.
+
+Relationship rumors:
+- Mostly flavor-only because relationships have no rewards.
+- Keep useful fields:
+  - Bond
+  - Since, when available.
+- Example:
+  - Title: `Rumor`
+  - Description: love/club RP flavor.
+  - Fields:
+    - Bond: Marriage
+    - Since: June 25, 2026
+
+Pregnancy rumors:
+- Keep only RP-safe useful data.
+- Pregnancy whisper:
+  - no names
+  - no stats
+  - no chance values
+- Pregnancy reveal fields:
+  - Stage: Reveal
+  - Day: 7/30
+- Birth fields:
+  - Stage: Birth
+  - Gender: Boy/Girl
+  - Journey: 30 days
+
+Other rumor field rules:
+- Career milestone rumors:
+  - Milestone
+  - Total Scenes
+  - Reputation Gained, if applicable
+- Casino jackpot rumors:
+  - Game
+  - Win
+  - Reputation, if applicable
+
+Rumor helper structure:
+- Add a shared helper that supports flavor text and stable data fields.
+- Suggested call shape:
+  - `postRumor(client, { type, title, flavor, fields, color, image, footer })`
+  - or `postRumor(client, type, data)`
+- Internally support:
+  - randomized flavor description
+  - stable data fields
+  - optional user mentions
+  - optional anonymity
+  - optional embed color
+  - optional image/badge support later
+- Supported rumor types:
+  - `scene_start`
+  - `scene_final`
+  - `relationship_created`
+  - `relationship_broken`
+  - `pregnancy_whisper`
+  - `pregnancy_reveal`
+  - `birth`
+  - `achievement_major`
+  - `casino_jackpot`
+  - `career_milestone`
+- The helper should:
+  - post to Rumors channel
+  - keep messages short
+  - use randomized templates
+  - avoid feeling like a raw log
+  - allow anonymous wording when appropriate
+  - avoid exposing private details
+  - avoid explicit text beyond the server's existing playful/sexy tone
+  - keep the RP industry gossip vibe
+
+Rumor template pool:
+- Scene start:
+  - `Rumor`: A new production just started behind closed doors. Word around the
+    studio is that the chemistry already has people watching.
+  - `Studio Whisper`: Cameras are rolling again. Someone at Midnight Pleasure
+    may be filming something worth talking about.
+  - `On Set`: Another scene has entered production. The first viewers are
+    already gathering.
+- Scene final:
+  - Awkward Scene: cameras stopped, not every production is a masterpiece, but
+    every performer starts somewhere.
+  - Solid Scene: another production wrapped successfully, nothing too
+    scandalous, studio seems pleased.
+  - Hot Scene: a hot release wrapped, chemistry carried the production.
+  - Viral Hit: a scene exploded across the studio, fans call it a must-watch.
+  - Critical Viral: something special happened on set, people will talk about it.
+- Relationship created:
+  - Marriage: love is in the air, two familiar faces tied the knot.
+  - Dating: someone made things official, the studio is watching.
+  - Besties: two regulars are inseparable, everyone has an opinion.
+  - Family/adoption: the Midnight Pleasure family grew.
+- Relationship broken:
+  - Romance: one romance reached its final scene.
+  - Besties/family: something shifted quietly inside the circle.
+- Pregnancy:
+  - Whisper: strange whispers spread, someone may be expecting.
+  - Reveal: the whispers were true, congratulations are spreading.
+  - Birth: a new little troublemaker joined the family.
+- Achievement major:
+  - A performer crossed a serious career milestone.
+- Casino jackpot:
+  - Someone walked away from the tables with a lucky win.
+- Career milestone:
+  - A performer reached a new career milestone; dedication got noticed.
+
+Routing separation:
+- Maid Feed:
+  - progression notices
+  - quest completions
+  - badge upgrades
+  - achievement unlocks
+- Rumors:
+  - story events with flavor plus useful fields
+  - scene starts/finals
+  - relationship story beats
+  - pregnancy story beats
+  - big casino stories
+  - career milestones
+
+Implementation notes:
+- Build Reputation awarding as a small helper called after existing validation
+  succeeds in each interaction handler.
+- Add daily cap checks before adding Reputation.
+- Add Rumor helper before refactoring all existing Rumor posts, so migration can
+  happen one system at a time.
+- Start with button Reputation and profile badge display before adding larger
+  Reputation leaderboards or achievements.
+- Integrate Porn Career final rewards with Reputation:
+  - call `addReputation` based on outcome
+  - add critical bonus when applicable
+  - post badge upgrade to Maid Feed if a threshold is crossed
+  - post scene final with the Rumor helper
+- Integrate daily quest Reputation:
+  - completed quest: +3 Reputation
+  - all 3 daily quests: +10 Reputation
+  - weekly streak: +25 Reputation
+  - use Maid Feed, not Rumors
+- Integrate achievements:
+  - normal/major/endless Reputation values above
+  - use Maid Feed
+- Public `/commands` can mention Reputation briefly later:
+  - earned through career activity, daily participation, achievements, and
+    public interactions
+  - relationships and pregnancy are RP-only and do not give Reputation
+- Public changelog, when this goes live:
+  - Reputation is live as a long-term prestige value
+  - Profiles show Reputation and cosmetic badge tier
+  - Major stories appear in Rumors with more RP flavor
+  - Relationships and pregnancy create better story moments but remain RP-only
+
 ## Medium Priority
 
 ### Private Scene Threads
@@ -443,14 +758,6 @@ Future:
 - Keep endless milestones for long-term actions, but avoid spammy rewards.
 
 ## Low Priority
-
-### Relationship System
-
-Status:
-- Leave this for last.
-- User wants to rework how it works.
-
-Do not touch unless specifically requested.
 
 ### Automatic X Repost Watcher
 

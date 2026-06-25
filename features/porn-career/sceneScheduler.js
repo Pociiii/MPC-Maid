@@ -258,7 +258,9 @@ function scheduleScene(
                                         phase,
                                         sceneTitle,
                                         requesterAuthor,
-                                        sceneColor
+                                        sceneColor,
+                                        result,
+                                        index
                                     )
                                 ]
                             });
