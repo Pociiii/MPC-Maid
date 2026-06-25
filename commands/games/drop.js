@@ -80,7 +80,10 @@ module.exports = {
             authorName:
                 interaction.member.displayName,
             thumbnail:
-                interaction.user.displayAvatarURL()
+                interaction.user.displayAvatarURL(),
+            userIds: [
+                interaction.user.id
+            ]
         };
 
         if (attachment) {

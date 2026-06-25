@@ -1,7 +1,6 @@
 const {
     ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle
+    StringSelectMenuBuilder
 } = require('discord.js');
 
 const {
@@ -29,9 +28,6 @@ const {
 const emojis =
     require('../../utils/emojis');
 
-const SHOP_TIER =
-    1;
-
 const statEmojis = {
     performance:
         '💪',
@@ -41,39 +37,88 @@ const statEmojis = {
         '👑'
 };
 
-function formatShopItem(
-    stat
-) {
+function getTierKeys() {
 
-    const tier =
-        boosterTiers[SHOP_TIER];
-
-    return `+${tier.value} ${boosterStatLabels[stat]} for one porn scene.\nCost: ${emojis.coin} **${tier.cost} coins**\nBurnout: **+${tier.burnoutRisk}%** flop chance`;
+    return Object.keys(
+        boosterTiers
+    );
 
 }
 
-function buildShopButtons(
+function formatShopItem(
+    stat,
+    tierKey
+) {
+
+    const tier =
+        boosterTiers[tierKey];
+
+    return `${statEmojis[stat]} **${boosterStatLabels[stat]}**: +${tier.value}, ${emojis.coin} **${tier.cost}**, burnout **+${tier.burnoutRisk}%**`;
+
+}
+
+function buildShopMenu(
     userId
 ) {
 
     return new ActionRowBuilder()
         .addComponents(
-            ...boosterStats.map(
-                (stat) =>
-                    new ButtonBuilder()
-                        .setCustomId(
-                            `shop_booster:${userId}:${stat}:${SHOP_TIER}`
+            new StringSelectMenuBuilder()
+                .setCustomId(
+                    `shop_booster:${userId}`
+                )
+                .setPlaceholder(
+                    'Choose a booster to buy'
+                )
+                .addOptions(
+                    getTierKeys()
+                        .flatMap(
+                            (tierKey) =>
+                                boosterStats.map(
+                                    (stat) => {
+
+                                        const tier =
+                                            boosterTiers[tierKey];
+
+                                        return {
+                                            label:
+                                                `${boosterStatLabels[stat]} T${tierKey}`,
+                                            description:
+                                                `+${tier.value}, ${tier.cost} coins, +${tier.burnoutRisk}% burnout`,
+                                            emoji:
+                                                statEmojis[stat],
+                                            value:
+                                                `${stat}:${tierKey}`
+                                        };
+
+                                    }
+                                )
                         )
-                        .setLabel(
-                            `${boosterStatLabels[stat]} Booster`
-                        )
-                        .setEmoji(
-                            statEmojis[stat]
-                        )
-                        .setStyle(
-                            ButtonStyle.Primary
-                        )
-            )
+                )
+        );
+
+}
+
+function buildTierFields() {
+
+    return getTierKeys()
+        .map(
+            (tierKey) => ({
+                name:
+                    `Tier ${tierKey}`,
+                value:
+                    boosterStats.map(
+                        (stat) =>
+                            formatShopItem(
+                                stat,
+                                tierKey
+                            )
+                    ).join(
+                        '\n'
+                    ),
+                inline:
+                    false
+            })
         );
 
 }
@@ -102,23 +147,13 @@ async function buildShopReply(
                     'Booster Shop',
                 description:
 `${notice?.text ? `${notice.text}\n\n` : ''}Balance: ${emojis.coin} **${user.coins} coins**
-Buy boosters for future \`/pornscene\` requests. One booster can be spent per scene.`
+Buy boosters for future \`/pornscene\` requests. One booster can be spent per scene.
+Best use: push a combined stat over a **10 / 20 / 30** threshold. Stronger tiers add more burnout risk.`
             }
         );
 
     embed.addFields(
-        ...boosterStats.map(
-            (stat) => ({
-                name:
-                    `${statEmojis[stat]} ${boosterStatLabels[stat]}`,
-                value:
-                    formatShopItem(
-                        stat
-                    ),
-                inline:
-                    true
-            })
-        )
+        ...buildTierFields()
     );
 
     return {
@@ -126,7 +161,7 @@ Buy boosters for future \`/pornscene\` requests. One booster can be spent per sc
             embed
         ],
         components: [
-            buildShopButtons(
+            buildShopMenu(
                 interaction.user.id
             )
         ]
@@ -164,7 +199,6 @@ async function buyShopBooster(
         );
 
     if (
-        numericTier !== SHOP_TIER ||
         !isValidBooster(
             stat,
             numericTier

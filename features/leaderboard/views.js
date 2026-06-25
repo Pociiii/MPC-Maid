@@ -20,6 +20,9 @@ const {
     getRankTitle
 } = require('../../utils/ranks');
 
+const rankingRowsPerRank =
+    5;
+
 function hasCareerActivity(
     user
 ) {
@@ -42,20 +45,36 @@ function formatRankingRows(
     )
         return 'No entries yet.';
 
-    return users
+    const visibleUsers =
+        users
         .slice(
             0,
-            8
-        )
+            rankingRowsPerRank
+        );
+
+    const rows =
+        visibleUsers
         .map(
             (user, index) =>
                 `${index + 1}. <@${user.id}> - **${Number(
                     user.ranking
                 ).toLocaleString()}**`
-        )
-        .join(
-            '\n'
         );
+
+    const hiddenCount =
+        users.length -
+        visibleUsers.length;
+
+    if (
+        hiddenCount > 0
+    )
+        rows.push(
+            `+ **${hiddenCount} more**`
+        );
+
+    return rows.join(
+        '\n'
+    );
 
 }
 

@@ -25,6 +25,19 @@ const {
     commandFooter
 } = require('../../utils/version');
 
+const interactionCategoryLabels = {
+    blowkiss:
+        'Blow Kiss',
+    brofist:
+        'Brofist',
+    spank:
+        'Spank',
+    titty_drop:
+        'Drop',
+    wiggle:
+        'Wiggle'
+};
+
 function parseSubmissionCustomId(
     customId
 ) {
@@ -57,7 +70,7 @@ function parseSubmissionCustomId(
                     group,
                     category
                 )
-                : category,
+                : interactionCategoryLabels[category] ?? category,
         group,
         isSceneSubmission
     };

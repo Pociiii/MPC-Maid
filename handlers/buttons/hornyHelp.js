@@ -34,8 +34,13 @@ const {
 } = require('../../utils/userCategory');
 
 const {
-    addHornyHelp
+    addHornyHelp,
+    addHornyHelped
 } = require('../../utils/users');
+
+const {
+    getSmartGifFromList
+} = require('../../utils/gifs');
 
 const sceneRoot =
     path.join(
@@ -99,7 +104,8 @@ function getSceneCategory(
 }
 
 function getRandomHelpScene(
-    sceneCategory
+    sceneCategory,
+    userIds = []
 ) {
 
     const phases =
@@ -155,11 +161,20 @@ function getRandomHelpScene(
     )
         return null;
 
-    return candidates[
-        Math.floor(
-            Math.random() * candidates.length
-        )
-    ];
+    const smartGif =
+        getSmartGifFromList(
+            `horny_help:${sceneCategory}`,
+            candidates.map(
+                (candidate) =>
+                    candidate.url
+            ),
+            userIds
+        );
+
+    return candidates.find(
+        (candidate) =>
+            candidate.url === smartGif.url
+    ) ?? null;
 
 }
 
@@ -264,7 +279,11 @@ module.exports = async (
 
     const scene =
         getRandomHelpScene(
-            sceneCategory
+            sceneCategory,
+            [
+                interaction.user.id,
+                targetUserId
+            ]
         );
 
     if (
@@ -365,6 +384,9 @@ module.exports = async (
         ),
         addHornyHelp(
             interaction.user.id
+        ),
+        addHornyHelped(
+            targetUserId
         )
     ]);
 

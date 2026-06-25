@@ -30,11 +30,22 @@ const sessionTimeoutMs =
     5 * 60 * 1000;
 
 const suits = [
-    '♠',
-    '♥',
-    '♦',
-    '♣'
+    '\u2660',
+    '\u2665',
+    '\u2666',
+    '\u2663'
 ];
+
+const suitEmojis = {
+    '\u2660':
+        '\u2660\uFE0F',
+    '\u2665':
+        '\u2665\uFE0F',
+    '\u2666':
+        '\u2666\uFE0F',
+    '\u2663':
+        '\u2663\uFE0F'
+};
 
 const ranks = [
     'A',
@@ -177,7 +188,7 @@ function formatCard(
     card
 ) {
 
-    return `${card.rank}${card.suit}`;
+    return `${suitEmojis[card.suit] ?? card.suit} **${card.rank}**`;
 
 }
 
@@ -190,7 +201,7 @@ function formatHand(
         hideFirst
     )
         return [
-            '??',
+            '\uD83C\uDCA0 **Hidden**',
             ...hand.slice(
                 1
             ).map(
@@ -226,7 +237,7 @@ function buildRows(
                         'Hit'
                     )
                     .setEmoji(
-                        '🃏'
+                        '\uD83C\uDCCF'
                     )
                     .setStyle(
                         ButtonStyle.Primary
@@ -242,7 +253,7 @@ function buildRows(
                         'Stand'
                     )
                     .setEmoji(
-                        '✋'
+                        '\u270B'
                     )
                     .setStyle(
                         ButtonStyle.Secondary
@@ -262,24 +273,24 @@ function getResultText(
     if (
         !session.done
     )
-        return 'Hit or stand?';
+        return 'Hit or stand? Watch the dealer and do not bust.';
 
     if (
         session.outcome === 'blackjack'
     )
-        return `Blackjack. You won **${session.payout - session.bet} coins**.`;
+        return `Blackjack. You won ${emojis.coin} **${session.payout - session.bet} coins**.`;
 
     if (
         session.outcome === 'win'
     )
-        return `You won **${session.payout - session.bet} coins**.`;
+        return `You won ${emojis.coin} **${session.payout - session.bet} coins**.`;
 
     if (
         session.outcome === 'push'
     )
         return 'Push. Your bet was returned.';
 
-    return `You lost **${session.bet} coins**.`;
+    return `You lost ${emojis.coin} **${session.bet} coins**.`;
 
 }
 
@@ -324,7 +335,7 @@ function buildEmbed(
     embed.addFields(
         {
             name:
-                'Your Hand',
+                '\uD83C\uDCCF Your Hand',
             value:
                 `${formatHand(
                     session.playerHand
@@ -334,7 +345,7 @@ function buildEmbed(
         },
         {
             name:
-                'Dealer Hand',
+                '\uD83C\uDCA0 Dealer Hand',
             value:
                 `${formatHand(
                     session.dealerHand,
@@ -352,6 +363,14 @@ function buildEmbed(
                 `${emojis.coin} Bet`,
             value:
                 `**${session.bet} coins**`,
+            inline:
+                true
+        },
+        {
+            name:
+                '\uD83C\uDCA0 Deck',
+            value:
+                '**1 standard deck**',
             inline:
                 true
         }

@@ -21,7 +21,9 @@ const cardAssets = {
     stiletto:
         'stilettoGang-card.png',
     tailored:
-        'tailoredFew-card.png'
+        'tailoredFew-card.png',
+    midnight:
+        'midnightCircle-card.png'
 };
 
 function getCardAsset(
@@ -58,6 +60,16 @@ function getCardAsset(
 
     }
 
+    if (
+        member.roles.cache.has(
+            ROLES.MIDNIGHT_CIRCLE
+        )
+    ) {
+
+        return cardAssets.midnight;
+
+    }
+
     return cardAssets.member;
 
 }
@@ -71,7 +83,7 @@ function drawFittedName(
 ) {
 
     let fontSize =
-        124;
+        136;
 
     do {
 
@@ -177,7 +189,7 @@ async function generateMemberCard(
         ctx,
         username,
         canvas.width / 2,
-        1138,
+        1110,
         880
     );
 

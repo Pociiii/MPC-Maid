@@ -175,6 +175,34 @@ const combinedSceneStatAchievements =
             )
     );
 
+const combinedSceneTwoStatsAchievements =
+    combinedSceneStatMilestones.map(
+        (milestone) =>
+            milestoneDefinition(
+                'scene_combined_two_stats',
+                milestone,
+                (value) =>
+                    `Be part of a scene with 2 combined stats at ${value}`,
+                statPoints(
+                    milestone
+                ) * 2
+            )
+    );
+
+const combinedSceneThreeStatsAchievements =
+    combinedSceneStatMilestones.map(
+        (milestone) =>
+            milestoneDefinition(
+                'scene_combined_three_stats',
+                milestone,
+                (value) =>
+                    `Be part of a scene with all 3 combined stats at ${value}`,
+                statPoints(
+                    milestone
+                ) * 3
+            )
+    );
+
 const showcaseAchievements =
     socialMilestones.map(
         (milestone) =>
@@ -223,6 +251,8 @@ const gifSubmissionAchievements =
 const achievementDefinitions = [
     ...sceneAchievements,
     ...combinedSceneStatAchievements,
+    ...combinedSceneTwoStatsAchievements,
+    ...combinedSceneThreeStatsAchievements,
     ...statAchievements,
     ...showcaseAchievements,
     ...buttonAchievements,
@@ -273,6 +303,28 @@ const endlessAchievements = {
                 `Be part of a scene with a combined stat of ${value}`,
         points:
             50
+    },
+    scene_combined_two_stats: {
+        startsAfter:
+            100,
+        step:
+            10,
+        label:
+            (value) =>
+                `Be part of a scene with 2 combined stats at ${value}`,
+        points:
+            100
+    },
+    scene_combined_three_stats: {
+        startsAfter:
+            100,
+        step:
+            10,
+        label:
+            (value) =>
+                `Be part of a scene with all 3 combined stats at ${value}`,
+        points:
+            150
     }
 };
 
@@ -280,7 +332,9 @@ module.exports = {
     achievementDefinitions,
     buttonAchievements,
     combinedSceneStatAchievements,
+    combinedSceneThreeStatsAchievements,
     combinedSceneStatMilestones,
+    combinedSceneTwoStatsAchievements,
     endlessAchievements,
     fixedSceneMilestones,
     gifSubmissionAchievements,

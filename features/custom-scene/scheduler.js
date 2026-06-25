@@ -1,6 +1,3 @@
-const fs =
-    require('fs');
-
 const path =
     require('path');
 
@@ -11,6 +8,10 @@ const {
 const {
     logError
 } = require('../../utils/inboxLogger');
+
+const {
+    getSmartGifFromFile
+} = require('../../utils/gifs');
 
 const sceneDurationMs =
     30 * 60 * 1000;
@@ -26,7 +27,8 @@ const sceneRoot =
 
 function getRandomSceneGif(
     cast,
-    phase
+    phase,
+    userIds = []
 ) {
 
     const filePath =
@@ -36,27 +38,10 @@ function getRandomSceneGif(
             `${phase}.json`
         );
 
-    const gifs =
-        JSON.parse(
-            fs.readFileSync(
-                filePath,
-                'utf8'
-            )
-        );
-
-    const index =
-        Math.floor(
-            Math.random() * gifs.length
-        );
-
-    return {
-        url:
-            gifs[index],
-        index:
-            index + 1,
-        total:
-            gifs.length
-    };
+    return getSmartGifFromFile(
+        filePath,
+        userIds
+    );
 
 }
 
@@ -71,7 +56,10 @@ function buildSceneEmbed(
     const gif =
         getRandomSceneGif(
             cast,
-            part
+            part,
+            [
+                interaction.user.id
+            ]
         );
 
     return createUserEmbed(

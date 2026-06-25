@@ -63,6 +63,14 @@ module.exports = {
 
                     {
                         label:
+                            'Brofist',
+
+                        value:
+                            'brofist'
+                    },
+
+                    {
+                        label:
                             'Flex',
 
                         value:

@@ -22,10 +22,6 @@ const {
 } = require('../../utils/users');
 
 const {
-    getRankTitle
-} = require('../../utils/ranks');
-
-const {
     formatPornCareerName
 } = require('../../utils/pornCareerTitles');
 
@@ -60,16 +56,11 @@ async function sendPornSceneRequest(
             interaction.user.id
         );
 
-    const requesterRank =
-        getRankTitle(
-            requesterUser.ranking
-        );
-
     const requesterName =
         formatPornCareerName(
             interaction.member.displayName,
             requesterUser,
-            requesterRank
+            interaction.member
         );
 
     const row =
@@ -118,7 +109,9 @@ async function sendPornSceneRequest(
 
 Booster: **${formatBooster(
     booster
-)}**`,
+)}**
+
+Tip: use \`/train\` to raise stats and help your scene partner get better outcomes.`,
             thumbnail:
                 interaction.user.displayAvatarURL(),
             footerText:

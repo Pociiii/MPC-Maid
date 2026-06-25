@@ -15,6 +15,7 @@ const dataFolder = path.join(__dirname, '..', '..', 'data');
 
 const interactionLabels = {
     blowkiss: 'Blow Kiss',
+    brofist: 'Brofist',
     spank: 'Spank',
     titty_drop: 'Drop',
     wiggle: 'Wiggle'

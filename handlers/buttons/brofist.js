@@ -1,9 +1,10 @@
+const {
+    ActionRowBuilder,
+    ButtonBuilder
+} = require('discord.js');
+
 const ROLES =
     require('../../data/roles.json');
-
-const {
-    getRandomGif
-} = require('../../utils/gifs');
 
 const {
     createEmbed
@@ -18,9 +19,9 @@ const {
 } = require('../../data/constants');
 
 const {
-    addSpankGiven,
-    addSpankTaken
-} = require('../../utils/users');
+    getGifList,
+    getRandomGif
+} = require('../../utils/gifs');
 
 const {
     trackDailyQuest
@@ -30,45 +31,54 @@ const {
     incrementAchievementProgress
 } = require('../../features/achievements/achievements');
 
-const {
-    ActionRowBuilder,
-    ButtonBuilder
-} = require('discord.js');
+function buildDisabledRow(
+    interaction
+) {
+
+    return new ActionRowBuilder()
+        .addComponents(
+            ...interaction.message
+                .components[0]
+                .components
+                .map(
+                    (component) =>
+                        ButtonBuilder
+                            .from(
+                                component
+                            )
+                            .setDisabled(
+                                component.disabled ||
+                                component.customId ===
+                                interaction.customId
+                            )
+                )
+        );
+
+}
 
 module.exports = async (
     interaction
 ) => {
 
-    const [
-        action,
-        targetUserId
-    ] =
+    const targetUserId =
         interaction.customId.split(
             ':'
-        );
-
-    const requiredRole =
-        action === 'spank_female'
-            ? ROLES.FEMALE
-            : ROLES.MALE;
-
-    const roleLabel =
-        action === 'spank_female'
-            ? 'female'
-            : 'male';
+        )[1];
 
     if (
         !interaction.member.roles.cache.has(
-            requiredRole
+            ROLES.MALE
         )
     ) {
 
-        return interaction.reply({
+        await interaction.reply({
             content:
-                `Only ${roleLabel} users can use this spank button.`,
+                'Only male users can use Brofist.',
             flags:
                 64
         });
+
+        return;
 
     }
 
@@ -76,18 +86,37 @@ module.exports = async (
         interaction.user.id === targetUserId
     ) {
 
-        return interaction.reply({
+        await interaction.reply({
             content:
-                'You cannot spank yourself.',
+                'You cannot brofist yourself.',
             flags:
                 64
         });
 
+        return;
+
     }
 
-    const spankGif =
+    if (
+        getGifList(
+            'brofist'
+        ).length === 0
+    ) {
+
+        await interaction.reply({
+            content:
+                'No Brofist GIFs are ready yet. Use `/gifsubmit` to send some in.',
+            flags:
+                64
+        });
+
+        return;
+
+    }
+
+    const brofistGif =
         getRandomGif(
-            'spank',
+            'brofist',
             [
                 interaction.user.id,
                 targetUserId
@@ -105,42 +134,24 @@ module.exports = async (
             thumbnail:
                 interaction.user.displayAvatarURL(),
             title:
-                'Spank!',
+                'Brofist',
             description:
-                `<@${interaction.user.id}> spanks <@${targetUserId}>.`,
+                `<@${interaction.user.id}> brofists <@${targetUserId}>.`,
             image:
-                spankGif.url,
+                brofistGif.url,
             footerText:
-                `GIF #${spankGif.index}/${spankGif.total}`,
+                `GIF #${brofistGif.index}/${brofistGif.total}`,
             timestamp:
                 true
         });
-
-    const disabledRow =
-        new ActionRowBuilder()
-            .addComponents(
-                ...interaction.message
-                    .components[0]
-                    .components
-                    .map(
-                        (component) =>
-                            ButtonBuilder
-                                .from(
-                                    component
-                                )
-                                .setDisabled(
-                                    component.disabled ||
-                                    component.customId ===
-                                    interaction.customId
-                                )
-                    )
-            );
 
     await interaction.deferUpdate();
 
     await interaction.message.edit({
         components: [
-            disabledRow
+            buildDisabledRow(
+                interaction
+            )
         ]
     });
 
@@ -149,14 +160,6 @@ module.exports = async (
             embed
         ]
     });
-
-    await addSpankGiven(
-        interaction.user.id
-    );
-
-    await addSpankTaken(
-        targetUserId
-    );
 
     await Promise.all([
         trackDailyQuest(

@@ -31,12 +31,14 @@ function getStatUpgradeCost(
             currentStat - prestigeStatStart + 1
         );
 
-    return 50 +
-        (currentStat * 20) +
-        (currentStat * currentStat * 2) +
-        (milestone * 500) +
-        (prestigeLevel * 250) +
-        (prestigeLevel * prestigeLevel * 75);
+    return Math.floor(
+        25 +
+        (currentStat * 6) +
+        (currentStat * currentStat * 0.45) +
+        (milestone * 100) +
+        (prestigeLevel * 50) +
+        (prestigeLevel * prestigeLevel * 8)
+    );
 
 }
 
@@ -50,9 +52,17 @@ function getStatUpgradeCoinCost(
             currentStat - prestigeStatStart + 1
         );
 
-    return (currentStat * 75) +
-        (prestigeLevel * 100) +
-        (prestigeLevel * prestigeLevel * 25);
+    const milestone =
+        Math.floor(
+            currentStat / 10
+        );
+
+    return Math.floor(
+        (currentStat * 20) +
+        (milestone * 50) +
+        (prestigeLevel * 40) +
+        (prestigeLevel * prestigeLevel * 5)
+    );
 
 }
 

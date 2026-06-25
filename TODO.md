@@ -23,6 +23,96 @@ the database is stable.
 
 ## High Priority
 
+### Daily Would You Rather
+
+Goal:
+- Add a lightweight daily social activity that is completely separate from
+  Porn Career.
+- Purpose: give members a small reason to check General chat, vote, and talk.
+- General channel: `1440755913572090038`.
+- Runs once per day at the same time daily quests reset: 12:00 UTC.
+- Only one Daily WYR should be active at a time.
+
+First version:
+- Store questions in `data/wyr/questions.json`.
+- Question shape:
+  - `id`
+  - `optionA`
+  - `optionB`
+- Bot picks one random question per day.
+- Avoid repeating recent questions; target buffer: last 100 question IDs.
+- Post the question in General chat.
+- Automatically create a thread attached to the question message.
+- Suggested thread name: `Daily WYR - June 25`.
+- Voting lasts 24 hours.
+- Voting uses exactly two buttons:
+  - Option A
+  - Option B
+- No Open Thread button; Discord already exposes the thread.
+
+Embed shape:
+- Title: `Daily Would You Rather`
+- Description:
+  - Would you rather...
+  - Option A
+  - OR
+  - Option B
+  - Vote below, then join the thread and explain why.
+  - Voting reward: 30 coins + 15 XP.
+  - Voting closes in 24 hours, using Discord timestamps.
+
+Voting rules:
+- One vote per user.
+- Users may change their vote until voting closes.
+- Votes are anonymous.
+- Reward is granted only once, the first time a user votes.
+- Users do not need to comment to receive the reward.
+- Users who only comment without voting receive no reward.
+
+Closing:
+- After 24 hours, disable both voting buttons.
+- Edit the original embed to show:
+  - Voting closed.
+  - Option A percentage.
+  - Option B percentage.
+  - Total votes.
+  - Thread replies.
+- Archive the thread automatically.
+
+Reward:
+- First version reward: 30 coins + 15 XP.
+- Reward values should be configurable constants.
+- This reward is intentionally small so it supports daily engagement without
+  competing with daily quests.
+
+Question writing guidelines:
+- Fun, playful, easy English.
+- Encourage conversation.
+- No obvious correct answer.
+- Avoid politics, religion, real-world drama, and divisive topics.
+- Fit Midnight Pleasure Club without needing to be explicit.
+- Mix funny, flirty, lifestyle, relationships, fashion, gaming, 3DXChat,
+  party, food, travel, and random prompts.
+- No categories in the first version; keep the daily feed varied.
+
+Data needed:
+- This feature should use SQL from the start because votes/rewards/history must
+  survive restarts.
+- Needed state:
+  - active WYR message/thread/question
+  - question history
+  - user votes
+  - reward claimed flag
+  - close timestamp
+
+Future ideas:
+- Community-submitted questions.
+- Staff approval queue.
+- Monthly most-discussed question.
+- Holiday questions.
+- Rare bonus reward days.
+- WYR stats and achievements.
+
 ### Balance And Live Testing
 
 - Rebalance daily quest rewards after live testing.
@@ -63,6 +153,169 @@ Current routing plan:
 
 ## Medium Priority
 
+### Private Scene Threads
+
+Goal:
+- Add `/privatescene` as a paid private RP sandbox.
+- Users create a temporary private thread for 2 or 3 participants.
+- The thread is for free RP and bot GIF commands, not porn career progression.
+- No XP, ranking, quests, achievements, or forced scene order in the first
+  version.
+
+Privacy rules:
+- Thread names must not include usernames.
+- Suggested thread name: `private-scene-4217`.
+- Only add explicit participants to the private thread as individual members.
+- Do not add any role overwrites to the private thread.
+- Do not add staff roles, host roles, or broad server roles to the thread.
+- Admins may still have server-level access because Discord permissions allow
+  that, but the bot should not deliberately add staff role overwrites.
+- Rumors/Maid Feed posts must never include participant names, thread links,
+  GIFs, or message content.
+
+Role rules:
+- Use the existing gender and skin roles for GIF selection:
+  - Male: `1492022010841141370`
+  - Female: `1492022133256224768`
+  - White/Light skin: `1495332763698724915`
+  - Black/Dark skin: `1495332837849698316`
+- Card, club, gang, staff, and host roles do not matter for GIF selection.
+- The private scene system should only read gender and skin tone roles.
+- Current 2-person scene folders:
+  - `wm_wf`
+  - `wm_bf`
+  - `bm_wf`
+  - `bm_bf`
+  - `wf_wf`
+  - `wf_bf`
+  - `bf_bf`
+- Missing role data should fail with a friendly message.
+- Bot users cannot be invited.
+- Maximum room size: creator + 2 invited users.
+- A user can only be inside one active private scene at a time.
+
+Cost and duration:
+- Couple private scene: 250 coins.
+- 3-user private scene: 400 coins.
+- Creator pays the full cost when the room is created.
+- Pricing reason: this should feel like a premium sandbox and coin sink, close
+  to booster pricing, without being more expensive than regular daily play can
+  support.
+- No refund if the room is closed early.
+- Max duration: 1 hour.
+- On expiry or manual close, post a closing message inside the thread, post
+  anonymous stats to Maid Feed or Rumors, then lock/archive the thread.
+- Preferred destination for anonymous private-scene stats: Maid Feed unless the
+  final vibe feels more like a Rumors hook.
+
+Command shape:
+- `/privatescene create partner:@user partner2:@user?`
+  - Creates the private thread and stores the session.
+- `/privatescene close`
+  - Ends the active private scene.
+  - Usable by scene creator and participants.
+  - Admin recovery can be separate if needed.
+- `/privatescene stats`
+  - Shows current private-scene stats inside the private thread.
+- `/privatescene foreplay`
+- `/privatescene oral`
+- `/privatescene sex`
+- `/privatescene finale`
+  - Only work inside an active private scene thread.
+  - For 2-user rooms, use the existing 2-person folder based on the two users'
+    roles.
+  - In 3-user rooms, `foreplay`, `sex`, and `finale` can use the 3some folders;
+    `oral` should tell users to use `/privatescene threesome` because the 3some
+    data does not have a dedicated oral category.
+  - No cooldown.
+  - No forced order.
+  - Oral and sex embeds get a Spank button.
+- `/privatescene threesome`
+  - Only works when the private room has exactly 3 users.
+  - Uses 3some GIF folders only.
+  - This command should not fall back to 2-person GIFs.
+  - If 3some GIF folders are empty/missing, reply privately that no 3some GIFs
+    are ready yet.
+
+3some GIF structure:
+- The 3some folders already exist and stay separate from normal 2-person scene
+  folders:
+  - `data/scenes_mfm`
+  - `data/scenes_fmf`
+  - `data/scenes_fff`
+- Current 3some folders are skin-tone specific:
+  - MFM: `bm_bm_bf`, `bm_bm_wf`, `wm_bm_bf`, `wm_bm_wf`, `wm_wm_bf`,
+    `wm_wm_wf`
+  - FMF: `bm_bf_bf`, `bm_wf_bf`, `bm_wf_wf`, `wm_bf_bf`, `wm_wf_bf`,
+    `wm_wf_wf`
+  - FFF: `bf_bf_bf`, `wf_bf_bf`, `wf_wf_bf`, `wf_wf_wf`
+- Current 3some subcategories are broad because most 3some GIFs mix oral and
+  sex:
+  - `foreplay`
+  - `sex`
+  - `finale`
+- `/privatescene threesome` can pick a random phase or accept a phase option:
+  - `phase: foreplay | sex | finale`
+- If no phase option is used, pick from all available 3some GIFs for that cast.
+
+2-person GIF logic:
+- For 2-user rooms, map roles the same way `/pornscene` does:
+  - one male + one female: `male_female`
+  - female + female: `wf_wf`, `wf_bf`, or `bf_bf`
+- Use existing scene subcategories:
+  - `foreplay`
+  - `oral`
+  - `sex`
+  - `finale`
+- The command should post the GIF in the private thread as a normal embed.
+
+Spank interaction:
+- Add Spank button only to:
+  - `/privatescene oral`
+  - `/privatescene sex`
+  - `/privatescene threesome` when phase is `sex` or when no phase is chosen
+    and the selected GIF comes from sex.
+- Use existing `data/gifs/spank.json`.
+- Increment private session `spank_count`.
+- Tag all other participants if target logic is not worth the complexity.
+- No cooldown.
+
+First version state:
+- Do not add SQL yet.
+- Keep active private scenes in memory first.
+- A bot restart can drop active private-scene tracking in the first test
+  version.
+- Store only the minimum runtime state:
+  - `thread_id`
+  - `guild_id`
+  - `parent_channel_id`
+  - `creator_id`
+  - participant IDs
+  - created timestamp
+  - expiry timestamp
+  - cost paid
+  - GIF counts by category
+  - spank count
+- Add a real SQL table later only if the feature feels good in live testing.
+
+Anonymous ending embed:
+- Participants: 2 or 3
+- Duration
+- GIFs used
+- Foreplay / Oral / Sex / Finale / 3some counts
+- Spanks
+- Messages
+- Most used category
+- No names, no links, no GIFs, no content.
+
+Implementation notes:
+- No SQL for the first basic version.
+- Later, if the feature works well, add a `private_scenes` table for recovery,
+  history, and safer cleanup after restarts.
+- Add recovery/admin cleanup later if a thread gets stuck.
+- Do not list `/privatescene` in `/commands` until it is tested.
+- Add to public changelog only when it is actually playable.
+
 ### Booster System
 
 Goal:
@@ -75,28 +328,27 @@ Current direction:
 - One booster per scene max.
 - Booster is selected from a dropdown before sending the request.
 - Dropdown shows only boosters in the user's inventory.
-- Tier 1 boosters can be bought with `/shop`.
-- Booster tiers can exist later, but the first shop should stay simple.
+- All 4 booster tiers can be bought with `/shop`.
+- `/shop` uses a dropdown menu because 12 booster buttons would be cramped.
 - Later downside idea: stronger boosters may increase flop chance.
 
 Needed later:
-- Prices and tier balance.
+- Watch tier prices and burnout risk after live testing.
 - SQL/inventory structure review before hosting.
-- Higher booster tiers, only after Tier 1 feels balanced.
 
 ### Shop System
 
 Goal:
 - Give coins meaningful sinks beyond training fees.
 
-First shop version:
-- Sell Tier 1 Performance, Stamina, and Fame boosters.
-- Use buttons instead of long text.
+Current shop version:
+- Sell Tier 1-4 Performance, Stamina, and Fame boosters.
+- Use a dropdown menu instead of crowded buttons.
 - Keep purchases private/ephemeral.
-- Current Tier 1 price: 250 coins.
+- Current prices: T1 120, T2 350, T3 800, T4 1400 coins.
+- Boosters are best used to push a combined stat over a 10-point threshold.
 
 Possible future items:
-- Stat-specific boosters.
 - Cosmetic profile/card items.
 - Temporary fertility or pregnancy-related items only if the pregnancy system
   needs them later.

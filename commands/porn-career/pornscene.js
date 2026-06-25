@@ -36,10 +36,6 @@ const {
 } = require('../../utils/users');
 
 const {
-    getRankTitle
-} = require('../../utils/ranks');
-
-const {
     formatPornCareerName
 } = require('../../utils/pornCareerTitles');
 
@@ -245,11 +241,6 @@ module.exports = {
                 interaction.user.id
             );
 
-        const requesterRank =
-            getRankTitle(
-                requesterUser.ranking
-            );
-
         const options = [
             {
                 label:
@@ -296,7 +287,7 @@ module.exports = {
                     formatPornCareerName(
                         interaction.member.displayName,
                         requesterUser,
-                        requesterRank
+                        interaction.member
                     ),
                 authorIcon:
                     mpcLogoAttachment,

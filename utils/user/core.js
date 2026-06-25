@@ -61,11 +61,12 @@ function createUser(
                     kisses_taken,
                     kisses_given,
                     horny_helps,
+                    horny_helped,
                     partner_id,
                     mother_id,
                     father_id
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     userId,
                     ECONOMY.STARTING_COINS,
@@ -77,6 +78,7 @@ function createUser(
                     0,
                     STATS.DEFAULT_SPANKS_TAKEN,
                     STATS.DEFAULT_SPANKS_GIVEN,
+                    0,
                     0,
                     0,
                     0,

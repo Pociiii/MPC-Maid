@@ -28,6 +28,10 @@ const categoryLabels = {
         'Porn Career',
     scene_combined_stat:
         'Scene Stat Thresholds',
+    scene_combined_three_stats:
+        'Scene Triple Stat Thresholds',
+    scene_combined_two_stats:
+        'Scene Duo Stat Thresholds',
     showcase_posts:
         'Showcase Commands',
     stamina:

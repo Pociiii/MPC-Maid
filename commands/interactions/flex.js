@@ -120,7 +120,12 @@ module.exports = {
             }
 
             const result =
-                getRandomGif(category);
+                getRandomGif(
+                    category,
+                    [
+                        interaction.user.id
+                    ]
+                );
 
             imageUrl =
                 result.url;
@@ -177,6 +182,24 @@ module.exports = {
 
                 .setEmoji(
                     '<a:ADP_kiss:1450797539862511720>'
+                )
+
+                .setStyle(
+                    ButtonStyle.Secondary
+                ),
+
+            new ButtonBuilder()
+
+                .setCustomId(
+                    `brofist:${interaction.user.id}`
+                )
+
+                .setLabel(
+                    'Brofist'
+                )
+
+                .setEmoji(
+                    '🤜'
                 )
 
                 .setStyle(

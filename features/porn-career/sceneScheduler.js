@@ -40,7 +40,8 @@ async function finishScene(
     targetId,
     result,
     sceneLinks,
-    requesterAuthor
+    requesterAuthor,
+    sceneColor
 ) {
 
     await applyRewards(
@@ -55,6 +56,22 @@ async function finishScene(
             result.combinedStamina,
             result.combinedFame
         );
+
+    const sortedCombinedStats =
+        [
+            result.combinedPerformance,
+            result.combinedStamina,
+            result.combinedFame
+        ].sort(
+            (first, second) =>
+                second - first
+        );
+
+    const secondHighestCombinedStat =
+        sortedCombinedStats[1];
+
+    const lowestCombinedStat =
+        sortedCombinedStats[2];
 
     await Promise.all([
         trackDailyQuest(
@@ -88,6 +105,30 @@ async function finishScene(
             targetId,
             'scene_combined_stat',
             highestCombinedStat
+        ),
+        setAchievementProgress(
+            channel.client,
+            requesterId,
+            'scene_combined_two_stats',
+            secondHighestCombinedStat
+        ),
+        setAchievementProgress(
+            channel.client,
+            targetId,
+            'scene_combined_two_stats',
+            secondHighestCombinedStat
+        ),
+        setAchievementProgress(
+            channel.client,
+            requesterId,
+            'scene_combined_three_stats',
+            lowestCombinedStat
+        ),
+        setAchievementProgress(
+            channel.client,
+            targetId,
+            'scene_combined_three_stats',
+            lowestCombinedStat
         )
     ]);
 
@@ -114,7 +155,8 @@ async function finishScene(
                         targetId,
                         result,
                         sceneLinks,
-                        requesterAuthor
+                        requesterAuthor,
+                        sceneColor
                     )
                 ]
             });
@@ -182,7 +224,8 @@ function scheduleScene(
     sceneCategory,
     result,
     sceneTitle,
-    requesterAuthor
+    requesterAuthor,
+    sceneColor
 ) {
 
     const phases =
@@ -214,7 +257,8 @@ function scheduleScene(
                                         sceneCategory,
                                         phase,
                                         sceneTitle,
-                                        requesterAuthor
+                                        requesterAuthor,
+                                        sceneColor
                                     )
                                 ]
                             });
@@ -232,7 +276,8 @@ function scheduleScene(
                                 targetId,
                                 result,
                                 sceneLinks,
-                                requesterAuthor
+                                requesterAuthor,
+                                sceneColor
                             );
 
                         }

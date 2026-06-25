@@ -1,8 +1,4 @@
-const path =
-    require('path');
-
 const {
-    AttachmentBuilder,
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle
@@ -16,6 +12,7 @@ const {
 } = require('../../utils/embeds');
 
 const {
+    CHANNELS,
     getRandomColor
 } = require('../../data/constants');
 
@@ -37,14 +34,8 @@ const PRIZE_ADD =
 const GIF_DURATION_MS =
     10000;
 
-const gifPath =
-    path.join(
-        __dirname,
-        '..',
-        '..',
-        'assets',
-        'spank_dilli.webp'
-    );
+const spankDilliGifUrl =
+    'https://cdn.discordapp.com/attachments/1519544070983258203/1519544182119862302/spank_dilli.webp?ex=6a3df14c&is=6a3c9fcc&hm=728ee19cd7e167b8f997af99b57c9fc2601c7499c954ddf84bf7a458d8f95598&';
 
 const queue = [];
 
@@ -311,6 +302,82 @@ function wait(
 
 }
 
+async function announceWinner(
+    interaction,
+    prize
+) {
+
+    const channel =
+        interaction.client.channels.cache.get(
+            CHANNELS.MAID_FEED
+        ) ??
+        await interaction.client.channels.fetch(
+            CHANNELS.MAID_FEED
+        ).catch(
+            () => null
+        );
+
+    if (
+        !channel?.send
+    )
+        return;
+
+    const embed =
+        createEmbed({
+            color:
+                getRandomColor(),
+            authorName:
+                interaction.member?.displayName ??
+                interaction.user.displayName,
+            authorIcon:
+                interaction.user.displayAvatarURL(),
+            thumbnail:
+                interaction.user.displayAvatarURL(),
+            title:
+                `${emojis.spank_given} Spank Dilli Winner`,
+            description:
+                `<@${interaction.user.id}> won the Spank Dilli prize!`,
+            footerText:
+                '/spankdilli',
+            timestamp:
+                true
+        });
+
+    embed.addFields(
+        {
+            name:
+                `${emojis.coin} Prize`,
+            value:
+                `**${Number(
+                    prize
+                ).toLocaleString()} coins**`,
+            inline:
+                true
+        },
+        {
+            name:
+                'Where',
+            value:
+                interaction.channelId
+                    ? `<#${interaction.channelId}>`
+                    : 'Spank Dilli',
+            inline:
+                true
+        }
+    );
+
+    await channel.send({
+        content:
+            `<@${interaction.user.id}> won Spank Dilli!`,
+        embeds: [
+            embed
+        ]
+    }).catch(
+        () => null
+    );
+
+}
+
 async function processQueue() {
 
     if (
@@ -337,10 +404,13 @@ async function processQueue() {
             await item.channel.send({
                 content:
                     `${emojis.spank_given} Spank from <@${item.userId}>`,
-                files: [
-                    new AttachmentBuilder(
-                        gifPath
-                    )
+                embeds: [
+                    createEmbed({
+                        color:
+                            getRandomColor(),
+                        image:
+                            spankDilliGifUrl
+                    })
                 ]
             }).catch(
                 () => null
@@ -484,6 +554,11 @@ async function handleSpankDilli(
             content:
                 `${emojis.coin} <@${interaction.user.id}> won the Spank Dilli prize: **${prizeAfterSpank} coins**!`
         });
+
+        void announceWinner(
+            interaction,
+            prizeAfterSpank
+        );
 
     }
 

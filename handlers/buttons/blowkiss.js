@@ -60,7 +60,13 @@ module.exports = async (
         interaction.customId.split(':')[1];
 
     const kissGif =
-        getRandomGif('blowkiss');
+        getRandomGif(
+            'blowkiss',
+            [
+                interaction.user.id,
+                targetUserId
+            ]
+        );
 
     const embed =
         createEmbed({
@@ -97,15 +103,21 @@ module.exports = async (
     const disabledRow =
         new ActionRowBuilder()
             .addComponents(
-
-                ButtonBuilder
-                    .from(
-                        interaction.message
-                            .components[0]
-                            .components[0]
+                ...interaction.message
+                    .components[0]
+                    .components
+                    .map(
+                        (component) =>
+                            ButtonBuilder
+                                .from(
+                                    component
+                                )
+                                .setDisabled(
+                                    component.disabled ||
+                                    component.customId ===
+                                    interaction.customId
+                                )
                     )
-                    .setDisabled(true)
-
             );
 
     await interaction.deferUpdate();

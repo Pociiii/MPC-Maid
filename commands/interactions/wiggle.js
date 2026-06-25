@@ -104,7 +104,10 @@ module.exports = {
 
             const result =
                 getRandomGif(
-                    'wiggle'
+                    'wiggle',
+                    [
+                        interaction.user.id
+                    ]
                 );
 
             imageUrl =

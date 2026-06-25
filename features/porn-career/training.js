@@ -12,6 +12,9 @@ const {
     createEmbed
 } = require('../../utils/embeds');
 
+const emojis =
+    require('../../utils/emojis');
+
 const {
     getOrCreateUser,
     removeCoins,
@@ -44,9 +47,9 @@ const statLabels = {
 };
 
 const statEmojis = {
-    performance: '💪',
-    stamina: '❤️',
-    fame: '👑'
+    performance: '\uD83D\uDCAA',
+    stamina: '\u2764\uFE0F',
+    fame: '\uD83D\uDC51'
 };
 
 const statSetters = {
@@ -150,7 +153,7 @@ async function buildTrainingPanel(
             title:
                 'Training',
             description:
-`${notice?.text ? `${notice.text}\n\n` : ''}Balance: **${user.xp} XP** and **${user.coins} coins**
+`${notice?.text ? `${notice.text}\n\n` : ''}Balance: ${emojis.xp} **${user.xp} XP** + ${emojis.coin} **${user.coins} coins**
 Pick a stat to train. Stats keep counting in scenes, but training gets much more expensive after **${prestigeStatStart}**.`,
             footerText:
                 '/train',

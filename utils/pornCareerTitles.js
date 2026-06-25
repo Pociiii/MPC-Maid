@@ -1,58 +1,118 @@
-const singleStatTitles = {
-    performance: [
-        'Natural Talent',
-        'Scene Stealer',
-        'Camera Charmer',
-        'Peak Performer',
-        'Bedroom Virtuoso'
-    ],
-    stamina: [
-        'Long Take Lover',
-        'Tireless Tease',
-        'Endurance Star',
-        'After Hours Ace',
-        'Marathon Muse'
-    ],
-    fame: [
-        'Crowd Favorite',
-        'Rising Fantasy',
-        'Viral Temptation',
-        'Spotlight Star',
-        'Household Sin'
-    ]
-};
+const ROLES =
+    require('../data/roles.json');
 
-const comboTitles = {
-    fame_performance: [
-        'Main Event',
-        'Box Office Babe',
-        'Fan Favorite',
-        'Headline Act',
-        'Studio Icon'
-    ],
-    fame_stamina: [
-        'Encore Machine',
-        'Late Night Legend',
-        'Crowd Pleaser',
-        'Afterparty Star',
-        'Midnight Idol'
-    ],
-    performance_stamina: [
-        'Relentless Performer',
-        'One-Take Wonder',
-        'All Night Pro',
-        'Endless Scene Star',
-        'No-Cut Legend'
-    ]
+const titlePools = {
+    male: {
+        single: {
+            performance: [
+                'Natural Talent',
+                'Scene Stealer',
+                'Camera Charmer',
+                'Peak Performer',
+                'Bedroom Virtuoso'
+            ],
+            stamina: [
+                'Long Take Lover',
+                'Tireless Tease',
+                'Endurance Star',
+                'After Hours Ace',
+                'Marathon Lover'
+            ],
+            fame: [
+                'Crowd Favorite',
+                'Rising Fantasy',
+                'Viral Temptation',
+                'Spotlight Star',
+                'Household Sin'
+            ]
+        },
+        combo: {
+            fame_performance: [
+                'Main Event',
+                'Box Office Star',
+                'Fan Favorite',
+                'Headline Act',
+                'Studio Icon'
+            ],
+            fame_stamina: [
+                'Encore Machine',
+                'Late Night Legend',
+                'Crowd Pleaser',
+                'Afterparty Star',
+                'Midnight Idol'
+            ],
+            performance_stamina: [
+                'Relentless Performer',
+                'One-Take Wonder',
+                'All Night Pro',
+                'Endless Scene Star',
+                'No-Cut Legend'
+            ]
+        },
+        balanced: [
+            'Jack of All Trades',
+            'Triple Threat',
+            'Complete Package',
+            'Studio Favorite',
+            'All-Round Star'
+        ]
+    },
+    female: {
+        single: {
+            performance: [
+                'Natural Talent',
+                'Scene Siren',
+                'Camera Charmer',
+                'Peak Temptress',
+                'Bedroom Virtuoso'
+            ],
+            stamina: [
+                'Long Take Lover',
+                'Tireless Tease',
+                'Endurance Star',
+                'After Hours Muse',
+                'Marathon Muse'
+            ],
+            fame: [
+                'Crowd Favorite',
+                'Rising Fantasy',
+                'Viral Temptation',
+                'Spotlight Siren',
+                'Household Sin'
+            ]
+        },
+        combo: {
+            fame_performance: [
+                'Main Event',
+                'Box Office Siren',
+                'Fan Favorite',
+                'Headline Muse',
+                'Studio Icon'
+            ],
+            fame_stamina: [
+                'Encore Muse',
+                'Late Night Legend',
+                'Crowd Pleaser',
+                'Afterparty Muse',
+                'Midnight Idol'
+            ],
+            performance_stamina: [
+                'Relentless Performer',
+                'One-Take Wonder',
+                'All Night Muse',
+                'Endless Scene Star',
+                'No-Cut Legend'
+            ]
+        },
+        balanced: [
+            'Jack of All Trades',
+            'Triple Threat',
+            'Complete Package',
+            'Studio Muse',
+            'All-Round Star'
+        ]
+    }
 };
-
-const balancedTitles = [
-    'Jack of All Trades',
-    'Triple Threat',
-    'Complete Package',
-    'Studio Favorite',
-    'All-Round Star'
-];
 
 function getTitleTier(
     value
@@ -82,33 +142,67 @@ function getTitleTier(
 
 }
 
-function getPornCareerTitle(
+function getMemberGender(
+    member
+) {
+
+    if (
+        member?.roles?.cache?.has(
+            ROLES.FEMALE
+        )
+    )
+        return 'female';
+
+    return 'male';
+
+}
+
+function getStatRanking(
     user
 ) {
 
+    return [
+        {
+            key:
+                'performance',
+            value:
+                user.performance
+        },
+        {
+            key:
+                'stamina',
+            value:
+                user.stamina
+        },
+        {
+            key:
+                'fame',
+            value:
+                user.fame
+        }
+    ].sort(
+        (first, second) =>
+            second.value - first.value
+    );
+
+}
+
+function getPornCareerTitle(
+    user,
+    member = null
+) {
+
+    const gender =
+        getMemberGender(
+            member
+        );
+
+    const titles =
+        titlePools[gender];
+
     const stats =
-        [
-            {
-                key:
-                    'performance',
-                value:
-                    user.performance
-            },
-            {
-                key:
-                    'stamina',
-                value:
-                    user.stamina
-            },
-            {
-                key:
-                    'fame',
-                value:
-                    user.fame
-            }
-        ].sort(
-            (first, second) =>
-                second.value - first.value
+        getStatRanking(
+            user
         );
 
     const highest =
@@ -125,7 +219,7 @@ function getPornCareerTitle(
     if (
         highest - lowest <= 1
     )
-        return balancedTitles[tier];
+        return titles.balanced[tier];
 
     if (
         highest >= 4 &&
@@ -143,21 +237,23 @@ function getPornCareerTitle(
                     '_'
                 );
 
-        return comboTitles[comboKey][tier];
+        return titles.combo[comboKey][tier];
 
     }
 
-    return singleStatTitles[stats[0].key][tier];
+    return titles.single[stats[0].key][tier];
 
 }
 
 function formatPornCareerName(
     displayName,
-    user
+    user,
+    member = null
 ) {
 
     return `${displayName} - ${getPornCareerTitle(
-        user
+        user,
+        member
     )}`;
 
 }

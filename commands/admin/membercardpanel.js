@@ -13,6 +13,9 @@ const {
     getRandomColor
 } = require('../../data/constants');
 
+const ROLES =
+    require('../../data/roles.json');
+
 const emojis =
     require('../../utils/emojis');
 
@@ -50,6 +53,14 @@ module.exports = {
 `Generate your official **Midnight Pleasure Club** membership card.
 
 The card style is picked from your MPC role.
+
+Card priority:
+- <@&${ROLES.MPC_CREW}> gets the crew card.
+- <@&${ROLES.STILETTO_GANG}> and <@&${ROLES.TAILORED_FEW}> get their gang card.
+- <@&${ROLES.MIDNIGHT_CIRCLE}> gets the Midnight Circle card.
+- No card role means the regular member card.
+
+Pick your roles first if you want at least the Midnight Circle card.
 
 Remember to change your nick to your in-game name first.
 

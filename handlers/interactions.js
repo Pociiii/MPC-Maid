@@ -4,6 +4,9 @@ const handleSpank =
 const handleBlowKiss =
     require('./buttons/blowkiss');
 
+const handleBrofist =
+    require('./buttons/brofist');
+
 const handleHornyHelp =
     require('./buttons/hornyHelp');
 
@@ -142,6 +145,12 @@ async function routeInteraction(
 
             case 'blowkiss':
                 await handleBlowKiss(
+                    interaction
+                );
+                return true;
+
+            case 'brofist':
+                await handleBrofist(
                     interaction
                 );
                 return true;
@@ -441,6 +450,35 @@ async function routeInteraction(
                 );
 
                 return true;
+
+            case 'shop_booster': {
+
+                const [
+                    ,
+                    ownerId
+                ] =
+                    interaction.customId.split(
+                        ':'
+                    );
+
+                const [
+                    stat,
+                    tier
+                ] =
+                    interaction.values[0].split(
+                        ':'
+                    );
+
+                await buyShopBooster(
+                    interaction,
+                    ownerId,
+                    stat,
+                    tier
+                );
+
+                return true;
+
+            }
 
             case 'leaderboard_select':
 

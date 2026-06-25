@@ -118,6 +118,13 @@ async function runMigrations(
 
     await addColumnIfMissing(
         db,
+        'users',
+        'horny_helped',
+        'INTEGER DEFAULT 0'
+    );
+
+    await addColumnIfMissing(
+        db,
         'pregnancy_profiles',
         'pregnancy_count',
         'INTEGER DEFAULT 0'

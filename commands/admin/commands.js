@@ -52,7 +52,7 @@ function commandLine(
     description
 ) {
 
-    return `\`${name}\` • ${channel} • ${cooldown}\n${description}`;
+    return `\`${name}\`\n📍 ${channel} • ⏱️ ${cooldown}\n${description}`;
 
 }
 
@@ -61,10 +61,39 @@ function cooldownLabel(
 ) {
 
     return seconds
-        ? minutes(
+        ? `Cooldown: ${minutes(
             seconds
-        )
-        : 'No CD';
+        )}`
+        : 'No cooldown';
+
+}
+
+function requestCooldownLabel(
+    seconds
+) {
+
+    return `Request cooldown: ${minutes(
+        seconds
+    )}`;
+
+}
+
+function resetLabel(
+    resetAt
+) {
+
+    return `Daily reset: ${resetAt}`;
+
+}
+
+const privateChannelLabel =
+    'Any channel, private reply';
+
+function postsIn(
+    channelId
+) {
+
+    return `Use anywhere, posts in <#${channelId}>`;
 
 }
 
@@ -116,26 +145,28 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
 [
     commandLine(
         '/profile',
-        'Any',
-        'No CD',
-        'View a member profile.'
+        privateChannelLabel,
+        cooldownLabel(),
+        'View a profile or compare stats.'
     ),
     commandLine(
         '/daily',
-        'Any',
-        `Reset ${dailyReset}`,
+        privateChannelLabel,
+        resetLabel(
+            dailyReset
+        ),
         'Check your personal daily quests.'
     ),
     commandLine(
         '/leaderboard',
-        'Any',
-        'No CD',
+        privateChannelLabel,
+        cooldownLabel(),
         'Browse server ladders.'
     ),
     commandLine(
         '/achievements',
-        'Any',
-        'No CD',
+        privateChannelLabel,
+        cooldownLabel(),
         'Check achievement progress.'
     )
 ].join(
@@ -151,15 +182,17 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
 [
     commandLine(
         '/pornscene',
-        `<#${CHANNELS.PORN_CAREER}>`,
-        cooldownLabel(
+        `Use anywhere, scenes in <#${CHANNELS.PORN_CAREER}>, notices in <#${CHANNELS.RUMORS}>`,
+        requestCooldownLabel(
             COOLDOWNS.PORN_SCENE_REQUEST
         ),
         'Make a shared career scene.'
     ),
     commandLine(
         '/customscene',
-        `Any, posts in <#${CHANNELS.CUSTOM_SCENE}>`,
+        postsIn(
+            CHANNELS.CUSTOM_SCENE
+        ),
         cooldownLabel(
             COOLDOWNS.CUSTOM_SCENE
         ),
@@ -167,20 +200,20 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
     ),
     commandLine(
         '/train',
-        'Any',
-        'No CD',
+        privateChannelLabel,
+        cooldownLabel(),
         'Spend XP and coins on stats.'
     ),
     commandLine(
         '/shop',
-        'Any',
-        'No CD',
-        'Buy scene boosters.'
+        privateChannelLabel,
+        cooldownLabel(),
+        'Buy tiered scene boosters.'
     ),
     commandLine(
         '/inventory',
-        'Any',
-        'No CD',
+        privateChannelLabel,
+        cooldownLabel(),
         'Check your boosters.'
     )
 ].join(
@@ -216,7 +249,7 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
         cooldownLabel(
             COOLDOWNS.FLEX
         ),
-        'Post a flex with kiss button.'
+        'Post a flex with Kiss and Brofist buttons.'
     ),
     commandLine(
         '/horny',
@@ -239,7 +272,7 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
 [
     commandLine(
         '/matchme',
-        'Any',
+        'Any channel, public reply',
         cooldownLabel(
             COOLDOWNS.MATCHME
         ),
@@ -247,14 +280,14 @@ Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
     ),
     commandLine(
         '/breed',
-        'Any',
-        'No CD',
+        `Any channel, notices in <#${CHANNELS.RUMORS}>`,
+        cooldownLabel(),
         'Send a pregnancy RP request.'
     ),
     commandLine(
         '/pregnancy',
-        'Any',
-        'No CD',
+        privateChannelLabel,
+        cooldownLabel(),
         'Check your own fertility and pregnancy status.'
     )
 ].join(

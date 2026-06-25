@@ -1,6 +1,3 @@
-const fs =
-    require('fs');
-
 const path =
     require('path');
 
@@ -13,12 +10,12 @@ const {
 } = require('../../utils/version');
 
 const {
-    getRandomColor
-} = require('../../data/constants');
-
-const {
     formatBooster
 } = require('../../utils/boosters');
+
+const {
+    getSmartGifFromFile
+} = require('../../utils/gifs');
 
 const emojis =
     require('../../utils/emojis');
@@ -34,6 +31,161 @@ const sceneRoot =
 
 const sceneNamesByCast =
     require('../../data/scenes/sceneNamesByCast.json');
+
+function hashString(
+    value
+) {
+
+    let hash =
+        2166136261;
+
+    for (
+        let index = 0;
+        index < value.length;
+        index += 1
+    ) {
+
+        hash ^= value.charCodeAt(
+            index
+        );
+
+        hash +=
+            (hash << 1) +
+            (hash << 4) +
+            (hash << 7) +
+            (hash << 8) +
+            (hash << 24);
+
+    }
+
+    return hash >>> 0;
+
+}
+
+function hueToRgb(
+    p,
+    q,
+    t
+) {
+
+    let normalized =
+        t;
+
+    if (
+        normalized < 0
+    )
+        normalized += 1;
+
+    if (
+        normalized > 1
+    )
+        normalized -= 1;
+
+    if (
+        normalized < 1 / 6
+    )
+        return p + ((q - p) * 6 * normalized);
+
+    if (
+        normalized < 1 / 2
+    )
+        return q;
+
+    if (
+        normalized < 2 / 3
+    )
+        return p + ((q - p) * (2 / 3 - normalized) * 6);
+
+    return p;
+
+}
+
+function hslToHex(
+    hue,
+    saturation,
+    lightness
+) {
+
+    const h =
+        hue / 360;
+
+    const s =
+        saturation / 100;
+
+    const l =
+        lightness / 100;
+
+    const q =
+        l < 0.5
+            ? l * (1 + s)
+            : l + s - (l * s);
+
+    const p =
+        (2 * l) - q;
+
+    const rgb = [
+        hueToRgb(
+            p,
+            q,
+            h + (1 / 3)
+        ),
+        hueToRgb(
+            p,
+            q,
+            h
+        ),
+        hueToRgb(
+            p,
+            q,
+            h - (1 / 3)
+        )
+    ].map(
+        (channel) =>
+            Math.round(
+                channel * 255
+            )
+                .toString(
+                    16
+                )
+                .padStart(
+                    2,
+                    '0'
+                )
+    );
+
+    return `#${rgb.join(
+        ''
+    )}`;
+
+}
+
+function getScenePairColor(
+    firstUserId,
+    secondUserId
+) {
+
+    const pairKey =
+        [
+            firstUserId,
+            secondUserId
+        ]
+            .sort()
+            .join(
+                ':'
+            );
+
+    const hue =
+        hashString(
+            pairKey
+        ) % 360;
+
+    return hslToHex(
+        hue,
+        82,
+        58
+    );
+
+}
 
 function getSceneNameType(
     sceneCategory
@@ -104,7 +256,8 @@ function getRandomSceneName(
 
 function getRandomSceneGif(
     sceneCategory,
-    phase
+    phase,
+    userIds = []
 ) {
 
     const filePath =
@@ -114,27 +267,10 @@ function getRandomSceneGif(
             `${phase}.json`
         );
 
-    const gifs =
-        JSON.parse(
-            fs.readFileSync(
-                filePath,
-                'utf8'
-            )
-        );
-
-    const index =
-        Math.floor(
-            Math.random() * gifs.length
-        );
-
-    return {
-        url:
-            gifs[index],
-        index:
-            index + 1,
-        total:
-            gifs.length
-    };
+    return getSmartGifFromFile(
+        filePath,
+        userIds
+    );
 
 }
 
@@ -144,18 +280,23 @@ function buildPartEmbed(
     sceneCategory,
     phase,
     sceneTitle,
-    requesterAuthor
+    requesterAuthor,
+    sceneColor
 ) {
 
     const gif =
         getRandomSceneGif(
             sceneCategory,
-            phase
+            phase,
+            [
+                requesterId,
+                targetId
+            ]
         );
 
     return createEmbed({
         color:
-            getRandomColor(),
+            sceneColor,
         authorName:
             requesterAuthor.name,
         authorIcon:
@@ -184,7 +325,8 @@ function buildFinalEmbed(
     targetId,
     result,
     sceneLinks,
-    requesterAuthor
+    requesterAuthor,
+    sceneColor
 ) {
 
     const rankingPrefix =
@@ -195,7 +337,7 @@ function buildFinalEmbed(
     const embed =
         createEmbed({
             color:
-                getRandomColor(),
+                sceneColor,
             authorName:
                 requesterAuthor.name,
             authorIcon:
@@ -289,12 +431,13 @@ function buildStartEmbed(
     targetUser,
     booster,
     requesterAuthor,
-    formatStatValue
+    formatStatValue,
+    sceneColor
 ) {
 
     return createEmbed({
         color:
-            getRandomColor(),
+            sceneColor,
         authorName:
             requesterAuthor.name,
         authorIcon:
@@ -362,5 +505,6 @@ module.exports = {
     buildFinalEmbed,
     buildPartEmbed,
     buildStartEmbed,
+    getScenePairColor,
     getRandomSceneName
 };

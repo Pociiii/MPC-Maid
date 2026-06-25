@@ -11,10 +11,6 @@ const {
 } = require('../../utils/users');
 
 const {
-    getRankTitle
-} = require('../../utils/ranks');
-
-const {
     formatPornCareerName
 } = require('../../utils/pornCareerTitles');
 
@@ -41,6 +37,7 @@ const {
 
 const {
     buildStartEmbed,
+    getScenePairColor,
     getRandomSceneName
 } = require('./sceneEmbeds');
 
@@ -299,14 +296,18 @@ async function acceptScene(
             sceneCategory
         );
 
+    const sceneColor =
+        getScenePairColor(
+            requesterId,
+            targetId
+        );
+
     const requesterAuthor = {
         name:
             formatPornCareerName(
                 requesterMember.displayName,
                 requesterUser,
-                getRankTitle(
-                    requesterUser.ranking
-                )
+                requesterMember
             ),
         icon:
             mpcLogoAttachment,
@@ -366,7 +367,8 @@ async function acceptScene(
                     targetUser,
                     booster,
                     requesterAuthor,
-                    formatStatValue
+                    formatStatValue,
+                    sceneColor
                 )
             ]
         });
@@ -403,7 +405,8 @@ async function acceptScene(
         sceneCategory,
         result,
         sceneTitle,
-        requesterAuthor
+        requesterAuthor,
+        sceneColor
     );
 
 }

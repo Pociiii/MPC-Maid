@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
     kisses_given INTEGER DEFAULT 0,
 
     horny_helps INTEGER DEFAULT 0,
+    horny_helped INTEGER DEFAULT 0,
 
     partner_id TEXT DEFAULT NULL,
 

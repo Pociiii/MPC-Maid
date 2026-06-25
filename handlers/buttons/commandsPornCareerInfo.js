@@ -68,6 +68,9 @@ module.exports = {
 - Scene XP: Awkward **10**, Solid **20**, Hot **35**, Viral **55**. Critical scenes add **+10 XP**.
 - Use \`/train\` to spend XP and coins on Performance, Stamina, and Fame.
 - Boosters are one-use scene bonuses for the requester only.
+- Booster tiers: T1 **120**, T2 **350**, T3 **800**, T4 **1400** coins.
+- Boosters are best used when they push a combined stat over a **10 / 20 / 30** threshold.
+- Stronger boosters add more stat power and more burnout/flop risk.
 - Use \`/shop\` to buy boosters and \`/inventory\` to check owned boosters.`,
                 footerText:
                     '/commands - Porn Career Info',

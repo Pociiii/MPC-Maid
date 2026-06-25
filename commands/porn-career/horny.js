@@ -89,7 +89,10 @@ module.exports = {
 
         const result =
             getRandomGif(
-                `horny/${category}`
+                `horny/${category}`,
+                [
+                    interaction.user.id
+                ]
             );
 
         const embed =

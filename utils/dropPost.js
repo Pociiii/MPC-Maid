@@ -26,7 +26,8 @@ function buildDropPost(
         options.imageUrl
             ? null
             : getRandomGif(
-                'titty_drop'
+                'titty_drop',
+                options.userIds
             );
 
     const imageUrl =
