@@ -436,16 +436,16 @@ function formatKeySummary(
             );
 
     return [
-        `Progress: **${current}**`,
-        `Unlocked: **${unlocked.length}**`,
+        `- Progress: **${current}**`,
+        `- Unlocked: **${unlocked.length}**`,
         next
-            ? `Next: **${next.label}** (${formatProgress(
+            ? `- Next: **${next.label}** (${formatProgress(
                 current,
                 next.milestone
             )})`
-            : 'All fixed milestones complete.',
+            : '- All fixed milestones complete.',
         latest.length
-            ? `Latest: ${latest.join(
+            ? `- Latest: ${latest.join(
                 ', '
             )}`
             : null
@@ -478,11 +478,11 @@ function formatOverviewField(
         );
 
     return next
-        ? `Unlocked: **${unlocked}**\nNext: **${formatProgress(
+        ? `- Unlocked: **${unlocked}**\n- Next: **${formatProgress(
             current,
             next.milestone
         )}**`
-        : `Unlocked: **${unlocked}**\nAll fixed milestones complete.`;
+        : `- Unlocked: **${unlocked}**\n- All fixed milestones complete.`;
 
 }
 
@@ -562,16 +562,16 @@ async function buildAchievementsReply(
             title:
                 views[activeView].title,
             description:
-`Achievement Points: **${Number(
+`- Achievement Points: **${Number(
     data.points
 ).toLocaleString()}**
-Fixed Unlocked: **${data.unlocked.filter(
+- Fixed Unlocked: **${data.unlocked.filter(
     (achievement) =>
         definitionsById.has(
             achievement.achievement_id
         )
 ).length}/${achievementDefinitions.length}**
-Total Unlocked: **${data.unlocked.length}**`
+- Total Unlocked: **${data.unlocked.length}**`
         });
 
     if (

@@ -42,6 +42,19 @@ const {
     getSmartGifFromList
 } = require('../../utils/gifs');
 
+const {
+    interactionFlavor,
+    pickOne
+} = require('../../utils/flavorText');
+
+const {
+    commandFooter
+} = require('../../utils/version');
+
+const {
+    recordActivityMoment
+} = require('../../features/activity/activityMoments');
+
 const sceneRoot =
     path.join(
         __dirname,
@@ -320,13 +333,18 @@ module.exports = async (
                 'Help Arrived',
 
             description:
-                `<@${interaction.user.id}> helps <@${targetUserId}>.`,
+                `<@${interaction.user.id}> helps <@${targetUserId}>.\n${pickOne(
+                    interactionFlavor.hornyHelp
+                )}`,
 
             image:
                 scene.url,
 
             footerText:
-                `${sceneCategory} / ${scene.phase} GIF #${scene.index}/${scene.total}`,
+                commandFooter(
+                    '/horny',
+                    `Help ${scene.phase} GIF #${scene.index}/${scene.total}`
+                ),
 
             timestamp:
                 true
@@ -362,6 +380,15 @@ module.exports = async (
     });
 
     await Promise.all([
+        addHornyHelp(
+            interaction.user.id
+        ),
+        addHornyHelped(
+            targetUserId
+        )
+    ]);
+
+    await Promise.all([
         trackDailyQuest(
             interaction.client,
             interaction.user.id,
@@ -382,11 +409,14 @@ module.exports = async (
             interaction.user.id,
             'button_interactions'
         ),
-        addHornyHelp(
-            interaction.user.id
-        ),
-        addHornyHelped(
-            targetUserId
+        recordActivityMoment(
+            interaction.client,
+            interaction.user.id,
+            'help',
+            {
+                partnerId:
+                    targetUserId
+            }
         )
     ]);
 

@@ -9,7 +9,10 @@ const {
 const { createEmbed } = require('../../utils/embeds');
 const { getRandomColor } = require('../../data/constants');
 const { getGifCount } = require('../../utils/gifs');
-const { sceneGroups } = require('../../data/sceneSubmitGroups');
+const {
+    castSymbol,
+    sceneGroups
+} = require('../../data/sceneSubmitGroups');
 
 const dataFolder = path.join(__dirname, '..', '..', 'data');
 
@@ -32,13 +35,6 @@ function fileCountLine(label, filePath) {
     return `- ${label} (${getGifCount(filePath)})`;
 }
 
-function shortSceneLabel(category) {
-    return category
-        .split('_')
-        .map((part) => part.toUpperCase())
-        .join(' / ');
-}
-
 function buildInteractionLines() {
     const gifsFolder = path.join(dataFolder, 'gifs');
 
@@ -59,8 +55,8 @@ function buildInteractionLines() {
         .sort();
 
     const flexLines = [
-        fileCountLine('White Male', path.join(gifsFolder, 'flex_w.json')),
-        fileCountLine('Black Male', path.join(gifsFolder, 'flex_b.json'))
+        fileCountLine(castSymbol.wm, path.join(gifsFolder, 'flex_w.json')),
+        fileCountLine(castSymbol.bm, path.join(gifsFolder, 'flex_b.json'))
     ];
 
     const hornyFolder = path.join(gifsFolder, 'horny');
@@ -69,6 +65,7 @@ function buildInteractionLines() {
         .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
         .map((entry) =>
             fileCountLine(
+                castSymbol[entry.name.replace(/\.json$/, '')] ??
                 entry.name.replace(/\.json$/, '').toUpperCase(),
                 path.join(hornyFolder, entry.name)
             )
@@ -87,10 +84,18 @@ function buildInteractionLines() {
 function buildSceneLines(group) {
     const scenesFolder = path.join(dataFolder, group.folder);
 
-    return fs.readdirSync(scenesFolder, { withFileTypes: true })
-        .filter((entry) => entry.isDirectory())
-        .map((entry) => {
-            const categoryFolder = path.join(scenesFolder, entry.name);
+    return Object.entries(group.categories)
+        .map(([category, label]) => {
+            const categoryFolder = path.join(scenesFolder, category);
+
+            if (!fs.existsSync(categoryFolder)) {
+                return {
+                    name: label,
+                    value: group.types
+                        .map((sceneType) => `- ${titleCase(sceneType)} (0)`)
+                        .join('\n')
+                };
+            }
 
             const subcategories = fs.readdirSync(categoryFolder, { withFileTypes: true })
                 .filter((subEntry) => subEntry.isFile() && subEntry.name.endsWith('.json'))
@@ -103,7 +108,7 @@ function buildSceneLines(group) {
                 .sort();
 
             return {
-                name: shortSceneLabel(entry.name),
+                name: label,
                 value: subcategories.join('\n')
             };
         })

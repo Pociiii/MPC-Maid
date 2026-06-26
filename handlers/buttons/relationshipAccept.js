@@ -7,8 +7,8 @@ const {
 } = require('../../utils/emojis');
 
 const {
-    postRumor
-} = require('../../utils/rumors');
+    postMoment
+} = require('../../utils/moments');
 
 const {
     assertNoFamilyRelationshipBetween,
@@ -281,7 +281,7 @@ async function acceptRequest(
 
 }
 
-async function postRelationshipRumor(
+async function postRelationshipMoment(
     interaction,
     result
 ) {
@@ -313,7 +313,7 @@ async function postRelationshipRumor(
             }
         );
 
-    await postRumor(
+    await postMoment(
         interaction.client,
         {
             type:
@@ -327,7 +327,7 @@ async function postRelationshipRumor(
             thumbnail:
                 result.targetMember.user.displayAvatarURL(),
             title:
-                `${mpc_logo} Rumor`,
+                `${mpc_logo} Moment`,
             flavor:
                 `${result.requesterMember} and ${result.targetMember} made it official.`,
             command:
@@ -337,7 +337,7 @@ async function postRelationshipRumor(
     ).catch(
         (error) =>
             console.error(
-                'RELATIONSHIP RUMOR ERROR',
+                'RELATIONSHIP MOMENT ERROR',
                 error
             )
     );
@@ -440,7 +440,7 @@ module.exports = {
                     []
             });
 
-            await postRelationshipRumor(
+            await postRelationshipMoment(
                 interaction,
                 result
             );

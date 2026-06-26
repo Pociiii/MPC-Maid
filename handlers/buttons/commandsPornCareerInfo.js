@@ -43,7 +43,7 @@ module.exports = {
 
 **Scenes**
 - Accepted scenes post in <#${CHANNELS.PORN_CAREER}>.
-- Rumors and final scene links post in <#${CHANNELS.RUMORS}>.
+- Moments and final scene links post in <#${CHANNELS.MOMENTS}>.
 - Parts are posted over time, one every 8-12 minutes.
 - The scene lasts up to about 1 hour.
 - Custom scenes post in <#${CHANNELS.CUSTOM_SCENE}> over 30 minutes.

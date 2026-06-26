@@ -6,6 +6,11 @@ const {
     commandFooter
 } = require('../../utils/version');
 
+const {
+    maidFeedFlavor,
+    pickOne
+} = require('../../utils/flavorText');
+
 function getFieldValue(
     embed,
     fieldName
@@ -135,6 +140,11 @@ function buildApprovalFeedEmbed(
     )
         .setTitle(
             'New GIF Added'
+        )
+        .setDescription(
+            pickOne(
+                maidFeedFlavor.gifApproval
+            )
         )
         .setFields(
             {

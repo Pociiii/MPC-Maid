@@ -23,8 +23,8 @@ const {
 } = require('../../utils/pregnancy');
 
 const {
-    postRumor
-} = require('../../utils/rumors');
+    postMoment
+} = require('../../utils/moments');
 
 const {
     buildBreedRequestEmbed
@@ -496,7 +496,7 @@ async function handleBreedDecision(
         result.added
     ) {
 
-        await postRumor(
+        await postMoment(
             interaction.client,
             {
                 type:

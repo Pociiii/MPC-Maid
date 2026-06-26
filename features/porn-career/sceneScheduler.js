@@ -34,10 +34,15 @@ const {
     applyRewards
 } = require('./sceneRewards');
 
+const {
+    recordActivityMoment
+} = require('../activity/activityMoments');
+
 async function finishScene(
     channel,
     requesterId,
     targetId,
+    sceneCategory,
     result,
     sceneLinks,
     requesterAuthor,
@@ -132,27 +137,28 @@ async function finishScene(
         )
     ]);
 
-    const rumorsChannel =
+    const momentsChannel =
         channel.client.channels.cache.get(
-            CHANNELS.RUMORS
+            CHANNELS.MOMENTS
         ) ??
         await channel.client.channels.fetch(
-            CHANNELS.RUMORS
+            CHANNELS.MOMENTS
         ).catch(
             () => null
         );
 
     if (
-        rumorsChannel
+        momentsChannel
     ) {
 
         try {
 
-            await rumorsChannel.send({
+            await momentsChannel.send({
                 embeds: [
                     buildFinalEmbed(
                         requesterId,
                         targetId,
+                        sceneCategory,
                         result,
                         sceneLinks,
                         requesterAuthor,
@@ -168,7 +174,7 @@ async function finishScene(
                 channel.client,
                 {
                     title:
-                        'Porn Scene Final Rumor Failed',
+                        'Porn Scene Final Moment Failed',
                     error,
                     fields: [
                         {
@@ -192,9 +198,9 @@ async function finishScene(
             channel.client,
             {
                 title:
-                    'Porn Scene Final Rumor Missing',
+                    'Porn Scene Final Moment Missing',
                 description:
-                    `Could not post final result because rumors channel <#${CHANNELS.RUMORS}> was unavailable.`,
+                    `Could not post final result because moments channel <#${CHANNELS.MOMENTS}> was unavailable.`,
                 fields: [
                     {
                         name:
@@ -209,6 +215,47 @@ async function finishScene(
         );
 
     }
+
+    await Promise.all([
+        recordActivityMoment(
+            channel.client,
+            requesterId,
+            'scene',
+            {
+                coins:
+                    result.coins,
+                criticalScene:
+                    result.criticalScene,
+                outcome:
+                    result.outcome,
+                partnerId:
+                    targetId,
+                ranking:
+                    result.rankingChange,
+                xp:
+                    result.xp
+            }
+        ),
+        recordActivityMoment(
+            channel.client,
+            targetId,
+            'scene',
+            {
+                coins:
+                    result.coins,
+                criticalScene:
+                    result.criticalScene,
+                outcome:
+                    result.outcome,
+                partnerId:
+                    requesterId,
+                ranking:
+                    result.rankingChange,
+                xp:
+                    result.xp
+            }
+        )
+    ]);
 
     clearSceneBusy(
         requesterId,
@@ -276,6 +323,7 @@ function scheduleScene(
                                 channel,
                                 requesterId,
                                 targetId,
+                                sceneCategory,
                                 result,
                                 sceneLinks,
                                 requesterAuthor,

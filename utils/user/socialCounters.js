@@ -82,7 +82,31 @@ function addHornyHelped(
 
 }
 
+function addBrofistGiven(
+    userId
+) {
+
+    return incrementColumn(
+        userId,
+        'brofists_given'
+    );
+
+}
+
+function addBrofistTaken(
+    userId
+) {
+
+    return incrementColumn(
+        userId,
+        'brofists_taken'
+    );
+
+}
+
 module.exports = {
+    addBrofistGiven,
+    addBrofistTaken,
     addHornyHelp,
     addHornyHelped,
     addKissGiven,

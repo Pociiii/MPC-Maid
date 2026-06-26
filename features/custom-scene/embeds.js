@@ -39,7 +39,7 @@ function formatParts(
     return parts
         .map(
             (part, index) =>
-                `${index + 1}. ${phaseLabels[part]}`
+                `- ${index + 1}. ${phaseLabels[part]}`
         )
         .join(
             '\n'
@@ -63,8 +63,8 @@ function buildBuilderEmbed(
             title:
                 'Custom Scene Builder',
             description:
-`Cast: **${castLabels[cast] ?? cast}**
-Parts: **${parts.length}/${maxParts}**
+`- Cast: **${castLabels[cast] ?? cast}**
+- Parts: **${parts.length}/${maxParts}**
 
 ${formatParts(parts)}`
         }

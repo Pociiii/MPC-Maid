@@ -15,6 +15,11 @@ const {
     createTargetUserEmbed
 } = require('../../utils/embeds');
 
+const {
+    maidFeedFlavor,
+    pickOne
+} = require('../../utils/flavorText');
+
 const categoryLabels = {
     button_interactions:
         'Interaction Buttons',
@@ -299,7 +304,11 @@ async function announceAchievement(
                         () => undefined
                 },
             title:
-                'Achievement Unlocked'
+                'Achievement Unlocked',
+            description:
+                pickOne(
+                    maidFeedFlavor.achievement
+                )
         });
 
     embed.addFields(
@@ -340,7 +349,7 @@ async function announceAchievement(
 
     await channel.send({
         content:
-            `<@${userId}> unlocked an achievement!`,
+            null,
         embeds: [
             embed
         ]

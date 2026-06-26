@@ -18,22 +18,55 @@ Current bot version: `0.14.0`
 - Admin/staff commands must not be listed in the public `/commands` guide.
 - Admin/staff commands must not be included in the public changelog.
 
+## Design Meaning
+
+The bot should make users feel involved and part of the club, not just served
+by commands. The main goal is to make the server feel alive around them.
+
+Prefer improving existing systems before adding new ones:
+
+- Make user actions visible in the right public spaces when it creates social
+  energy: Moments for story moments, Maid Feed for progress moments.
+- Make posts feel like something happened in the club, not like a plain bot log.
+- Give users recognition through names, avatars, titles, ranks, milestones,
+  scene links, and clean outcome fields.
+- Turn solo actions into social hooks where possible: buttons, helpers,
+  partner choices, shared scenes, public results, and lightweight story hooks.
+- Keep useful data visible so users understand why stats, quests, training,
+  relationships, and choices matter.
+- Use timestamps for waiting, cooldowns, resets, pregnancy checks, and future
+  events so users can plan instead of guessing.
+- Avoid feature clutter. If the same feeling can be created by better embeds,
+  better routing, better flavor text, or better feedback, do that first.
+- Repeated public posts should use small flavor text arrays so the bot feels
+  alive without becoming wordy.
+- Every major loop should answer: "Why should users care, talk about it, or
+  come back tomorrow?"
+
 ## Design Style
 
 - Discord users do not read walls of text, so embeds should stay short.
 - Use fields, emoji, buttons, and dropdown menus for visual feedback.
-- In embeds, keep emoji mostly in titles, author text, field titles, and
-  buttons. Avoid repeating emoji inside field values or dense description
-  lines unless the emoji is the actual content, such as slot reels or cards.
+- For gender/skin category labels in buttons and menus, prefer compact symbols:
+  `⚪♂️`, `⚪♀️`, `⚫♂️`, `⚫♀️`.
+- In embeds, emoji belong in field titles, buttons, menus, and rare top-level
+  titles where they help scanning. Field values and embed descriptions should
+  stay clean text with no decorative emoji. Exceptions are only when the emoji
+  is the actual content, such as slot reels, cards, or cast symbols in menus.
+- When a field value contains a list, every list item should start with `- `.
+  Avoid bare stacked lines for lists.
 - If buttons get cramped, use a dropdown menu.
 - `/commands` should stay as a compact public directory. Exact command details
   belong in private dropdown replies, with separate info buttons for big
   systems.
 - Use user avatars as thumbnails for user-centered embeds.
 - Use consistent command footers with the bot version where applicable.
-- Keep Rumors sexy/story-focused.
+- Keep Moments sexy/story-focused.
 - Keep Maid Feed for progress/system notices.
-- Rumors should be flavor plus useful fields, not flavor-only. Keep key data
+- Maid Feed posts should be embed-first: user/avatar when user-centered, one
+  short flavor line, clean useful fields, and no duplicate plain-text content
+  unless the post intentionally pings the user.
+- Moments should be flavor plus useful fields, not flavor-only. Keep key data
   such as outcome, ranking, XP, Reputation, viewers, parts, and critical state
   where it helps users understand the event.
 - Avoid making the bot feel like a generic economy bot. Systems should feel
@@ -44,7 +77,7 @@ Current bot version: `0.14.0`
 - Commands: `1495316822646325268`
 - General: `1440755913572090038`
 - Updates: `1518153153860730981`
-- Rumors: `1504424543865929888`
+- Moments: `1504424543865929888`
 - Maid Feed: `1518308768335528187`
 - Porn Career: `1493483825869754440`
 - Custom Scene: `1517485570656571462`
@@ -125,9 +158,14 @@ Scene request flow:
 - Partner receives a DM request.
 - Busy status starts only after the partner accepts.
 - Accepted scenes post parts in the Porn Career channel.
-- Start and final notices post in Rumors.
+- Start and final notices post in Moments.
 - Scene parts show live viewer counts to make the posts feel like an ongoing
   recording.
+- Scene embeds keep RP flavor in the description and move structured details
+  into fields. Cast should be one compact field with both users on one line and
+  the role/category labels underneath.
+- Do not repeat `part X/X` in the description. Use a Progress field for the
+  count instead.
 - Final result includes outcome, revenue, XP, ranking, and links to parts.
 
 Scene pacing:
@@ -173,7 +211,7 @@ Colors:
 - Color is based on the two user IDs sorted together.
 - Rank should stay in text/title areas, not control the embed color.
 
-## Reputation And Rumors Planned
+## Reputation And Moments Planned
 
 Reputation is planned as a social participation layer, not a solo command spam
 reward.
@@ -185,7 +223,7 @@ Core rule:
 - Pregnancy remains pure RP flavor.
 - Relationships and pregnancy must never give coins, XP, Reputation, rank,
   achievements, or gameplay advantages.
-- Rumors is the RP story/newspaper layer.
+- Moments is the RP story/newspaper layer.
 - Maid Feed is the progression/system notice layer.
 
 Reputation is separate from:
@@ -251,21 +289,23 @@ Badge display:
 - The current Reputation badge image should use the profile embed's main image
   slot when an `imageUrl` exists.
 - If no `imageUrl` exists, show only the badge name as text.
-- Badge upgrade announcements go to Maid Feed, not Rumors.
+- Badge upgrade announcements go to Maid Feed, not Moments.
 
-Rumors:
+Moments:
 
-- Rumors should feel alive with short RP flavor text, but keep useful fields.
+- Moments should feel alive with short RP flavor text, but keep useful fields.
 - Use title + flavor description + data fields.
-- Add a shared Rumor helper before refactoring current Rumors posts.
+- Add a shared Moment helper before refactoring current Moments posts.
 - The helper should support randomized flavor, stable data fields, optional
   mentions, optional anonymity, embed color, and optional image support.
-- Scene final Rumors should keep fields such as Outcome, Ranking, Revenue, XP,
+- Scene final Moments should keep fields such as Outcome, Ranking, Revenue, XP,
   Reputation, Viewers, Parts, and Critical.
-- Relationship Rumors stay mostly flavor because relationships have no rewards,
+- Porn scene start/final Moments should use the same shape as scene embeds:
+  flavor in the description, Cast in a field, and setup/outcome data in fields.
+- Relationship Moments stay mostly flavor because relationships have no rewards,
   but can keep fields such as Bond and Since.
-- Pregnancy Rumors must remain RP-safe:
-  - pregnancy whispers: no names, stats, or chance values
+- Pregnancy Moments must remain RP-safe:
+  - pregnancy moments: no names, stats, or chance values
   - reveal: Stage and Day
   - birth: Stage, Gender, and Journey
 - Career milestones and big casino stories can include Reputation fields when
@@ -275,8 +315,24 @@ Routing:
 
 - Maid Feed is for progression notices, quest completions, badge upgrades, and
   achievement unlocks.
-- Rumors is for story events: scene starts/finals, relationship beats,
+- Moments is for story events: scene starts/finals, relationship beats,
   pregnancy beats, big casino stories, and career milestones.
+
+Activity Moments:
+
+- Scene, help, spank, kiss, and brofist activity is tracked daily, weekly, and
+  across career totals.
+- Daily/weekly counters live in `user_activity_period_stats`; posted milestones
+  are guarded by `user_activity_moment_posts` so restarts do not duplicate
+  Moments.
+- Scene/help thresholds should reach farther than early use: daily
+  `3/5/10/20/40`, weekly `10/25/50/100/200`.
+- Fast button actions use wider thresholds: daily `5/10/20/40/80`, weekly
+  `25/50/100/200/400`.
+- Lifetime scene/help Moments post every 10 career actions. Faster social
+  buttons post every 25 career actions.
+- A single completed action should post at most one milestone Moment for the
+  acting user. Priority is lifetime, then weekly, then daily.
 
 ## Boosters
 
@@ -518,9 +574,9 @@ Current rules:
 - Gender validation uses the existing Male/Female roles and requires exactly
   one clear gender role where the command needs gender.
 - `/relationship view` is private and uses the user's avatar as thumbnail.
-- Accepted relationship requests post a compact embed in Rumors so public RP
+- Accepted relationship requests post a compact embed in Moments so public RP
   links feel visible without adding rewards or progression pressure.
-- Broken relationship links also post a compact Rumors embed, but only after
+- Broken relationship links also post a compact Moments embed, but only after
   the removal actually succeeds.
 
 ## Pregnancy System
@@ -757,7 +813,7 @@ Next update currently includes:
 - Design and implement Daily Would You Rather for General chat.
 - Continue embed/UI consistency cleanup.
 - Decide when to implement `/privatescene`.
-- Decide whether private scene end stats should go to Maid Feed or Rumors.
+- Decide whether private scene end stats should go to Maid Feed or Moments.
 - Keep pregnancy meaningful without turning it into a child-list bot.
 - Low-priority future idea: X/Twitter watcher using `X_BEARER_TOKEN`, text/link
   only, no scraping or bypassing adult-media walls.

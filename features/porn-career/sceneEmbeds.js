@@ -6,8 +6,17 @@ const {
 } = require('../../utils/embeds');
 
 const {
-    pickFlavor
-} = require('../../utils/rumors');
+    getSceneCategoryLabel
+} = require('../../data/sceneSubmitGroups');
+
+const {
+    pickMomentFlavor
+} = require('../../utils/moments');
+
+const {
+    pickOne,
+    sceneFinalReview
+} = require('../../utils/flavorText');
 
 const {
     commandFooter
@@ -298,6 +307,54 @@ function getPhaseFlavor(
 
 }
 
+function sceneGroupForCategory(
+    sceneCategory
+) {
+
+    return getSceneNameType(
+        sceneCategory
+    ) === 'ff'
+        ? 'ff'
+        : 'mf';
+
+}
+
+function formatSceneCategory(
+    sceneCategory
+) {
+
+    return getSceneCategoryLabel(
+        sceneGroupForCategory(
+            sceneCategory
+        ),
+        sceneCategory
+    );
+
+}
+
+function formatCast(
+    requesterId,
+    targetId,
+    sceneCategory = null
+) {
+
+    return [
+        `<@${requesterId}> + <@${targetId}>`,
+        sceneCategory
+            ? formatSceneCategory(
+                sceneCategory
+            )
+            : null
+    ]
+        .filter(
+            Boolean
+        )
+        .join(
+            '\n'
+        );
+
+}
+
 function buildPartEmbed(
     requesterId,
     targetId,
@@ -348,9 +405,9 @@ function buildPartEmbed(
         title:
             sceneTitle,
         description:
-            `<@${requesterId}> and <@${targetId}> are recording part ${partIndex + 1}/${totalParts}.\n${getPhaseFlavor(
+            getPhaseFlavor(
                 phase
-            )}`,
+            ),
         image:
             gif.url,
         footerText:
@@ -363,6 +420,18 @@ function buildPartEmbed(
     });
 
     embed.addFields(
+        {
+            name:
+                'Cast',
+            value:
+                formatCast(
+                    requesterId,
+                    targetId,
+                    sceneCategory
+                ),
+            inline:
+                false
+        },
         {
             name:
                 'Viewers',
@@ -378,6 +447,14 @@ function buildPartEmbed(
                 phaseLabel,
             inline:
                 true
+        },
+        {
+            name:
+                'Progress',
+            value:
+                `**${partIndex + 1}/${totalParts}**`,
+            inline:
+                true
         }
     );
 
@@ -388,6 +465,7 @@ function buildPartEmbed(
 function buildFinalEmbed(
     requesterId,
     targetId,
+    sceneCategory,
     result,
     sceneLinks,
     requesterAuthor,
@@ -404,6 +482,12 @@ function buildFinalEmbed(
             ? 'Midnight Headline'
             : 'Porn Scene Finished';
 
+    const review =
+        pickOne(
+            sceneFinalReview[result.outcome],
+            'The studio has another release to talk about.'
+        );
+
     const embed =
         createEmbed({
             color:
@@ -417,9 +501,9 @@ function buildFinalEmbed(
             title:
                 finalTitle,
             description:
-                `${pickFlavor(
+                `${pickMomentFlavor(
                     'scene_final'
-                )}\n\n<@${requesterId}> and <@${targetId}> finished their scene.`,
+                )}\n\n${review}`,
             footerText:
                 commandFooter(
                     '/pornscene'
@@ -429,6 +513,18 @@ function buildFinalEmbed(
         });
 
     embed.addFields(
+        {
+            name:
+                'Cast',
+            value:
+                formatCast(
+                    requesterId,
+                    targetId,
+                    sceneCategory
+                ),
+            inline:
+                false
+        },
         {
             name:
                 '🎬 Outcome',
@@ -501,6 +597,7 @@ function buildFinalEmbed(
 function buildStartEmbed(
     requesterId,
     targetId,
+    sceneCategory,
     sceneTitle,
     result,
     requesterUser,
@@ -523,16 +620,9 @@ function buildStartEmbed(
         title:
             sceneTitle,
         description:
-`${pickFlavor(
-    'scene_start'
-)}
-
-<@${requesterId}> and <@${targetId}> are starting a scene.
-
-Parts: **${result.totalParts}**
-Booster: **${formatBooster(
-    booster
-)}**`,
+            pickMomentFlavor(
+                'scene_start'
+            ),
         footerText:
             commandFooter(
                 '/pornscene'
@@ -543,13 +633,36 @@ Booster: **${formatBooster(
         .addFields(
             {
                 name:
+                    'Cast',
+                value:
+                    formatCast(
+                        requesterId,
+                        targetId,
+                        sceneCategory
+                    ),
+                inline:
+                    false
+            },
+            {
+                name:
+                    'Scene Setup',
+                value:
+                    `- Parts: **${result.totalParts}**
+- Booster: **${formatBooster(
+                        booster
+                    )}**`,
+                inline:
+                    false
+            },
+            {
+                name:
                     'Performance',
                 value:
-                    `${formatStatValue(
+                    `- Total: ${formatStatValue(
                         requesterUser.performance,
                         result.requesterPerformanceBoost
                     )} + ${targetUser.performance} = ${result.combinedPerformance}
-Score: **+${result.performanceScoreBonus}**`,
+- Score: **+${result.performanceScoreBonus}**`,
                 inline:
                     true
             },
@@ -557,11 +670,11 @@ Score: **+${result.performanceScoreBonus}**`,
                 name:
                     'Stamina',
                 value:
-                    `${formatStatValue(
+                    `- Total: ${formatStatValue(
                         requesterUser.stamina,
                         result.requesterStaminaBoost
                     )} + ${targetUser.stamina} = ${result.combinedStamina}
-Score: **+${result.staminaScoreBonus}**`,
+- Score: **+${result.staminaScoreBonus}**`,
                 inline:
                     true
             },
@@ -569,11 +682,11 @@ Score: **+${result.staminaScoreBonus}**`,
                 name:
                     'Fame',
                 value:
-                    `${formatStatValue(
+                    `- Total: ${formatStatValue(
                         requesterUser.fame,
                         result.requesterFameBoost
                     )} + ${targetUser.fame} = ${result.combinedFame}
-Score: **+${result.fameScoreBonus}**`,
+- Score: **+${result.fameScoreBonus}**`,
                 inline:
                     true
             }

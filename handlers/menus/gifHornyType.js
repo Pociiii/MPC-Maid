@@ -3,9 +3,11 @@ const path =
 
 const {
     approveGif
-} = require(
-    '../../utils/gifApproval'
-);
+} = require('../../utils/gifApproval');
+
+const {
+    castSymbol
+} = require('../../data/sceneSubmitGroups');
 
 module.exports = {
 
@@ -18,25 +20,19 @@ module.exports = {
 
         const filePath =
             path.join(
-
                 __dirname,
-
                 '..',
                 '..',
-
                 'data',
                 'gifs',
-
                 'horny',
-
                 `${hornyType}.json`
-
             );
 
         return approveGif(
             interaction,
             filePath,
-            `Horny → ${hornyType.toUpperCase()}`
+            `Horny -> ${castSymbol[hornyType] ?? hornyType}`
         );
 
     }

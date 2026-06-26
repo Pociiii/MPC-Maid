@@ -43,6 +43,35 @@ const {
     mpcLogoAttachment
 } = require('../../utils/mpcLogo');
 
+const {
+    getSceneCategoryLabel
+} = require('../../data/sceneSubmitGroups');
+
+function getSceneCategoryName(
+    sceneCategory
+) {
+
+    const group =
+        sceneCategory
+            .split(
+                '_'
+            )
+            .every(
+                (part) =>
+                    part.endsWith(
+                        'f'
+                    )
+            )
+            ? 'ff'
+            : 'mf';
+
+    return getSceneCategoryLabel(
+        group,
+        sceneCategory
+    );
+
+}
+
 function getSceneCategory(
     firstCategory,
     secondCategory
@@ -294,7 +323,7 @@ module.exports = {
                 title:
                     'Choose Scene Booster',
                 description:
-                    `Pick one booster to spend now for the request with ${target}, or choose no booster.`,
+                    'Pick one booster to spend now, or send the request clean.',
                 thumbnail:
                     interaction.user.displayAvatarURL(),
                 footerText:
@@ -302,6 +331,27 @@ module.exports = {
                 timestamp:
                     true
             });
+
+        embed.addFields(
+            {
+                name:
+                    'Cast',
+                value:
+                    `<@${interaction.user.id}> + ${target}\n${getSceneCategoryName(
+                        sceneCategory
+                    )}`,
+                inline:
+                    false
+            },
+            {
+                name:
+                    'Booster',
+                value:
+                    'Choose from the menu below.',
+                inline:
+                    false
+            }
+        );
 
         await interaction.editReply({
             embeds: [

@@ -6,7 +6,7 @@
 - Convert pornscene, GIF submit, and showcase embeds to shared footer/style helpers.
 - Keep adding versioned footers when touching embeds.
 - Audit buttons as commands are touched so controls keep clear visual feedback.
-- Keep rumor announcements aligned with the shared user embed style.
+- Keep moment announcements aligned with the shared user embed style.
 - Use TODO.md for bigger parked systems before adding new SQL.
 - Add non-SQL pregnancy config/helpers before command and database work.
 - Test `/shop` booster prices against live coin income.

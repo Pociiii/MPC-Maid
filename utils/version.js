@@ -28,11 +28,10 @@ function commandFooter(
 
     return [
         command,
-        detail,
-        `v${getVersion()}`
+        detail
     ]
         .filter(Boolean)
-        .join(' • ');
+        .join(' - ');
 
 }
 

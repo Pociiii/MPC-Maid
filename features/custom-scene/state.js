@@ -10,9 +10,9 @@ const castLabels = {
     wm_bf: getSceneCategoryLabel('mf', 'wm_bf'),
     bm_wf: getSceneCategoryLabel('mf', 'bm_wf'),
     bm_bf: getSceneCategoryLabel('mf', 'bm_bf'),
-    wf_wf: getSceneCategoryLabel('mf', 'wf_wf'),
-    wf_bf: getSceneCategoryLabel('mf', 'wf_bf'),
-    bf_bf: getSceneCategoryLabel('mf', 'bf_bf')
+    wf_wf: getSceneCategoryLabel('ff', 'wf_wf'),
+    wf_bf: getSceneCategoryLabel('ff', 'wf_bf'),
+    bf_bf: getSceneCategoryLabel('ff', 'bf_bf')
 };
 
 const phaseLabels = {

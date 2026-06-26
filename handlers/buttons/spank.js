@@ -35,6 +35,19 @@ const {
     ButtonBuilder
 } = require('discord.js');
 
+const {
+    interactionFlavor,
+    pickOne
+} = require('../../utils/flavorText');
+
+const {
+    commandFooter
+} = require('../../utils/version');
+
+const {
+    recordActivityMoment
+} = require('../../features/activity/activityMoments');
+
 module.exports = async (
     interaction
 ) => {
@@ -107,11 +120,16 @@ module.exports = async (
             title:
                 'Spank!',
             description:
-                `<@${interaction.user.id}> spanks <@${targetUserId}>.`,
+                `<@${interaction.user.id}> spanks <@${targetUserId}>.\n${pickOne(
+                    interactionFlavor.spank
+                )}`,
             image:
                 spankGif.url,
             footerText:
-                `GIF #${spankGif.index}/${spankGif.total}`,
+                commandFooter(
+                    '/wiggle',
+                    `Spank GIF #${spankGif.index}/${spankGif.total}`
+                ),
             timestamp:
                 true
         });
@@ -173,6 +191,15 @@ module.exports = async (
             interaction.client,
             interaction.user.id,
             'button_interactions'
+        ),
+        recordActivityMoment(
+            interaction.client,
+            interaction.user.id,
+            'spank',
+            {
+                partnerId:
+                    targetUserId
+            }
         )
     ]);
 

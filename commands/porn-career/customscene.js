@@ -38,15 +38,15 @@ const castOptions = [
         value: 'bm_bf'
     },
     {
-        label: getSceneCategoryLabel('mf', 'wf_wf'),
+        label: getSceneCategoryLabel('ff', 'wf_wf'),
         value: 'wf_wf'
     },
     {
-        label: getSceneCategoryLabel('mf', 'wf_bf'),
+        label: getSceneCategoryLabel('ff', 'wf_bf'),
         value: 'wf_bf'
     },
     {
-        label: getSceneCategoryLabel('mf', 'bf_bf'),
+        label: getSceneCategoryLabel('ff', 'bf_bf'),
         value: 'bf_bf'
     }
 ];

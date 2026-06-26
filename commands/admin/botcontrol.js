@@ -112,6 +112,16 @@ function startReplacementProcess() {
 
 }
 
+function usesExternalProcessManager() {
+
+    return Boolean(
+        process.env.MPC_PROCESS_MANAGER ||
+        process.env.INVOCATION_ID ||
+        process.env.pm_id
+    );
+
+}
+
 function scheduleExit(
     client,
     shouldRestart
@@ -121,7 +131,8 @@ function scheduleExit(
         () => {
 
             if (
-                shouldRestart
+                shouldRestart &&
+                !usesExternalProcessManager()
             )
                 startReplacementProcess();
 

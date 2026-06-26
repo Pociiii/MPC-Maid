@@ -131,8 +131,8 @@ function buildProfileEmbed(
             name:
                 `${emojis.coin} Wallet`,
             value:
-`Coins: **${user.coins}**
-XP: **${user.xp}**`,
+`- Coins: **${user.coins}**
+- XP: **${user.xp}**`,
             inline:
                 true
         },
@@ -140,9 +140,9 @@ XP: **${user.xp}**`,
             name:
                 `${emojis.performance} Stats`,
             value:
-`Performance: **${user.performance}**
-Stamina: **${user.stamina}**
-Fame: **${user.fame}**`,
+`- Performance: **${user.performance}**
+- Stamina: **${user.stamina}**
+- Fame: **${user.fame}**`,
             inline:
                 true
         },
@@ -150,9 +150,9 @@ Fame: **${user.fame}**`,
             name:
                 `${emojis.ranking} Career`,
             value:
-`Ranking: **${rankTitle} (${user.ranking})**
-Scenes: **${user.scenes_completed}**
-Achievements: **${achievementPoints}**`,
+`- Ranking: **${rankTitle} (${user.ranking})**
+- Scenes: **${user.scenes_completed}**
+- Achievements: **${achievementPoints}**`,
             inline:
                 true
         },
@@ -160,12 +160,14 @@ Achievements: **${achievementPoints}**`,
             name:
                 `${emojis.spank_given} Interactions`,
             value:
-`Spanks Given: **${user.spanks_given}**
-Spanks Taken: **${user.spanks_taken}**
-Kisses Given: **${user.kisses_given}**
-Kisses Taken: **${user.kisses_taken}**
-Helps Given: **${user.horny_helps ?? 0}**
-Helps Received: **${user.horny_helped ?? 0}**`,
+`- Spanks Given: **${user.spanks_given}**
+- Spanks Taken: **${user.spanks_taken}**
+- Kisses Given: **${user.kisses_given}**
+- Kisses Taken: **${user.kisses_taken}**
+- Helps Given: **${user.horny_helps ?? 0}**
+- Helps Received: **${user.horny_helped ?? 0}**
+- Brofists Given: **${user.brofists_given ?? 0}**
+- Brofists Taken: **${user.brofists_taken ?? 0}**`,
             inline:
                 false
         }
@@ -264,9 +266,9 @@ function buildCompareEmbed(
             name:
                 firstMember.displayName,
             value:
-`Performance: **${firstUser.performance}**
-Stamina: **${firstUser.stamina}**
-Fame: **${firstUser.fame}**`,
+`- Performance: **${firstUser.performance}**
+- Stamina: **${firstUser.stamina}**
+- Fame: **${firstUser.fame}**`,
             inline:
                 true
         },
@@ -274,9 +276,9 @@ Fame: **${firstUser.fame}**`,
             name:
                 secondMember.displayName,
             value:
-`Performance: **${secondUser.performance}**
-Stamina: **${secondUser.stamina}**
-Fame: **${secondUser.fame}**`,
+`- Performance: **${secondUser.performance}**
+- Stamina: **${secondUser.stamina}**
+- Fame: **${secondUser.fame}**`,
             inline:
                 true
         },
@@ -284,17 +286,17 @@ Fame: **${secondUser.fame}**`,
             name:
                 'Difference',
             value:
-`${formatStatCompareLine(
+`- ${formatStatCompareLine(
     'Performance',
     firstUser.performance,
     secondUser.performance
 )}
-${formatStatCompareLine(
+- ${formatStatCompareLine(
     'Stamina',
     firstUser.stamina,
     secondUser.stamina
 )}
-${formatStatCompareLine(
+- ${formatStatCompareLine(
     'Fame',
     firstUser.fame,
     secondUser.fame
@@ -306,10 +308,10 @@ ${formatStatCompareLine(
             name:
                 `${emojis.performance} Combined Scene Stats`,
             value:
-`Performance: **${combinedPerformance}** | Crit: **${critChance}%**
-Stamina: **${combinedStamina}** | Parts: **${totalParts}/8** | XP bonus: **+${staminaXpBonus}**
-Fame: **${combinedFame}** | Fame bonus: **+${fameBonus}**
-Scene score bonus: **+${scoreBonus}**`,
+`- Performance: **${combinedPerformance}** | Crit: **${critChance}%**
+- Stamina: **${combinedStamina}** | Parts: **${totalParts}/8** | XP bonus: **+${staminaXpBonus}**
+- Fame: **${combinedFame}** | Fame bonus: **+${fameBonus}**
+- Scene score bonus: **+${scoreBonus}**`,
             inline:
                 false
         }

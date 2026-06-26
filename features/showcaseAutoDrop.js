@@ -15,7 +15,13 @@ const {
 const ONE_HOUR =
     60 * 60 * 1000;
 
+const STARTUP_DROP_DELAY =
+    15 * 1000;
+
 let autoDropTimer =
+    null;
+
+let startupDropTimer =
     null;
 
 async function sendAutoDrop(
@@ -102,13 +108,28 @@ function startShowcaseAutoDrop(
             ONE_HOUR
         );
 
+    startupDropTimer =
+        setTimeout(
+            () => {
+
+                startupDropTimer =
+                    null;
+
+                void sendAutoDrop(
+                    client
+                );
+
+            },
+            STARTUP_DROP_DELAY
+        );
+
     void logBotEvent(
         client,
         {
             title:
                 'Auto Drop Started',
             description:
-                `Automatic drops will post in <#${CHANNELS.TITTY_DROP}> every hour.`
+                `Automatic drops will post in <#${CHANNELS.TITTY_DROP}> after startup and then every hour.`
         }
     );
 

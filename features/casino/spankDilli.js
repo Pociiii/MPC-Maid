@@ -22,6 +22,11 @@ const {
     removeCoins
 } = require('../../utils/users');
 
+const {
+    maidFeedFlavor,
+    pickOne
+} = require('../../utils/flavorText');
+
 const emojis =
     require('../../utils/emojis');
 
@@ -215,10 +220,10 @@ function buildPanelEmbed(
             name:
                 `${emojis.spank_given} Stats`,
             value:
-`Total spanks: **${Number(state.total_spanks).toLocaleString()}**
-Queue: **${queue.length}**
-Current prize: **${prize.toLocaleString()} coins**
-Win chance: **${getWinChance(prize)}%**`,
+`- Total spanks: **${Number(state.total_spanks).toLocaleString()}**
+- Queue: **${queue.length}**
+- Current prize: **${prize.toLocaleString()} coins**
+- Win chance: **${getWinChance(prize)}%**`,
             inline:
                 false
         },
@@ -226,8 +231,8 @@ Win chance: **${getWinChance(prize)}%**`,
             name:
                 'Last',
             value:
-`Last spank from: ${lastSpanker}
-Last winner: ${lastWinner}`,
+`- Last spank from: ${lastSpanker}
+- Last winner: ${lastWinner}`,
             inline:
                 false
         },
@@ -235,10 +240,10 @@ Last winner: ${lastWinner}`,
             name:
                 `${emojis.coin} Rules`,
             value:
-`Cost: **${COST} coins**
-Adds **${PRIZE_ADD} coins** to the prize
-Plays a spank GIF for **10 sec**
-Each spank rolls for the current prize`,
+`- Cost: **${COST} coins**
+- Adds **${PRIZE_ADD} coins** to the prize
+- Plays a spank GIF for **10 sec**
+- Each spank rolls for the current prize`,
             inline:
                 false
         }
@@ -336,7 +341,9 @@ async function announceWinner(
             title:
                 `${emojis.spank_given} Spank Dilli Winner`,
             description:
-                `<@${interaction.user.id}> won the Spank Dilli prize!`,
+                `<@${interaction.user.id}> won the Spank Dilli prize!\n${pickOne(
+                    maidFeedFlavor.spankDilli
+                )}`,
             footerText:
                 '/spankdilli',
             timestamp:
@@ -368,7 +375,7 @@ async function announceWinner(
 
     await channel.send({
         content:
-            `<@${interaction.user.id}> won Spank Dilli!`,
+            null,
         embeds: [
             embed
         ]

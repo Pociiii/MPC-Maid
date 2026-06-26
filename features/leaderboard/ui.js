@@ -29,7 +29,7 @@ function formatRows(
     return users
         .map(
             (user, index) =>
-                `${index + 1}. <@${user.id}> - **${Number(user[stat]).toLocaleString()}${suffix}**`
+                `- ${index + 1}. <@${user.id}> - **${Number(user[stat]).toLocaleString()}${suffix}**`
         )
         .join(
             '\n'

@@ -22,15 +22,15 @@ const {
 const dayIntervalMs =
     24 * 60 * 60 * 1000;
 
-async function getRumorsChannel(
+async function getMomentsChannel(
     client
 ) {
 
     return client.channels.cache.get(
-        CHANNELS.RUMORS
+        CHANNELS.MOMENTS
     ) ||
         await client.channels.fetch(
-            CHANNELS.RUMORS
+            CHANNELS.MOMENTS
         ).catch(
             () => null
         );
@@ -43,7 +43,7 @@ async function announcePregnancyResults(
 ) {
 
     const channel =
-        await getRumorsChannel(
+        await getMomentsChannel(
             client
         );
 
@@ -79,7 +79,7 @@ async function announceMilestones(
 ) {
 
     const channel =
-        await getRumorsChannel(
+        await getMomentsChannel(
             client
         );
 

@@ -12,7 +12,8 @@ const {
 
 const {
     getSceneCategoryName,
-    getSceneGroup
+    getSceneGroup,
+    castSymbol
 } = require('../../data/sceneSubmitGroups');
 
 function dataPath(
@@ -116,13 +117,13 @@ function buildFlexTypeUpdate(
             .addOptions(
                 {
                     label:
-                        `White Male (${flexWCount})`,
+                        `${castSymbol.wm} (${flexWCount})`,
                     value:
                         'flex_w'
                 },
                 {
                     label:
-                        `Black Male (${flexBCount})`,
+                        `${castSymbol.bm} (${flexBCount})`,
                     value:
                         'flex_b'
                 }
@@ -161,25 +162,25 @@ function buildHornyTypeUpdate(
             .addOptions(
                 {
                     label:
-                        `WM (${getGifCount(path.join(hornyFolder, 'wm.json'))})`,
+                        `${castSymbol.wm} (${getGifCount(path.join(hornyFolder, 'wm.json'))})`,
                     value:
                         'wm'
                 },
                 {
                     label:
-                        `BM (${getGifCount(path.join(hornyFolder, 'bm.json'))})`,
+                        `${castSymbol.bm} (${getGifCount(path.join(hornyFolder, 'bm.json'))})`,
                     value:
                         'bm'
                 },
                 {
                     label:
-                        `WF (${getGifCount(path.join(hornyFolder, 'wf.json'))})`,
+                        `${castSymbol.wf} (${getGifCount(path.join(hornyFolder, 'wf.json'))})`,
                     value:
                         'wf'
                 },
                 {
                     label:
-                        `BF (${getGifCount(path.join(hornyFolder, 'bf.json'))})`,
+                        `${castSymbol.bf} (${getGifCount(path.join(hornyFolder, 'bf.json'))})`,
                     value:
                         'bf'
                 }

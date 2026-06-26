@@ -206,6 +206,49 @@ async function runMigrations(
         )`
     );
 
+    await run(
+        db,
+        `CREATE TABLE IF NOT EXISTS user_activity_period_stats (
+            user_id TEXT NOT NULL,
+            activity_type TEXT NOT NULL,
+            period_type TEXT NOT NULL,
+            period_key TEXT NOT NULL,
+            count INTEGER DEFAULT 0,
+            xp INTEGER DEFAULT 0,
+            coins INTEGER DEFAULT 0,
+            ranking INTEGER DEFAULT 0,
+            hot_count INTEGER DEFAULT 0,
+            viral_count INTEGER DEFAULT 0,
+            critical_count INTEGER DEFAULT 0,
+            last_at TEXT,
+            PRIMARY KEY (
+                user_id,
+                activity_type,
+                period_type,
+                period_key
+            )
+        )`
+    );
+
+    await run(
+        db,
+        `CREATE TABLE IF NOT EXISTS user_activity_moment_posts (
+            user_id TEXT NOT NULL,
+            activity_type TEXT NOT NULL,
+            period_type TEXT NOT NULL,
+            period_key TEXT NOT NULL,
+            milestone INTEGER NOT NULL,
+            posted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (
+                user_id,
+                activity_type,
+                period_type,
+                period_key,
+                milestone
+            )
+        )`
+    );
+
     await addColumnIfMissing(
         db,
         'user_achievements',
@@ -224,6 +267,20 @@ async function runMigrations(
         db,
         'users',
         'horny_helped',
+        'INTEGER DEFAULT 0'
+    );
+
+    await addColumnIfMissing(
+        db,
+        'users',
+        'brofists_given',
+        'INTEGER DEFAULT 0'
+    );
+
+    await addColumnIfMissing(
+        db,
+        'users',
+        'brofists_taken',
         'INTEGER DEFAULT 0'
     );
 

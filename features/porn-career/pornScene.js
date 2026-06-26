@@ -342,25 +342,26 @@ async function acceptScene(
             []
     });
 
-    const rumorsChannel =
+    const momentsChannel =
         interaction.client.channels.cache.get(
-            CHANNELS.RUMORS
+            CHANNELS.MOMENTS
         ) ??
         await interaction.client.channels.fetch(
-            CHANNELS.RUMORS
+            CHANNELS.MOMENTS
         ).catch(
             () => null
         );
 
     if (
-        rumorsChannel
+        momentsChannel
     ) {
 
-        await rumorsChannel.send({
+        await momentsChannel.send({
             embeds: [
                 buildStartEmbed(
                     requesterId,
                     targetId,
+                    sceneCategory,
                     sceneTitle,
                     result,
                     requesterUser,
@@ -380,9 +381,9 @@ async function acceptScene(
             interaction.client,
             {
                 title:
-                    'Porn Scene Start Rumor Missing',
+                    'Porn Scene Start Moment Missing',
                 description:
-                    `Could not post scene start rumor because <#${CHANNELS.RUMORS}> was unavailable.`,
+                    `Could not post scene start moment because <#${CHANNELS.MOMENTS}> was unavailable.`,
                 fields: [
                     {
                         name:

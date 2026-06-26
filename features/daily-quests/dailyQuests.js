@@ -23,6 +23,11 @@ const {
     formatBooster
 } = require('../../utils/boosters');
 
+const {
+    dailyFlavor,
+    pickOne
+} = require('../../utils/flavorText');
+
 const emojis =
     require('../../utils/emojis');
 
@@ -1003,7 +1008,7 @@ async function buildDailyEmbed(
             title:
                 'Daily Quests',
             description:
-                `Next reset: <t:${nextReset}:F> (<t:${nextReset}:R>)\nCompleted: **${completed}/${QUESTS_PER_DAY}**\nWeekly streak: **${formatWeeklyStreakProgress(
+                `- Next reset: <t:${nextReset}:F> (<t:${nextReset}:R>)\n- Completed: **${completed}/${QUESTS_PER_DAY}**\n- Weekly streak: **${formatWeeklyStreakProgress(
                     weeklyStreak,
                     questDate
                 )}**`
@@ -1018,10 +1023,10 @@ async function buildDailyEmbed(
                         ? `Done - ${quest.label}`
                         : quest.label,
                 value:
-                    `Progress: **${Math.min(
+                    `- Progress: **${Math.min(
                         quest.progress,
                         quest.target
-                    )}/${quest.target}**\nReward: ${formatReward(
+                    )}/${quest.target}**\n- Reward: ${formatReward(
                         quest.reward_coins,
                         quest.reward_xp
                     )}`,
@@ -1104,7 +1109,11 @@ async function sendQuestCompleteFeed(
                 '/daily',
             target,
             title:
-                'Daily Quest Complete'
+                'Daily Quest Complete',
+            description:
+                pickOne(
+                    dailyFlavor.quest
+                )
         });
 
     embed.addFields(
@@ -1202,7 +1211,13 @@ async function sendDailySetCompleteFeed(
                 '/daily',
             target,
             title:
-                'Daily Set Complete'
+                'Daily Set Complete',
+            description:
+                pickOne(
+                    weeklyResult?.awarded
+                        ? dailyFlavor.weekly
+                        : dailyFlavor.set
+                )
         });
 
     embed.addFields(
@@ -1249,9 +1264,9 @@ async function sendDailySetCompleteFeed(
             name:
                 '\uD83C\uDF81 Weekly Reward',
             value:
-                `Random booster: **${formatBooster(
+                `- Random booster: **${formatBooster(
                     weeklyResult.booster
-                )}**\nUse it with \`/pornscene\`.`,
+                )}**\n- Use it with \`/pornscene\`.`,
             inline:
                 false
         });

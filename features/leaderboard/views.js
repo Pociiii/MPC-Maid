@@ -56,7 +56,7 @@ function formatRankingRows(
         visibleUsers
         .map(
             (user, index) =>
-                `${index + 1}. <@${user.id}> - **${Number(
+                `- ${index + 1}. <@${user.id}> - **${Number(
                     user.ranking
                 ).toLocaleString()}**`
         );
@@ -69,7 +69,7 @@ function formatRankingRows(
         hiddenCount > 0
     )
         rows.push(
-            `+ **${hiddenCount} more**`
+            `- + **${hiddenCount} more**`
         );
 
     return rows.join(

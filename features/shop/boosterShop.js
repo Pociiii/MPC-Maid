@@ -53,7 +53,7 @@ function formatShopItem(
     const tier =
         boosterTiers[tierKey];
 
-    return `**${boosterStatLabels[stat]}**: +${tier.value}, **${tier.cost} coins**, burnout **+${tier.burnoutRisk}%**`;
+    return `- **${boosterStatLabels[stat]}**: +${tier.value}, **${tier.cost} coins**, burnout **+${tier.burnoutRisk}%**`;
 
 }
 

@@ -1,10 +1,23 @@
 {
   "name": "mpc-maid",
   "version": "1.0.0",
-  "description": "",
+  "description": "Custom Discord bot for MPC Maid",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "check": "node --check index.js"
+  },
+  "engines": {
+    "node": ">=22 <25"
+  },
+  "dependencies": {
+    "canvas": "^3.2.3",
+    "discord.js": "^14.26.4",
+    "dotenv": "^17.4.2",
+    "sqlite3": "^6.0.1"
+  },
+  "overrides": {
+    "undici": "6.27.0"
   },
   "keywords": [],
   "author": "Gus",

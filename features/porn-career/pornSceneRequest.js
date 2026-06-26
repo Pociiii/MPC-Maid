@@ -36,12 +36,41 @@ const {
 } = require('../../utils/mpcLogo');
 
 const {
+    getSceneCategoryLabel
+} = require('../../data/sceneSubmitGroups');
+
+const {
     logWarning
 } = require('../../utils/inboxLogger');
 
 const {
-    postRumor
-} = require('../../utils/rumors');
+    postMoment
+} = require('../../utils/moments');
+
+function getSceneCategoryName(
+    sceneCategory
+) {
+
+    const group =
+        sceneCategory
+            .split(
+                '_'
+            )
+            .every(
+                (part) =>
+                    part.endsWith(
+                        'f'
+                    )
+            )
+            ? 'ff'
+            : 'mf';
+
+    return getSceneCategoryLabel(
+        group,
+        sceneCategory
+    );
+
+}
 
 async function sendPornSceneRequest(
     interaction,
@@ -109,20 +138,45 @@ async function sendPornSceneRequest(
             title:
                 'Porn Scene Request',
             description:
-`<@${interaction.user.id}> wants to make a porn scene with you.
-
-Booster: **${formatBooster(
-    booster
-)}**
-
-Tip: use \`/train\` to raise stats and help your scene partner get better outcomes.`,
+                'A scene request is waiting for your answer.',
             thumbnail:
                 interaction.user.displayAvatarURL(),
             footerText:
                 '/pornscene',
             timestamp:
-                true
+            true
         });
+
+    embed.addFields(
+        {
+            name:
+                'Cast',
+            value:
+                `<@${interaction.user.id}> + <@${targetId}>\n${getSceneCategoryName(
+                    sceneCategory
+                )}`,
+            inline:
+                false
+        },
+        {
+            name:
+                'Booster',
+            value:
+                formatBooster(
+                    booster
+                ),
+            inline:
+                true
+        },
+        {
+            name:
+                'Tip',
+            value:
+                'Use `/train` to raise stats and help your scene partner get better outcomes.',
+            inline:
+                false
+        }
+    );
 
     if (
         booster
@@ -225,8 +279,8 @@ Tip: use \`/train\` to raise stats and help your scene partner get better outcom
 
     try {
 
-        const rumorMessage =
-            await postRumor(
+        const momentMessage =
+            await postMoment(
                 interaction.client,
                 {
                     type:
@@ -240,14 +294,22 @@ Tip: use \`/train\` to raise stats and help your scene partner get better outcom
                     thumbnail:
                         interaction.user.displayAvatarURL(),
                     title:
-                        'Porn Scene Rumor',
+                        'Porn Scene Moment',
                     flavor:
-`A new production is being whispered about backstage.
-
-<@${interaction.user.id}> is talking scene with <@${targetId}>.`,
+                        'A new production just became a club moment backstage.',
                     command:
                         '/pornscene',
                     fields: [
+                        {
+                            name:
+                                'Cast',
+                            value:
+                                `<@${interaction.user.id}> + <@${targetId}>\n${getSceneCategoryName(
+                                    sceneCategory
+                                )}`,
+                            inline:
+                                false
+                        },
                         {
                             name:
                                 'Booster',
@@ -263,16 +325,16 @@ Tip: use \`/train\` to raise stats and help your scene partner get better outcom
             );
 
         if (
-            !rumorMessage
+            !momentMessage
         ) {
 
             await logWarning(
                 interaction.client,
                 {
                     title:
-                        'Porn Scene Request Rumor Missing',
+                        'Porn Scene Request Moment Missing',
                     description:
-                        `Could not post the request rumor because <#${CHANNELS.RUMORS}> was unavailable.`,
+                        `Could not post the request moment because <#${CHANNELS.MOMENTS}> was unavailable.`,
                     fields: [
                         {
                             name:
@@ -300,7 +362,7 @@ Tip: use \`/train\` to raise stats and help your scene partner get better outcom
     catch (error) {
 
         console.error(
-            'PORN SCENE RUMOR ERROR'
+            'PORN SCENE MOMENT ERROR'
         );
         console.error(
             error
@@ -310,9 +372,9 @@ Tip: use \`/train\` to raise stats and help your scene partner get better outcom
             interaction.client,
             {
                 title:
-                    'Porn Scene Request Rumor Failed',
+                    'Porn Scene Request Moment Failed',
                 description:
-                    `Could not post the request rumor in <#${CHANNELS.RUMORS}>.`,
+                    `Could not post the request moment in <#${CHANNELS.MOMENTS}>.`,
                 fields: [
                     {
                         name:

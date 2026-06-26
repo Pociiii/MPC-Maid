@@ -134,29 +134,29 @@ Current direction:
 
 Future:
 - Continue converting older command groups.
-- Keep rumor announcements visually consistent.
+- Keep moment announcements visually consistent.
 - Keep command text short because Discord users do not read walls of text.
 
 ### Channel Routing
 
 Current:
-- Rumors stays focused on sexy/story RP moments.
+- Moments stays focused on sexy/story RP moments.
 - Maid Feed carries progress/system notices: `1518308768335528187`.
 
 Current routing plan:
-- Keep Rumors for sexy/story RP moments: pornscene final results, pregnancy
+- Keep Moments for sexy/story RP moments: pornscene final results, pregnancy
   confirmed, gender reveal, birth, and bigger RP hooks.
 - Move game/system spam to Maid Feed: daily quest completions, achievement
   unlocks, GIF approvals, and similar progress notices.
 - Keep porn career channel for scene parts only.
 - Keep custom scene channel for custom scene parts only.
 
-### Reputation And Rumors
+### Reputation And Moments
 
 Goal:
 - Add a social Reputation layer that rewards visible participation and club
   complicity, without turning showcase commands into solo spam farms.
-- Make Rumors feel more alive with RP flavor while keeping useful data fields
+- Make Moments feel more alive with RP flavor while keeping useful data fields
   so users understand what happened and why stats matter.
 
 Reputation rules:
@@ -275,11 +275,11 @@ Initial badge tiers:
 
 Badge upgrade announcements:
 - When a user crosses into a new Reputation badge tier, post a short public
-  notice in Maid Feed, not Rumors.
+  notice in Maid Feed, not Moments.
 - Example fields:
   - New Badge
   - Reputation
-- Badge upgrades are progression/system moments, not story rumors.
+- Badge upgrades are progression/system moments, not story moments.
 
 Profile update:
 - Add a Reputation section to `/profile`.
@@ -290,16 +290,16 @@ Profile update:
   - Reputation: Reputation number and badge name/image
   - Social: interactions, helps, relationships later if needed
 
-Rumors design:
-- Rumors should not become pure flavor text only.
-- Rumors should have:
-  - Title: rumor/event title.
+Moments design:
+- Moments should not become pure flavor text only.
+- Moments should have:
+  - Title: moment/event title.
   - Description: short RP flavor text.
   - Fields: actual useful data.
-- Useful data stays in Rumors for story events; the goal is flavor plus clarity,
+- Useful data stays in Moments for story events; the goal is flavor plus clarity,
   not hiding numbers.
 
-Scene final rumor examples:
+Scene final moment examples:
 - Normal:
   - Title: `Studio Buzz`
   - Description: a short release/chemistry flavor line.
@@ -317,21 +317,21 @@ Scene final rumor examples:
   - Description: special performance flavor.
   - Same fields as normal final, with stronger numbers.
 
-Relationship rumors:
+Relationship moments:
 - Mostly flavor-only because relationships have no rewards.
 - Keep useful fields:
   - Bond
   - Since, when available.
 - Example:
-  - Title: `Rumor`
+  - Title: `Moment`
   - Description: love/club RP flavor.
   - Fields:
     - Bond: Marriage
     - Since: June 25, 2026
 
-Pregnancy rumors:
+Pregnancy moments:
 - Keep only RP-safe useful data.
-- Pregnancy whisper:
+- Pregnancy confirmed:
   - no names
   - no stats
   - no chance values
@@ -343,21 +343,21 @@ Pregnancy rumors:
   - Gender: Boy/Girl
   - Journey: 30 days
 
-Other rumor field rules:
-- Career milestone rumors:
+Other moment field rules:
+- Career milestone moments:
   - Milestone
   - Total Scenes
   - Reputation Gained, if applicable
-- Casino jackpot rumors:
+- Casino jackpot moments:
   - Game
   - Win
   - Reputation, if applicable
 
-Rumor helper structure:
+Moment helper structure:
 - Add a shared helper that supports flavor text and stable data fields.
 - Suggested call shape:
-  - `postRumor(client, { type, title, flavor, fields, color, image, footer })`
-  - or `postRumor(client, type, data)`
+  - `postMoment(client, { type, title, flavor, fields, color, image, footer })`
+  - or `postMoment(client, type, data)`
 - Internally support:
   - randomized flavor description
   - stable data fields
@@ -365,32 +365,32 @@ Rumor helper structure:
   - optional anonymity
   - optional embed color
   - optional image/badge support later
-- Supported rumor types:
+- Supported moment types:
   - `scene_start`
   - `scene_final`
   - `relationship_created`
   - `relationship_broken`
-  - `pregnancy_whisper`
+  - `pregnancy_confirmed`
   - `pregnancy_reveal`
   - `birth`
   - `achievement_major`
   - `casino_jackpot`
   - `career_milestone`
 - The helper should:
-  - post to Rumors channel
+  - post to Moments channel
   - keep messages short
   - use randomized templates
   - avoid feeling like a raw log
   - allow anonymous wording when appropriate
   - avoid exposing private details
   - avoid explicit text beyond the server's existing playful/sexy tone
-  - keep the RP industry gossip vibe
+  - keep the RP industry story vibe
 
-Rumor template pool:
+Moment template pool:
 - Scene start:
-  - `Rumor`: A new production just started behind closed doors. Word around the
+  - `Moment`: A new production just started behind closed doors. Word around the
     studio is that the chemistry already has people watching.
-  - `Studio Whisper`: Cameras are rolling again. Someone at Midnight Pleasure
+  - `Studio Moment`: Cameras are rolling again. Someone at Midnight Pleasure
     may be filming something worth talking about.
   - `On Set`: Another scene has entered production. The first viewers are
     already gathering.
@@ -411,8 +411,8 @@ Rumor template pool:
   - Romance: one romance reached its final scene.
   - Besties/family: something shifted quietly inside the circle.
 - Pregnancy:
-  - Whisper: strange whispers spread, someone may be expecting.
-  - Reveal: the whispers were true, congratulations are spreading.
+  - Confirmed: a private moment changed, someone may be expecting.
+  - Reveal: the moment became real, congratulations are spreading.
   - Birth: a new little troublemaker joined the family.
 - Achievement major:
   - A performer crossed a serious career milestone.
@@ -427,7 +427,7 @@ Routing separation:
   - quest completions
   - badge upgrades
   - achievement unlocks
-- Rumors:
+- Moments:
   - story events with flavor plus useful fields
   - scene starts/finals
   - relationship story beats
@@ -435,11 +435,20 @@ Routing separation:
   - big casino stories
   - career milestones
 
+Activity Moments:
+- Track scene, help, spank, kiss, and brofist activity by daily and weekly
+  period, with posted milestone guards.
+- Scene/help thresholds: daily `3/5/10/20/40`, weekly `10/25/50/100/200`.
+- Faster button thresholds: daily `5/10/20/40/80`, weekly
+  `25/50/100/200/400`.
+- Lifetime scene/help Moments every 10 actions; faster social button Moments
+  every 25 actions.
+
 Implementation notes:
 - Build Reputation awarding as a small helper called after existing validation
   succeeds in each interaction handler.
 - Add daily cap checks before adding Reputation.
-- Add Rumor helper before refactoring all existing Rumor posts, so migration can
+- Add Moment helper before refactoring all existing Moment posts, so migration can
   happen one system at a time.
 - Start with button Reputation and profile badge display before adding larger
   Reputation leaderboards or achievements.
@@ -447,12 +456,12 @@ Implementation notes:
   - call `addReputation` based on outcome
   - add critical bonus when applicable
   - post badge upgrade to Maid Feed if a threshold is crossed
-  - post scene final with the Rumor helper
+  - post scene final with the Moment helper
 - Integrate daily quest Reputation:
   - completed quest: +3 Reputation
   - all 3 daily quests: +10 Reputation
   - weekly streak: +25 Reputation
-  - use Maid Feed, not Rumors
+  - use Maid Feed, not Moments
 - Integrate achievements:
   - normal/major/endless Reputation values above
   - use Maid Feed
@@ -463,7 +472,7 @@ Implementation notes:
 - Public changelog, when this goes live:
   - Reputation is live as a long-term prestige value
   - Profiles show Reputation and cosmetic badge tier
-  - Major stories appear in Rumors with more RP flavor
+  - Major stories appear in Moments with more RP flavor
   - Relationships and pregnancy create better story moments but remain RP-only
 
 ## Medium Priority
@@ -485,7 +494,7 @@ Privacy rules:
 - Do not add staff roles, host roles, or broad server roles to the thread.
 - Admins may still have server-level access because Discord permissions allow
   that, but the bot should not deliberately add staff role overwrites.
-- Rumors/Maid Feed posts must never include participant names, thread links,
+- Moments/Maid Feed posts must never include participant names, thread links,
   GIFs, or message content.
 
 Role rules:
@@ -519,9 +528,9 @@ Cost and duration:
 - No refund if the room is closed early.
 - Max duration: 1 hour.
 - On expiry or manual close, post a closing message inside the thread, post
-  anonymous stats to Maid Feed or Rumors, then lock/archive the thread.
+  anonymous stats to Maid Feed or Moments, then lock/archive the thread.
 - Preferred destination for anonymous private-scene stats: Maid Feed unless the
-  final vibe feels more like a Rumors hook.
+  final vibe feels more like a Moments hook.
 
 Command shape:
 - `/privatescene create partner:@user partner2:@user?`
@@ -728,10 +737,10 @@ Current commands:
   and public announcement preference.
 
 Announcement ideas:
-- Breed accepted: small rumor post.
-- Pregnancy confirmed: special rumor post.
-- Day 7 gender reveal: special rumor post.
-- Day 30 birth: special rumor post.
+- Breed accepted: small moment post.
+- Pregnancy confirmed: special moment post.
+- Day 7 gender reveal: special moment post.
+- Day 30 birth: special moment post.
 
 Meaningful-history rule:
 - Store enough to remember mother, father, gender, conception date, and birth

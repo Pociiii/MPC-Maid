@@ -12,8 +12,8 @@ const {
 } = require('../../utils/version');
 
 const {
-    pickFlavor
-} = require('../../utils/rumors');
+    pickMomentFlavor
+} = require('../../utils/moments');
 
 const {
     CARRIER_FERTILITY_STATES,
@@ -244,9 +244,9 @@ function buildPregnancyStatusEmbed(
                 name:
                     '\uD83E\uDD30 Current Pregnancy',
                 value:
-`Day **${day}/${PREGNANCY.DURATION_DAYS}**
-Father: <@${active.father_id}>
-Gender: ${
+`- Day: **${day}/${PREGNANCY.DURATION_DAYS}**
+- Father: <@${active.father_id}>
+- Gender: ${
     active.gender_revealed
         ? `**${active.baby_gender}**`
         : `Hidden until Day ${PREGNANCY.GENDER_REVEAL_DAY} (${formatTimestamp(
@@ -255,7 +255,7 @@ Gender: ${
             )
         )})`
 }
-Due: ${formatTimestamp(
+- Due: ${formatTimestamp(
     getDueTimestamp(
         active
     )
@@ -295,11 +295,11 @@ function buildPregnancyConfirmedEmbed(
         color:
             getRandomColor(),
         description:
-            pickFlavor(
+            pickMomentFlavor(
                 'pregnancy_confirmed'
             ),
         title:
-            'Pregnancy Whisper',
+            'Pregnancy Moment',
         footerText:
             commandFooter(
                 '/pregnancy'
@@ -345,7 +345,7 @@ function buildGenderRevealEmbed(
         color:
             getRandomColor(),
         description:
-            pickFlavor(
+            pickMomentFlavor(
                 'pregnancy_reveal'
             ),
         title:
@@ -399,7 +399,7 @@ function buildBirthEmbed(
         color:
             getRandomColor(),
         description:
-            pickFlavor(
+            pickMomentFlavor(
                 'birth'
             ),
         title:

@@ -1,6 +1,11 @@
 const cooldowns =
     new Map();
 
+const {
+    cooldownFlavor,
+    pickOne
+} = require('./flavorText');
+
 function checkCooldown(
     userId,
     command,
@@ -76,7 +81,9 @@ async function handleCooldown(
 
     await interaction.reply({
         content:
-            `\u23F3 /${command} is still on cooldown. Try again ${formatCooldownTimestamp(
+            `\u23F3 /${command} is still on cooldown. ${pickOne(
+                cooldownFlavor
+            )} Try again ${formatCooldownTimestamp(
                 remaining
             )}. (${minutes}m ${secs}s)`,
         flags:

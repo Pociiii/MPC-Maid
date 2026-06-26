@@ -37,6 +37,19 @@ const {
     incrementAchievementProgress
 } = require('../../features/achievements/achievements');
 
+const {
+    interactionFlavor,
+    pickOne
+} = require('../../utils/flavorText');
+
+const {
+    commandFooter
+} = require('../../utils/version');
+
+const {
+    recordActivityMoment
+} = require('../../features/activity/activityMoments');
+
 module.exports = async (
     interaction
 ) => {
@@ -87,13 +100,18 @@ module.exports = async (
                 'Blow Kiss',
 
             description:
-                `<@${interaction.user.id}> blows a kiss to <@${targetUserId}>.`,
+                `<@${interaction.user.id}> blows a kiss to <@${targetUserId}>.\n${pickOne(
+                    interactionFlavor.kiss
+                )}`,
 
             image:
                 kissGif.url,
 
             footerText:
-                `GIF #${kissGif.index}/${kissGif.total}`,
+                commandFooter(
+                    '/flex',
+                    `Kiss GIF #${kissGif.index}/${kissGif.total}`
+                ),
 
             timestamp:
                 true
@@ -159,6 +177,15 @@ module.exports = async (
             interaction.client,
             interaction.user.id,
             'button_interactions'
+        ),
+        recordActivityMoment(
+            interaction.client,
+            interaction.user.id,
+            'kiss',
+            {
+                partnerId:
+                    targetUserId
+            }
         )
     ]);
 

@@ -22,8 +22,8 @@ const {
 } = require('../../utils/emojis');
 
 const {
-    postRumor
-} = require('../../utils/rumors');
+    postMoment
+} = require('../../utils/moments');
 
 const {
     assertNoFamilyRelationshipBetween,
@@ -62,18 +62,30 @@ function userMention(
 
 }
 
-function formatList(
+function bulletLine(
+    label,
+    value
+) {
+
+    return `- ${label}: ${value}`;
+
+}
+
+function bulletLineList(
+    label,
     values
 ) {
 
-    if (
-        values.length === 0
-    )
-        return 'None';
-
-    return values.join(
-        '\n'
-    );
+    return [
+        bulletLine(
+            label,
+            values.length > 0
+                ? values.join(
+                    ', '
+                )
+                : 'None'
+        )
+    ];
 
 }
 
@@ -152,9 +164,9 @@ async function formatRomanticLine(
 
     const since =
         relationship.started_at
-            ? ` - since ${formatDate(
+            ? ` (since ${formatDate(
                 relationship.started_at
-            )}`
+            )})`
             : '';
 
     return `${userMention(
@@ -309,7 +321,7 @@ async function buildRelationshipEmbed(
                 interaction,
                 row,
                 target.id,
-                'Dating'
+                'Girlfriend / Boyfriend'
             );
 
         datingGroups[label] ??=
@@ -327,22 +339,16 @@ async function buildRelationshipEmbed(
     const datingLines =
         Object.entries(
             datingGroups
-        ).map(
+        ).flatMap(
             ([
                 label,
                 values
             ]) =>
-                `${label}: ${formatList(
+                bulletLineList(
+                    label,
                     values
-                )}`
+                )
         );
-
-    const datingText =
-        datingLines.length > 0
-            ? formatList(
-                datingLines
-            )
-            : 'Dating: None';
 
     const marriageLabel =
         marriage
@@ -362,6 +368,57 @@ async function buildRelationshipEmbed(
             )
             : 'None';
 
+    const familyLines = [
+        bulletLine(
+            'Mother',
+            mother
+                ? userMention(
+                    mother.user_a_id
+                )
+                : 'None'
+        ),
+        bulletLine(
+            'Father',
+            father
+                ? userMention(
+                    father.user_a_id
+                )
+                : 'None'
+        ),
+        ...bulletLineList(
+            'Child',
+            children
+        ),
+        ...bulletLineList(
+            'Sibling',
+            siblings
+        )
+    ];
+
+    const romanticLines = [
+        bulletLine(
+            marriageLabel,
+            marriageLine
+        ),
+        ...(
+            datingLines.length > 0
+                ? datingLines
+                : [
+                    bulletLine(
+                        'Girlfriend / Boyfriend',
+                        'None'
+                    )
+                ]
+        )
+    ];
+
+    const socialLines = [
+        ...bulletLineList(
+            'Bestie',
+            besties
+        )
+    ];
+
     const targetName =
         displayNameFor(
             target
@@ -379,6 +436,8 @@ async function buildRelationshipEmbed(
                 target.displayAvatarURL(),
             title:
                 `${targetName}'s Relationships`,
+            description:
+                'Current RP links. Relationship links are flavor only and do not affect porn career progress.',
             footerText:
                 commandFooter(
                     '/relationship',
@@ -393,27 +452,19 @@ async function buildRelationshipEmbed(
             name:
                 'Family',
             value:
-`Mother: ${mother ? userMention(
-    mother.user_a_id
-) : 'None'}
-Father: ${father ? userMention(
-    father.user_a_id
-) : 'None'}
-Children: ${formatList(
-    children
-)}
-Siblings: ${formatList(
-    siblings
-)}`,
+                familyLines.join(
+                    '\n'
+                ),
             inline:
                 false
         },
         {
             name:
-                'Romantic',
+                'Romance',
             value:
-`${marriageLabel}: ${marriageLine}
-${datingText}`,
+                romanticLines.join(
+                    '\n'
+                ),
             inline:
                 false
         },
@@ -421,9 +472,9 @@ ${datingText}`,
             name:
                 'Social',
             value:
-                `Besties: ${formatList(
-                    besties
-                )}`,
+                socialLines.join(
+                    '\n'
+                ),
             inline:
                 false
         }
@@ -851,7 +902,7 @@ async function removeOrReply(
     if (
         removed
     )
-        await postRelationshipBrokenRumor(
+        await postRelationshipBrokenMoment(
             interaction,
             firstId,
             secondId,
@@ -860,7 +911,7 @@ async function removeOrReply(
 
 }
 
-async function postRelationshipBrokenRumor(
+async function postRelationshipBrokenMoment(
     interaction,
     firstId,
     secondId,
@@ -891,7 +942,7 @@ async function postRelationshipBrokenRumor(
         secondMember?.user.displayAvatarURL() ??
         interaction.user.displayAvatarURL();
 
-    await postRumor(
+    await postMoment(
         interaction.client,
         {
             type:
@@ -902,7 +953,7 @@ async function postRelationshipBrokenRumor(
             authorIcon,
             thumbnail,
             title:
-                `${mpc_logo} Rumor`,
+                `${mpc_logo} Moment`,
             flavor:
                 `${userMention(
                     firstId
@@ -925,7 +976,7 @@ async function postRelationshipBrokenRumor(
     ).catch(
         (error) =>
             console.error(
-                'RELATIONSHIP RUMOR ERROR',
+                'RELATIONSHIP MOMENT ERROR',
                 error
             )
     );

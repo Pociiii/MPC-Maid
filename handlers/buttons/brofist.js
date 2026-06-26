@@ -19,6 +19,11 @@ const {
 } = require('../../data/constants');
 
 const {
+    addBrofistGiven,
+    addBrofistTaken
+} = require('../../utils/users');
+
+const {
     getGifList,
     getRandomGif
 } = require('../../utils/gifs');
@@ -30,6 +35,19 @@ const {
 const {
     incrementAchievementProgress
 } = require('../../features/achievements/achievements');
+
+const {
+    interactionFlavor,
+    pickOne
+} = require('../../utils/flavorText');
+
+const {
+    commandFooter
+} = require('../../utils/version');
+
+const {
+    recordActivityMoment
+} = require('../../features/activity/activityMoments');
 
 function buildDisabledRow(
     interaction
@@ -136,11 +154,16 @@ module.exports = async (
             title:
                 'Brofist',
             description:
-                `<@${interaction.user.id}> brofists <@${targetUserId}>.`,
+                `<@${interaction.user.id}> brofists <@${targetUserId}>.\n${pickOne(
+                    interactionFlavor.brofist
+                )}`,
             image:
                 brofistGif.url,
             footerText:
-                `GIF #${brofistGif.index}/${brofistGif.total}`,
+                commandFooter(
+                    '/flex',
+                    `Brofist GIF #${brofistGif.index}/${brofistGif.total}`
+                ),
             timestamp:
                 true
         });
@@ -162,6 +185,15 @@ module.exports = async (
     });
 
     await Promise.all([
+        addBrofistGiven(
+            interaction.user.id
+        ),
+        addBrofistTaken(
+            targetUserId
+        )
+    ]);
+
+    await Promise.all([
         trackDailyQuest(
             interaction.client,
             interaction.user.id,
@@ -176,6 +208,15 @@ module.exports = async (
             interaction.client,
             interaction.user.id,
             'button_interactions'
+        ),
+        recordActivityMoment(
+            interaction.client,
+            interaction.user.id,
+            'brofist',
+            {
+                partnerId:
+                    targetUserId
+            }
         )
     ]);
 

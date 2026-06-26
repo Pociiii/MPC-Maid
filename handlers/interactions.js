@@ -22,6 +22,9 @@ const commandsPornCareerInfo =
 const commandsPregnancyInfo =
     require('./buttons/commandsPregnancyInfo');
 
+const commandsRelationshipInfo =
+    require('./buttons/commandsRelationshipInfo');
+
 const {
     buildLeaderboard
 } = require('../features/leaderboard/leaderboard');
@@ -246,6 +249,12 @@ async function routeInteraction(
 
             case 'commands_pregnancy_info':
                 await commandsPregnancyInfo.execute(
+                    interaction
+                );
+                return true;
+
+            case 'commands_relationship_info':
+                await commandsRelationshipInfo.execute(
                     interaction
                 );
                 return true;

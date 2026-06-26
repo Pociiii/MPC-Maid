@@ -3,9 +3,11 @@ const path =
 
 const {
     approveGif
-} = require(
-    '../../utils/gifApproval'
-);
+} = require('../../utils/gifApproval');
+
+const {
+    castSymbol
+} = require('../../data/sceneSubmitGroups');
 
 module.exports = {
 
@@ -18,25 +20,20 @@ module.exports = {
 
         const filePath =
             path.join(
-
                 __dirname,
-
                 '..',
                 '..',
-
                 'data',
                 'gifs',
-
                 `${flexType}.json`
-
             );
 
         return approveGif(
             interaction,
             filePath,
             flexType === 'flex_w'
-                ? 'Flex → White Male'
-                : 'Flex → Black Male'
+                ? `Flex -> ${castSymbol.wm}`
+                : `Flex -> ${castSymbol.bm}`
         );
 
     }

@@ -13,6 +13,10 @@ const {
     getSmartGifFromFile
 } = require('../../utils/gifs');
 
+const {
+    getRandomSceneName
+} = require('../porn-career/sceneEmbeds');
+
 const sceneDurationMs =
     30 * 60 * 1000;
 
@@ -50,7 +54,8 @@ function buildSceneEmbed(
     cast,
     part,
     index,
-    totalParts
+    totalParts,
+    sceneTitle
 ) {
 
     const gif =
@@ -70,7 +75,7 @@ function buildSceneEmbed(
         footerDetail:
             `Part ${index + 1}/${totalParts} - GIF #${gif.index}/${gif.total}`,
         title:
-            `Part ${index + 1}`,
+            sceneTitle,
         description:
             `Custom scene from <@${interaction.user.id}>`,
         image:
@@ -107,6 +112,11 @@ function scheduleCustomScene(
             parts.length
         );
 
+    const sceneTitle =
+        getRandomSceneName(
+            cast
+        );
+
     parts.forEach(
         (part, index) => {
 
@@ -122,7 +132,8 @@ function scheduleCustomScene(
                                     cast,
                                     part,
                                     index,
-                                    parts.length
+                                    parts.length,
+                                    sceneTitle
                                 )
                             ]
                         });

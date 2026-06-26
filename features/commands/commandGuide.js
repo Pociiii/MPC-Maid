@@ -76,10 +76,10 @@ function commandSummary(
     return names
         .map(
             (name) =>
-                `\`${name}\``
+                `- \`${name}\``
         )
         .join(
-            ' '
+            '\n'
         );
 
 }
@@ -94,9 +94,9 @@ function commandDetail(
     return {
         name,
         value:
-`Channel: ${channel}
-Cooldown: ${cooldown}
-${description}`
+`- Channel: ${channel}
+- Cooldown: ${cooldown}
+- ${description}`
     };
 
 }
@@ -121,7 +121,6 @@ function buildSections() {
                 commandSummary([
                     '/profile',
                     '/daily',
-                    '/relationship',
                     '/leaderboard',
                     '/achievements'
                 ]),
@@ -137,12 +136,6 @@ function buildSections() {
                     privateReply,
                     `Resets ${dailyReset}`,
                     'Personal daily quests, streaks, and lucky boosters.'
-                ),
-                commandDetail(
-                    '/relationship',
-                    privateReply,
-                    'None',
-                    'Manage RP relationships and view links.'
                 ),
                 commandDetail(
                     '/leaderboard',
@@ -174,7 +167,7 @@ function buildSections() {
             commands: [
                 commandDetail(
                     '/pornscene',
-                    `Any channel. Scenes in <#${CHANNELS.PORN_CAREER}>. Notices in <#${CHANNELS.RUMORS}>.`,
+                    `Any channel. Scenes in <#${CHANNELS.PORN_CAREER}>. Notices in <#${CHANNELS.MOMENTS}>.`,
                     requestCooldownLabel(
                         COOLDOWNS.PORN_SCENE_REQUEST
                     ),
@@ -263,6 +256,7 @@ function buildSections() {
             summary:
                 commandSummary([
                     '/matchme',
+                    '/relationship',
                     '/breed',
                     '/pregnancy'
                 ]),
@@ -276,8 +270,14 @@ function buildSections() {
                     'Get matched with another member.'
                 ),
                 commandDetail(
+                    '/relationship',
+                    privateReply,
+                    'None',
+                    'Manage RP relationships and view links.'
+                ),
+                commandDetail(
                     '/breed',
-                    `Any channel. Notices in <#${CHANNELS.RUMORS}>.`,
+                    `Any channel. Notices in <#${CHANNELS.MOMENTS}>.`,
                     'None',
                     'Send a pregnancy RP request.'
                 ),
@@ -333,7 +333,7 @@ function buildSections() {
             emoji:
                 '📣',
             summary:
-                `<#${CHANNELS.MAID_FEED}> <#${CHANNELS.RUMORS}> <#${CHANNELS.UPDATES}>`,
+                `<#${CHANNELS.MAID_FEED}> <#${CHANNELS.MOMENTS}> <#${CHANNELS.UPDATES}>`,
             commands: [
                 commandDetail(
                     'Maid Feed',
@@ -342,10 +342,10 @@ function buildSections() {
                     'Daily quests, achievements, GIF approvals, and bot feed posts.'
                 ),
                 commandDetail(
-                    'Rumors',
-                    `<#${CHANNELS.RUMORS}>`,
+                    'Moments',
+                    `<#${CHANNELS.MOMENTS}>`,
                     'Automatic',
-                    'Porn scene notices, relationship links, pregnancy RP notices, and club chatter.'
+                    'Porn scene notices, relationship links, pregnancy RP notices, and club moments.'
                 ),
                 commandDetail(
                     'Updates',
@@ -378,8 +378,8 @@ function buildCommandOverviewEmbed(
 `Pick a section from the menu for channels, cooldowns, and short notes.
 
 Role-based GIFs use:
-Gender: <@&${ROLES.MALE}> / <@&${ROLES.FEMALE}>
-Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
+- Gender: <@&${ROLES.MALE}> / <@&${ROLES.FEMALE}>
+- Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
             }
         );
 
@@ -502,6 +502,19 @@ function buildCommandGuideComponents() {
                     )
                     .setEmoji(
                         '🤰'
+                    )
+                    .setStyle(
+                        ButtonStyle.Secondary
+                    ),
+                new ButtonBuilder()
+                    .setCustomId(
+                        'commands_relationship_info'
+                    )
+                    .setLabel(
+                        'Relationship Info'
+                    )
+                    .setEmoji(
+                        '💬'
                     )
                     .setStyle(
                         ButtonStyle.Secondary
