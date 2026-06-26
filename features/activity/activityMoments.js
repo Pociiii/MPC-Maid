@@ -2,7 +2,8 @@ const db =
     require('../../database/database');
 
 const {
-    getDailyQuestDate
+    getDailyQuestDate,
+    getWeeklyQuestDate
 } = require('../daily-quests/dailyQuests');
 
 const {
@@ -237,41 +238,6 @@ function dbRun(
                         );
                 }
             )
-    );
-
-}
-
-function formatDateKey(
-    date
-) {
-
-    return date
-        .toISOString()
-        .slice(
-            0,
-            10
-        );
-
-}
-
-function getWeekKey(
-    dailyKey
-) {
-
-    const date =
-        new Date(
-            `${dailyKey}T00:00:00.000Z`
-        );
-
-    const day =
-        date.getUTCDay() || 7;
-
-    date.setUTCDate(
-        date.getUTCDate() - day + 1
-    );
-
-    return formatDateKey(
-        date
     );
 
 }
@@ -873,8 +839,8 @@ async function recordActivityMoment(
             );
 
         const weeklyKey =
-            getWeekKey(
-                dailyKey
+            getWeeklyQuestDate(
+                now
             );
 
         const [

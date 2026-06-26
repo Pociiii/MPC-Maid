@@ -90,7 +90,7 @@ Question writing guidelines:
 - Encourage conversation.
 - No obvious correct answer.
 - Avoid politics, religion, real-world drama, and divisive topics.
-- Fit Midnight Pleasure Club without needing to be explicit.
+- Fit Midnight Pleasure's community without needing to be explicit.
 - Mix funny, flirty, lifestyle, relationships, fashion, gaming, 3DXChat,
   party, food, travel, and random prompts.
 - No categories in the first version; keep the daily feed varied.
@@ -154,8 +154,8 @@ Current routing plan:
 ### Reputation And Moments
 
 Goal:
-- Add a social Reputation layer that rewards visible participation and club
-  complicity, without turning showcase commands into solo spam farms.
+- Add a social Reputation layer that rewards visible participation and group
+  chemistry, without turning showcase commands into solo spam farms.
 - Make Moments feel more alive with RP flavor while keeping useful data fields
   so users understand what happened and why stats matter.
 
@@ -250,8 +250,8 @@ Badge config:
   - `imageUrl`
   - `color`
 - Example:
-  - `key`: `club_icon`
-  - `name`: `Club Icon`
+  - `key`: `group_icon`
+  - `name`: `Group Icon`
   - `minReputation`: `5000`
   - `imageUrl`: external image URL
   - `color`: `#FF2EF9`
@@ -269,7 +269,7 @@ Initial badge tiers:
 - 750 Reputation: Local Favorite, key `local_favorite`
 - 1500 Reputation: Rising Name, key `rising_name`
 - 3000 Reputation: Midnight Regular, key `midnight_regular`
-- 5000 Reputation: Club Icon, key `club_icon`
+- 5000 Reputation: Group Icon, key `group_icon`
 - 8000 Reputation: MPC Star, key `mpc_star`
 - 12000 Reputation: Living Legend, key `living_legend`
 
@@ -324,7 +324,7 @@ Relationship moments:
   - Since, when available.
 - Example:
   - Title: `Moment`
-  - Description: love/club RP flavor.
+  - Description: love/group RP flavor.
   - Fields:
     - Bond: Marriage
     - Since: June 25, 2026
@@ -503,7 +503,7 @@ Role rules:
   - Female: `1492022133256224768`
   - White/Light skin: `1495332763698724915`
   - Black/Dark skin: `1495332837849698316`
-- Card, club, gang, staff, and host roles do not matter for GIF selection.
+- Card, status, gang, staff, and host roles do not matter for GIF selection.
 - The private scene system should only read gender and skin tone roles.
 - Current 2-person scene folders:
   - `wm_wf`

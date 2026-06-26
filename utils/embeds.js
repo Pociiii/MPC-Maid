@@ -66,15 +66,81 @@ function getUserDisplayName(
 ) {
 
     return interaction.member?.displayName ??
-        interaction.user.displayName;
+        getDisplayName(
+            interaction.user
+        );
 
 }
 
-function getUserAvatar(
-    user
+function getDisplayName(
+    target
 ) {
 
-    return user.displayAvatarURL();
+    return target?.displayName ??
+        target?.user?.displayName ??
+        target?.globalName ??
+        target?.user?.globalName ??
+        target?.username ??
+        target?.user?.username ??
+        'MPC Member';
+
+}
+
+function getDisplayAvatar(
+    target
+) {
+
+    return target?.displayAvatarURL?.() ??
+        target?.user?.displayAvatarURL?.();
+
+}
+
+async function fetchDisplayTarget(
+    client,
+    userId,
+    guildId = process.env.GUILD_ID
+) {
+
+    const fallback = {
+        id:
+            userId,
+        displayName:
+            'MPC Member',
+        displayAvatarURL:
+            () => undefined
+    };
+
+    const guild =
+        guildId
+            ? client.guilds.cache.get(
+                guildId
+            ) ??
+            await client.guilds.fetch(
+                guildId
+            ).catch(
+                () => null
+            )
+            : null;
+
+    const member =
+        guild
+            ? await guild.members.fetch(
+                userId
+            ).catch(
+                () => null
+            )
+            : null;
+
+    if (
+        member
+    )
+        return member;
+
+    return await client.users.fetch(
+        userId
+    ).catch(
+        () => fallback
+    );
 
 }
 
@@ -98,12 +164,12 @@ function createUserEmbed(
                 interaction
             ),
         authorIcon:
-            getUserAvatar(
+            getDisplayAvatar(
                 interaction.user
             ),
         thumbnail:
             thumbnail ??
-            getUserAvatar(
+            getDisplayAvatar(
                 interaction.user
             ),
         title,
@@ -137,13 +203,15 @@ function createTargetUserEmbed(
     return createEmbed({
         color,
         authorName:
-            target.displayName,
+            getDisplayName(
+                target
+            ),
         authorIcon:
-            getUserAvatar(
+            getDisplayAvatar(
                 target
             ),
         thumbnail:
-            getUserAvatar(
+            getDisplayAvatar(
                 target
             ),
         title,
@@ -203,5 +271,8 @@ module.exports = {
     createEmbed,
     createReply,
     createTargetUserEmbed,
-    createUserEmbed
+    createUserEmbed,
+    fetchDisplayTarget,
+    getDisplayAvatar,
+    getDisplayName
 };

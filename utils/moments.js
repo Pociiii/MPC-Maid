@@ -13,89 +13,132 @@ const {
 
 const flavorPools = {
     scene_request: [
-        'A new production just became a club moment backstage.',
+        'A new production just became a Moment backstage.',
         'Someone just started talking business behind the velvet curtain.',
-        'The studio moment board is already warming up.'
+        'The studio Moments board is already warming up.',
+        'A fresh idea is moving through the dressing room.',
+        'The cameras are not rolling yet, but the room is curious.',
+        'A new invite is making the backstage air warmer.'
     ],
     scene_start: [
         'The cameras are rolling and the room is already paying attention.',
         'A fresh recording just hit the studio floor.',
-        'People around the club are already watching this one closely.'
+        'People around the room are already watching this one closely.',
+        'The set lights are on, and the crowd leaned in fast.',
+        'A new scene stepped out of planning and into motion.',
+        'The studio found its rhythm, and the room noticed.'
     ],
     scene_final: [
         'A new release just wrapped, and the studio is buzzing.',
         'The final cut is out, and the talk started fast.',
-        'Another production is in the books. The crowd has opinions.'
+        'Another production is in the books. The crowd has opinions.',
+        'The last take landed, and the feed is already moving.',
+        'The scene wrapped with enough spark to leave a trail.',
+        'The cameras stopped, but the conversation did not.'
     ],
     relationship_created: [
         'Love is in the air at Midnight Pleasure.',
         'Two familiar faces just made things official.',
-        'The club chatter has a new soft spot tonight.'
+        'The room has a new soft spot tonight.',
+        'A sweet link just found its place in the story.',
+        'Two names just moved a little closer on the board.',
+        'That bond has enough glow to earn a Moment.'
     ],
     relationship_broken: [
         'Not every link survives the neon lights.',
-        'The club chatter caught a quiet goodbye.',
-        'A familiar bond just changed shape.'
+        'The room caught a quiet goodbye.',
+        'A familiar bond just changed shape.',
+        'One chapter softened into something different.',
+        'The board marked a gentle ending.',
+        'Some connections leave a trace even when they loosen.'
     ],
     breed_accepted: [
         'Two members slipped away for some private time.',
         'The private rooms were not so quiet today.',
-        'A little closed-door chemistry just made the moment board.'
+        'A little closed-door chemistry just made the Moments board.',
+        'A private spark turned into a shared note.',
+        'Some invitations are quiet, but the afterglow still travels.',
+        'A little private time added warmth to the day.'
     ],
     pregnancy_confirmed: [
         'A private chapter quietly became something bigger.',
-        'The club has a special new journey to talk about.',
-        'Something meaningful is growing behind the scenes.'
+        'A special new journey just joined the story.',
+        'Something meaningful is growing behind the scenes.',
+        'The Moments board caught a tender new chapter.',
+        'A quiet kind of news found its way into the room.',
+        'Some private magic is becoming part of the shared story.'
     ],
     pregnancy_reveal: [
         'The private countdown reached its first big reveal.',
         'The baby news just got a little more real.',
-        'A sweet reveal made its way through the club.'
+        'A sweet reveal made its way through the room.',
+        'A tender update just found its spotlight.',
+        'The journey opened a new little page today.',
+        'A quiet wait turned into a softer kind of news.'
     ],
     birth: [
         'A long little journey reached its big moment.',
-        'The club has a new birth story to smile about.',
-        'Thirty days later, the private chapter became official.'
+        'The room has a new birth story to smile about.',
+        'Thirty days later, the private chapter became official.',
+        'A tender story reached its first big hello.',
+        'The waiting ended with a new name for the board.',
+        'A private journey became a shared celebration.'
     ],
     casino_jackpot: [
         'The casino lights just got a little brighter.',
         'Someone made the house blink first.',
-        'A lucky hit just made noise across the club.'
+        'A lucky hit just made noise across the room.',
+        'The table had to respect that one.',
+        'One bold pull turned into a loud little payday.',
+        'The feed loves a win that arrives with style.'
     ],
     career_milestone: [
         'A career milestone just landed under the neon.',
         'Someone added another notch to their studio story.',
-        'The club records just got a little heavier.'
+        'The records just got a little heavier.',
+        'The studio board has another name to underline.',
+        'That career path is starting to leave a brighter trail.',
+        'A steady run just became official enough to post.'
     ],
     activity_scene_milestone: [
         'Another mark on the studio wall. Some careers do not stay quiet for long.',
-        'That is not a one-off anymore. The club is starting to recognize the pattern.',
+        'That is not a one-off anymore. The room is starting to recognize the pattern.',
         'The cameras keep finding them, and the numbers are starting to agree.',
-        'A busy run just became official enough for the board.'
+        'A busy run just became official enough for the board.',
+        'Scene by scene, that reputation is becoming easier to spot.',
+        'The studio count says this is more than a lucky streak.'
     ],
     activity_help_milestone: [
         'Some members do not just show up. They step in when the room gets hot.',
         'That helpful streak has become hard to miss.',
         'A good assist can change the whole scene, and the count is starting to prove it.',
-        'The club noticed who keeps answering the call.'
+        'The room noticed who keeps answering the call.',
+        'That kind of support adds up faster than people expect.',
+        'A steady helper just earned a louder note on the board.'
     ],
     activity_spank_milestone: [
         'That hand has been busy enough for the board to notice.',
         'Some reputations are built one sharp little moment at a time.',
         'The room keeps hearing the same name after the smack lands.',
-        'A public habit just crossed into milestone territory.'
+        'A public habit just crossed into milestone territory.',
+        'A playful pattern just became too loud to ignore.',
+        'The count says that teasing hand has been working overtime.'
     ],
     activity_kiss_milestone: [
         'A little sparkle became a pattern.',
-        'That is a lot of kisses for one club record to ignore.',
+        'That is a lot of kisses for one record to ignore.',
         'Soft moves count too, especially when they keep happening.',
-        'The room keeps catching that same sweet signal.'
+        'The room keeps catching that same sweet signal.',
+        'A steady trail of sweetness just earned its own note.',
+        'Some people leave glitter in the stats without even trying.'
     ],
     activity_brofist_milestone: [
         'Solid support has a way of adding up.',
         'That is a lot of quick hype from one familiar name.',
-        'The club saw the energy, and now the count backs it up.',
-        'A steady run of brofists just made the board.'
+        'The room saw the energy, and now the count backs it up.',
+        'A steady run of brofists just made the board.',
+        'Shared hype became a habit, and the numbers noticed.',
+        'That support streak is looking very official now.'
     ]
 };
 

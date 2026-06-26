@@ -17,7 +17,8 @@ const {
 } = require('../../data/achievementDefinitions');
 
 const {
-    createTargetUserEmbed
+    createTargetUserEmbed,
+    fetchDisplayTarget
 } = require('../../utils/embeds');
 
 const emojis =
@@ -661,17 +662,9 @@ async function handleAchievementsView(
     await interaction.deferUpdate();
 
     const target =
-        await interaction.client.users.fetch(
+        await fetchDisplayTarget(
+            interaction.client,
             targetId
-        ).catch(
-            () => ({
-                id:
-                    targetId,
-                displayName:
-                    'MPC Member',
-                displayAvatarURL:
-                    () => undefined
-            })
         );
 
     await interaction.editReply(

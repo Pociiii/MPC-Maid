@@ -70,7 +70,7 @@ module.exports = {
         await interaction.editReply({
             embeds: [
                 buildPregnancyStatusEmbed(
-                    target,
+                    targetMember ?? target,
                     status,
                     dailyFertility
                 )

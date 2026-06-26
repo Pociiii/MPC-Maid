@@ -5,6 +5,26 @@ const {
     addXP
 } = require('../../utils/users');
 
+const {
+    ECONOMY
+} = require('../../data/constants');
+
+function getRequesterSceneXp(
+    result
+) {
+
+    return result.xp + ECONOMY.PORN_SCENE_STARTER_XP_BONUS;
+
+}
+
+function getTargetSceneXp(
+    result
+) {
+
+    return result.xp;
+
+}
+
 async function applyRewards(
     requesterId,
     targetId,
@@ -14,11 +34,15 @@ async function applyRewards(
     await Promise.all([
         addXP(
             requesterId,
-            result.xp
+            getRequesterSceneXp(
+                result
+            )
         ),
         addXP(
             targetId,
-            result.xp
+            getTargetSceneXp(
+                result
+            )
         ),
         addCoins(
             requesterId,
@@ -47,5 +71,7 @@ async function applyRewards(
 }
 
 module.exports = {
-    applyRewards
+    applyRewards,
+    getRequesterSceneXp,
+    getTargetSceneXp
 };

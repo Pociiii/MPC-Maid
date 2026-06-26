@@ -8,7 +8,8 @@ const db =
     require('../../database/database');
 
 const {
-    createEmbed
+    createEmbed,
+    getDisplayName
 } = require('../../utils/embeds');
 
 const {
@@ -332,8 +333,10 @@ async function announceWinner(
             color:
                 getRandomColor(),
             authorName:
-                interaction.member?.displayName ??
-                interaction.user.displayName,
+                getDisplayName(
+                    interaction.member ??
+                    interaction.user
+                ),
             authorIcon:
                 interaction.user.displayAvatarURL(),
             thumbnail:

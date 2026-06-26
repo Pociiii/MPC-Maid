@@ -8,7 +8,8 @@ const {
 
 const {
     createTargetUserEmbed,
-    createUserEmbed
+    createUserEmbed,
+    fetchDisplayTarget
 } = require('../../utils/embeds');
 
 const {
@@ -443,6 +444,33 @@ function getDailyQuestDate(
     }
 
     return resetDate
+        .toISOString()
+        .slice(
+            0,
+            10
+        );
+
+}
+
+function getWeeklyQuestDate(
+    now = new Date()
+) {
+
+    const weekDate =
+        new Date(
+            `${getDailyQuestDate(
+                now
+            )}T00:00:00.000Z`
+        );
+
+    const day =
+        weekDate.getUTCDay() || 7;
+
+    weekDate.setUTCDate(
+        weekDate.getUTCDate() - day + 1
+    );
+
+    return weekDate
         .toISOString()
         .slice(
             0,
@@ -959,15 +987,9 @@ async function getAnnouncementTarget(
     userId
 ) {
 
-    return await client.users.fetch(
+    return fetchDisplayTarget(
+        client,
         userId
-    ).catch(
-        () => ({
-            displayName:
-                'MPC Member',
-            displayAvatarURL:
-                () => undefined
-        })
     );
 
 }
@@ -1583,6 +1605,7 @@ module.exports = {
     getDailyQuestDate,
     getDailyQuests,
     getNextResetTimestamp,
+    getWeeklyQuestDate,
     questPool,
     trackDailyQuest
 };

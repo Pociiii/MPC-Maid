@@ -11,6 +11,8 @@ const {
 const {
     castLabels,
     createCustomId,
+    customScenePartCost,
+    getCustomSceneCost,
     maxParts,
     phaseLabels,
     phaseValues
@@ -53,6 +55,11 @@ function buildBuilderEmbed(
     parts
 ) {
 
+    const cost =
+        getCustomSceneCost(
+            parts
+        );
+
     return createUserEmbed(
         interaction,
         {
@@ -65,6 +72,7 @@ function buildBuilderEmbed(
             description:
 `- Cast: **${castLabels[cast] ?? cast}**
 - Parts: **${parts.length}/${maxParts}**
+- Cost: **${cost} coins** (${customScenePartCost} per part)
 
 ${formatParts(parts)}`
         }

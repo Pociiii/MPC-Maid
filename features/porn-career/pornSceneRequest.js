@@ -296,7 +296,7 @@ async function sendPornSceneRequest(
                     title:
                         'Porn Scene Moment',
                     flavor:
-                        'A new production just became a club moment backstage.',
+                        'A new production just became a Moment backstage.',
                     command:
                         '/pornscene',
                     fields: [

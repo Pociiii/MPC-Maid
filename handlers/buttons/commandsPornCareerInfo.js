@@ -5,6 +5,7 @@ const {
 const {
     CHANNELS,
     COOLDOWNS,
+    ECONOMY,
     getRandomColor
 } = require('../../data/constants');
 
@@ -46,7 +47,7 @@ module.exports = {
 - Moments and final scene links post in <#${CHANNELS.MOMENTS}>.
 - Parts are posted over time, one every 8-12 minutes.
 - The scene lasts up to about 1 hour.
-- Custom scenes post in <#${CHANNELS.CUSTOM_SCENE}> over 30 minutes.
+- Custom scenes post in <#${CHANNELS.CUSTOM_SCENE}> over 30 minutes and cost **${ECONOMY.CUSTOM_SCENE_PART_COST} coins per selected part**.
 
 **Stats**
 - Performance improves scene score and critical scene chance.
@@ -65,7 +66,7 @@ module.exports = {
 
 **Progression**
 - Completed scenes grant XP based on outcome, plus coins, ranking points, and scenes completed.
-- Scene XP: Awkward **10**, Solid **20**, Hot **35**, Viral **55**. Critical scenes add **+10 XP**.
+- Scene XP: Awkward **10**, Solid **20**, Hot **35**, Viral **55**. Critical scenes add **+10 XP**. The requester gets **+${ECONOMY.PORN_SCENE_STARTER_XP_BONUS} XP** for starting the scene.
 - Use \`/train\` to spend XP and coins on Performance, Stamina, and Fame.
 - Boosters are one-use scene bonuses for the requester only.
 - Booster tiers: T1 **120**, T2 **350**, T3 **800**, T4 **1400** coins.

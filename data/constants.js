@@ -28,7 +28,9 @@ function getRandomColor() {
 }
 
 const ECONOMY = {
-    STARTING_COINS: 500
+    STARTING_COINS: 500,
+    CUSTOM_SCENE_PART_COST: 20,
+    PORN_SCENE_STARTER_XP_BONUS: 5
 };
 
 const STATS = {

@@ -2,8 +2,15 @@ const {
     getSceneCategoryLabel
 } = require('../../data/sceneSubmitGroups');
 
+const {
+    ECONOMY
+} = require('../../data/constants');
+
 const maxParts =
     8;
+
+const customScenePartCost =
+    ECONOMY.CUSTOM_SCENE_PART_COST;
 
 const castLabels = {
     wm_wf: getSceneCategoryLabel('mf', 'wm_wf'),
@@ -90,10 +97,20 @@ function createCustomId(
 
 }
 
+function getCustomSceneCost(
+    parts
+) {
+
+    return parts.length * customScenePartCost;
+
+}
+
 module.exports = {
     castLabels,
     createCustomId,
+    customScenePartCost,
     decodeParts,
+    getCustomSceneCost,
     maxParts,
     phaseLabels,
     phaseValues

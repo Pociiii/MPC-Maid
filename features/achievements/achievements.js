@@ -12,7 +12,8 @@ const {
 } = require('../../data/achievementDefinitions');
 
 const {
-    createTargetUserEmbed
+    createTargetUserEmbed,
+    fetchDisplayTarget
 } = require('../../utils/embeds');
 
 const {
@@ -283,11 +284,10 @@ async function announceAchievement(
     )
         return;
 
-    const user =
-        await client.users.fetch(
+    const target =
+        await fetchDisplayTarget(
+            client,
             userId
-        ).catch(
-            () => null
         );
 
     const embed =
@@ -297,12 +297,7 @@ async function announceAchievement(
             command:
                 '/profile',
             target:
-                user ?? {
-                    displayName:
-                        'MPC Member',
-                    displayAvatarURL:
-                        () => undefined
-                },
+                target,
             title:
                 'Achievement Unlocked',
             description:

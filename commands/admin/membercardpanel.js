@@ -50,7 +50,7 @@ module.exports = {
 
                 description:
 
-`Generate your official **Midnight Pleasure Club** membership card.
+`Generate your official **MPC** membership card.
 
 The card style is picked from your MPC role.
 

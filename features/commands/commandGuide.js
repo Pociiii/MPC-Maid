@@ -13,6 +13,7 @@ const {
 const {
     CHANNELS,
     COOLDOWNS,
+    ECONOMY,
     getRandomColor
 } = require('../../data/constants');
 
@@ -179,7 +180,7 @@ function buildSections() {
                     cooldownLabel(
                         COOLDOWNS.CUSTOM_SCENE
                     ),
-                    'Build a solo custom scene.'
+                    `Build a solo custom scene. Costs ${ECONOMY.CUSTOM_SCENE_PART_COST} coins per selected part.`
                 ),
                 commandDetail(
                     '/train',
@@ -345,7 +346,7 @@ function buildSections() {
                     'Moments',
                     `<#${CHANNELS.MOMENTS}>`,
                     'Automatic',
-                    'Porn scene notices, relationship links, pregnancy RP notices, and club moments.'
+                    'Porn scene notices, relationship links, pregnancy RP notices, and group moments.'
                 ),
                 commandDetail(
                     'Updates',

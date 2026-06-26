@@ -9,7 +9,8 @@ const {
 } = require('../../utils/embeds');
 
 const {
-    COOLDOWNS
+    COOLDOWNS,
+    ECONOMY
 } = require('../../data/constants');
 
 const {
@@ -115,7 +116,7 @@ module.exports = {
                     title:
                         'Custom Scene',
                     description:
-                        'Choose the cast for your custom scene.'
+                        `Choose the cast for your custom scene.\n\nCost: **${ECONOMY.CUSTOM_SCENE_PART_COST} coins per part**, paid when you press Finish.`
                 }
             );
 

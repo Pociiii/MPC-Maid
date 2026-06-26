@@ -31,7 +31,9 @@ const {
 } = require('./sceneEmbeds');
 
 const {
-    applyRewards
+    applyRewards,
+    getRequesterSceneXp,
+    getTargetSceneXp
 } = require('./sceneRewards');
 
 const {
@@ -233,7 +235,9 @@ async function finishScene(
                 ranking:
                     result.rankingChange,
                 xp:
-                    result.xp
+                    getRequesterSceneXp(
+                        result
+                    )
             }
         ),
         recordActivityMoment(
@@ -252,7 +256,9 @@ async function finishScene(
                 ranking:
                     result.rankingChange,
                 xp:
-                    result.xp
+                    getTargetSceneXp(
+                        result
+                    )
             }
         )
     ]);

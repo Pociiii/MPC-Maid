@@ -10,6 +10,10 @@ const {
 } = require('../../data/sceneSubmitGroups');
 
 const {
+    ECONOMY
+} = require('../../data/constants');
+
+const {
     pickMomentFlavor
 } = require('../../utils/moments');
 
@@ -292,18 +296,44 @@ function getPhaseFlavor(
 ) {
 
     const flavors = {
-        foreplay:
+        foreplay: [
             'The cameras are live and the scene is warming up.',
-        oral:
+            'The studio lights settle in while the room leans closer.',
+            'A slow opening beat gives everyone time to lock in.',
+            'The first take starts soft, but the attention is already there.',
+            'The setup is done, and the chemistry is starting to show.',
+            'The room gets quiet in that very interested way.'
+        ],
+        oral: [
             'The room is locked in and the viewers are climbing.',
-        sex:
+            'The recording slips into a closer, warmer rhythm.',
+            'The crowd response starts climbing with every minute.',
+            'The camera stays close while the scene finds its pulse.',
+            'The energy narrows in, and the viewers follow it.',
+            'The set feels smaller now, in the best possible way.'
+        ],
+        sex: [
             'The recording hits its main act.',
-        finale:
-            'The last take is rolling.'
+            'The scene opens up and the viewer count follows.',
+            'The main stretch lands with clear crowd attention.',
+            'The studio pace turns heavier and more confident.',
+            'The chemistry has stopped warming up and started carrying the room.',
+            'The feed is watching the numbers climb in real time.'
+        ],
+        finale: [
+            'The last take is rolling.',
+            'The scene starts moving toward its final beat.',
+            'The room stays close for the ending.',
+            'The cameras hold steady while the final stretch lands.',
+            'The last moments are getting the attention they deserve.',
+            'The recording is almost wrapped, and the crowd knows it.'
+        ]
     };
 
-    return flavors[phase] ??
-        'The recording keeps rolling.';
+    return pickOne(
+        flavors[phase],
+        'The recording keeps rolling.'
+    );
 
 }
 
@@ -377,20 +407,10 @@ function buildPartEmbed(
             ]
         );
 
-    const totalParts =
-        result?.totalParts ?? 1;
-
     const viewerCount =
         result?.partViewers?.[partIndex] ??
         result?.viewers ??
         0;
-
-    const phaseLabel =
-        `${phase.charAt(
-            0
-        ).toUpperCase()}${phase.slice(
-            1
-        )}`;
 
     const embed =
         createEmbed({
@@ -426,8 +446,7 @@ function buildPartEmbed(
             value:
                 formatCast(
                     requesterId,
-                    targetId,
-                    sceneCategory
+                    targetId
                 ),
             inline:
                 false
@@ -437,22 +456,6 @@ function buildPartEmbed(
                 'Viewers',
             value:
                 `**${viewerCount}** watching now`,
-            inline:
-                true
-        },
-        {
-            name:
-                'Scene Part',
-            value:
-                phaseLabel,
-            inline:
-                true
-        },
-        {
-            name:
-                'Progress',
-            value:
-                `**${partIndex + 1}/${totalParts}**`,
             inline:
                 true
         }
@@ -549,6 +552,7 @@ function buildFinalEmbed(
             value:
                 [
                     `**${result.xp} each**`,
+                    `+${ECONOMY.PORN_SCENE_STARTER_XP_BONUS} starter bonus for requester`,
                     result.criticalScene
                         ? '+10 crit bonus'
                         : null,

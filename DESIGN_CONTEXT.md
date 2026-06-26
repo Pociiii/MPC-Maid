@@ -20,16 +20,20 @@ Current bot version: `0.14.0`
 
 ## Design Meaning
 
-The bot should make users feel involved and part of the club, not just served
+The bot should make users feel involved and part of the group, not just served
 by commands. The main goal is to make the server feel alive around them.
 
 Prefer improving existing systems before adding new ones:
 
 - Make user actions visible in the right public spaces when it creates social
   energy: Moments for story moments, Maid Feed for progress moments.
-- Make posts feel like something happened in the club, not like a plain bot log.
+- Make posts feel like something happened in the shared room, not like a plain
+  bot log.
 - Give users recognition through names, avatars, titles, ranks, milestones,
   scene links, and clean outcome fields.
+- User display names should prefer the server nickname first. Only fall back to
+  the global Discord display name or username when the guild member cannot be
+  resolved.
 - Turn solo actions into social hooks where possible: buttons, helpers,
   partner choices, shared scenes, public results, and lightweight story hooks.
 - Keep useful data visible so users understand why stats, quests, training,
@@ -38,8 +42,8 @@ Prefer improving existing systems before adding new ones:
   events so users can plan instead of guessing.
 - Avoid feature clutter. If the same feeling can be created by better embeds,
   better routing, better flavor text, or better feedback, do that first.
-- Repeated public posts should use small flavor text arrays so the bot feels
-  alive without becoming wordy.
+- Repeated public posts should use flavor text arrays with enough variety so
+  the bot feels alive without becoming wordy.
 - Every major loop should answer: "Why should users care, talk about it, or
   come back tomorrow?"
 
@@ -70,7 +74,7 @@ Prefer improving existing systems before adding new ones:
   such as outcome, ranking, XP, Reputation, viewers, parts, and critical state
   where it helps users understand the event.
 - Avoid making the bot feel like a generic economy bot. Systems should feel
-  like they belong to Midnight Pleasure Club / After Dinner Productions.
+  like they belong to Midnight Pleasure / After Dinner Productions.
 
 ## Key Channels
 
@@ -101,7 +105,7 @@ These are used for GIF category logic:
 - White/Light skin: `1495332763698724915`
 - Black/Dark skin: `1495332837849698316`
 
-Card/club/status roles exist, but they should not affect scene GIF selection.
+Card/status roles exist, but they should not affect scene GIF selection.
 For scene systems, use only gender and skin tone unless explicitly designing a
 different feature.
 
@@ -161,11 +165,10 @@ Scene request flow:
 - Start and final notices post in Moments.
 - Scene parts show live viewer counts to make the posts feel like an ongoing
   recording.
-- Scene embeds keep RP flavor in the description and move structured details
-  into fields. Cast should be one compact field with both users on one line and
-  the role/category labels underneath.
-- Do not repeat `part X/X` in the description. Use a Progress field for the
-  count instead.
+- Live scene part embeds should stay immersive: flavor in the description, only
+  Cast and Viewers fields, and Cast should show only the two users with no
+  gender/color/category labels.
+- Do not show scene part or progress fields on live scene part embeds.
 - Final result includes outcome, revenue, XP, ranking, and links to parts.
 
 Scene pacing:
@@ -204,6 +207,8 @@ XP by outcome:
 - Viral: 55 XP
 - Critical scenes add +10 XP.
 - Stamina adds +2 XP per extra scene part above 4.
+- The user who starts `/pornscene` gets +5 XP when the accepted scene
+  completes.
 
 Colors:
 
@@ -282,7 +287,7 @@ Badge display:
   - Local Favorite: 750
   - Rising Name: 1500
   - Midnight Regular: 3000
-  - Club Icon: 5000
+  - Group Icon: 5000
   - MPC Star: 8000
   - Living Legend: 12000
 - Profile embeds should keep the user avatar as thumbnail.
@@ -294,6 +299,8 @@ Badge display:
 Moments:
 
 - Moments should feel alive with short RP flavor text, but keep useful fields.
+- Avoid generic venue wording in flavor text. Prefer warmer community language
+  such as room, group, crowd, studio, shared space, or Moments board.
 - Use title + flavor description + data fields.
 - Add a shared Moment helper before refactoring current Moments posts.
 - The helper should support randomized flavor, stable data fields, optional
@@ -322,6 +329,9 @@ Activity Moments:
 
 - Scene, help, spank, kiss, and brofist activity is tracked daily, weekly, and
   across career totals.
+- Weekly Activity Moment counters start on Monday at the same boundary as daily
+  quests: 12:00 UTC, which is 14:00 in Rome during summer time and 13:00 during
+  winter time.
 - Daily/weekly counters live in `user_activity_period_stats`; posted milestones
   are guarded by `user_activity_moment_posts` so restarts do not duplicate
   Moments.
@@ -697,6 +707,7 @@ Current direction:
 
 - User chooses cast with a dropdown menu.
 - User chooses up to 8 parts.
+- Custom scenes cost 20 coins per selected part, paid only when Finish succeeds.
 - Parts are spread across the 30-minute cooldown instead of posted all at once.
 - Posts go to Custom Scene channel.
 - Embed thumbnail uses the user's avatar.

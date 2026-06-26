@@ -6,6 +6,10 @@ const {
     buildAchievementsReply
 } = require('../../features/achievements/viewer');
 
+const {
+    fetchDisplayTarget
+} = require('../../utils/embeds');
+
 module.exports = {
 
     data:
@@ -39,11 +43,17 @@ module.exports = {
                 64
         });
 
-        const target =
+        const targetUser =
             interaction.options.getUser(
                 'user'
             ) ??
             interaction.user;
+
+        const target =
+            await fetchDisplayTarget(
+                interaction.client,
+                targetUser.id
+            );
 
         await interaction.editReply(
             await buildAchievementsReply(
