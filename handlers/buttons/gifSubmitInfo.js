@@ -159,7 +159,7 @@ function buildGifInfoReply(view = 'interactions') {
 
     if (safeView === 'interactions') {
         embed.addFields({
-            name: 'Interactions',
+            name: '\uD83D\uDD18 Interactions',
             value: buildInteractionLines().join('\n')
         });
     }

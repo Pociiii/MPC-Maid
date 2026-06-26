@@ -115,25 +115,25 @@ const views = {
 
 const categoryLabels = {
     button_interactions:
-        'Interaction Buttons',
+        '\uD83D\uDD18 Interaction Buttons',
     fame:
-        'Fame',
+        '\uD83D\uDC51 Fame',
     gif_submissions:
-        'GIF Submissions',
+        '\uD83D\uDDBC\uFE0F GIF Submissions',
     performance:
-        'Performance',
+        '\uD83D\uDCAA Performance',
     porn_scenes:
-        'Porn Career',
+        '\uD83C\uDFAC Porn Career',
     scene_combined_stat:
-        'Scene Stat Thresholds',
+        '\uD83D\uDCCA Scene Stat Thresholds',
     scene_combined_three_stats:
-        'Scene Triple Stat Thresholds',
+        '\uD83C\uDFB2 Scene Triple Stat Thresholds',
     scene_combined_two_stats:
-        'Scene Duo Stat Thresholds',
+        '\uD83D\uDC65 Scene Duo Stat Thresholds',
     showcase_posts:
-        'Showcase Commands',
+        '\uD83D\uDD25 Showcase Commands',
     stamina:
-        'Stamina'
+        '\u2764\uFE0F Stamina'
 };
 
 const definitionsByKey =

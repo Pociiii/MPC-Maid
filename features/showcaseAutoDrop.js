@@ -76,7 +76,7 @@ async function sendAutoDrop(
                 fields: [
                     {
                         name:
-                            'Channel',
+                            '\uD83D\uDCCD Channel',
                         value:
                             `<#${CHANNELS.TITTY_DROP}>`,
                         inline:

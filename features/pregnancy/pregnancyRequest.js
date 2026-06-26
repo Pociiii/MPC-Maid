@@ -512,7 +512,7 @@ async function handleBreedDecision(
                 fields: [
                     {
                         name:
-                            'Carrier',
+                            '\uD83E\uDD30 Carrier',
                         value:
                             `<@${carrierId}>`,
                         inline:
@@ -520,7 +520,7 @@ async function handleBreedDecision(
                     },
                     {
                         name:
-                            'Next Check',
+                            '\u23F3 Next Check',
                         value:
                             `<t:${nextCheck}:F>\n<t:${nextCheck}:R>`,
                         inline:

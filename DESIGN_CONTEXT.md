@@ -57,6 +57,8 @@ Prefer improving existing systems before adding new ones:
   titles where they help scanning. Field values and embed descriptions should
   stay clean text with no decorative emoji. Exceptions are only when the emoji
   is the actual content, such as slot reels, cards, or cast symbols in menus.
+- Embed field titles should always carry a useful emoji or bot emoji unless the
+  title itself is already a compact symbol label, such as cast category labels.
 - When a field value contains a list, every list item should start with `- `.
   Avoid bare stacked lines for lists.
 - If buttons get cramped, use a dropdown menu.
@@ -343,6 +345,9 @@ Activity Moments:
   buttons post every 25 career actions.
 - A single completed action should post at most one milestone Moment for the
   acting user. Priority is lifetime, then weekly, then daily.
+- Activity Moment embeds should follow normal user-centered styling: actor name
+  as author, user avatar as thumbnail, short flavor description, and emoji-led
+  field names.
 
 ## Boosters
 

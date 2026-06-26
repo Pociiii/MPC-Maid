@@ -289,7 +289,7 @@ async function postRelationshipMoment(
     const fields = [
         {
             name:
-                'Bond',
+                '\uD83E\uDD1D Bond',
             value:
                 result.linkLabel,
             inline:
@@ -303,7 +303,7 @@ async function postRelationshipMoment(
         fields.push(
             {
                 name:
-                    'Since',
+                    '\uD83D\uDCC5 Since',
                 value:
                     formatDate(
                         result.request.started_at

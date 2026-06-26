@@ -153,7 +153,7 @@ module.exports = {
                     fields: [
                         {
                             name:
-                                'User',
+                                '\uD83D\uDC64 User',
                             value:
                                 `<@${interaction.user.id}>`,
                             inline:
@@ -161,7 +161,7 @@ module.exports = {
                         },
                         {
                             name:
-                                'Category',
+                                '\uD83D\uDCC1 Category',
                             value:
                                 submission.categoryName,
                             inline:

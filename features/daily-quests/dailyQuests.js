@@ -1042,8 +1042,8 @@ async function buildDailyEmbed(
             (quest) => ({
                 name:
                     quest.completed
-                        ? `Done - ${quest.label}`
-                        : quest.label,
+                        ? `\u2705 Done - ${quest.label}`
+                        : `\uD83D\uDCCB ${quest.label}`,
                 value:
                     `- Progress: **${Math.min(
                         quest.progress,

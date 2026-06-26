@@ -19,7 +19,10 @@ function getFieldValue(
     return embed.fields
         ?.find(
             (field) =>
-                field.name === fieldName
+                field.name === fieldName ||
+                field.name.endsWith(
+                    ` ${fieldName}`
+                )
         )
         ?.value;
 

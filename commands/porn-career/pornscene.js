@@ -335,7 +335,7 @@ module.exports = {
         embed.addFields(
             {
                 name:
-                    'Cast',
+                    '\uD83D\uDC65 Cast',
                 value:
                     `<@${interaction.user.id}> + ${target}\n${getSceneCategoryName(
                         sceneCategory
@@ -345,7 +345,7 @@ module.exports = {
             },
             {
                 name:
-                    'Booster',
+                    '\uD83D\uDE80 Booster',
                 value:
                     'Choose from the menu below.',
                 inline:

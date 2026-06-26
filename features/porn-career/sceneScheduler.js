@@ -181,7 +181,7 @@ async function finishScene(
                     fields: [
                         {
                             name:
-                                'Scene',
+                                '\uD83C\uDFAC Scene',
                             value:
                                 `<@${requesterId}> + <@${targetId}>`,
                             inline:
@@ -206,7 +206,7 @@ async function finishScene(
                 fields: [
                     {
                         name:
-                            'Scene',
+                            '\uD83C\uDFAC Scene',
                         value:
                             `${requesterId} + ${targetId}`,
                         inline:
@@ -357,7 +357,7 @@ function scheduleScene(
                                 fields: [
                                     {
                                         name:
-                                            'Part',
+                                            '\uD83C\uDF9E\uFE0F Part',
                                         value:
                                             `${index + 1}/${phases.length}`,
                                         inline:
@@ -365,7 +365,7 @@ function scheduleScene(
                                     },
                                     {
                                         name:
-                                            'Phase',
+                                            '\uD83C\uDFAD Phase',
                                         value:
                                             phase,
                                         inline:
@@ -373,7 +373,7 @@ function scheduleScene(
                                     },
                                     {
                                         name:
-                                            'Channel',
+                                            '\uD83D\uDCCD Channel',
                                         value:
                                             `<#${channel.id}>`,
                                         inline:
@@ -381,7 +381,7 @@ function scheduleScene(
                                     },
                                     {
                                         name:
-                                            'Users',
+                                            '\uD83D\uDC65 Users',
                                         value:
                                             `<@${requesterId}> + <@${targetId}>`,
                                         inline:

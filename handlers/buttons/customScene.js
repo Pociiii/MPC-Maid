@@ -218,7 +218,7 @@ module.exports = {
                         fields: [
                             {
                                 name:
-                                    'User',
+                                    '\uD83D\uDC64 User',
                                 value:
                                     `<@${interaction.user.id}>`,
                                 inline:
@@ -226,7 +226,7 @@ module.exports = {
                             },
                             {
                                 name:
-                                    'Parts',
+                                    '\uD83C\uDF9E\uFE0F Parts',
                                 value:
                                     String(
                                         parts.length

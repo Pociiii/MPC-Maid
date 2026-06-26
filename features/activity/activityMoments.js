@@ -10,6 +10,12 @@ const {
     postMoment
 } = require('../../utils/moments');
 
+const {
+    fetchDisplayTarget,
+    getDisplayAvatar,
+    getDisplayName
+} = require('../../utils/embeds');
+
 const sceneDailyThresholds = [
     3,
     5,
@@ -41,6 +47,23 @@ const buttonWeeklyThresholds = [
     200,
     400
 ];
+
+const fieldIcons = {
+    actor:
+        '\uD83C\uDFAD',
+    career:
+        '\uD83C\uDF1F',
+    latestOutcome:
+        '\uD83C\uDFB2',
+    milestone:
+        '\uD83C\uDFC1',
+    partner:
+        '\uD83E\uDD1D',
+    today:
+        '\uD83D\uDCC5',
+    week:
+        '\uD83D\uDCC6'
+};
 
 const activityConfig = {
     scene: {
@@ -649,7 +672,7 @@ function buildFields(
     const fields = [
         {
             name:
-                config.actorLabel,
+                `${fieldIcons.actor} ${config.actorLabel}`,
             value:
                 `<@${userId}>`,
             inline:
@@ -657,7 +680,7 @@ function buildFields(
         },
         {
             name:
-                'Milestone',
+                `${fieldIcons.milestone} Milestone`,
             value:
                 `**${milestoneDescription(
                     config,
@@ -668,7 +691,7 @@ function buildFields(
         },
         {
             name:
-                'Today',
+                `${fieldIcons.today} Today`,
             value:
                 `**${formatCount(
                     config,
@@ -681,7 +704,7 @@ function buildFields(
         },
         {
             name:
-                'This Week',
+                `${fieldIcons.week} This Week`,
             value:
                 `**${formatCount(
                     config,
@@ -694,7 +717,7 @@ function buildFields(
         },
         {
             name:
-                'Career',
+                `${fieldIcons.career} Career`,
             value:
                 `**${formatCount(
                     config,
@@ -710,7 +733,7 @@ function buildFields(
     )
         fields.push({
             name:
-                config.partnerLabel,
+                `${fieldIcons.partner} ${config.partnerLabel}`,
             value:
                 `<@${details.partnerId}>`,
             inline:
@@ -722,7 +745,7 @@ function buildFields(
     )
         fields.push({
             name:
-                'Latest Outcome',
+                `${fieldIcons.latestOutcome} Latest Outcome`,
             value:
                 details.criticalScene
                     ? `**${details.outcome}**\nCritical Scene`
@@ -758,12 +781,31 @@ async function postActivityMilestone(
     )
         return null;
 
+    const target =
+        await fetchDisplayTarget(
+            client,
+            userId
+        );
+
+    const avatar =
+        getDisplayAvatar(
+            target
+        );
+
     const message =
         await postMoment(
             client,
             {
+                authorIcon:
+                    avatar,
+                authorName:
+                    getDisplayName(
+                        target
+                    ),
                 type:
                     config.momentType,
+                thumbnail:
+                    avatar,
                 title:
                     milestoneTitle(
                         config,

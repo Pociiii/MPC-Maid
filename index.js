@@ -255,7 +255,7 @@ async readyClient => {
                 fields: [
                     {
                         name:
-                            'Scene Busy Reset',
+                            '\uD83C\uDFAC Scene Busy Reset',
                         value:
                             `${clearedBusy} in-memory busy entries cleared.`,
                         inline:
@@ -263,7 +263,7 @@ async readyClient => {
                     },
                     {
                         name:
-                            'Commands',
+                            '\uD83D\uDCCB Commands',
                         value:
                             String(
                                 commands.length
@@ -398,7 +398,7 @@ async interaction => {
                 fields: [
                     {
                         name:
-                            'Interaction',
+                            '\uD83D\uDD18 Interaction',
                         value:
                             interaction.customId ??
                             interaction.commandName ??
@@ -408,7 +408,7 @@ async interaction => {
                     },
                     {
                         name:
-                            'User',
+                            '\uD83D\uDC64 User',
                         value:
                             `${interaction.user.tag} (${interaction.user.id})`,
                         inline:
@@ -416,7 +416,7 @@ async interaction => {
                     },
                     {
                         name:
-                            'Channel',
+                            '\uD83D\uDCCD Channel',
                         value:
                             interaction.channelId
                                 ? `<#${interaction.channelId}>`
@@ -471,7 +471,7 @@ async interaction => {
                 fields: [
                     {
                         name:
-                            'Command',
+                            '\uD83D\uDCCB Command',
                         value:
                             `/${interaction.commandName}`,
                         inline:
@@ -479,7 +479,7 @@ async interaction => {
                     },
                     {
                         name:
-                            'User',
+                            '\uD83D\uDC64 User',
                         value:
                             `${interaction.user.tag} (${interaction.user.id})`,
                         inline:
@@ -487,7 +487,7 @@ async interaction => {
                     },
                     {
                         name:
-                            'Channel',
+                            '\uD83D\uDCCD Channel',
                         value:
                             interaction.channelId
                                 ? `<#${interaction.channelId}>`

@@ -238,7 +238,7 @@ module.exports = {
         embed.addFields(
             {
                 name:
-                    'Your Roll',
+                    '\uD83C\uDFAF Your Roll',
                 value:
                     formatRoll(
                         playerDie1,
@@ -249,7 +249,7 @@ module.exports = {
             },
             {
                 name:
-                    'Bot Roll',
+                    '\uD83E\uDD16 Bot Roll',
                 value:
                     formatRoll(
                         botDie1,

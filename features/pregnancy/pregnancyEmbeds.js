@@ -311,7 +311,7 @@ function buildPregnancyConfirmedEmbed(
     embed.addFields(
         {
             name:
-                'Stage',
+                '\uD83E\uDD30 Stage',
             value:
                 'Confirmed',
             inline:
@@ -319,7 +319,7 @@ function buildPregnancyConfirmedEmbed(
         },
         {
             name:
-                'Reveal',
+                '\uD83D\uDD0E Reveal',
             value:
                 formatTimestamp(
                     getRevealTimestamp(
@@ -361,7 +361,7 @@ function buildGenderRevealEmbed(
     embed.addFields(
         {
             name:
-                'Stage',
+                '\uD83C\uDF89 Stage',
             value:
                 'Reveal',
             inline:
@@ -369,7 +369,7 @@ function buildGenderRevealEmbed(
         },
         {
             name:
-                'Day',
+                '\uD83D\uDCC5 Day',
             value:
                 `${PREGNANCY.GENDER_REVEAL_DAY}/${PREGNANCY.DURATION_DAYS}`,
             inline:
@@ -377,7 +377,7 @@ function buildGenderRevealEmbed(
         },
         {
             name:
-                'Gender',
+                '\uD83D\uDC76 Gender',
             value:
                 pregnancy.baby_gender,
             inline:
@@ -415,7 +415,7 @@ function buildBirthEmbed(
     embed.addFields(
         {
             name:
-                'Stage',
+                '\uD83D\uDC76 Stage',
             value:
                 'Birth',
             inline:
@@ -423,7 +423,7 @@ function buildBirthEmbed(
         },
         {
             name:
-                'Gender',
+                '\uD83D\uDC76 Gender',
             value:
                 pregnancy.baby_gender,
             inline:
@@ -431,7 +431,7 @@ function buildBirthEmbed(
         },
         {
             name:
-                'Journey',
+                '\uD83D\uDCC5 Journey',
             value:
                 `${PREGNANCY.DURATION_DAYS} days`,
             inline:

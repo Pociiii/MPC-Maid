@@ -230,7 +230,7 @@ function buildPanelEmbed(
         },
         {
             name:
-                'Last',
+                '\uD83D\uDCCC Last',
             value:
 `- Last spank from: ${lastSpanker}
 - Last winner: ${lastWinner}`,
@@ -366,7 +366,7 @@ async function announceWinner(
         },
         {
             name:
-                'Where',
+                '\uD83D\uDCCD Where',
             value:
                 interaction.channelId
                     ? `<#${interaction.channelId}>`

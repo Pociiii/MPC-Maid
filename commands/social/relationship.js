@@ -450,7 +450,7 @@ async function buildRelationshipEmbed(
     embed.addFields(
         {
             name:
-                'Family',
+                '\uD83D\uDC6A Family',
             value:
                 familyLines.join(
                     '\n'
@@ -460,7 +460,7 @@ async function buildRelationshipEmbed(
         },
         {
             name:
-                'Romance',
+                '\uD83D\uDC98 Romance',
             value:
                 romanticLines.join(
                     '\n'
@@ -470,7 +470,7 @@ async function buildRelationshipEmbed(
         },
         {
             name:
-                'Social',
+                '\uD83D\uDCAC Social',
             value:
                 socialLines.join(
                     '\n'
@@ -550,7 +550,7 @@ function getRequestCopy(
             fields: [
                 {
                     name:
-                        'Role',
+                        '\uD83C\uDFAD Role',
                     value:
                         roleLabel,
                     inline:
@@ -578,7 +578,7 @@ function getRequestCopy(
             fields: [
                 {
                     name:
-                        'Anniversary',
+                        '\uD83D\uDCC5 Anniversary',
                     value:
                         formatDate(
                             startedAt
@@ -598,7 +598,7 @@ function getRequestCopy(
             fields: [
                 {
                     name:
-                        'Started',
+                        '\uD83D\uDCC5 Started',
                     value:
                         formatDate(
                             startedAt
@@ -965,7 +965,7 @@ async function postRelationshipBrokenMoment(
             fields: [
                 {
                     name:
-                        'Bond',
+                        '\uD83E\uDD1D Bond',
                     value:
                         linkLabel,
                     inline:

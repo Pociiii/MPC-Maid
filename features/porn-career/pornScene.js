@@ -251,7 +251,7 @@ async function acceptScene(
                 fields: [
                     {
                         name:
-                            'Users',
+                            '\uD83D\uDC65 Users',
                         value:
                             `<@${requesterId}> + <@${targetId}>`,
                         inline:
@@ -387,7 +387,7 @@ async function acceptScene(
                 fields: [
                     {
                         name:
-                            'Scene',
+                            '\uD83C\uDFAC Scene',
                         value:
                             `<@${requesterId}> + <@${targetId}>`,
                         inline:

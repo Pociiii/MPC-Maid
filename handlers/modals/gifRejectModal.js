@@ -85,7 +85,7 @@ async execute(
         dmEmbed.addFields(
             {
                 name:
-                    'Category',
+                    '\uD83D\uDCC1 Category',
                 value:
                     category,
                 inline:
@@ -93,7 +93,7 @@ async execute(
             },
             {
                 name:
-                    'Refused Link',
+                    '\uD83D\uDD17 Refused Link',
                 value:
                     rejectedGifUrl ||
                     'Link unavailable',
@@ -102,7 +102,7 @@ async execute(
             },
             {
                 name:
-                    'Reason',
+                    '\uD83D\uDCDD Reason',
                 value:
                     reason,
                 inline:

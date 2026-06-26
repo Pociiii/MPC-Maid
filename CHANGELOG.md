@@ -2,6 +2,10 @@
 
 ## Next Update
 
+- Embed field titles now use emoji more consistently across commands, Moments,
+  Maid Feed posts, leaderboards, GIF review cards, and bot warning/error logs.
+- Activity Moment embeds now use the acting user's avatar and emoji-led fields
+  so they match the usual MPC embed style.
 - `/pornscene` live part embeds now show only Cast and Viewers, with Cast kept
   to the two users only.
 - `/pornscene` now gives the requester a small +5 XP starter bonus when the

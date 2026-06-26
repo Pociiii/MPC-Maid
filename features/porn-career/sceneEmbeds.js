@@ -442,7 +442,7 @@ function buildPartEmbed(
     embed.addFields(
         {
             name:
-                'Cast',
+                '\uD83D\uDC65 Cast',
             value:
                 formatCast(
                     requesterId,
@@ -453,7 +453,7 @@ function buildPartEmbed(
         },
         {
             name:
-                'Viewers',
+                '\uD83D\uDCFA Viewers',
             value:
                 `**${viewerCount}** watching now`,
             inline:
@@ -518,7 +518,7 @@ function buildFinalEmbed(
     embed.addFields(
         {
             name:
-                'Cast',
+                '\uD83D\uDC65 Cast',
             value:
                 formatCast(
                     requesterId,
@@ -637,7 +637,7 @@ function buildStartEmbed(
         .addFields(
             {
                 name:
-                    'Cast',
+                    '\uD83D\uDC65 Cast',
                 value:
                     formatCast(
                         requesterId,
@@ -649,7 +649,7 @@ function buildStartEmbed(
             },
             {
                 name:
-                    'Scene Setup',
+                    '\uD83C\uDFAC Scene Setup',
                 value:
                     `- Parts: **${result.totalParts}**
 - Booster: **${formatBooster(
@@ -660,7 +660,7 @@ function buildStartEmbed(
             },
             {
                 name:
-                    'Performance',
+                    '\uD83D\uDCAA Performance',
                 value:
                     `- Total: ${formatStatValue(
                         requesterUser.performance,
@@ -672,7 +672,7 @@ function buildStartEmbed(
             },
             {
                 name:
-                    'Stamina',
+                    '\u2764\uFE0F Stamina',
                 value:
                     `- Total: ${formatStatValue(
                         requesterUser.stamina,
@@ -684,7 +684,7 @@ function buildStartEmbed(
             },
             {
                 name:
-                    'Fame',
+                    '\uD83D\uDC51 Fame',
                 value:
                     `- Total: ${formatStatValue(
                         requesterUser.fame,

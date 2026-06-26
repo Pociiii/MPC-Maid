@@ -506,7 +506,7 @@ function buildSlotEmbed(
         },
         {
             name:
-                'Session',
+                '\uD83D\uDCCA Session',
             value:
                 `Spins: **${session.spins}**\nNet: **${session.totalProfit >= 0 ? '+' : ''}${session.totalProfit} coins**`,
             inline:

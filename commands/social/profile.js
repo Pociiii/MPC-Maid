@@ -264,7 +264,7 @@ function buildCompareEmbed(
     embed.addFields(
         {
             name:
-                firstMember.displayName,
+                `\uD83D\uDC64 ${firstMember.displayName}`,
             value:
 `- Performance: **${firstUser.performance}**
 - Stamina: **${firstUser.stamina}**
@@ -274,7 +274,7 @@ function buildCompareEmbed(
         },
         {
             name:
-                secondMember.displayName,
+                `\uD83D\uDC64 ${secondMember.displayName}`,
             value:
 `- Performance: **${secondUser.performance}**
 - Stamina: **${secondUser.stamina}**
@@ -284,7 +284,7 @@ function buildCompareEmbed(
         },
         {
             name:
-                'Difference',
+                '\u2194\uFE0F Difference',
             value:
 `- ${formatStatCompareLine(
     'Performance',

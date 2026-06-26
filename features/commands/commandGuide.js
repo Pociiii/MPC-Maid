@@ -93,7 +93,8 @@ function commandDetail(
 ) {
 
     return {
-        name,
+        name:
+            `\uD83D\uDD39 ${name}`,
         value:
 `- Channel: ${channel}
 - Cooldown: ${cooldown}

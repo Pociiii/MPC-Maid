@@ -150,7 +150,7 @@ async function sendPornSceneRequest(
     embed.addFields(
         {
             name:
-                'Cast',
+                '\uD83D\uDC65 Cast',
             value:
                 `<@${interaction.user.id}> + <@${targetId}>\n${getSceneCategoryName(
                     sceneCategory
@@ -160,7 +160,7 @@ async function sendPornSceneRequest(
         },
         {
             name:
-                'Booster',
+                '\uD83D\uDE80 Booster',
             value:
                 formatBooster(
                     booster
@@ -170,7 +170,7 @@ async function sendPornSceneRequest(
         },
         {
             name:
-                'Tip',
+                '\uD83D\uDCA1 Tip',
             value:
                 'Use `/train` to raise stats and help your scene partner get better outcomes.',
             inline:
@@ -234,7 +234,7 @@ async function sendPornSceneRequest(
                 fields: [
                     {
                         name:
-                            'Requester',
+                            '\uD83D\uDC64 Requester',
                         value:
                             `<@${interaction.user.id}>`,
                         inline:
@@ -242,7 +242,7 @@ async function sendPornSceneRequest(
                     },
                     {
                         name:
-                            'Target',
+                            '\uD83C\uDFAF Target',
                         value:
                             `<@${targetId}>`,
                         inline:
@@ -250,7 +250,7 @@ async function sendPornSceneRequest(
                     },
                     {
                         name:
-                            'Reason',
+                            '\uD83D\uDCDD Reason',
                         value:
                             error.message || 'Unknown error',
                         inline:
@@ -302,7 +302,7 @@ async function sendPornSceneRequest(
                     fields: [
                         {
                             name:
-                                'Cast',
+                                '\uD83D\uDC65 Cast',
                             value:
                                 `<@${interaction.user.id}> + <@${targetId}>\n${getSceneCategoryName(
                                     sceneCategory
@@ -312,7 +312,7 @@ async function sendPornSceneRequest(
                         },
                         {
                             name:
-                                'Booster',
+                                '\uD83D\uDE80 Booster',
                             value:
                                 formatBooster(
                                     booster
@@ -338,7 +338,7 @@ async function sendPornSceneRequest(
                     fields: [
                         {
                             name:
-                                'Requester',
+                                '\uD83D\uDC64 Requester',
                             value:
                                 `<@${interaction.user.id}>`,
                             inline:
@@ -346,7 +346,7 @@ async function sendPornSceneRequest(
                         },
                         {
                             name:
-                                'Target',
+                                '\uD83C\uDFAF Target',
                             value:
                                 `<@${targetId}>`,
                             inline:
@@ -378,7 +378,7 @@ async function sendPornSceneRequest(
                 fields: [
                     {
                         name:
-                            'Requester',
+                            '\uD83D\uDC64 Requester',
                         value:
                             `<@${interaction.user.id}>`,
                         inline:
@@ -386,7 +386,7 @@ async function sendPornSceneRequest(
                     },
                     {
                         name:
-                            'Target',
+                            '\uD83C\uDFAF Target',
                         value:
                             `<@${targetId}>`,
                         inline:
@@ -394,7 +394,7 @@ async function sendPornSceneRequest(
                     },
                     {
                         name:
-                            'Reason',
+                            '\uD83D\uDCDD Reason',
                         value:
                             error.message || 'Unknown error',
                         inline:

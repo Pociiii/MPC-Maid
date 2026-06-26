@@ -142,7 +142,7 @@ function buildReviewEmbed(
     embed.addFields(
         {
             name:
-                'Submitted By',
+                '\uD83D\uDC64 Submitted By',
             value:
                 `<@${submitterId}>`,
             inline:
@@ -150,7 +150,7 @@ function buildReviewEmbed(
         },
         {
             name:
-                'Category',
+                '\uD83D\uDCC1 Category',
             value:
                 categoryName,
             inline:
@@ -158,7 +158,7 @@ function buildReviewEmbed(
         },
         {
             name:
-                'URL',
+                '\uD83D\uDD17 URL',
             value:
                 gifUrl,
             inline:

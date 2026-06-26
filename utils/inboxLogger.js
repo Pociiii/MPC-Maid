@@ -246,7 +246,7 @@ function logError(
                 ...fields,
                 {
                     name:
-                        'Error',
+                        '\u26A0\uFE0F Error',
                     value:
                         formatError(
                             error

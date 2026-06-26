@@ -157,7 +157,7 @@ function scheduleCustomScene(
                                 fields: [
                                     {
                                         name:
-                                            'Part',
+                                            '\uD83C\uDF9E\uFE0F Part',
                                         value:
                                             `${index + 1}/${parts.length}`,
                                         inline:
@@ -165,7 +165,7 @@ function scheduleCustomScene(
                                     },
                                     {
                                         name:
-                                            'Category',
+                                            '\uD83D\uDCC1 Category',
                                         value:
                                             `${cast}/${part}`,
                                         inline:
@@ -173,7 +173,7 @@ function scheduleCustomScene(
                                     },
                                     {
                                         name:
-                                            'Channel',
+                                            '\uD83D\uDCCD Channel',
                                         value:
                                             `<#${channel.id}>`,
                                         inline:
@@ -181,7 +181,7 @@ function scheduleCustomScene(
                                     },
                                     {
                                         name:
-                                            'User',
+                                            '\uD83D\uDC64 User',
                                         value:
                                             `<@${interaction.user.id}>`,
                                         inline:

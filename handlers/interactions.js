@@ -625,7 +625,7 @@ module.exports = async (
                 fields: [
                     {
                         name:
-                            'Type',
+                            '\uD83D\uDD22 Type',
                         value:
                             interaction.type?.toString() || 'Unknown',
                         inline:
@@ -633,7 +633,7 @@ module.exports = async (
                     },
                     {
                         name:
-                            'Custom ID',
+                            '\uD83C\uDD94 Custom ID',
                         value:
                             interaction.customId || 'None',
                         inline:
@@ -641,7 +641,7 @@ module.exports = async (
                     },
                     {
                         name:
-                            'User',
+                            '\uD83D\uDC64 User',
                         value:
                             `${interaction.user.tag} (${interaction.user.id})`,
                         inline:

@@ -105,7 +105,7 @@ function buildTierFields() {
         .map(
             (tierKey) => ({
                 name:
-                    `Tier ${tierKey}`,
+                    `\uD83D\uDED2 Tier ${tierKey}`,
                 value:
                     boosterStats.map(
                         (stat) =>

@@ -129,7 +129,7 @@ async function buildRankingEmbed(
         ...ranks.map(
             (rank) => ({
                 name:
-                    rank.title,
+                    `\uD83C\uDFC6 ${rank.title}`,
                 value:
                     formatRankingRows(
                         users.filter(
@@ -182,7 +182,7 @@ async function buildScenesEmbed(
     embed.addFields(
         {
             name:
-                'Male Scenes',
+                '\u2642\uFE0F Male Scenes',
             value:
                 formatRows(
                     topBy(
@@ -198,7 +198,7 @@ async function buildScenesEmbed(
         },
         {
             name:
-                'Female Scenes',
+                '\u2640\uFE0F Female Scenes',
             value:
                 formatRows(
                     topBy(
@@ -233,7 +233,7 @@ async function buildCoinsEmbed(
 
     embed.addFields({
         name:
-            'Richest Members',
+            '\uD83D\uDCB0 Richest Members',
         value:
             formatRows(
                 topBy(
@@ -269,7 +269,7 @@ async function buildSpanksEmbed(
     embed.addFields(
         {
             name:
-                'Top Spankers',
+                '\uD83D\uDC4B Top Spankers',
             value:
                 formatRows(
                     topBy(
@@ -288,7 +288,7 @@ async function buildSpanksEmbed(
         },
         {
             name:
-                'Most Spanked',
+                '\uD83D\uDE33 Most Spanked',
             value:
                 formatRows(
                     topBy(
@@ -327,7 +327,7 @@ async function buildKissesEmbed(
     embed.addFields(
         {
             name:
-                'Top Kiss Givers',
+                '\uD83D\uDC8B Top Kiss Givers',
             value:
                 formatRows(
                     topBy(
@@ -346,7 +346,7 @@ async function buildKissesEmbed(
         },
         {
             name:
-                'Most Kissed',
+                '\uD83D\uDC8C Most Kissed',
             value:
                 formatRows(
                     topBy(
@@ -384,7 +384,7 @@ async function buildAchievementsEmbed(
 
     embed.addFields({
         name:
-            'Achievement Points',
+            '\uD83C\uDFC5 Achievement Points',
         value:
             formatRows(
                 topBy(
@@ -435,7 +435,7 @@ async function buildHelpsEmbed(
     embed.addFields(
         {
             name:
-                'Male Helpers',
+                '\u2642\uFE0F Male Helpers',
             value:
                 formatRows(
                     topBy(
@@ -451,7 +451,7 @@ async function buildHelpsEmbed(
         },
         {
             name:
-                'Female Helpers',
+                '\u2640\uFE0F Female Helpers',
             value:
                 formatRows(
                     topBy(
