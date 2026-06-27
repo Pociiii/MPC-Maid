@@ -10,6 +10,10 @@ const {
     commandFooter
 } = require('./version');
 
+const {
+    mpcLogoAttachment
+} = require('./mpcLogo');
+
 function createEmbed(options = {}) {
 
     const embed = new EmbedBuilder();
@@ -27,7 +31,7 @@ function createEmbed(options = {}) {
 
         embed.setAuthor({
             name: options.authorName,
-            iconURL: options.authorIcon
+            iconURL: mpcLogoAttachment
         });
 
     }
@@ -163,15 +167,11 @@ function createUserEmbed(
             getUserDisplayName(
                 interaction
             ),
-        authorIcon:
-            getDisplayAvatar(
-                interaction.user
-            ),
         thumbnail:
-            thumbnail ??
             getDisplayAvatar(
                 interaction.user
-            ),
+            ) ??
+            thumbnail,
         title,
         description,
         image,
@@ -204,10 +204,6 @@ function createTargetUserEmbed(
         color,
         authorName:
             getDisplayName(
-                target
-            ),
-        authorIcon:
-            getDisplayAvatar(
                 target
             ),
         thumbnail:
@@ -247,9 +243,11 @@ function createBotEmbed(
         color,
         authorName:
             interaction.client.user.username,
-        authorIcon:
-            interaction.client.user.displayAvatarURL(),
-        thumbnail,
+        thumbnail:
+            thumbnail ??
+            getDisplayAvatar(
+                interaction.user
+            ),
         title,
         description,
         image,

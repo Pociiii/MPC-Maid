@@ -85,6 +85,8 @@ function baseEmbed(
             interaction.client.user.username,
         authorIcon:
             interaction.client.user.displayAvatarURL(),
+        thumbnail:
+            interaction.user.displayAvatarURL(),
         title:
             views[view].title,
         footerText:

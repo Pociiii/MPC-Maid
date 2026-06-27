@@ -67,7 +67,7 @@ function achievementUsers() {
 
 }
 
-function topBy(
+function rankedBy(
     users,
     stat,
     includeUser = () => true
@@ -89,10 +89,61 @@ function topBy(
                     a[stat]
                 )
         )
-        .slice(
-            0,
-            limit
+
+}
+
+function topBy(
+    users,
+    stat,
+    includeUser = () => true
+) {
+
+    return rankedBy(
+        users,
+        stat,
+        includeUser
+    ).slice(
+        0,
+        limit
+    );
+
+}
+
+function rankBy(
+    users,
+    stat,
+    userId,
+    includeUser = () => true
+) {
+
+    const rankedUsers =
+        rankedBy(
+            users,
+            stat,
+            includeUser
         );
+
+    const index =
+        rankedUsers.findIndex(
+            (user) =>
+                user.id === userId
+        );
+
+    if (
+        index === -1
+    )
+        return null;
+
+    return {
+        rank:
+            index + 1,
+        user:
+            rankedUsers[index],
+        value:
+            Number(
+                rankedUsers[index][stat]
+            )
+    };
 
 }
 
@@ -131,5 +182,6 @@ module.exports = {
     achievementUsers,
     allUsers,
     filterByRole,
+    rankBy,
     topBy
 };

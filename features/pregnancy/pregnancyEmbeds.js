@@ -4,7 +4,9 @@ const {
 
 const {
     createEmbed,
-    createTargetUserEmbed
+    createTargetUserEmbed,
+    getDisplayAvatar,
+    getDisplayName
 } = require('../../utils/embeds');
 
 const {
@@ -97,6 +99,28 @@ function getDueTimestamp(
             pregnancy.due_at
         ).getTime() / 1000
     );
+
+}
+
+function getCarrierStyle(
+    carrier
+) {
+
+    if (
+        !carrier
+    )
+        return {};
+
+    return {
+        authorName:
+            getDisplayName(
+                carrier
+            ),
+        thumbnail:
+            getDisplayAvatar(
+                carrier
+            )
+    };
 
 }
 
@@ -292,21 +316,24 @@ function buildPregnancyConfirmedEmbed(
 
     const embed =
         createEmbed({
-        color:
-            getRandomColor(),
-        description:
-            pickMomentFlavor(
-                'pregnancy_confirmed'
+            ...getCarrierStyle(
+                carrier
             ),
-        title:
-            'Pregnancy Moment',
-        footerText:
-            commandFooter(
-                '/pregnancy'
-            ),
-        timestamp:
-            true
-    });
+            color:
+                getRandomColor(),
+            description:
+                pickMomentFlavor(
+                    'pregnancy_confirmed'
+                ),
+            title:
+                'Pregnancy Moment',
+            footerText:
+                commandFooter(
+                    '/pregnancy'
+                ),
+            timestamp:
+                true
+        });
 
     embed.addFields(
         {
@@ -342,21 +369,24 @@ function buildGenderRevealEmbed(
 
     const embed =
         createEmbed({
-        color:
-            getRandomColor(),
-        description:
-            pickMomentFlavor(
-                'pregnancy_reveal'
+            ...getCarrierStyle(
+                carrier
             ),
-        title:
-            'Gender Reveal',
-        footerText:
-            commandFooter(
-                '/pregnancy'
-            ),
-        timestamp:
-            true
-    });
+            color:
+                getRandomColor(),
+            description:
+                pickMomentFlavor(
+                    'pregnancy_reveal'
+                ),
+            title:
+                'Gender Reveal',
+            footerText:
+                commandFooter(
+                    '/pregnancy'
+                ),
+            timestamp:
+                true
+        });
 
     embed.addFields(
         {
@@ -396,21 +426,24 @@ function buildBirthEmbed(
 
     const embed =
         createEmbed({
-        color:
-            getRandomColor(),
-        description:
-            pickMomentFlavor(
-                'birth'
+            ...getCarrierStyle(
+                carrier
             ),
-        title:
-            'Birth Announcement',
-        footerText:
-            commandFooter(
-                '/pregnancy'
-            ),
-        timestamp:
-            true
-    });
+            color:
+                getRandomColor(),
+            description:
+                pickMomentFlavor(
+                    'birth'
+                ),
+            title:
+                'Birth Announcement',
+            footerText:
+                commandFooter(
+                    '/pregnancy'
+                ),
+            timestamp:
+                true
+        });
 
     embed.addFields(
         {

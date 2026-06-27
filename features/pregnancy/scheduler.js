@@ -19,6 +19,10 @@ const {
     logError
 } = require('../../utils/inboxLogger');
 
+const {
+    fetchDisplayTarget
+} = require('../../utils/embeds');
+
 const dayIntervalMs =
     24 * 60 * 60 * 1000;
 
@@ -34,6 +38,23 @@ async function getMomentsChannel(
         ).catch(
             () => null
         );
+
+}
+
+async function getCarrierTarget(
+    client,
+    pregnancy
+) {
+
+    if (
+        !pregnancy?.carrier_id
+    )
+        return null;
+
+    return fetchDisplayTarget(
+        client,
+        pregnancy.carrier_id
+    );
 
 }
 
@@ -62,10 +83,17 @@ async function announcePregnancyResults(
         )
             continue;
 
+        const carrier =
+            await getCarrierTarget(
+                client,
+                result.pregnancy
+            );
+
         await channel.send({
             embeds: [
                 buildPregnancyConfirmedEmbed(
-                    result.pregnancy
+                    result.pregnancy,
+                    carrier
                 )
             ]
         });
@@ -98,10 +126,17 @@ async function announceMilestones(
         const pregnancy of reveals
     ) {
 
+        const carrier =
+            await getCarrierTarget(
+                client,
+                pregnancy
+            );
+
         await channel.send({
             embeds: [
                 buildGenderRevealEmbed(
-                    pregnancy
+                    pregnancy,
+                    carrier
                 )
             ]
         });
@@ -112,10 +147,17 @@ async function announceMilestones(
         const pregnancy of births
     ) {
 
+        const carrier =
+            await getCarrierTarget(
+                client,
+                pregnancy
+            );
+
         await channel.send({
             embeds: [
                 buildBirthEmbed(
-                    pregnancy
+                    pregnancy,
+                    carrier
                 )
             ]
         });

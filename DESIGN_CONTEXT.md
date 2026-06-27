@@ -66,6 +66,8 @@ Prefer improving existing systems before adding new ones:
   belong in private dropdown replies, with separate info buttons for big
   systems.
 - Use user avatars as thumbnails for user-centered embeds.
+- Use the MPC logo URL as the small author icon on embeds. The right-side
+  thumbnail should show the command runner or the user the embed is centered on.
 - Use consistent command footers with the bot version where applicable.
 - Keep Moments sexy/story-focused.
 - Keep Maid Feed for progress/system notices.

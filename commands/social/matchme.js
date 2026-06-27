@@ -171,7 +171,7 @@ module.exports = {
 Compatibility: **${compatibility}%**
 Vibe: **${getRandomItem(vibes)}**`,
                 thumbnail:
-                    match.user.displayAvatarURL(),
+                    interaction.user.displayAvatarURL(),
                 footerText:
                     '/matchme - One match per day',
                 timestamp:

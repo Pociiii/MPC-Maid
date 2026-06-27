@@ -150,6 +150,8 @@ async function buildTrainingPanel(
                 interaction.member.displayName,
             authorIcon:
                 interaction.user.displayAvatarURL(),
+            thumbnail:
+                interaction.user.displayAvatarURL(),
             title:
                 'Training',
             description:

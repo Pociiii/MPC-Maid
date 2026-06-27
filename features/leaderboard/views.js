@@ -5,6 +5,7 @@ const {
     achievementUsers,
     allUsers,
     filterByRole,
+    rankBy,
     topBy
 } = require('./data');
 
@@ -100,6 +101,52 @@ async function getGenderGroups(
 
 }
 
+function formatPositionLine(
+    label,
+    rankInfo,
+    suffix = '',
+    detail = null
+) {
+
+    if (
+        !rankInfo
+    )
+        return `- ${label}: Not ranked yet`;
+
+    const value =
+        Number.isFinite(
+            rankInfo.value
+        )
+            ? rankInfo.value
+            : 0;
+
+    const detailText =
+        detail
+            ? ` (${detail})`
+            : '';
+
+    return `- ${label}: **#${rankInfo.rank}** - **${value.toLocaleString()}${suffix}**${detailText}`;
+
+}
+
+function addPositionField(
+    embed,
+    lines
+) {
+
+    embed.addFields({
+        name:
+            '\uD83D\uDCCD Your Position',
+        value:
+            lines.join(
+                '\n'
+            ),
+        inline:
+            false
+    });
+
+}
+
 async function buildRankingEmbed(
     interaction
 ) {
@@ -145,6 +192,31 @@ async function buildRankingEmbed(
                     true
             })
         )
+    );
+
+    const requesterRank =
+        rankBy(
+            users,
+            'ranking',
+            interaction.user.id
+        );
+
+    addPositionField(
+        embed,
+        [
+            formatPositionLine(
+                '\uD83C\uDFC6 Overall Ranking',
+                requesterRank,
+                ' rank score',
+                requesterRank
+                    ? getRankTitle(
+                        Number(
+                            requesterRank.value
+                        )
+                    )
+                    : null
+            )
+        ]
     );
 
     return embed;
@@ -214,6 +286,32 @@ async function buildScenesEmbed(
         }
     );
 
+    addPositionField(
+        embed,
+        [
+            formatPositionLine(
+                '\u2642\uFE0F Male Scenes',
+                rankBy(
+                    maleUsers,
+                    'scenes_completed',
+                    interaction.user.id,
+                    hasScenes
+                ),
+                ' scenes'
+            ),
+            formatPositionLine(
+                '\u2640\uFE0F Female Scenes',
+                rankBy(
+                    femaleUsers,
+                    'scenes_completed',
+                    interaction.user.id,
+                    hasScenes
+                ),
+                ' scenes'
+            )
+        ]
+    );
+
     return embed;
 
 }
@@ -231,6 +329,12 @@ async function buildCoinsEmbed(
             'coins'
         );
 
+    const hasCoins =
+        (user) =>
+            Number(
+                user.coins
+            ) > 0;
+
     embed.addFields({
         name:
             '\uD83D\uDCB0 Richest Members',
@@ -239,15 +343,28 @@ async function buildCoinsEmbed(
                 topBy(
                     users,
                     'coins',
-                    (user) =>
-                        Number(
-                            user.coins
-                        ) > 0
+                    hasCoins
                 ),
                 'coins',
                 ' coins'
             )
     });
+
+    addPositionField(
+        embed,
+        [
+            formatPositionLine(
+                '\uD83D\uDCB0 Richest Members',
+                rankBy(
+                    users,
+                    'coins',
+                    interaction.user.id,
+                    hasCoins
+                ),
+                ' coins'
+            )
+        ]
+    );
 
     return embed;
 
@@ -266,6 +383,18 @@ async function buildSpanksEmbed(
             'spanks'
         );
 
+    const hasSpanksGiven =
+        (user) =>
+            Number(
+                user.spanks_given
+            ) > 0;
+
+    const hasSpanksTaken =
+        (user) =>
+            Number(
+                user.spanks_taken
+            ) > 0;
+
     embed.addFields(
         {
             name:
@@ -275,10 +404,7 @@ async function buildSpanksEmbed(
                     topBy(
                         users,
                         'spanks_given',
-                        (user) =>
-                            Number(
-                                user.spanks_given
-                            ) > 0
+                        hasSpanksGiven
                     ),
                     'spanks_given',
                     ' given'
@@ -294,10 +420,7 @@ async function buildSpanksEmbed(
                     topBy(
                         users,
                         'spanks_taken',
-                        (user) =>
-                            Number(
-                                user.spanks_taken
-                            ) > 0
+                        hasSpanksTaken
                     ),
                     'spanks_taken',
                     ' taken'
@@ -305,6 +428,32 @@ async function buildSpanksEmbed(
             inline:
                 true
         }
+    );
+
+    addPositionField(
+        embed,
+        [
+            formatPositionLine(
+                '\uD83D\uDC4B Top Spankers',
+                rankBy(
+                    users,
+                    'spanks_given',
+                    interaction.user.id,
+                    hasSpanksGiven
+                ),
+                ' given'
+            ),
+            formatPositionLine(
+                '\uD83D\uDE33 Most Spanked',
+                rankBy(
+                    users,
+                    'spanks_taken',
+                    interaction.user.id,
+                    hasSpanksTaken
+                ),
+                ' taken'
+            )
+        ]
     );
 
     return embed;
@@ -324,6 +473,18 @@ async function buildKissesEmbed(
             'kisses'
         );
 
+    const hasKissesGiven =
+        (user) =>
+            Number(
+                user.kisses_given
+            ) > 0;
+
+    const hasKissesTaken =
+        (user) =>
+            Number(
+                user.kisses_taken
+            ) > 0;
+
     embed.addFields(
         {
             name:
@@ -333,10 +494,7 @@ async function buildKissesEmbed(
                     topBy(
                         users,
                         'kisses_given',
-                        (user) =>
-                            Number(
-                                user.kisses_given
-                            ) > 0
+                        hasKissesGiven
                     ),
                     'kisses_given',
                     ' given'
@@ -352,10 +510,7 @@ async function buildKissesEmbed(
                     topBy(
                         users,
                         'kisses_taken',
-                        (user) =>
-                            Number(
-                                user.kisses_taken
-                            ) > 0
+                        hasKissesTaken
                     ),
                     'kisses_taken',
                     ' taken'
@@ -363,6 +518,32 @@ async function buildKissesEmbed(
             inline:
                 true
         }
+    );
+
+    addPositionField(
+        embed,
+        [
+            formatPositionLine(
+                '\uD83D\uDC8B Top Kiss Givers',
+                rankBy(
+                    users,
+                    'kisses_given',
+                    interaction.user.id,
+                    hasKissesGiven
+                ),
+                ' given'
+            ),
+            formatPositionLine(
+                '\uD83D\uDC8C Most Kissed',
+                rankBy(
+                    users,
+                    'kisses_taken',
+                    interaction.user.id,
+                    hasKissesTaken
+                ),
+                ' taken'
+            )
+        ]
     );
 
     return embed;
@@ -382,6 +563,12 @@ async function buildAchievementsEmbed(
             'achievements'
         );
 
+    const hasAchievementPoints =
+        (user) =>
+            Number(
+                user.achievement_points
+            ) > 0;
+
     embed.addFields({
         name:
             '\uD83C\uDFC5 Achievement Points',
@@ -390,15 +577,28 @@ async function buildAchievementsEmbed(
                 topBy(
                     users,
                     'achievement_points',
-                    (user) =>
-                        Number(
-                            user.achievement_points
-                        ) > 0
+                    hasAchievementPoints
                 ),
                 'achievement_points',
                 ' pts'
             )
     });
+
+    addPositionField(
+        embed,
+        [
+            formatPositionLine(
+                '\uD83C\uDFC5 Achievement Points',
+                rankBy(
+                    users,
+                    'achievement_points',
+                    interaction.user.id,
+                    hasAchievementPoints
+                ),
+                ' pts'
+            )
+        ]
+    );
 
     return embed;
 
@@ -465,6 +665,32 @@ async function buildHelpsEmbed(
             inline:
                 true
         }
+    );
+
+    addPositionField(
+        embed,
+        [
+            formatPositionLine(
+                '\u2642\uFE0F Male Helpers',
+                rankBy(
+                    maleUsers,
+                    'horny_helps',
+                    interaction.user.id,
+                    hasHelps
+                ),
+                ' helps'
+            ),
+            formatPositionLine(
+                '\u2640\uFE0F Female Helpers',
+                rankBy(
+                    femaleUsers,
+                    'horny_helps',
+                    interaction.user.id,
+                    hasHelps
+                ),
+                ' helps'
+            )
+        ]
     );
 
     return embed;
