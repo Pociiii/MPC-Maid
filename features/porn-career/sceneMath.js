@@ -3,6 +3,10 @@ const {
     boosterTiers
 } = require('../../utils/boosters');
 
+const {
+    SCENE_BALANCE
+} = require('../../data/constants');
+
 function randomInt(
     min,
     max
@@ -140,6 +144,16 @@ const scorePerStatThreshold =
 const xpPerExtraPart =
     2;
 
+function getStatBonus(
+    combinedStat
+) {
+
+    return Math.floor(
+        combinedStat / SCENE_BALANCE.STAT_BONUS_THRESHOLD
+    );
+
+}
+
 const outcomeRewards = {
     'Awkward Scene': {
         ranking:
@@ -257,18 +271,18 @@ function calculateScene(
         targetUser.fame;
 
     const staminaBonus =
-        Math.floor(
-            combinedStamina / 10
+        getStatBonus(
+            combinedStamina
         );
 
     const performanceBonus =
-        Math.floor(
-            combinedPerformance / 10
+        getStatBonus(
+            combinedPerformance
         );
 
     const fameBonus =
-        Math.floor(
-            combinedFame / 10
+        getStatBonus(
+            combinedFame
         );
 
     const totalParts =
@@ -371,9 +385,9 @@ function calculateScene(
 
     const critChance =
         clamp(
-            3 + (Math.floor(
-                combinedPerformance / 10
-            ) * 1),
+            3 + getStatBonus(
+                combinedPerformance
+            ),
             3,
             15
         );
@@ -475,5 +489,6 @@ module.exports = {
     buildPhaseOrder,
     calculateScene,
     formatStatValue,
+    getStatBonus,
     getIntervalMs
 };

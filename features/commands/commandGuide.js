@@ -259,6 +259,8 @@ function buildSections() {
                 commandSummary([
                     '/matchme',
                     '/relationship',
+                    '/drink',
+                    '/firework',
                     '/breed',
                     '/pregnancy'
                 ]),
@@ -276,6 +278,22 @@ function buildSections() {
                     privateReply,
                     'None',
                     'Manage RP relationships and view links.'
+                ),
+                commandDetail(
+                    '/drink',
+                    'Any channel, public reply',
+                    cooldownLabel(
+                        COOLDOWNS.DRINK
+                    ),
+                    `Spend ${ECONOMY.DRINK_COST} coins to give ${ECONOMY.DRINK_XP_REWARD} XP to everyone online.`
+                ),
+                commandDetail(
+                    '/firework',
+                    'Any channel, public reply',
+                    cooldownLabel(
+                        COOLDOWNS.FIREWORK
+                    ),
+                    `Spend ${ECONOMY.FIREWORK_COST} coins on a public flex with no XP reward.`
                 ),
                 commandDetail(
                     '/breed',

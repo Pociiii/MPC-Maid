@@ -19,7 +19,9 @@ const dataFolder = path.join(__dirname, '..', '..', 'data');
 const interactionLabels = {
     blowkiss: 'Blow Kiss',
     brofist: 'Brofist',
+    drink: 'Drink',
     spank: 'Spank',
+    firework: 'Firework',
     titty_drop: 'Drop',
     wiggle: 'Wiggle'
 };

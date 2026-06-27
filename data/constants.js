@@ -30,6 +30,9 @@ function getRandomColor() {
 const ECONOMY = {
     STARTING_COINS: 500,
     CUSTOM_SCENE_PART_COST: 20,
+    DRINK_COST: 250,
+    DRINK_XP_REWARD: 3,
+    FIREWORK_COST: 1000,
     PORN_SCENE_STARTER_XP_BONUS: 5
 };
 
@@ -40,6 +43,10 @@ const STATS = {
     DEFAULT_RANKING: 0,
     DEFAULT_SPANKS_TAKEN: 0,
     DEFAULT_SPANKS_GIVEN: 0
+};
+
+const SCENE_BALANCE = {
+    STAT_BONUS_THRESHOLD: 20
 };
 
 const SCENE_PHASES = {
@@ -107,6 +114,8 @@ const COOLDOWNS = {
     SLOTS: 60,
     BLACKJACK: 1200,
     CUSTOM_SCENE: 1800,
+    DRINK: 86400,
+    FIREWORK: 86400,
     PORN_SCENE_REQUEST: 600,
     MATCHME: 86400
 };
@@ -117,6 +126,7 @@ module.exports = {
     getRandomColor,
     ECONOMY,
     STATS,
+    SCENE_BALANCE,
     SCENE_PHASES,
     RANKS,
     COOLDOWNS,

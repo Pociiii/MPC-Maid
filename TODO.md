@@ -670,7 +670,7 @@ Current shop version:
 - Use a dropdown menu instead of crowded buttons.
 - Keep purchases private/ephemeral.
 - Current prices: T1 120, T2 350, T3 800, T4 1400 coins.
-- Boosters are best used to push a combined stat over a 10-point threshold.
+- Boosters are best used to push a combined stat over a 20-point threshold.
 
 Possible future items:
 - Cosmetic profile/card items.

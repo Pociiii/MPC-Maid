@@ -378,10 +378,15 @@ async function announceWinner(
 
     await channel.send({
         content:
-            null,
+            `<@${interaction.user.id}>`,
         embeds: [
             embed
-        ]
+        ],
+        allowedMentions: {
+            users: [
+                interaction.user.id
+            ]
+        }
     }).catch(
         () => null
     );
@@ -560,12 +565,7 @@ async function handleSpankDilli(
         won
     ) {
 
-        await interaction.followUp({
-            content:
-                `<@${interaction.user.id}> won the Spank Dilli prize: **${prizeAfterSpank} coins**!`
-        });
-
-        void announceWinner(
+        await announceWinner(
             interaction,
             prizeAfterSpank
         );

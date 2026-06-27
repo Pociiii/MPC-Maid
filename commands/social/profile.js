@@ -11,6 +11,10 @@ const {
 } = require('../../features/achievements/achievements');
 
 const {
+    getStatBonus
+} = require('../../features/porn-career/sceneMath');
+
+const {
     createEmbed
 } = require('../../utils/embeds');
 
@@ -200,8 +204,8 @@ function buildCompareEmbed(
 
     const critChance =
         clamp(
-            3 + Math.floor(
-                combinedPerformance / 10
+            3 + getStatBonus(
+                combinedPerformance
             ),
             3,
             15
@@ -209,8 +213,8 @@ function buildCompareEmbed(
 
     const totalParts =
         clamp(
-            4 + Math.floor(
-                combinedStamina / 10
+            4 + getStatBonus(
+                combinedStamina
             ),
             4,
             8
@@ -223,17 +227,17 @@ function buildCompareEmbed(
         ) * 2;
 
     const fameBonus =
-        Math.floor(
-            combinedFame / 10
+        getStatBonus(
+            combinedFame
         );
 
     const scoreBonus =
         (
-            Math.floor(
-                combinedPerformance / 10
+            getStatBonus(
+                combinedPerformance
             ) +
-            Math.floor(
-                combinedStamina / 10
+            getStatBonus(
+                combinedStamina
             ) +
             fameBonus
         ) * 3;

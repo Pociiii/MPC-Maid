@@ -141,6 +141,10 @@ Social / RP:
 
 - `/matchme` publicly matches the user with an opposite-gender member.
 - `/relationship` manages consent-based RP relationship links.
+- `/drink` costs coins, posts publicly, and grants a tiny XP toast to visible
+  online members. It uses the `GuildPresences` intent and its own GIF pool.
+- `/firework` costs more coins, posts publicly, grants no rewards, and is a
+  pure flex sink with its own GIF pool.
 - `/breed` sends a pregnancy RP consent request.
 - `/pregnancy` privately shows the user their own pregnancy/fertility state.
 
@@ -187,11 +191,11 @@ Scene stats:
   extra parts.
 - Fame increases viewers, revenue, and score.
 - Partner stats are combined.
-- Every stat adds a score bonus every 10 combined points.
-- Performance adds critical chance every 10 combined points, capped at 15%.
-- Stamina adds scene parts every 10 combined points, capped at 8 parts.
+- Every stat adds a score bonus every 20 combined points.
+- Performance adds critical chance every 20 combined points, capped at 15%.
+- Stamina adds scene parts every 20 combined points, capped at 8 parts.
 - Each stamina-created extra part gives +2 XP each.
-- Fame gives bigger viewer/revenue value every 10 combined points.
+- Fame gives bigger viewer/revenue value every 20 combined points.
 - Ranking can go negative.
 
 Outcomes:
@@ -360,7 +364,7 @@ Rules:
 - Booster is consumed immediately when the request is sent.
 - Booster is not refunded if the partner declines.
 - Booster applies only to the requester side of the combined scene stat.
-- Boosters are best used to push a combined stat over a 10-point threshold.
+- Boosters are best used to push a combined stat over a 20-point threshold.
 - Stronger boosters add more burnout/flop risk.
 
 Current tiers:
@@ -684,6 +688,8 @@ Interactions:
 - `data/gifs/spank.json`
 - `data/gifs/blowkiss.json`
 - `data/gifs/brofist.json`
+- `data/gifs/drink.json`
+- `data/gifs/firework.json`
 - Horny GIFs are split under `data/gifs/horny`.
 
 GIF randomness:
@@ -817,7 +823,7 @@ Next update currently includes:
 - `/pornscene` posts now keep one consistent color for the same pair.
 - `/flex` now has a male-only Brofist button, and `/gifsubmit` accepts Brofist GIFs.
 - New porn career achievements unlock when 2 combined scene stats, or all 3,
-  hit 10-point thresholds.
+  hit 20-point thresholds.
 - GIF picks now use shuffle bags and recent-user history to reduce repeats.
 - Daily Would You Rather is planned for General chat as a daily social vote
   with a discussion thread.

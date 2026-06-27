@@ -71,6 +71,22 @@ module.exports = {
 
                     {
                         label:
+                            'Drink',
+
+                        value:
+                            'drink'
+                    },
+
+                    {
+                        label:
+                            'Firework',
+
+                        value:
+                            'firework'
+                    },
+
+                    {
+                        label:
                             'Flex',
 
                         value:

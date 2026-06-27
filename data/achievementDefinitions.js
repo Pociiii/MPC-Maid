@@ -3,6 +3,10 @@ const {
     trainableStats
 } = require('../utils/statTraining');
 
+const {
+    SCENE_BALANCE
+} = require('./constants');
+
 const fixedSceneMilestones = [
     1,
     10,
@@ -44,7 +48,7 @@ const combinedSceneStatMilestones =
                 10
         },
         (_, index) =>
-            (index + 1) * 10
+            (index + 1) * SCENE_BALANCE.STAT_BONUS_THRESHOLD
     );
 
 function milestoneDefinition(
@@ -295,9 +299,9 @@ const endlessAchievements = {
     },
     scene_combined_stat: {
         startsAfter:
-            100,
+            SCENE_BALANCE.STAT_BONUS_THRESHOLD * 10,
         step:
-            10,
+            SCENE_BALANCE.STAT_BONUS_THRESHOLD,
         label:
             (value) =>
                 `Be part of a scene with a combined stat of ${value}`,
@@ -306,9 +310,9 @@ const endlessAchievements = {
     },
     scene_combined_two_stats: {
         startsAfter:
-            100,
+            SCENE_BALANCE.STAT_BONUS_THRESHOLD * 10,
         step:
-            10,
+            SCENE_BALANCE.STAT_BONUS_THRESHOLD,
         label:
             (value) =>
                 `Be part of a scene with 2 combined stats at ${value}`,
@@ -317,9 +321,9 @@ const endlessAchievements = {
     },
     scene_combined_three_stats: {
         startsAfter:
-            100,
+            SCENE_BALANCE.STAT_BONUS_THRESHOLD * 10,
         step:
-            10,
+            SCENE_BALANCE.STAT_BONUS_THRESHOLD,
         label:
             (value) =>
                 `Be part of a scene with all 3 combined stats at ${value}`,

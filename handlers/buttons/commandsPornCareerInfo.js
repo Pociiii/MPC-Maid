@@ -6,6 +6,7 @@ const {
     CHANNELS,
     COOLDOWNS,
     ECONOMY,
+    SCENE_BALANCE,
     getRandomColor
 } = require('../../data/constants');
 
@@ -55,14 +56,14 @@ module.exports = {
 - Fame increases viewers and revenue.
 - Ranking changes based on the final scene outcome.
 - Partner stats are combined for the scene.
-- Every stat adds the same scene score bonus every **10 combined points**.
-- Performance gets more critical chance every **10 combined points**, capped at **15%**.
-- Stamina adds scene parts every **10 combined points**, up to **8 parts**.
-- Fame gets a bigger viewer/revenue bonus every **10 combined points**.
+- Every stat adds the same scene score bonus every **${SCENE_BALANCE.STAT_BONUS_THRESHOLD} combined points**.
+- Performance gets more critical chance every **${SCENE_BALANCE.STAT_BONUS_THRESHOLD} combined points**, capped at **15%**.
+- Stamina adds scene parts every **${SCENE_BALANCE.STAT_BONUS_THRESHOLD} combined points**, up to **8 parts**.
+- Fame gets a bigger viewer/revenue bonus every **${SCENE_BALANCE.STAT_BONUS_THRESHOLD} combined points**.
 - A critical scene upgrades the outcome by one tier and adds a small XP bonus.
 - Boosters count for that scene's combined stat check only.
 - Stats keep counting after **40**, but training costs get much steeper.
-- Scene stat achievements unlock at combined stat thresholds like **10**, **20**, **30**, and beyond.
+- Scene stat achievements unlock at combined stat thresholds like **${SCENE_BALANCE.STAT_BONUS_THRESHOLD}**, **${SCENE_BALANCE.STAT_BONUS_THRESHOLD * 2}**, **${SCENE_BALANCE.STAT_BONUS_THRESHOLD * 3}**, and beyond.
 
 **Progression**
 - Completed scenes grant XP based on outcome, plus coins, ranking points, and scenes completed.
@@ -70,7 +71,7 @@ module.exports = {
 - Use \`/train\` to spend XP and coins on Performance, Stamina, and Fame.
 - Boosters are one-use scene bonuses for the requester only.
 - Booster tiers: T1 **120**, T2 **350**, T3 **800**, T4 **1400** coins.
-- Boosters are best used when they push a combined stat over a **10 / 20 / 30** threshold.
+- Boosters are best used when they push a combined stat over a **${SCENE_BALANCE.STAT_BONUS_THRESHOLD} / ${SCENE_BALANCE.STAT_BONUS_THRESHOLD * 2} / ${SCENE_BALANCE.STAT_BONUS_THRESHOLD * 3}** threshold.
 - Stronger boosters add more stat power and more burnout/flop risk.
 - Use \`/shop\` to buy boosters and \`/inventory\` to check owned boosters.`,
                 footerText:

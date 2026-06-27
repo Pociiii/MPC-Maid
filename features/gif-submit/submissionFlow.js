@@ -30,6 +30,10 @@ const interactionCategoryLabels = {
         'Blow Kiss',
     brofist:
         'Brofist',
+    drink:
+        'Drink',
+    firework:
+        'Firework',
     spank:
         'Spank',
     titty_drop:

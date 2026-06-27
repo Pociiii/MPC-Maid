@@ -4,7 +4,8 @@ const {
 } = require('discord.js');
 
 const {
-    COLORS
+    COLORS,
+    SCENE_BALANCE
 } = require('../../data/constants');
 
 const {
@@ -148,7 +149,7 @@ async function buildShopReply(
                 description:
 `${notice?.text ? `${notice.text}\n\n` : ''}Balance: **${user.coins} coins**
 Buy boosters for future \`/pornscene\` requests. One booster can be spent per scene.
-Best use: push a combined stat over a **10 / 20 / 30** threshold. Stronger tiers add more burnout risk.`
+Best use: push a combined stat over a **${SCENE_BALANCE.STAT_BONUS_THRESHOLD} / ${SCENE_BALANCE.STAT_BONUS_THRESHOLD * 2} / ${SCENE_BALANCE.STAT_BONUS_THRESHOLD * 3}** threshold. Stronger tiers add more burnout risk.`
             }
         );
 
