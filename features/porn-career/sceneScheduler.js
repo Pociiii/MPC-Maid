@@ -52,6 +52,7 @@ async function finishScene(
 ) {
 
     await applyRewards(
+        channel.client,
         requesterId,
         targetId,
         result

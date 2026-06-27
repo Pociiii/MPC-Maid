@@ -29,6 +29,10 @@ const {
     pickOne
 } = require('../../utils/flavorText');
 
+const {
+    syncUserAchievementCounters
+} = require('../achievements/achievements');
+
 const emojis =
     require('../../utils/emojis');
 
@@ -1306,6 +1310,7 @@ async function sendDailySetCompleteFeed(
 }
 
 async function grantQuestReward(
+    client,
     userId,
     quest
 ) {
@@ -1320,6 +1325,15 @@ async function grantQuestReward(
             quest.reward_xp
         )
     ]);
+
+    await syncUserAchievementCounters(
+        client,
+        userId,
+        [
+            'wallet_coins',
+            'xp_earned'
+        ]
+    );
 
 }
 
@@ -1392,9 +1406,9 @@ async function maybeGrantDailyBonus(
     )
         return completedCount;
 
-    await Promise.all([
-        addCoins(
-            userId,
+        await Promise.all([
+            addCoins(
+                userId,
             DAILY_BONUS.coins
         ),
         addXP(
@@ -1413,8 +1427,17 @@ async function maybeGrantDailyBonus(
                 userId,
                 questDate
             ]
-        )
-    ]);
+            )
+        ]);
+
+    await syncUserAchievementCounters(
+        client,
+        userId,
+        [
+            'wallet_coins',
+            'xp_earned'
+        ]
+    );
 
     const weeklyResult =
         await updateWeeklyStreak(
@@ -1537,6 +1560,7 @@ async function updateDailyQuestProgress(
         };
 
         await grantQuestReward(
+            client,
             userId,
             completedQuest
         );

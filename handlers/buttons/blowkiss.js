@@ -34,7 +34,8 @@ const {
 } = require('../../features/daily-quests/dailyQuests');
 
 const {
-    incrementAchievementProgress
+    incrementAchievementProgress,
+    syncUserAchievementCounters
 } = require('../../features/achievements/achievements');
 
 const {
@@ -177,6 +178,20 @@ module.exports = async (
             interaction.client,
             interaction.user.id,
             'button_interactions'
+        ),
+        syncUserAchievementCounters(
+            interaction.client,
+            interaction.user.id,
+            [
+                'kisses_given'
+            ]
+        ),
+        syncUserAchievementCounters(
+            interaction.client,
+            targetUserId,
+            [
+                'kisses_taken'
+            ]
         ),
         recordActivityMoment(
             interaction.client,

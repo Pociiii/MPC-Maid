@@ -12,6 +12,15 @@ const {
 } = require('../../data/achievementDefinitions');
 
 const {
+    getOrCreateUser
+} = require('../../utils/users');
+
+const {
+    getStatUpgradeCost,
+    trainableStats
+} = require('../../utils/statTraining');
+
+const {
     createTargetUserEmbed,
     fetchDisplayTarget
 } = require('../../utils/embeds');
@@ -22,16 +31,38 @@ const {
 } = require('../../utils/flavorText');
 
 const categoryLabels = {
+    all_stats:
+        'Balanced Stats',
+    brofists_given:
+        'Brofists Given',
+    brofists_taken:
+        'Brofists Received',
     button_interactions:
         'Interaction Buttons',
+    drinks_bought:
+        'Drink Rounds',
     fame:
         'Fame',
+    fireworks_launched:
+        'Fireworks Launched',
     gif_submissions:
         'GIF Submissions',
+    horny_helped:
+        'Helps Received',
+    horny_helps:
+        'Helps Given',
+    kisses_given:
+        'Kisses Given',
+    kisses_taken:
+        'Kisses Received',
     performance:
         'Performance',
     porn_scenes:
         'Porn Career',
+    profile_likes_received:
+        'Profile Likes',
+    ranking_reached:
+        'Ranking',
     scene_combined_stat:
         'Scene Stat Thresholds',
     scene_combined_three_stats:
@@ -40,8 +71,76 @@ const categoryLabels = {
         'Scene Duo Stat Thresholds',
     showcase_posts:
         'Showcase Commands',
+    spanks_given:
+        'Spanks Given',
+    spanks_taken:
+        'Spanks Received',
+    wallet_coins:
+        'Coins',
+    daily_wyr_votes:
+        'Daily WYR Votes',
+    xp_earned:
+        'XP Earned',
     stamina:
         'Stamina'
+};
+
+const userAchievementValueGetters = {
+    brofists_given:
+        (user) =>
+            Number(
+                user.brofists_given ?? 0
+            ),
+    brofists_taken:
+        (user) =>
+            Number(
+                user.brofists_taken ?? 0
+            ),
+    horny_helped:
+        (user) =>
+            Number(
+                user.horny_helped ?? 0
+            ),
+    horny_helps:
+        (user) =>
+            Number(
+                user.horny_helps ?? 0
+            ),
+    kisses_given:
+        (user) =>
+            Number(
+                user.kisses_given ?? 0
+            ),
+    kisses_taken:
+        (user) =>
+            Number(
+                user.kisses_taken ?? 0
+            ),
+    ranking_reached:
+        (user) =>
+            Number(
+                user.ranking ?? 0
+            ),
+    spanks_given:
+        (user) =>
+            Number(
+                user.spanks_given ?? 0
+            ),
+    spanks_taken:
+        (user) =>
+            Number(
+                user.spanks_taken ?? 0
+            ),
+    wallet_coins:
+        (user) =>
+            Number(
+                user.coins ?? 0
+            ),
+    xp_earned:
+        (user) =>
+            getLifetimeXpBaseline(
+                user
+            )
 };
 
 const definitionsByKey =
@@ -480,6 +579,86 @@ async function setAchievementProgress(
 
 }
 
+function getSpentXpForStat(
+    value
+) {
+
+    let total =
+        0;
+
+    for (
+        let statValue = 1;
+        statValue < Number(
+            value ?? 1
+        );
+        statValue += 1
+    )
+        total +=
+            getStatUpgradeCost(
+                statValue
+            );
+
+    return total;
+
+}
+
+function getLifetimeXpBaseline(
+    user
+) {
+
+    const currentXp =
+        Number(
+            user.xp ?? 0
+        );
+
+    const spentTrainingXp =
+        trainableStats.reduce(
+            (total, stat) =>
+                total + getSpentXpForStat(
+                    user[stat]
+                ),
+            0
+        );
+
+    return currentXp +
+        spentTrainingXp;
+
+}
+
+async function syncUserAchievementCounters(
+    client,
+    userId,
+    keys = Object.keys(
+        userAchievementValueGetters
+    )
+) {
+
+    const user =
+        await getOrCreateUser(
+            userId
+        );
+
+    await Promise.all(
+        keys
+            .filter(
+                (key) =>
+                    userAchievementValueGetters[key]
+            )
+            .map(
+                (key) =>
+                    setAchievementProgress(
+                        client,
+                        userId,
+                        key,
+                        userAchievementValueGetters[key](
+                            user
+                        )
+                    )
+            )
+    );
+
+}
+
 async function incrementAchievementProgress(
     client,
     userId,
@@ -520,5 +699,6 @@ module.exports = {
     getAchievementPoints,
     getMilestonesCrossed,
     incrementAchievementProgress,
-    setAchievementProgress
+    setAchievementProgress,
+    syncUserAchievementCounters
 };

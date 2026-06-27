@@ -1,4 +1,7 @@
 const {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
     SlashCommandBuilder
 } = require('discord.js');
 
@@ -33,6 +36,11 @@ const {
 const {
     getOrCreateUser
 } = require('../../utils/users');
+
+const {
+    getProfileLikeCount,
+    hasProfileLike
+} = require('../../features/profile/profileLikes');
 
 const {
     commandFooter
@@ -98,7 +106,8 @@ function buildProfileEmbed(
     target,
     member,
     user,
-    achievementPoints
+    achievementPoints,
+    profileLikes
 ) {
 
     const rankTitle =
@@ -162,22 +171,91 @@ function buildProfileEmbed(
         },
         {
             name:
-                `${emojis.spank_given} Interactions`,
+                `${emojis.spank_given} Spanks`,
             value:
 `- Spanks Given: **${user.spanks_given}**
-- Spanks Taken: **${user.spanks_taken}**
-- Kisses Given: **${user.kisses_given}**
-- Kisses Taken: **${user.kisses_taken}**
-- Helps Given: **${user.horny_helps ?? 0}**
-- Helps Received: **${user.horny_helped ?? 0}**
-- Brofists Given: **${user.brofists_given ?? 0}**
+- Spanks Taken: **${user.spanks_taken}**`,
+            inline:
+                true
+        },
+        {
+            name:
+                `${emojis.kiss_given} Kisses`,
+            value:
+`- Kisses Given: **${user.kisses_given}**
+- Kisses Taken: **${user.kisses_taken}**`,
+            inline:
+                true
+        },
+        {
+            name:
+                `${emojis.help} Helps`,
+            value:
+`- Helps Given: **${user.horny_helps ?? 0}**
+- Helps Received: **${user.horny_helped ?? 0}**`,
+            inline:
+                true
+        },
+        {
+            name:
+                'Brofists',
+            value:
+`- Brofists Given: **${user.brofists_given ?? 0}**
 - Brofists Taken: **${user.brofists_taken ?? 0}**`,
             inline:
-                false
+                true
+        },
+        {
+            name:
+                'Profile Likes',
+            value:
+                `- Total Likes: **${profileLikes}**`,
+            inline:
+                true
         }
     );
 
     return embed;
+
+}
+
+function buildProfileComponents(
+    targetId,
+    viewerId,
+    alreadyLiked
+) {
+
+    const ownProfile =
+        targetId === viewerId;
+
+    const button =
+        new ButtonBuilder()
+            .setCustomId(
+                `profile_like:${targetId}`
+            )
+            .setLabel(
+                alreadyLiked
+                    ? 'Liked'
+                    : ownProfile
+                        ? 'Own Profile'
+                        : 'Like Profile'
+            )
+            .setStyle(
+                alreadyLiked
+                    ? ButtonStyle.Secondary
+                    : ButtonStyle.Success
+            )
+            .setDisabled(
+                ownProfile ||
+                alreadyLiked
+            );
+
+    return [
+        new ActionRowBuilder()
+            .addComponents(
+                button
+            )
+    ];
 
 }
 
@@ -428,16 +506,40 @@ module.exports = {
                 target.id
             );
 
+        const [
+            profileLikes,
+            alreadyLiked
+        ] =
+            await Promise.all([
+                getProfileLikeCount(
+                    target.id
+                ),
+                hasProfileLike(
+                    target.id,
+                    interaction.user.id
+                )
+            ]);
+
         await interaction.editReply({
             embeds: [
                 buildProfileEmbed(
                     target,
                     member,
                     user,
-                    achievementPoints
+                    achievementPoints,
+                    profileLikes
                 )
-            ]
+            ],
+            components:
+                buildProfileComponents(
+                    target.id,
+                    interaction.user.id,
+                    alreadyLiked
+                )
         });
 
     }
 };
+
+module.exports.buildProfileComponents =
+    buildProfileComponents;

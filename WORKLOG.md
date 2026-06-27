@@ -1,32 +1,68 @@
 # MPC Maid Worklog
 
-## Working On
+## Current State
 
-- Continue the embed consistency pass across older command groups.
-- Convert pornscene, GIF submit, and showcase embeds to shared footer/style helpers.
-- Keep adding versioned footers when touching embeds.
-- Audit buttons as commands are touched so controls keep clear visual feedback.
-- Keep moment announcements aligned with the shared user embed style.
-- Use TODO.md for bigger parked systems before adding new SQL.
-- Add non-SQL pregnancy config/helpers before command and database work.
-- Test `/shop` booster prices against live coin income.
-- Test `/achievements` readability once users have more unlocks.
-- Converted customscene embeds to shared style helpers.
-- Added first pregnancy system with `/breed`, `/pregnancy`, and one daily automatic check.
-- Added Pregnancy Info button to the command guide.
-- Added pregnancy recovery tools for testing and cleanup.
-- Added pregnancy history counters for pregnancies, births, successful partners, and timestamps.
-- Switched `/leaderboard` navigation from buttons to a dropdown menu.
-- Added horny Help counter and leaderboard view.
-- Added `/blackjack` casino command with Hit/Stand buttons.
-- Added blackjack to the daily quest pool.
-- Routed daily quest, achievement, and GIF approval notices to Maid Feed.
-- Converted crowded customscene cast buttons to a dropdown menu.
-- Reworked pornscene Performance into outcome score plus critical scene chance.
-- Updated member card panel posting and moved card names into the new bottom name space.
-- Replaced `/quitbot` with `/botcontrol` for restart/shutdown and kept game chat online/offline notices.
+- The bot is in a 1.0 preparation pass: core systems are implemented enough to
+  test together, and the next work should favor live testing, balance, and
+  polish over new large systems.
+- `npm run preflight` is the readiness gate before hosting. It checks command
+  syntax, JSON data, GIF pools, scene title data, Daily WYR prompts, and the
+  SQLite schema.
+- New SQL tables are now part of the current build for systems that need
+  restart-safe state. Do not delete `database.db`; run the bot or preflight so
+  migrations can create missing tables.
+
+## Recently Completed
+
+- Added a preflight script and `npm run preflight`.
+- Cleaned dependency resolution so packages load from the project folder.
+- Added Daily Would You Rather:
+  - posts daily in General at reset time
+  - anonymous voting
+  - one reward per voter
+  - discussion thread
+  - SQL-backed sessions/votes
+  - 40 starter questions
+- Added GIF Submit scene title suggestions:
+  - users can suggest scene titles
+  - staff can approve or reject them
+  - title pools are validated by preflight
+- Updated pornscene extra-part selection:
+  - foreplay max 2
+  - oral max 2
+  - sex max 3
+  - finale max 1
+  - extras are still placed in the correct scene order
+- Improved `/profile`:
+  - split interaction stats into separate readable fields
+  - added profile likes
+  - first likes post a Moments embed
+  - duplicate likes and self-likes are blocked
+  - profile likes use SQL so counts survive restarts
+- Added `/holdem`:
+  - user vs dealer Texas Hold'em
+  - private Peek for hole cards
+  - public board progression
+  - pay per street
+  - real 5-card poker hand evaluation from 7 cards
+- Updated `/commands`:
+  - overview uses separate fields per category
+  - role-based GIF rules are their own field
+  - `/holdem` appears under Casino
+- Kept command guide, changelog, deployment notes, and TODO aligned with the
+  current build.
 
 ## Next
 
-- Continue balancing daily quest rewards and achievement milestones after live testing.
-- Test pregnancy flow with female/male and female/female pairings.
+- Live test the 1.0 feature set in a small group before server hosting.
+- Watch coin economy pressure from Daily WYR, quests, training, shop, and
+  casino games.
+- Test `/holdem` pacing and payouts; decide later whether it deserves SQL or
+  multiplayer tables.
+- Test Daily WYR timing, thread creation, close handling, and vote rewards.
+- Test profile likes in the live Moments channel.
+- Keep adding scene titles and GIFs where preflight warns about parked empty
+  threesome folders.
+- Continue the embed consistency pass only when touching related commands.
+- Defer new large systems, especially Reputation and `/privatescene`, until the
+  current build has real usage data.

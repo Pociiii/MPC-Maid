@@ -41,6 +41,14 @@ const views = {
                 'performance',
                 'stamina',
                 'fame',
+                'all_stats',
+                'wallet_coins',
+                'xp_earned',
+                'ranking_reached',
+                'profile_likes_received',
+                'daily_wyr_votes',
+                'drinks_bought',
+                'fireworks_launched',
                 'button_interactions',
                 'showcase_posts',
                 'gif_submissions'
@@ -72,7 +80,22 @@ const views = {
             [
                 'performance',
                 'stamina',
-                'fame'
+                'fame',
+                'all_stats'
+            ]
+    },
+    progress: {
+        label:
+            'Progress',
+        emoji:
+            '\uD83D\uDCC8',
+        title:
+            'Progress Achievements',
+        keys:
+            [
+                'wallet_coins',
+                'xp_earned',
+                'ranking_reached'
             ]
     },
     social: {
@@ -84,7 +107,19 @@ const views = {
             'Social Achievements',
         keys:
             [
-                'button_interactions'
+                'button_interactions',
+                'spanks_given',
+                'spanks_taken',
+                'kisses_given',
+                'kisses_taken',
+                'horny_helps',
+                'horny_helped',
+                'brofists_given',
+                'brofists_taken',
+                'profile_likes_received',
+                'daily_wyr_votes',
+                'drinks_bought',
+                'fireworks_launched'
             ]
     },
     showcase: {
@@ -114,16 +149,40 @@ const views = {
 };
 
 const categoryLabels = {
+    all_stats:
+        '\u2696\uFE0F Balanced Stats',
+    brofists_given:
+        '\uD83E\uDD1C Brofists Given',
+    brofists_taken:
+        '\uD83E\uDD1C Brofists Received',
     button_interactions:
         '\uD83D\uDD18 Interaction Buttons',
+    daily_wyr_votes:
+        '\u2753 Daily WYR Votes',
+    drinks_bought:
+        '\uD83C\uDF79 Drink Rounds',
     fame:
         '\uD83D\uDC51 Fame',
+    fireworks_launched:
+        '\uD83C\uDF86 Fireworks Launched',
     gif_submissions:
         '\uD83D\uDDBC\uFE0F GIF Submissions',
+    horny_helped:
+        '\uD83E\uDD1D Helps Received',
+    horny_helps:
+        '\uD83E\uDD1D Helps Given',
+    kisses_given:
+        '\uD83D\uDC8B Kisses Given',
+    kisses_taken:
+        '\uD83D\uDC8B Kisses Received',
     performance:
         '\uD83D\uDCAA Performance',
     porn_scenes:
         '\uD83C\uDFAC Porn Career',
+    profile_likes_received:
+        '\u2764\uFE0F Profile Likes',
+    ranking_reached:
+        '\uD83C\uDFC6 Ranking',
     scene_combined_stat:
         '\uD83D\uDCCA Scene Stat Thresholds',
     scene_combined_three_stats:
@@ -132,8 +191,16 @@ const categoryLabels = {
         '\uD83D\uDC65 Scene Duo Stat Thresholds',
     showcase_posts:
         '\uD83D\uDD25 Showcase Commands',
+    spanks_given:
+        '\uD83D\uDC4B Spanks Given',
+    spanks_taken:
+        '\uD83D\uDC4B Spanks Received',
     stamina:
-        '\u2764\uFE0F Stamina'
+        '\u2764\uFE0F Stamina',
+    wallet_coins:
+        `${emojis.coin} Coins`,
+    xp_earned:
+        '\u2B50 XP Earned'
 };
 
 const definitionsByKey =

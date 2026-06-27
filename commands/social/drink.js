@@ -20,8 +20,14 @@ const {
 const {
     buildDrinkEmbed,
     getCommandGif,
-    getVisibleOnlineMembers
+    getVisibleOnlineMembers,
+    postDrinkMoment
 } = require('../../features/social/partyCommands');
+
+const {
+    incrementAchievementProgress,
+    syncUserAchievementCounters
+} = require('../../features/achievements/achievements');
 
 module.exports = {
 
@@ -106,6 +112,14 @@ module.exports = {
                         ECONOMY.DRINK_XP_REWARD
                     );
 
+                    await syncUserAchievementCounters(
+                        interaction.client,
+                        member.id,
+                        [
+                            'xp_earned'
+                        ]
+                    );
+
                 }
             )
         );
@@ -135,6 +149,29 @@ module.exports = {
                 )
             ]
         });
+
+        await incrementAchievementProgress(
+            interaction.client,
+            interaction.user.id,
+            'drinks_bought'
+        );
+
+        await postDrinkMoment(
+            interaction,
+            {
+                gif,
+                recipientCount:
+                    recipients.length,
+                xpReward:
+                    ECONOMY.DRINK_XP_REWARD
+            }
+        ).catch(
+            (error) =>
+                console.error(
+                    'DRINK MOMENT ERROR',
+                    error
+                )
+        );
 
     }
 

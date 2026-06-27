@@ -4,7 +4,7 @@ Use this file as the quick context handoff when discussing bot design in
 ChatGPT or another planning thread. Keep it updated when major systems,
 balance rules, channels, or design principles change.
 
-Current bot version: `0.14.0`
+Current bot version: `1.0.0`
 
 ## Server Context
 
@@ -62,9 +62,10 @@ Prefer improving existing systems before adding new ones:
 - When a field value contains a list, every list item should start with `- `.
   Avoid bare stacked lines for lists.
 - If buttons get cramped, use a dropdown menu.
-- `/commands` should stay as a compact public directory. Exact command details
-  belong in private dropdown replies, with separate info buttons for big
-  systems.
+- `/commands` should stay as a compact public directory. The overview should
+  use separate fields for role rules and each command category. Exact command
+  details belong in private dropdown replies, with separate info buttons for
+  big systems.
 - Use user avatars as thumbnails for user-centered embeds.
 - Use the MPC logo URL as the small author icon on embeds. The right-side
   thumbnail should show the command runner or the user the embed is centered on.
@@ -117,8 +118,9 @@ different feature.
 
 General:
 
-- `/profile` shows a user profile, stats, social counters, help counters, and
-  can compare career stats with another user.
+- `/profile` shows a user profile, wallet, stats, career data, split
+  interaction counters, profile likes, and can compare career stats with
+  another user.
 - `/daily` shows personal daily quests.
 - `/leaderboard` shows ladders through a dropdown menu.
 - `/achievements` shows private achievement progress.
@@ -155,6 +157,7 @@ Casino:
 - `/dice`
 - `/slots`
 - `/blackjack`
+- `/holdem`
 - Spank Dilli is a fixed casino-style button panel in its own channel.
 
 ## Porn Career System
@@ -185,6 +188,11 @@ Scene pacing:
 - Parts post every 8-12 minutes, adjusted by total part count.
 - Minimum parts: 4.
 - Maximum parts: 8.
+- Extra parts respect phase caps before being ordered into the scene:
+  - foreplay max 2
+  - oral max 2
+  - sex max 3
+  - finale max 1
 
 Scene stats:
 
@@ -440,10 +448,10 @@ Rewards:
 - Weekly streak reward: complete all 3 daily quests for 7 consecutive quest
   days to receive 1 random T2/T3 booster.
 
-## Daily Would You Rather Planned
+## Daily Would You Rather
 
-Daily WYR is a lightweight community discussion feature, completely separate
-from Porn Career.
+Daily WYR is implemented as a lightweight community discussion feature,
+completely separate from Porn Career.
 
 Goal:
 
@@ -509,9 +517,8 @@ Closing:
 
 Implementation note:
 
-- Unlike some planned systems, Daily WYR should use SQL from the first version
-  because active vote state, reward claims, and question history need to survive
-  restarts.
+- Daily WYR uses SQL because active vote state, reward claims, and question
+  history need to survive restarts.
 
 ## Achievements
 
@@ -527,6 +534,8 @@ Achievement categories include:
 
 - Porn scenes completed.
 - Stats trained by 10-point thresholds.
+- Balanced trained stats when Performance, Stamina, and Fame all reach the same
+  10-point threshold.
 - Combined scene stat thresholds.
 - Combined scene 2-stat thresholds.
 - Combined scene all-3-stat thresholds.
@@ -557,6 +566,27 @@ Design notes:
 - Help leaderboard should split male/female where useful.
 - Kisses and spanks need gender logic because interaction direction is not
   symmetrical.
+
+## Profiles
+
+`/profile` should stay readable and social without turning into a giant stats
+wall.
+
+Current:
+
+- Wallet, stats, and career are grouped separately.
+- Interaction counters are split into separate fields for spanks, kisses, helps,
+  and brofists.
+- Profile likes are stored in `profile_likes`.
+- A user can like another user's profile once.
+- Self-likes and duplicate likes are blocked.
+- First-time profile likes post a small Moment with the liker, profile owner,
+  and total likes.
+
+Future:
+
+- Add Reputation to profile only when the Reputation system is actually live.
+- Watch profile field count as new social data is added.
 
 ## Relationship System
 
@@ -712,6 +742,26 @@ GIF randomness:
 - Button interactions use both clicker and target.
 - Auto posts without a user still benefit from the global shuffle bag.
 
+## GIF Submit
+
+GIF Submit supports member submissions and staff review.
+
+Current:
+
+- Members can submit GIFs for interaction and scene pools.
+- Members can suggest scene titles.
+- Staff can approve or reject scene title suggestions.
+- Approved scene titles feed `data/scenes/sceneNamesByCast.json`.
+- Preflight validates scene title pools so empty or malformed title data is
+  caught before hosting.
+
+Design notes:
+
+- Keep title suggestions lightweight so members can help improve scene variety.
+- Staff review should stay private/admin-facing.
+- Public changelog should mention member-visible submit improvements, but not
+  staff-only workflow details.
+
 ## Custom Scene
 
 `/customscene` lets users build a solo custom scene.
@@ -790,6 +840,11 @@ Current:
   and Leave buttons control the slot session.
 - `/blackjack`: max 100 coins, uses one standard deck.
 - Blackjack card display uses suit emoji.
+- `/holdem`: max 50 coins per street, user vs dealer, private Peek for hole
+  cards, public board progression, and real best-hand comparison at showdown.
+- Hold'em is intentionally in-memory for the first version, like blackjack.
+- If Hold'em becomes popular, SQL-backed table state should come before
+  multiplayer or all-in/side-pot logic.
 - Spank Dilli has a fixed embed in its own channel and public GIF replies.
 - Spank Dilli uses a hosted GIF URL instead of a local asset attachment so
   button clicks feel faster.
@@ -815,28 +870,35 @@ Design notes:
 
 Next update currently includes:
 
-- `/profile` now shows horny Help given and received.
-- Porn career titles now fit male and female roles better.
-- Pornscene request DMs now remind users that `/train` helps scene outcomes.
-- Boosters are fully live: `/shop` now sells all 4 tiers with better prices,
-  and `/pornscene` lets you spend one before sending a request.
-- `/train` is less brutal before stat 40, so active players can actually grow
-  their pornstar stats.
-- `/pornscene` posts now keep one consistent color for the same pair.
-- `/flex` now has a male-only Brofist button, and `/gifsubmit` accepts Brofist GIFs.
-- New porn career achievements unlock when 2 combined scene stats, or all 3,
-  hit 20-point thresholds.
-- GIF picks now use shuffle bags and recent-user history to reduce repeats.
-- Daily Would You Rather is planned for General chat as a daily social vote
-  with a discussion thread.
+- Removed unused empty scaffolding files and old helper modules.
+- Rebuilt local dependency resolution so packages load from the project folder.
+- Embed author icons use the MPC logo consistently.
+- `/leaderboard` pages include a runner-specific "Your Position" section.
+- Daily Would You Rather posts in General with anonymous voting, a discussion
+  thread, and a small one-time voting reward.
+- GIF Submit lets members suggest scene titles for staff review.
+- `/profile` splits interaction stats by type and supports profile likes with
+  Moments announcements.
+- `/holdem` adds first playable Texas Hold'em against the dealer.
+- `/commands` overview uses readable fields for role rules and command
+  categories.
+- Pornscene extra parts respect phase caps while staying in proper scene order.
+- Achievements include balanced trained-stat milestones for all three career
+  stats reaching each 10-point threshold.
+- Preflight validates commands, JSON data, GIF pools, scene titles, Daily WYR
+  questions, and the database schema.
 
 ## Current Open Design Topics
 
-- Live test booster prices and burnout risk.
-- Live test daily quest rewards.
-- Design and implement Daily Would You Rather for General chat.
-- Continue embed/UI consistency cleanup.
-- Decide when to implement `/privatescene`.
+- Live test Daily WYR timing, voting, rewards, thread close, and archive flow.
+- Live test profile likes and whether Moments posts feel good.
+- Live test `/holdem` pacing, payouts, low-balance handling, and whether it
+  should stay user-vs-dealer for 1.0.
+- Live test booster prices, burnout risk, daily quest rewards, and casino coin
+  pressure.
+- Continue embed/UI consistency cleanup when touching related commands.
+- Decide when to implement `/privatescene`, after the current 1.0 feature set
+  has usage data.
 - Decide whether private scene end stats should go to Maid Feed or Moments.
 - Keep pregnancy meaningful without turning it into a child-list bot.
 - Low-priority future idea: X/Twitter watcher using `X_BEARER_TOKEN`, text/link

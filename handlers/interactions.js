@@ -51,12 +51,24 @@ const {
 } = require('../features/casino/blackjack');
 
 const {
+    handleHoldemAction
+} = require('../features/casino/holdem');
+
+const {
     handleSlotsAction
 } = require('../features/casino/slots');
 
 const {
     handleSpankDilli
 } = require('../features/casino/spankDilli');
+
+const {
+    handleDailyWyrVote
+} = require('../features/daily-wyr/dailyWyr');
+
+const {
+    handleProfileLike
+} = require('../features/profile/profileLikes');
 
 const handleRelationshipAccept =
     require('./buttons/relationshipAccept');
@@ -73,11 +85,17 @@ const gifSubmitInteractions =
 const gifSubmitInfo =
     require('./buttons/gifSubmitInfo');
 
+const gifSubmitTitles =
+    require('./buttons/gifSubmitTitles');
+
 const gifSceneSelect =
     require('./menus/gifSceneSelect');
 
 const gifInteractionSelect =
     require('./menus/gifInteractionSelect');
+
+const gifSceneTitlePool =
+    require('./menus/gifSceneTitlePool');
 
 const commandsSection =
     require('./menus/commandsSection');
@@ -112,6 +130,13 @@ const memberCard =
 const {
     logError
 } = require('../utils/inboxLogger');
+
+const {
+    approveSceneTitle,
+    rejectSceneTitle,
+    showSceneTitleRejectModal,
+    submitSceneTitleSuggestion
+} = require('../features/gif-submit/sceneTitleSubmission');
 
 async function replyInteractionError(
     interaction
@@ -199,6 +224,36 @@ async function routeInteraction(
                 );
                 return true;
 
+            case 'holdem_peek':
+                await handleHoldemAction(
+                    interaction,
+                    'peek',
+                    interaction.customId.split(
+                        ':'
+                    )[1]
+                );
+                return true;
+
+            case 'holdem_advance':
+                await handleHoldemAction(
+                    interaction,
+                    'advance',
+                    interaction.customId.split(
+                        ':'
+                    )[1]
+                );
+                return true;
+
+            case 'holdem_fold':
+                await handleHoldemAction(
+                    interaction,
+                    'fold',
+                    interaction.customId.split(
+                        ':'
+                    )[1]
+                );
+                return true;
+
             case 'slots_spin':
                 await handleSlotsAction(
                     interaction,
@@ -221,6 +276,18 @@ async function routeInteraction(
 
             case 'spank_dilli':
                 await handleSpankDilli(
+                    interaction
+                );
+                return true;
+
+            case 'daily_wyr_vote':
+                await handleDailyWyrVote(
+                    interaction
+                );
+                return true;
+
+            case 'profile_like':
+                await handleProfileLike(
                     interaction
                 );
                 return true;
@@ -388,6 +455,14 @@ async function routeInteraction(
 
             return true;
 
+            case 'gifsubmit_titles':
+
+                await gifSubmitTitles.execute(
+                    interaction
+                );
+
+            return true;
+
             case 'gifapprove':
 
                 await gifApprove.execute(
@@ -399,6 +474,22 @@ async function routeInteraction(
             case 'gifreject':
 
                 await gifReject.execute(
+                    interaction
+                );
+
+                return true;
+
+            case 'scenetitleapprove':
+
+                await approveSceneTitle(
+                    interaction
+                );
+
+                return true;
+
+            case 'scenetitlereject':
+
+                await showSceneTitleRejectModal(
                     interaction
                 );
 
@@ -447,6 +538,14 @@ async function routeInteraction(
             case 'gif_interaction_select':
 
                 await gifInteractionSelect.execute(
+                    interaction
+                );
+
+                return true;
+
+            case 'gif_scene_title_pool':
+
+                await gifSceneTitlePool.execute(
                     interaction
                 );
 
@@ -578,6 +677,32 @@ async function routeInteraction(
         ) {
 
             await gifRejectModal.execute(
+                interaction
+            );
+
+            return true;
+
+        }
+        if (
+            interaction.customId.startsWith(
+                'scene_title_submit:'
+            )
+        ) {
+
+            await submitSceneTitleSuggestion(
+                interaction
+            );
+
+            return true;
+
+        }
+        if (
+            interaction.customId.startsWith(
+                'scenetitlerejectmodal:'
+            )
+        ) {
+
+            await rejectSceneTitle(
                 interaction
             );
 

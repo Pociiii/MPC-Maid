@@ -12,37 +12,30 @@ const {
 
 const {
     getOrCreateUser,
-    removeCoins
+    spendCoins
 } = require('../../utils/users');
 
 const {
+    MAX_BET,
     buildEmbed,
     buildRows,
     createSession,
     getActiveSession,
-    paySession,
     registerSession
-} = require('../../features/casino/blackjack');
-
-const {
-    trackDailyQuest
-} = require('../../features/daily-quests/dailyQuests');
+} = require('../../features/casino/holdem');
 
 const emojis =
     require('../../utils/emojis');
-
-const MAX_BET =
-    100;
 
 module.exports = {
 
     data:
         new SlashCommandBuilder()
             .setName(
-                'blackjack'
+                'holdem'
             )
             .setDescription(
-                'Bet coins and play blackjack against the dealer'
+                'Play Texas Hold\'em against the dealer'
             )
             .addIntegerOption(
                 (option) =>
@@ -51,7 +44,7 @@ module.exports = {
                             'bet'
                         )
                         .setDescription(
-                            `Coins to bet, max ${MAX_BET}`
+                            `Base bet per street, max ${MAX_BET}`
                         )
                         .setMinValue(
                             1
@@ -101,7 +94,7 @@ module.exports = {
 
             await interaction.reply({
                 content:
-                    'Finish your current blackjack hand first.',
+                    'Finish your current Hold\'em hand first.',
                 flags:
                     64
             });
@@ -113,11 +106,32 @@ module.exports = {
         if (
             await handleCooldown(
                 interaction,
-                'blackjack',
-                COOLDOWNS.BLACKJACK
+                'holdem',
+                COOLDOWNS.HOLDEM
             )
         )
             return;
+
+        const spent =
+            await spendCoins(
+                interaction.user.id,
+                bet
+            );
+
+        if (
+            !spent
+        ) {
+
+            await interaction.reply({
+                content:
+                    `You need ${emojis.coin} **${bet} coins** to start this Hold'em hand.`,
+                flags:
+                    64
+            });
+
+            return;
+
+        }
 
         const session =
             createSession(
@@ -125,22 +139,9 @@ module.exports = {
                 bet
             );
 
-        await removeCoins(
-            interaction.user.id,
-            bet
+        registerSession(
+            session
         );
-
-        if (
-            !session.done
-        )
-            registerSession(
-                session
-            );
-        else
-            await paySession(
-                session,
-                interaction.client
-            );
 
         await interaction.reply({
             embeds: [
@@ -151,16 +152,9 @@ module.exports = {
             ],
             components:
                 buildRows(
-                    session,
-                    session.done
+                    session
                 )
         });
-
-        await trackDailyQuest(
-            interaction.client,
-            interaction.user.id,
-            'blackjack'
-        );
 
     }
 

@@ -30,6 +30,16 @@ const db = new sqlite3.Database('./database.db', (err) => {
         'utf8'
     );
 
+    const dailyWyrSchema = fs.readFileSync(
+        path.join(__dirname, 'schemas', 'daily_wyr.sql'),
+        'utf8'
+    );
+
+    const profileLikesSchema = fs.readFileSync(
+        path.join(__dirname, 'schemas', 'profile_likes.sql'),
+        'utf8'
+    );
+
     const achievementsSchema = fs.readFileSync(
         path.join(__dirname, 'schemas', 'achievements.sql'),
         'utf8'
@@ -50,7 +60,7 @@ const db = new sqlite3.Database('./database.db', (err) => {
         'utf8'
     );
 
-    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${achievementsSchema}\n${pregnancySchema}\n${relationshipsSchema}\n${spankDilliSchema}`, async (err) => {
+    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${dailyWyrSchema}\n${profileLikesSchema}\n${achievementsSchema}\n${pregnancySchema}\n${relationshipsSchema}\n${spankDilliSchema}`, async (err) => {
 
         if (err) {
             console.error(err);

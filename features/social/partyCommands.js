@@ -3,12 +3,19 @@ const {
 } = require('../../data/constants');
 
 const {
-    createUserEmbed
+    createUserEmbed,
+    fetchDisplayTarget,
+    getDisplayAvatar,
+    getDisplayName
 } = require('../../utils/embeds');
 
 const {
     getRandomGif
 } = require('../../utils/gifs');
+
+const {
+    postMoment
+} = require('../../utils/moments');
 
 async function getVisibleOnlineMembers(
     interaction
@@ -222,9 +229,168 @@ function buildFireworkEmbed(
 
 }
 
+async function getPartyMomentTarget(
+    interaction
+) {
+
+    return interaction.member ??
+        await fetchDisplayTarget(
+            interaction.client,
+            interaction.user.id,
+            interaction.guildId
+        );
+
+}
+
+async function postDrinkMoment(
+    interaction,
+    {
+        gif,
+        recipientCount,
+        xpReward
+    }
+) {
+
+    const target =
+        await getPartyMomentTarget(
+            interaction
+        );
+
+    const avatar =
+        getDisplayAvatar(
+            target
+        );
+
+    return postMoment(
+        interaction.client,
+        {
+            type:
+                'party_drink',
+            color:
+                getRandomColor(),
+            command:
+                '/drink',
+            authorName:
+                getDisplayName(
+                    target
+                ),
+            thumbnail:
+                avatar,
+            image:
+                gif.image,
+            title:
+                '\uD83C\uDF79 Drinks Around',
+            fields: [
+                {
+                    name:
+                        '\uD83C\uDF79 Host',
+                    value:
+                        `<@${interaction.user.id}>`,
+                    inline:
+                        true
+                },
+                {
+                    name:
+                        '\uD83D\uDC65 Served',
+                    value:
+                        `${recipientCount} online member${recipientCount === 1 ? '' : 's'}`,
+                    inline:
+                        true
+                },
+                {
+                    name:
+                        '\u2B50 XP Shared',
+                    value:
+                        `+${xpReward} XP each`,
+                    inline:
+                        true
+                }
+            ]
+        }
+    );
+
+}
+
+async function postFireworkMoment(
+    interaction,
+    {
+        cost,
+        gif,
+        message
+    }
+) {
+
+    const target =
+        await getPartyMomentTarget(
+            interaction
+        );
+
+    const avatar =
+        getDisplayAvatar(
+            target
+        );
+
+    const fields = [
+        {
+            name:
+                '\uD83C\uDF86 Launched By',
+            value:
+                `<@${interaction.user.id}>`,
+            inline:
+                true
+        },
+        {
+            name:
+                '\uD83E\uDE99 Burned',
+            value:
+                `${cost} coins`,
+            inline:
+                true
+        }
+    ];
+
+    if (
+        message
+    )
+        fields.push({
+            name:
+                '\uD83D\uDCDD Message',
+            value:
+                message,
+            inline:
+                false
+        });
+
+    return postMoment(
+        interaction.client,
+        {
+            type:
+                'party_firework',
+            color:
+                getRandomColor(),
+            command:
+                '/firework',
+            authorName:
+                getDisplayName(
+                    target
+                ),
+            thumbnail:
+                avatar,
+            image:
+                gif.image,
+            title:
+                '\uD83C\uDF86 Firework Flex',
+            fields
+        }
+    );
+
+}
+
 module.exports = {
     buildDrinkEmbed,
     buildFireworkEmbed,
     getCommandGif,
-    getVisibleOnlineMembers
+    getVisibleOnlineMembers,
+    postDrinkMoment,
+    postFireworkMoment
 };

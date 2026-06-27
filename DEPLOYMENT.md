@@ -5,11 +5,19 @@ online.
 
 ## Before Moving
 
+- Run `npm run preflight` locally and fix any failures.
 - Stop the local bot before copying `database.db`.
+- Back up `database.db` before moving it.
+- Do not delete `database.db` to pick up new features. Missing tables are
+  created by the schema/migration path when the bot starts or preflight runs.
 - Copy these private files to the server by hand:
   - `.env`
   - `database.db`
 - Do not commit `.env`, `database.db`, `node_modules`, or `backups`.
+- Rotate the Discord bot token before final hosting.
+
+Current schema-backed systems include daily quests, achievements, pregnancy,
+relationships, Spank Dilli, Daily WYR, activity Moments, and profile likes.
 
 ## Install On Ubuntu/Debian
 
@@ -32,8 +40,13 @@ Create `/opt/mpc-maid/.env` from `.env.example`, then copy the live
 Test once in the foreground:
 
 ```bash
+npm run preflight
 npm start
 ```
+
+Preflight should pass before the service is enabled. It validates commands,
+JSON data, GIF pools, scene titles, Daily WYR questions, and the database
+schema.
 
 ## systemd Service
 
@@ -80,6 +93,7 @@ sudo journalctl -u mpc-maid -f
 cd /opt/mpc-maid
 git pull
 npm install
+npm run preflight
 sudo systemctl restart mpc-maid
 ```
 

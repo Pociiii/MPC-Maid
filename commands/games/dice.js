@@ -25,6 +25,10 @@ const {
     trackDailyQuest
 } = require('../../features/daily-quests/dailyQuests');
 
+const {
+    syncUserAchievementCounters
+} = require('../../features/achievements/achievements');
+
 const emojis =
     require('../../utils/emojis');
 
@@ -201,6 +205,14 @@ module.exports = {
             await addCoins(
                 interaction.user.id,
                 result.coins
+            );
+
+            await syncUserAchievementCounters(
+                interaction.client,
+                interaction.user.id,
+                [
+                    'wallet_coins'
+                ]
             );
 
         }

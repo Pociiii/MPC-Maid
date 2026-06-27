@@ -29,7 +29,8 @@ const {
 } = require('../daily-quests/dailyQuests');
 
 const {
-    setAchievementProgress
+    setAchievementProgress,
+    syncUserAchievementCounters
 } = require('../achievements/achievements');
 
 const {
@@ -127,6 +128,25 @@ function formatStatField(
             )}**`
             : ''
     }`;
+
+}
+
+function getBalancedStatValue(
+    user,
+    trainedStat,
+    trainedValue
+) {
+
+    return Math.min(
+        ...trainableStats.map(
+            (stat) =>
+                stat === trainedStat
+                    ? trainedValue
+                    : Number(
+                        user[stat] ?? 0
+                    )
+        )
+    );
 
 }
 
@@ -330,6 +350,25 @@ async function trainStat(
         interaction.user.id,
         stat,
         currentValue + 1
+    );
+
+    await setAchievementProgress(
+        interaction.client,
+        interaction.user.id,
+        'all_stats',
+        getBalancedStatValue(
+            user,
+            stat,
+            currentValue + 1
+        )
+    );
+
+    await syncUserAchievementCounters(
+        interaction.client,
+        interaction.user.id,
+        [
+            'xp_earned'
+        ]
     );
 
 }

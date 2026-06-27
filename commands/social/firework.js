@@ -18,8 +18,13 @@ const {
 
 const {
     buildFireworkEmbed,
-    getCommandGif
+    getCommandGif,
+    postFireworkMoment
 } = require('../../features/social/partyCommands');
+
+const {
+    incrementAchievementProgress
+} = require('../../features/achievements/achievements');
 
 module.exports = {
 
@@ -110,6 +115,11 @@ module.exports = {
                 ]
             );
 
+        const message =
+            interaction.options.getString(
+                'message'
+            );
+
         await interaction.editReply({
             embeds: [
                 buildFireworkEmbed(
@@ -119,13 +129,33 @@ module.exports = {
                             ECONOMY.FIREWORK_COST,
                         gif,
                         message:
-                            interaction.options.getString(
-                                'message'
-                            )
+                            message
                     }
                 )
             ]
         });
+
+        await incrementAchievementProgress(
+            interaction.client,
+            interaction.user.id,
+            'fireworks_launched'
+        );
+
+        await postFireworkMoment(
+            interaction,
+            {
+                cost:
+                    ECONOMY.FIREWORK_COST,
+                gif,
+                message
+            }
+        ).catch(
+            (error) =>
+                console.error(
+                    'FIREWORK MOMENT ERROR',
+                    error
+                )
+        );
 
     }
 

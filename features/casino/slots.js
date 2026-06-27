@@ -23,6 +23,10 @@ const {
     trackDailyQuest
 } = require('../daily-quests/dailyQuests');
 
+const {
+    syncUserAchievementCounters
+} = require('../achievements/achievements');
+
 const emojis =
     require('../../utils/emojis');
 
@@ -353,11 +357,22 @@ async function spinSession(
 
     if (
         payout > 0
-    )
+    ) {
+
         await addCoins(
             session.userId,
             payout
         );
+
+        await syncUserAchievementCounters(
+            client,
+            session.userId,
+            [
+                'wallet_coins'
+            ]
+        );
+
+    }
 
     const profit =
         payout -

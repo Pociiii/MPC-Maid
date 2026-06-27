@@ -68,6 +68,10 @@ const {
 } = require('./features/pregnancy/scheduler');
 
 const {
+    startDailyWyrScheduler
+} = require('./features/daily-wyr/dailyWyr');
+
+const {
     clearAllSceneBusy
 } = require('./utils/pornScenes');
 
@@ -285,6 +289,10 @@ async readyClient => {
         );
 
         startPregnancyScheduler(
+            readyClient
+        );
+
+        startDailyWyrScheduler(
             readyClient
         );
 

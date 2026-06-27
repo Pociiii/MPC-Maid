@@ -29,6 +29,35 @@ const socialMilestones = [
     1000
 ];
 
+const coinMilestones = [
+    1000,
+    2500,
+    5000,
+    10000,
+    25000,
+    50000
+];
+
+const xpMilestones = [
+    100,
+    500,
+    1000,
+    2500,
+    5000,
+    10000,
+    25000,
+    50000
+];
+
+const rankingMilestones = [
+    500,
+    1000,
+    1500,
+    2500,
+    5000,
+    10000
+];
+
 const statMilestones =
     Array.from(
         {
@@ -165,6 +194,20 @@ const statAchievements =
             )
     );
 
+const allStatsAchievements =
+    statMilestones.map(
+        (milestone) =>
+            milestoneDefinition(
+                'all_stats',
+                milestone,
+                (value) =>
+                    `Performance, Stamina, and Fame reach ${value}`,
+                statPoints(
+                    milestone
+                ) * 3
+            )
+    );
+
 const combinedSceneStatAchievements =
     combinedSceneStatMilestones.map(
         (milestone) =>
@@ -252,12 +295,126 @@ const gifSubmissionAchievements =
             )
     );
 
+const resourceAchievements = [
+    ...coinMilestones.map(
+        (milestone) =>
+            milestoneDefinition(
+                'wallet_coins',
+                milestone,
+                (value) =>
+                    `Hold ${value.toLocaleString()} coins`,
+                progressionPoints(
+                    milestone
+                )
+            )
+    ),
+    ...xpMilestones.map(
+        (milestone) =>
+            milestoneDefinition(
+                'xp_earned',
+                milestone,
+                (value) =>
+                    `Earn ${value.toLocaleString()} total XP`,
+                progressionPoints(
+                    milestone
+                )
+            )
+    ),
+    ...rankingMilestones.map(
+        (milestone) =>
+            milestoneDefinition(
+                'ranking_reached',
+                milestone,
+                (value) =>
+                    `Reach ${value.toLocaleString()} ranking`,
+                progressionPoints(
+                    milestone
+                )
+            )
+    )
+];
+
+const socialCounterLabels = {
+    brofists_given:
+        (value) =>
+            `Give ${value.toLocaleString()} brofist${value === 1 ? '' : 's'}`,
+    brofists_taken:
+        (value) =>
+            `Receive ${value.toLocaleString()} brofist${value === 1 ? '' : 's'}`,
+    drinks_bought:
+        (value) =>
+            `Buy ${value.toLocaleString()} drink round${value === 1 ? '' : 's'}`,
+    fireworks_launched:
+        (value) =>
+            `Launch ${value.toLocaleString()} firework${value === 1 ? '' : 's'}`,
+    horny_helped:
+        (value) =>
+            `Receive ${value.toLocaleString()} horny help${value === 1 ? '' : 's'}`,
+    horny_helps:
+        (value) =>
+            `Help ${value.toLocaleString()} horny member${value === 1 ? '' : 's'}`,
+    kisses_given:
+        (value) =>
+            `Give ${value.toLocaleString()} kiss${value === 1 ? '' : 'es'}`,
+    kisses_taken:
+        (value) =>
+            `Receive ${value.toLocaleString()} kiss${value === 1 ? '' : 'es'}`,
+    profile_likes_received:
+        (value) =>
+            `Receive ${value.toLocaleString()} profile like${value === 1 ? '' : 's'}`,
+    spanks_given:
+        (value) =>
+            `Give ${value.toLocaleString()} spank${value === 1 ? '' : 's'}`,
+    spanks_taken:
+        (value) =>
+            `Receive ${value.toLocaleString()} spank${value === 1 ? '' : 's'}`
+};
+
+const socialCounterAchievements =
+    Object.entries(
+        socialCounterLabels
+    ).flatMap(
+        ([
+            key,
+            label
+        ]) =>
+            socialMilestones.map(
+                (milestone) =>
+                    milestoneDefinition(
+                        key,
+                        milestone,
+                        label,
+                        progressionPoints(
+                            milestone
+                        )
+                    )
+            )
+    );
+
+const dailyWyrVoteAchievements =
+    socialMilestones.map(
+        (milestone) =>
+            milestoneDefinition(
+                'daily_wyr_votes',
+                milestone,
+                (value) =>
+                    `Vote in Daily WYR ${value.toLocaleString()} time${value === 1 ? '' : 's'}`,
+                progressionPoints(
+                    milestone
+                )
+            )
+    );
+
 const achievementDefinitions = [
     ...sceneAchievements,
     ...combinedSceneStatAchievements,
     ...combinedSceneTwoStatsAchievements,
     ...combinedSceneThreeStatsAchievements,
     ...statAchievements,
+    ...allStatsAchievements,
+    ...resourceAchievements,
+    ...socialCounterAchievements,
+    ...dailyWyrVoteAchievements,
     ...showcaseAchievements,
     ...buttonAchievements,
     ...gifSubmissionAchievements
@@ -329,11 +486,56 @@ const endlessAchievements = {
                 `Be part of a scene with all 3 combined stats at ${value}`,
         points:
             150
+    },
+    all_stats: {
+        startsAfter:
+            prestigeStatStart,
+        step:
+            10,
+        label:
+            (value) =>
+                `Performance, Stamina, and Fame reach ${value}`,
+        points:
+            150
+    },
+    wallet_coins: {
+        startsAfter:
+            50000,
+        step:
+            25000,
+        label:
+            (value) =>
+                `Hold ${value.toLocaleString()} coins`,
+        points:
+            100
+    },
+    xp_earned: {
+        startsAfter:
+            50000,
+        step:
+            25000,
+        label:
+            (value) =>
+                `Earn ${value.toLocaleString()} total XP`,
+        points:
+            100
+    },
+    ranking_reached: {
+        startsAfter:
+            10000,
+        step:
+            5000,
+        label:
+            (value) =>
+                `Reach ${value.toLocaleString()} ranking`,
+        points:
+            100
     }
 };
 
 module.exports = {
     achievementDefinitions,
+    allStatsAchievements,
     buttonAchievements,
     combinedSceneStatAchievements,
     combinedSceneThreeStatsAchievements,
@@ -343,9 +545,14 @@ module.exports = {
     fixedSceneMilestones,
     gifSubmissionAchievements,
     progressionPoints,
+    coinMilestones,
+    rankingMilestones,
+    resourceAchievements,
     sceneAchievements,
     showcaseAchievements,
+    socialCounterAchievements,
     socialMilestones,
     statAchievements,
-    statMilestones
+    statMilestones,
+    xpMilestones
 };

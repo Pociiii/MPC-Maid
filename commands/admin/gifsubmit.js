@@ -50,7 +50,9 @@ Scene buttons are split by cast type:
 - **Scene FMF**: 1 male + 2 females
 - **Scene FFF**: 3 females
 
-**Interactions** are used by Wiggle, Flex, Horny, Drop, Drink, Firework, and similar commands.`,
+**Interactions** are used by Wiggle, Flex, Horny, Drop, Drink, Firework, and similar commands.
+
+**Scene Titles** lets members suggest names for future porn scene posts.`,
                 timestamp:
                     true
             });
@@ -140,6 +142,16 @@ Scene buttons are split by cast type:
                         )
                         .setStyle(
                             ButtonStyle.Success
+                        ),
+                    new ButtonBuilder()
+                        .setCustomId(
+                            'gifsubmit_titles'
+                        )
+                        .setLabel(
+                            'Scene Titles'
+                        )
+                        .setStyle(
+                            ButtonStyle.Primary
                         ),
                     new ButtonBuilder()
                         .setCustomId(

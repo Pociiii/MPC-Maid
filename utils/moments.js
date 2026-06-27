@@ -84,6 +84,22 @@ const flavorPools = {
         'The waiting ended with a new name for the board.',
         'A private journey became a shared celebration.'
     ],
+    party_drink: [
+        'Someone just bought the room a little more courage.',
+        'A fresh round made the night feel warmer.',
+        'The bar got busy, and the room noticed who paid.',
+        'A small toast just turned into a shared Moment.',
+        'The night picked up a little sparkle from one generous round.',
+        'Someone made sure nobody online was left empty-handed.'
+    ],
+    party_firework: [
+        'Someone just made the ceiling remember their name.',
+        'The room got brighter, louder, and impossible to ignore.',
+        'A public flex just crossed the Moments board.',
+        'Someone spent big just to light up the night.',
+        'The neon got competition for a few seconds.',
+        'That was not subtle, which was probably the point.'
+    ],
     casino_jackpot: [
         'The casino lights just got a little brighter.',
         'Someone made the house blink first.',

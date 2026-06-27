@@ -86,6 +86,86 @@ async function runMigrations(
 
     await run(
         db,
+        `CREATE TABLE IF NOT EXISTS daily_wyr_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            question_date TEXT NOT NULL UNIQUE,
+            question_id TEXT NOT NULL,
+            option_a TEXT NOT NULL,
+            option_b TEXT NOT NULL,
+            channel_id TEXT,
+            message_id TEXT,
+            thread_id TEXT,
+            posted_at TEXT,
+            closes_at TEXT NOT NULL,
+            closed_at TEXT,
+            status TEXT NOT NULL DEFAULT 'active'
+                CHECK (status IN ('active', 'closed')),
+            thread_reply_count INTEGER DEFAULT 0,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )`
+    );
+
+    await run(
+        db,
+        `CREATE UNIQUE INDEX IF NOT EXISTS idx_daily_wyr_one_active
+         ON daily_wyr_sessions(status)
+         WHERE status = 'active'`
+    );
+
+    await run(
+        db,
+        `CREATE INDEX IF NOT EXISTS idx_daily_wyr_sessions_status_close
+         ON daily_wyr_sessions(status, closes_at)`
+    );
+
+    await run(
+        db,
+        `CREATE TABLE IF NOT EXISTS daily_wyr_votes (
+            session_id INTEGER NOT NULL,
+            user_id TEXT NOT NULL,
+            vote TEXT NOT NULL CHECK (vote IN ('a', 'b')),
+            reward_claimed INTEGER DEFAULT 0,
+            voted_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+            PRIMARY KEY (session_id, user_id),
+            FOREIGN KEY (session_id)
+                REFERENCES daily_wyr_sessions(id)
+                ON DELETE CASCADE
+        )`
+    );
+
+    await run(
+        db,
+        `CREATE INDEX IF NOT EXISTS idx_daily_wyr_votes_session
+         ON daily_wyr_votes(session_id)`
+    );
+
+    await run(
+        db,
+        `CREATE TABLE IF NOT EXISTS profile_likes (
+            target_user_id TEXT NOT NULL,
+            liker_user_id TEXT NOT NULL,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+            PRIMARY KEY (target_user_id, liker_user_id)
+        )`
+    );
+
+    await run(
+        db,
+        `CREATE INDEX IF NOT EXISTS idx_profile_likes_target
+         ON profile_likes(target_user_id)`
+    );
+
+    await run(
+        db,
+        `CREATE INDEX IF NOT EXISTS idx_profile_likes_liker
+         ON profile_likes(liker_user_id)`
+    );
+
+    await run(
+        db,
         `CREATE TABLE IF NOT EXISTS relationships (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_a_id TEXT NOT NULL,

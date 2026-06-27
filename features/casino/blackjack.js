@@ -17,6 +17,10 @@ const {
     addCoins
 } = require('../../utils/users');
 
+const {
+    syncUserAchievementCounters
+} = require('../achievements/achievements');
+
 const emojis =
     require('../../utils/emojis');
 
@@ -496,7 +500,8 @@ function clearSession(
 }
 
 async function paySession(
-    session
+    session,
+    client = null
 ) {
 
     if (
@@ -509,11 +514,25 @@ async function paySession(
 
     if (
         session.payout > 0
-    )
+    ) {
+
         await addCoins(
             session.userId,
             session.payout
         );
+
+        if (
+            client
+        )
+            await syncUserAchievementCounters(
+                client,
+                session.userId,
+                [
+                    'wallet_coins'
+                ]
+            );
+
+    }
 
 }
 
@@ -714,7 +733,8 @@ async function handleBlackjackAction(
         session.done
     )
         await paySession(
-            session
+            session,
+            interaction.client
         );
 
     await interaction.editReply({

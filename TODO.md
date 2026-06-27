@@ -17,13 +17,59 @@ the database is stable.
 
 - Keep testing daily quests, achievements, leaderboard, and versioned embeds.
 - Reset the local database as needed during testing.
-- Avoid adding new SQL tables until the remaining systems are clearer.
+- Avoid adding more SQL tables unless the feature needs restart-safe state.
+- Current new SQL-backed systems include Daily WYR and profile likes.
+- Do not delete `database.db` to pick up new tables; run the bot or preflight so
+  migrations can create missing schema.
 - Keep `.env` private and rotate the Discord bot token before hosting.
+- Run `npm run preflight` and fix failures before copying the bot to a server.
 - Check cooldowns again after more live testing.
+
+## Recently Completed
+
+- Added `npm run preflight` as the main local/server readiness check.
+- Daily Would You Rather is implemented in General with anonymous voting,
+  one-time vote rewards, a discussion thread, close handling, and SQL state.
+- GIF Submit now lets users suggest scene titles for staff review.
+- Pornscene extra parts now respect caps while staying in scene order:
+  foreplay max 2, oral max 2, sex max 3, finale max 1.
+- `/profile` now splits interaction stats into separate fields and supports
+  profile likes with Moments announcements.
+- `/holdem` is live as a first user-vs-dealer Texas Hold'em game.
+- `/commands` overview now uses readable fields for role rules and each
+  command category.
+- `/drink` and `/firework` now track achievement progress and post successful
+  uses to Moments.
 
 ## High Priority
 
+### 1.0 Live Test Checklist
+
+Goal:
+- Get the current feature set stable enough for hosting before adding another
+  major system.
+
+Test:
+- Run `npm run preflight` before each server move or release candidate.
+- Test slash command registration after adding `/holdem`.
+- Test Daily WYR post, voting, reward, thread, close, and archive flow.
+- Test `/profile` likes in the real Moments channel.
+- Test `/holdem` with win, loss, tie, fold, timeout, and low-balance cases.
+- Test GIF Submit scene title approval and rejection with staff roles.
+- Test pornscene extra part ordering across several scenes.
+- Check `/commands` on mobile to make sure category fields stay readable.
+
+Balance watch:
+- Coin income from Daily WYR and daily quests.
+- Coin sinks from `/train`, `/shop`, custom scenes, and casino games.
+- `/holdem` pacing and whether per-street betting feels fair.
+- Cooldowns for casino, showcase, and scene request commands.
+
 ### Daily Would You Rather
+
+Status:
+- First version implemented and ready for live testing.
+- Future ideas below remain parked until the live version has been tested.
 
 Goal:
 - Add a lightweight daily social activity that is completely separate from
@@ -95,10 +141,9 @@ Question writing guidelines:
   party, food, travel, and random prompts.
 - No categories in the first version; keep the daily feed varied.
 
-Data needed:
-- This feature should use SQL from the start because votes/rewards/history must
-  survive restarts.
-- Needed state:
+Data:
+- This feature uses SQL because votes/rewards/history must survive restarts.
+- Stored state:
   - active WYR message/thread/question
   - question history
   - user votes
@@ -123,6 +168,19 @@ Future ideas:
 - Keep an eye on pornscene XP now that Performance gives crit chance instead
   of raw XP.
 
+### GIF Submit And Scene Titles
+
+Current:
+- GIF Submit supports normal GIF submissions and scene title suggestions.
+- Staff can approve or reject suggested scene titles.
+- Preflight validates scene title pools.
+
+Future:
+- Keep adding approved titles so scene names feel less repetitive.
+- Watch whether title suggestion review needs better staff filters or logs.
+- Keep title suggestions out of public changelog unless the workflow is visible
+  to members.
+
 ### Embed And UI Consistency
 
 Current direction:
@@ -131,11 +189,28 @@ Current direction:
 - Use versioned footers on command embeds.
 - Add clear emoji feedback to buttons and fields.
 - If buttons start feeling cramped, use a dropdown menu instead.
+- Use fields for readable command/profile categories instead of long stacked
+  description lists.
+- Keep `/commands` overview as category fields, with exact details behind the
+  section menu.
 
 Future:
 - Continue converting older command groups.
 - Keep moment announcements visually consistent.
 - Keep command text short because Discord users do not read walls of text.
+
+### Profile And Social Polish
+
+Current:
+- `/profile` shows wallet, stats, career, split interaction fields, and profile
+  likes.
+- Profile likes are one per liker/target pair, block self-likes, and post first
+  likes to Moments.
+
+Future:
+- Watch whether profile likes create good social energy or need cooldowns.
+- Consider adding relationships or future Reputation to profile only after live
+  testing proves the profile stays readable.
 
 ### Channel Routing
 
@@ -208,7 +283,7 @@ Initial Reputation rewards:
   - No Reputation for normal wins/losses.
   - Big jackpot/special win: +10 Reputation, if the event is notable enough to
     post.
-- Daily Would You Rather, when implemented:
+- Daily Would You Rather:
   - First vote of the day: +2 Reputation.
 
 Data needed:
@@ -476,6 +551,27 @@ Implementation notes:
   - Relationships and pregnancy create better story moments but remain RP-only
 
 ## Medium Priority
+
+### Casino Polish
+
+Current:
+- `/dice`, `/slots`, `/blackjack`, `/holdem`, and Spank Dilli are playable.
+- `/holdem` is intentionally user vs dealer for the first version.
+- Hold'em does not use SQL yet because it is a short live session like
+  blackjack.
+
+Hold'em live-test notes:
+- Watch whether per-street betting is easier to understand than locking the
+  full max risk up front.
+- Test edge cases: low balance on the next street, fold, tie, timeout, and
+  showdown.
+- Keep multiplayer tables parked until the user-vs-dealer version feels good.
+- If Hold'em becomes popular, consider SQL-backed tables before adding
+  multiplayer or all-in/side-pot logic.
+
+Future casino ideas:
+- Add notable-win Moments only for rare/special results, not normal wins.
+- Add casino Reputation only for notable jackpots if Reputation becomes live.
 
 ### Private Scene Threads
 
@@ -761,6 +857,11 @@ Current:
 - Achievements unlock automatically and post in Maid Feed.
 - Achievement points exist and can be shown on leaderboard.
 - `/achievements` shows private progress with category buttons.
+- Training achievements include single-stat milestones and balanced all-three
+  milestones when Performance, Stamina, and Fame all reach each 10-point
+  threshold.
+- Social achievements include drink rounds, fireworks, profile likes, Daily
+  WYR votes, and tracked interaction counters.
 
 Future:
 - Add milestones for pregnancy only after the first pregnancy version is tested.

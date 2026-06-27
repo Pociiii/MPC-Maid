@@ -28,6 +28,10 @@ const {
     pickOne
 } = require('../../utils/flavorText');
 
+const {
+    syncUserAchievementCounters
+} = require('../achievements/achievements');
+
 const emojis =
     require('../../utils/emojis');
 
@@ -512,6 +516,14 @@ async function handleSpankDilli(
         await addCoins(
             interaction.user.id,
             prizeAfterSpank
+        );
+
+        await syncUserAchievementCounters(
+            interaction.client,
+            interaction.user.id,
+            [
+                'wallet_coins'
+            ]
         );
 
     }

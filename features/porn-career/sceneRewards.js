@@ -9,6 +9,10 @@ const {
     ECONOMY
 } = require('../../data/constants');
 
+const {
+    syncUserAchievementCounters
+} = require('../achievements/achievements');
+
 function getRequesterSceneXp(
     result
 ) {
@@ -26,6 +30,7 @@ function getTargetSceneXp(
 }
 
 async function applyRewards(
+    client,
     requesterId,
     targetId,
     result
@@ -65,6 +70,27 @@ async function applyRewards(
         ),
         addScene(
             targetId
+        )
+    ]);
+
+    await Promise.all([
+        syncUserAchievementCounters(
+            client,
+            requesterId,
+            [
+                'xp_earned',
+                'wallet_coins',
+                'ranking_reached'
+            ]
+        ),
+        syncUserAchievementCounters(
+            client,
+            targetId,
+            [
+                'xp_earned',
+                'wallet_coins',
+                'ranking_reached'
+            ]
         )
     ]);
 

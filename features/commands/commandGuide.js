@@ -318,7 +318,8 @@ function buildSections() {
                 commandSummary([
                     '/dice',
                     '/slots',
-                    '/blackjack'
+                    '/blackjack',
+                    '/holdem'
                 ]),
             commands: [
                 commandDetail(
@@ -344,6 +345,14 @@ function buildSections() {
                         COOLDOWNS.BLACKJACK
                     ),
                     'Bet up to 100 coins, play the dealer.'
+                ),
+                commandDetail(
+                    '/holdem',
+                    `<#${CHANNELS.CASINO}>`,
+                    cooldownLabel(
+                        COOLDOWNS.HOLDEM
+                    ),
+                    'Bet up to 50 coins per street, play Texas Hold\'em against the dealer.'
                 )
             ]
         },
@@ -372,6 +381,12 @@ function buildSections() {
                     `<#${CHANNELS.UPDATES}>`,
                     'Manual',
                     'Patch notes and bot updates.'
+                ),
+                commandDetail(
+                    'Daily WYR',
+                    `<#${CHANNELS.GENERAL}>`,
+                    'Automatic',
+                    'Daily Would You Rather vote with a discussion thread.'
                 )
             ]
         }
@@ -395,15 +410,20 @@ function buildCommandOverviewEmbed(
                 title:
                     'MPC Maid Commands',
                 description:
-`Pick a section from the menu for channels, cooldowns, and short notes.
-
-Role-based GIFs use:
-- Gender: <@&${ROLES.MALE}> / <@&${ROLES.FEMALE}>
-- Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`
+                    'Pick a section from the menu for channels, cooldowns, and short notes.'
             }
         );
 
     embed.addFields(
+        {
+            name:
+                'Role-Based GIFs',
+            value:
+`- Gender: <@&${ROLES.MALE}> / <@&${ROLES.FEMALE}>
+- Skin: <@&${ROLES.LIGHT_SKIN}> / <@&${ROLES.DARK_SKIN}>`,
+            inline:
+                false
+        },
         ...Object.values(
             sections
         ).map(
