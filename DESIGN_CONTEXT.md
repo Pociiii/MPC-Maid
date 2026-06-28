@@ -336,8 +336,8 @@ Moments:
 
 Routing:
 
-- Maid Feed is for progression notices, quest completions, badge upgrades, and
-  achievement unlocks.
+- Maid Feed is for progression notices, quest completions, daily/weekly
+  activity milestones, badge upgrades, and achievement unlocks.
 - Moments is for story events: scene starts/finals, relationship beats,
   pregnancy beats, big casino stories, and career milestones.
 
@@ -350,14 +350,16 @@ Activity Moments:
   winter time.
 - Daily/weekly counters live in `user_activity_period_stats`; posted milestones
   are guarded by `user_activity_moment_posts` so restarts do not duplicate
-  Moments.
+  updates.
 - Scene/help thresholds should reach farther than early use: daily
   `3/5/10/20/40`, weekly `10/25/50/100/200`.
 - Fast button actions use wider thresholds: daily `5/10/20/40/80`, weekly
   `25/50/100/200/400`.
+- Daily and weekly activity milestones post to Maid Feed as progress updates.
 - Lifetime scene/help Moments post every 10 career actions. Faster social
-  buttons post every 25 career actions.
-- A single completed action should post at most one milestone Moment for the
+  buttons post every 25 career actions and stay in Moments as bigger
+  career/social milestones.
+- A single completed action should post at most one milestone update for the
   acting user. Priority is lifetime, then weekly, then daily.
 - Activity Moment embeds should follow normal user-centered styling: actor name
   as author, user avatar as thumbnail, short flavor description, and emoji-led

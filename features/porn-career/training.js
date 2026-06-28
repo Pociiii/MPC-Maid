@@ -17,8 +17,7 @@ const emojis =
 
 const {
     getOrCreateUser,
-    removeCoins,
-    removeXP,
+    spendResources,
     setFame,
     setPerformance,
     setStamina
@@ -312,20 +311,41 @@ async function trainStat(
 
     }
 
-    await Promise.all([
-        removeXP(
+    const spent =
+        await spendResources(
             interaction.user.id,
-            cost.xp
-        ),
-        removeCoins(
-            interaction.user.id,
-            cost.coins
-        ),
-        statSetters[stat](
-            interaction.user.id,
-            currentValue + 1
-        )
-    ]);
+            {
+                coins:
+                    cost.coins,
+                xp:
+                    cost.xp
+            }
+        );
+
+    if (
+        !spent
+    ) {
+
+        await interaction.editReply(
+            await buildTrainingPanel(
+                interaction,
+                {
+                    success:
+                        false,
+                    text:
+                        `Not enough resources for ${statEmojis[stat]} ${statLabels[stat]}. Check the missing amount below.`
+                }
+            )
+        );
+
+        return;
+
+    }
+
+    await statSetters[stat](
+        interaction.user.id,
+        currentValue + 1
+    );
 
     await interaction.editReply(
         await buildTrainingPanel(

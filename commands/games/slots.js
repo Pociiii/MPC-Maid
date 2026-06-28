@@ -105,6 +105,21 @@ module.exports = {
                 session
             );
 
+        if (
+            !result.ok
+        ) {
+
+            await interaction.reply({
+                content:
+                    `You only have ${emojis.coin} **${result.user.coins} coins**. Lower the bet and try again.`,
+                flags:
+                    64
+            });
+
+            return;
+
+        }
+
         await interaction.reply({
             embeds: [
                 buildSlotEmbed(

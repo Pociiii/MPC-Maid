@@ -25,3 +25,7 @@
   Stamina, and Fame all reach 10, then every 10 after that.
 - `/drink` and `/firework` now have achievement progress and post social
   notices to Moments when they succeed.
+- Daily and weekly activity milestone updates now post to Maid Feed so Moments
+  stays focused on RP/story posts.
+- Paid actions now use atomic coin/resource spending so users cannot trigger
+  purchases, training, or casino plays without the required balance.

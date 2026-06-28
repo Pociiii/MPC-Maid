@@ -40,6 +40,8 @@ the database is stable.
   command category.
 - `/drink` and `/firework` now track achievement progress and post successful
   uses to Moments.
+- Daily and weekly activity milestone updates now route to Maid Feed instead of
+  Moments.
 
 ## High Priority
 
@@ -222,7 +224,8 @@ Current routing plan:
 - Keep Moments for sexy/story RP moments: pornscene final results, pregnancy
   confirmed, gender reveal, birth, and bigger RP hooks.
 - Move game/system spam to Maid Feed: daily quest completions, achievement
-  unlocks, GIF approvals, and similar progress notices.
+  unlocks, daily/weekly activity milestones, GIF approvals, and similar
+  progress notices.
 - Keep porn career channel for scene parts only.
 - Keep custom scene channel for custom scene parts only.
 
@@ -516,8 +519,9 @@ Activity Moments:
 - Scene/help thresholds: daily `3/5/10/20/40`, weekly `10/25/50/100/200`.
 - Faster button thresholds: daily `5/10/20/40/80`, weekly
   `25/50/100/200/400`.
+- Daily and weekly activity milestones post to Maid Feed as progress updates.
 - Lifetime scene/help Moments every 10 actions; faster social button Moments
-  every 25 actions.
+  every 25 actions and stay in Moments as bigger career/social milestones.
 
 Implementation notes:
 - Build Reputation awarding as a small helper called after existing validation

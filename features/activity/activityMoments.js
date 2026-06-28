@@ -7,6 +7,11 @@ const {
 } = require('../daily-quests/dailyQuests');
 
 const {
+    CHANNELS
+} = require('../../data/constants');
+
+const {
+    buildMomentEmbed,
     postMoment
 } = require('../../utils/moments');
 
@@ -85,11 +90,11 @@ const activityConfig = {
             'scene',
         titles: {
             daily:
-                'Daily Scene Moment',
+                'Daily Scene Update',
             lifetime:
                 'Career Scene Moment',
             weekly:
-                'Weekly Scene Moment'
+                'Weekly Scene Update'
         },
         dailyThresholds:
             sceneDailyThresholds,
@@ -115,11 +120,11 @@ const activityConfig = {
             'help',
         titles: {
             daily:
-                'Daily Help Moment',
+                'Daily Help Update',
             lifetime:
                 'Help Moment',
             weekly:
-                'Weekly Help Moment'
+                'Weekly Help Update'
         },
         dailyThresholds:
             sceneDailyThresholds,
@@ -145,11 +150,11 @@ const activityConfig = {
             'spank',
         titles: {
             daily:
-                'Daily Spank Moment',
+                'Daily Spank Update',
             lifetime:
                 'Spank Moment',
             weekly:
-                'Weekly Spank Moment'
+                'Weekly Spank Update'
         },
         dailyThresholds:
             buttonDailyThresholds,
@@ -175,11 +180,11 @@ const activityConfig = {
             'kiss',
         titles: {
             daily:
-                'Daily Kiss Moment',
+                'Daily Kiss Update',
             lifetime:
                 'Kiss Moment',
             weekly:
-                'Weekly Kiss Moment'
+                'Weekly Kiss Update'
         },
         dailyThresholds:
             buttonDailyThresholds,
@@ -205,11 +210,11 @@ const activityConfig = {
             'brofist',
         titles: {
             daily:
-                'Daily Brofist Moment',
+                'Daily Brofist Update',
             lifetime:
                 'Brofist Moment',
             weekly:
-                'Weekly Brofist Moment'
+                'Weekly Brofist Update'
         },
         dailyThresholds:
             buttonDailyThresholds,
@@ -659,6 +664,85 @@ function milestoneDescription(
 
 }
 
+function isActivityFeedMilestone(
+    milestone
+) {
+
+    return [
+        'daily',
+        'weekly'
+    ].includes(
+        milestone.periodType
+    );
+
+}
+
+async function getMaidFeedChannel(
+    client
+) {
+
+    return client.channels.cache.get(
+        CHANNELS.MAID_FEED
+    ) ??
+        await client.channels.fetch(
+            CHANNELS.MAID_FEED
+        ).catch(
+            () => null
+        );
+
+}
+
+async function postActivityFeed(
+    client,
+    options
+) {
+
+    const channel =
+        await getMaidFeedChannel(
+            client
+        );
+
+    if (
+        !channel?.isTextBased?.() &&
+        !channel?.send
+    )
+        return null;
+
+    const embed =
+        buildMomentEmbed(
+            options
+        );
+
+    return channel.send({
+        content:
+            options.content,
+        embeds: [
+            embed
+        ]
+    });
+
+}
+
+function activityFeedFlavor(
+    displayName,
+    config,
+    milestone
+) {
+
+    if (
+        !isActivityFeedMilestone(
+            milestone
+        )
+    )
+        return undefined;
+
+    return `${displayName} reached ${milestoneDescription(
+        config,
+        milestone
+    )}.`;
+
+}
+
 function buildFields(
     userId,
     config,
@@ -792,38 +876,58 @@ async function postActivityMilestone(
             target
         );
 
+    const displayName =
+        getDisplayName(
+            target
+        );
+
+    const postOptions = {
+        authorIcon:
+            avatar,
+        authorName:
+            displayName,
+        type:
+            config.momentType,
+        thumbnail:
+            avatar,
+        title:
+            milestoneTitle(
+                config,
+                milestone
+            ),
+        command:
+            config.command,
+        flavor:
+            activityFeedFlavor(
+                displayName,
+                config,
+                milestone
+            ),
+        fields:
+            buildFields(
+                userId,
+                config,
+                milestone,
+                dailyStats,
+                weeklyStats,
+                lifetimeCount,
+                details
+            )
+    };
+
     const message =
-        await postMoment(
-            client,
-            {
-                authorIcon:
-                    avatar,
-                authorName:
-                    getDisplayName(
-                        target
-                    ),
-                type:
-                    config.momentType,
-                thumbnail:
-                    avatar,
-                title:
-                    milestoneTitle(
-                        config,
-                        milestone
-                    ),
-                command:
-                    config.command,
-                fields:
-                    buildFields(
-                        userId,
-                        config,
-                        milestone,
-                        dailyStats,
-                        weeklyStats,
-                        lifetimeCount,
-                        details
-                    )
-            }
+        await (
+            isActivityFeedMilestone(
+                milestone
+            )
+                ? postActivityFeed(
+                    client,
+                    postOptions
+                )
+                : postMoment(
+                    client,
+                    postOptions
+                )
         ).catch(
             (error) => {
 

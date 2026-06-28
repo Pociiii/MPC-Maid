@@ -12,7 +12,7 @@ const {
 
 const {
     getOrCreateUser,
-    removeCoins
+    spendCoins
 } = require('../../utils/users');
 
 const {
@@ -119,16 +119,37 @@ module.exports = {
         )
             return;
 
+        const spent =
+            await spendCoins(
+                interaction.user.id,
+                bet
+            );
+
+        if (
+            !spent
+        ) {
+
+            const currentUser =
+                await getOrCreateUser(
+                    interaction.user.id
+                );
+
+            await interaction.reply({
+                content:
+                    `You only have ${emojis.coin} **${currentUser.coins} coins**. Lower the bet and try again.`,
+                flags:
+                    64
+            });
+
+            return;
+
+        }
+
         const session =
             createSession(
                 interaction.user.id,
                 bet
             );
-
-        await removeCoins(
-            interaction.user.id,
-            bet
-        );
 
         if (
             !session.done

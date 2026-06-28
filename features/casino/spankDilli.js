@@ -20,7 +20,7 @@ const {
 const {
     addCoins,
     getOrCreateUser,
-    removeCoins
+    spendCoins
 } = require('../../utils/users');
 
 const {
@@ -486,12 +486,33 @@ async function handleSpankDilli(
 
     }
 
-    await interaction.deferUpdate();
+    const spent =
+        await spendCoins(
+            interaction.user.id,
+            COST
+        );
 
-    await removeCoins(
-        interaction.user.id,
-        COST
-    );
+    if (
+        !spent
+    ) {
+
+        const currentUser =
+            await getOrCreateUser(
+                interaction.user.id
+            );
+
+        await interaction.reply({
+            content:
+                `You need ${emojis.coin} **${COST} coins** to spank Dilli. You have **${currentUser.coins}**.`,
+            flags:
+                64
+        });
+
+        return;
+
+    }
+
+    await interaction.deferUpdate();
 
     const previousState =
         await getState();

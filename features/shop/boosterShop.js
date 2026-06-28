@@ -23,7 +23,7 @@ const {
 
 const {
     getOrCreateUser,
-    removeCoins
+    spendCoins
 } = require('../../utils/users');
 
 const emojis =
@@ -254,10 +254,35 @@ async function buyShopBooster(
 
     }
 
-    await removeCoins(
-        interaction.user.id,
-        cost
-    );
+    const spent =
+        await spendCoins(
+            interaction.user.id,
+            cost
+        );
+
+    if (
+        !spent
+    ) {
+
+        await interaction.editReply(
+            await buildShopReply(
+                interaction,
+                {
+                    success:
+                        false,
+                    text:
+                        `Not enough coins for ${formatBooster({
+                            stat,
+                            tier:
+                                numericTier
+                        })}.`
+                }
+            )
+        );
+
+        return;
+
+    }
 
     await addBooster(
         interaction.user.id,

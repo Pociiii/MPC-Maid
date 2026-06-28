@@ -16,7 +16,7 @@ const {
 const {
     addCoins,
     getOrCreateUser,
-    removeCoins
+    spendCoins
 } = require('../../utils/users');
 
 const {
@@ -319,18 +319,22 @@ async function spinSession(
     session
 ) {
 
-    const user =
-        await getOrCreateUser(
-            session.userId
+    const spent =
+        await spendCoins(
+            session.userId,
+            session.bet
         );
 
     if (
-        user.coins < session.bet
+        !spent
     )
         return {
             ok:
                 false,
-            user
+            user:
+                await getOrCreateUser(
+                    session.userId
+                )
         };
 
     const reels = [
@@ -349,11 +353,6 @@ async function spinSession(
             session.bet *
             multiplier
         );
-
-    await removeCoins(
-        session.userId,
-        session.bet
-    );
 
     if (
         payout > 0

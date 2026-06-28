@@ -18,7 +18,7 @@ const {
 const {
     addCoins,
     getOrCreateUser,
-    removeCoins
+    spendCoins
 } = require('../../utils/users');
 
 const {
@@ -173,6 +173,32 @@ module.exports = {
         )
             return;
 
+        const spent =
+            await spendCoins(
+                interaction.user.id,
+                bet
+            );
+
+        if (
+            !spent
+        ) {
+
+            const currentUser =
+                await getOrCreateUser(
+                    interaction.user.id
+                );
+
+            await interaction.reply({
+                content:
+                    `You only have ${emojis.coin} **${currentUser.coins} coins**. Lower the bet and try again.`,
+                flags:
+                    64
+            });
+
+            return;
+
+        }
+
         const playerDie1 =
             rollDie();
 
@@ -198,15 +224,27 @@ module.exports = {
                 bet
             );
 
-        if (
+        const payout =
             result.coins > 0
+                ? bet * 2
+                : result.coins === 0
+                    ? bet
+                    : 0;
+
+        if (
+            payout > 0
         ) {
 
             await addCoins(
                 interaction.user.id,
-                result.coins
+                payout
             );
 
+        }
+
+        if (
+            result.coins > 0
+        )
             await syncUserAchievementCounters(
                 interaction.client,
                 interaction.user.id,
@@ -215,22 +253,10 @@ module.exports = {
                 ]
             );
 
-        }
-        else if (
-            result.coins < 0
-        ) {
-
-            await removeCoins(
-                interaction.user.id,
-                Math.abs(
-                    result.coins
-                )
+        const currentUser =
+            await getOrCreateUser(
+                interaction.user.id
             );
-
-        }
-
-        const newBalance =
-            user.coins + result.coins;
 
         const embed =
             createUserEmbed(
@@ -282,7 +308,7 @@ module.exports = {
                 name:
                     `${emojis.coin} Balance`,
                 value:
-                    `**${newBalance} coins**`,
+                    `**${currentUser.coins} coins**`,
                 inline:
                     true
             }

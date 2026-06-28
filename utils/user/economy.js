@@ -115,6 +115,91 @@ async function spendCoins(
 
 }
 
+async function spendResources(
+    userId,
+    {
+        coins = 0,
+        xp = 0
+    } = {}
+) {
+
+    const coinCost =
+        Number(
+            coins
+        );
+
+    const xpCost =
+        Number(
+            xp
+        );
+
+    if (
+        !Number.isFinite(
+            coinCost
+        ) ||
+        !Number.isFinite(
+            xpCost
+        ) ||
+        coinCost < 0 ||
+        xpCost < 0
+    )
+        return false;
+
+    if (
+        coinCost === 0 &&
+        xpCost === 0
+    )
+        return true;
+
+    await getOrCreateUser(
+        userId
+    );
+
+    return new Promise(
+        (resolve, reject) => {
+
+            db.run(
+                `UPDATE users
+                SET coins = coins - ?,
+                    xp = xp - ?
+                WHERE id = ?
+                AND coins >= ?
+                AND xp >= ?`,
+                [
+                    coinCost,
+                    xpCost,
+                    userId,
+                    coinCost,
+                    xpCost
+                ],
+                function onSpend(
+                    error
+                ) {
+
+                    if (
+                        error
+                    ) {
+
+                        reject(
+                            error
+                        );
+
+                        return;
+
+                    }
+
+                    resolve(
+                        this.changes > 0
+                    );
+
+                }
+            );
+
+        }
+    );
+
+}
+
 function setCoins(
     userId,
     amount
@@ -135,5 +220,6 @@ module.exports = {
     getBalance,
     removeCoins,
     spendCoins,
+    spendResources,
     setCoins
 };
