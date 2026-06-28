@@ -49,6 +49,9 @@ const views = {
                 'daily_wyr_votes',
                 'drinks_bought',
                 'fireworks_launched',
+                'casino_plays',
+                'training_sessions',
+                'shop_purchases',
                 'button_interactions',
                 'showcase_posts',
                 'gif_submissions'
@@ -96,6 +99,20 @@ const views = {
                 'wallet_coins',
                 'xp_earned',
                 'ranking_reached'
+            ]
+    },
+    activity: {
+        label:
+            'Activity',
+        emoji:
+            '\uD83C\uDFAE',
+        title:
+            'Activity Achievements',
+        keys:
+            [
+                'casino_plays',
+                'training_sessions',
+                'shop_purchases'
             ]
     },
     social: {
@@ -157,6 +174,8 @@ const categoryLabels = {
         '\uD83E\uDD1C Brofists Received',
     button_interactions:
         '\uD83D\uDD18 Interaction Buttons',
+    casino_plays:
+        '\uD83C\uDFB0 Casino Plays',
     daily_wyr_votes:
         '\u2753 Daily WYR Votes',
     drinks_bought:
@@ -191,6 +210,8 @@ const categoryLabels = {
         '\uD83D\uDC65 Scene Duo Stat Thresholds',
     showcase_posts:
         '\uD83D\uDD25 Showcase Commands',
+    shop_purchases:
+        '\uD83D\uDED2 Shop Purchases',
     spanks_given:
         '\uD83D\uDC4B Spanks Given',
     spanks_taken:
@@ -199,6 +220,8 @@ const categoryLabels = {
         '\u2764\uFE0F Stamina',
     wallet_coins:
         `${emojis.coin} Coins`,
+    training_sessions:
+        '\uD83C\uDFCB\uFE0F Training Sessions',
     xp_earned:
         '\u2B50 XP Earned'
 };

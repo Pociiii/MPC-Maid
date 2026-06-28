@@ -28,6 +28,10 @@ const {
     trackDailyQuest
 } = require('../../features/daily-quests/dailyQuests');
 
+const {
+    incrementAchievementProgress
+} = require('../../features/achievements/achievements');
+
 const emojis =
     require('../../utils/emojis');
 
@@ -181,6 +185,12 @@ module.exports = {
             interaction.client,
             interaction.user.id,
             'blackjack'
+        );
+
+        await incrementAchievementProgress(
+            interaction.client,
+            interaction.user.id,
+            'casino_plays'
         );
 
     }

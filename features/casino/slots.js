@@ -24,6 +24,7 @@ const {
 } = require('../daily-quests/dailyQuests');
 
 const {
+    incrementAchievementProgress,
     syncUserAchievementCounters
 } = require('../achievements/achievements');
 
@@ -372,6 +373,12 @@ async function spinSession(
         );
 
     }
+
+    await incrementAchievementProgress(
+        client,
+        session.userId,
+        'casino_plays'
+    );
 
     const profit =
         payout -

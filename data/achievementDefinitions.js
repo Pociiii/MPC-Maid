@@ -405,6 +405,39 @@ const dailyWyrVoteAchievements =
             )
     );
 
+const actionCounterLabels = {
+    casino_plays:
+        (value) =>
+            `Play casino games ${value.toLocaleString()} time${value === 1 ? '' : 's'}`,
+    shop_purchases:
+        (value) =>
+            `Buy ${value.toLocaleString()} shop item${value === 1 ? '' : 's'}`,
+    training_sessions:
+        (value) =>
+            `Train stats ${value.toLocaleString()} time${value === 1 ? '' : 's'}`
+};
+
+const actionCounterAchievements =
+    Object.entries(
+        actionCounterLabels
+    ).flatMap(
+        ([
+            key,
+            label
+        ]) =>
+            socialMilestones.map(
+                (milestone) =>
+                    milestoneDefinition(
+                        key,
+                        milestone,
+                        label,
+                        progressionPoints(
+                            milestone
+                        )
+                    )
+            )
+    );
+
 const achievementDefinitions = [
     ...sceneAchievements,
     ...combinedSceneStatAchievements,
@@ -415,6 +448,7 @@ const achievementDefinitions = [
     ...resourceAchievements,
     ...socialCounterAchievements,
     ...dailyWyrVoteAchievements,
+    ...actionCounterAchievements,
     ...showcaseAchievements,
     ...buttonAchievements,
     ...gifSubmissionAchievements
@@ -534,6 +568,7 @@ const endlessAchievements = {
 };
 
 module.exports = {
+    actionCounterAchievements,
     achievementDefinitions,
     allStatsAchievements,
     buttonAchievements,

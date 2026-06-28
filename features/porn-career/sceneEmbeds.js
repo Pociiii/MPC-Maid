@@ -465,6 +465,66 @@ function buildPartEmbed(
 
 }
 
+function formatSignedNumber(
+    value
+) {
+
+    return value >= 0
+        ? `+${value}`
+        : `${value}`;
+
+}
+
+function formatSceneLinks(
+    sceneLinks
+) {
+
+    if (
+        sceneLinks.length === 0
+    )
+        return 'No part links recorded.';
+
+    return sceneLinks
+        .map(
+            (link, index) =>
+                `- Part ${index + 1}: ${link}`
+        )
+        .join(
+            '\n'
+        );
+
+}
+
+function formatXpRewards(
+    requesterId,
+    targetId,
+    result
+) {
+
+    const requesterXp =
+        result.xp +
+        ECONOMY.PORN_SCENE_STARTER_XP_BONUS;
+
+    return [
+        `- <@${requesterId}>: **${requesterXp} XP**`,
+        `- <@${targetId}>: **${result.xp} XP**`,
+        `- Requester starter bonus: **+${ECONOMY.PORN_SCENE_STARTER_XP_BONUS} XP**`,
+        result.criticalScene
+            ? '- Critical scene bonus included'
+            : null,
+        result.staminaXpBonus > 0
+            ? `- Stamina bonus included: **+${result.staminaXpBonus} XP**`
+            : null
+    ]
+        .filter(
+            Boolean
+        )
+        .join(
+            '\n'
+        );
+
+}
+
 function buildFinalEmbed(
     requesterId,
     targetId,
@@ -474,11 +534,6 @@ function buildFinalEmbed(
     requesterAuthor,
     sceneColor
 ) {
-
-    const rankingPrefix =
-        result.rankingChange >= 0
-            ? '+'
-            : '';
 
     const finalTitle =
         result.criticalScene
@@ -530,11 +585,17 @@ function buildFinalEmbed(
         },
         {
             name:
-                '🎬 Outcome',
+                '\uD83C\uDFAC Outcome',
             value:
-                result.criticalScene
-                    ? `**${result.outcome}**\n\uD83C\uDFB2 Critical Scene`
-                    : `**${result.outcome}**`,
+                `**${result.outcome}**`,
+            inline:
+                true
+        },
+        {
+            name:
+                '\uD83D\uDCFA Viewers',
+            value:
+                `**${result.viewers.toLocaleString()}**`,
             inline:
                 true
         },
@@ -548,47 +609,51 @@ function buildFinalEmbed(
         },
         {
             name:
-                '⭐ XP',
+                '\u2B50 XP Rewards',
             value:
-                [
-                    `**${result.xp} each**`,
-                    `+${ECONOMY.PORN_SCENE_STARTER_XP_BONUS} starter bonus for requester`,
-                    result.criticalScene
-                        ? '+10 crit bonus'
-                        : null,
-                    result.staminaXpBonus > 0
-                        ? `+${result.staminaXpBonus} stamina bonus`
-                        : null
-                ]
-                    .filter(
-                        Boolean
-                    )
-                    .join(
-                        '\n'
-                    ),
+                formatXpRewards(
+                    requesterId,
+                    targetId,
+                    result
+                ),
+            inline:
+                false
+        },
+        {
+            name:
+                '\uD83C\uDFC6 Ranking',
+            value:
+                `**${formatSignedNumber(
+                    result.rankingChange
+                )}**`,
             inline:
                 true
         },
         {
             name:
-                '🏆 Ranking',
+                '\uD83C\uDF9E\uFE0F Parts',
             value:
-                `**${rankingPrefix}${result.rankingChange}**`,
+                `**${result.totalParts}**`,
             inline:
                 true
         },
         {
             name:
-                '🎞️ Parts',
+                '\uD83C\uDFB2 Critical',
             value:
-                sceneLinks
-                    .map(
-                        (link, index) =>
-                            `- Part ${index + 1}: ${link}`
-                    )
-                    .join(
-                        '\n'
-                    ),
+                result.criticalScene
+                    ? '**Yes**'
+                    : 'No',
+            inline:
+                true
+        },
+        {
+            name:
+                '\uD83D\uDD17 Scene Links',
+            value:
+                formatSceneLinks(
+                    sceneLinks
+                ),
             inline:
                 false
         }

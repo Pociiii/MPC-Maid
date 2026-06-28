@@ -29,3 +29,7 @@
   stays focused on RP/story posts.
 - Paid actions now use atomic coin/resource spending so users cannot trigger
   purchases, training, or casino plays without the required balance.
+- Porn Career final embeds now split outcome, viewers, XP rewards, ranking,
+  critical status, and scene links into clearer fields.
+- Added no-new-SQL achievement tracks for casino plays, training sessions, and
+  shop purchases.

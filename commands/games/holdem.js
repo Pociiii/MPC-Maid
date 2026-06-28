@@ -24,6 +24,10 @@ const {
     registerSession
 } = require('../../features/casino/holdem');
 
+const {
+    incrementAchievementProgress
+} = require('../../features/achievements/achievements');
+
 const emojis =
     require('../../utils/emojis');
 
@@ -141,6 +145,12 @@ module.exports = {
 
         registerSession(
             session
+        );
+
+        await incrementAchievementProgress(
+            interaction.client,
+            interaction.user.id,
+            'casino_plays'
         );
 
         await interaction.reply({

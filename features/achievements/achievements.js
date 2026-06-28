@@ -39,6 +39,8 @@ const categoryLabels = {
         'Brofists Received',
     button_interactions:
         'Interaction Buttons',
+    casino_plays:
+        'Casino Plays',
     drinks_bought:
         'Drink Rounds',
     fame:
@@ -71,6 +73,8 @@ const categoryLabels = {
         'Scene Duo Stat Thresholds',
     showcase_posts:
         'Showcase Commands',
+    shop_purchases:
+        'Shop Purchases',
     spanks_given:
         'Spanks Given',
     spanks_taken:
@@ -79,6 +83,8 @@ const categoryLabels = {
         'Coins',
     daily_wyr_votes:
         'Daily WYR Votes',
+    training_sessions:
+        'Training Sessions',
     xp_earned:
         'XP Earned',
     stamina:
@@ -408,7 +414,7 @@ async function announceAchievement(
     embed.addFields(
         {
             name:
-                '🏅 Achievement',
+                '\uD83C\uDFC5 Achievement',
             value:
                 achievement.label,
             inline:
@@ -416,7 +422,7 @@ async function announceAchievement(
         },
         {
             name:
-                '📁 Category',
+                '\uD83D\uDCC1 Category',
             value:
                 categoryLabels[achievement.key] ??
                 achievement.key,
@@ -425,7 +431,7 @@ async function announceAchievement(
         },
         {
             name:
-                '📈 Progress',
+                '\uD83D\uDCC8 Progress',
             value:
                 `${progress}`,
             inline:
@@ -433,7 +439,7 @@ async function announceAchievement(
         },
         {
             name:
-                '⭐ Points',
+                '\u2B50 Points',
             value:
                 `+${achievement.points ?? 0}`,
             inline:

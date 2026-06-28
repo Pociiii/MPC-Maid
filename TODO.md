@@ -19,6 +19,9 @@ the database is stable.
 - Reset the local database as needed during testing.
 - Avoid adding more SQL tables unless the feature needs restart-safe state.
 - Current new SQL-backed systems include Daily WYR and profile likes.
+- Before deployment, batch the remaining planned SQL schema work together so
+  migrations, preflight, and database backup/recovery can be tested as one
+  pass.
 - Do not delete `database.db` to pick up new tables; run the bot or preflight so
   migrations can create missing schema.
 - Keep `.env` private and rotate the Discord bot token before hosting.
@@ -42,8 +45,64 @@ the database is stable.
   uses to Moments.
 - Daily and weekly activity milestone updates now route to Maid Feed instead of
   Moments.
+- Porn Career final Moments embeds now use clearer fields for outcome, viewers,
+  XP rewards, ranking, critical status, and scene links.
+- Added achievement progress for casino plays, training sessions, and shop
+  purchases using the existing achievement progress table.
 
 ## High Priority
+
+### Pre-Deployment SQL Work
+
+Goal:
+- Finish planned systems that truly need restart-safe database state before the
+  bot is moved to a live server.
+- Keep SQL changes grouped so migrations, preflight checks, and database backup
+  behavior can be tested together.
+
+Pending SQL-backed systems before deployment:
+- Production Studios:
+  - Needs `studios` and likely `studio_productions`.
+  - Stores owner, guild, tier, style, generated display name, open/closed
+    status, forum thread ID, overview message ID, production totals, upkeep
+    timestamps, and production catalog logs.
+  - Uses Studio Forum channel `1520732388186128495`.
+  - Creates exactly one public forum thread per studio.
+  - The first thread post is the Studio Overview embed and should be edited over
+    time instead of reposted.
+  - Completed Porn Career productions from an open requester studio get posted
+    into that studio thread as catalog entries.
+  - Live scene parts stay in Porn Career; the studio thread stays a clean
+    completed-production catalog.
+  - Open requester studios add a small tier-based XP bonus to both scene
+    participants.
+  - Closed studios keep their catalog but receive no new productions and give no
+    XP bonus.
+  - Daily upkeep is automatic and silent on success; failed upkeep closes the
+    studio and DMs the owner if possible.
+  - `/studio` manages purchase, visit, pay upkeep, upgrade tier, and change
+    style.
+- Reputation:
+  - Needs `users.reputation` plus a daily cap table such as `daily_rep_claims`.
+  - Optional `reputation_events` can be added if audit/recovery is worth it
+    before hosting.
+  - Should integrate with profiles, button interactions, daily quests,
+    achievements, and Porn Career final rewards.
+
+Already implemented SQL-backed systems:
+- Daily quests and weekly streak state.
+- Daily WYR sessions/votes.
+- Profile likes.
+- Achievements/progress.
+- Pregnancy profiles/history.
+- Relationships and relationship requests.
+- Spank Dilli state.
+
+Parked SQL ideas, not required before deployment:
+- Private scene history/recovery SQL. First version is still planned as
+  in-memory only unless live testing proves it needs persistence.
+- Multiplayer Hold'em table SQL. Current user-vs-dealer Hold'em stays
+  in-memory like Blackjack.
 
 ### 1.0 Live Test Checklist
 
@@ -57,6 +116,8 @@ Test:
 - Test Daily WYR post, voting, reward, thread, close, and archive flow.
 - Test `/profile` likes in the real Moments channel.
 - Test `/holdem` with win, loss, tie, fold, timeout, and low-balance cases.
+- Test casino, training, and shop achievement progress across the new milestone
+  tracks.
 - Test GIF Submit scene title approval and rejection with staff roles.
 - Test pornscene extra part ordering across several scenes.
 - Check `/commands` on mobile to make sure category fields stay readable.
@@ -307,8 +368,8 @@ Data needed:
   - `brofist`
   - `horny_help`
 - Optional later history table for audit/recovery if needed.
-- This likely needs SQL before launch because Reputation should survive
-  restarts.
+- This belongs in the pre-deployment SQL batch because Reputation should
+  survive restarts.
 - Suggested SQL:
   - `users.reputation INTEGER NOT NULL DEFAULT 0`
   - optional `reputation_events` for history/audit

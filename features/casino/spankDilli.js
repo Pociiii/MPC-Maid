@@ -29,6 +29,7 @@ const {
 } = require('../../utils/flavorText');
 
 const {
+    incrementAchievementProgress,
     syncUserAchievementCounters
 } = require('../achievements/achievements');
 
@@ -513,6 +514,12 @@ async function handleSpankDilli(
     }
 
     await interaction.deferUpdate();
+
+    await incrementAchievementProgress(
+        interaction.client,
+        interaction.user.id,
+        'casino_plays'
+    );
 
     const previousState =
         await getState();

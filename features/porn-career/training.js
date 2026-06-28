@@ -28,6 +28,7 @@ const {
 } = require('../daily-quests/dailyQuests');
 
 const {
+    incrementAchievementProgress,
     setAchievementProgress,
     syncUserAchievementCounters
 } = require('../achievements/achievements');
@@ -363,6 +364,12 @@ async function trainStat(
         interaction.client,
         interaction.user.id,
         'train'
+    );
+
+    await incrementAchievementProgress(
+        interaction.client,
+        interaction.user.id,
+        'training_sessions'
     );
 
     await setAchievementProgress(

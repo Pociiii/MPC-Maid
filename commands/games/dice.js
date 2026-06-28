@@ -26,6 +26,7 @@ const {
 } = require('../../features/daily-quests/dailyQuests');
 
 const {
+    incrementAchievementProgress,
     syncUserAchievementCounters
 } = require('../../features/achievements/achievements');
 
@@ -223,6 +224,12 @@ module.exports = {
                 botTotal,
                 bet
             );
+
+        await incrementAchievementProgress(
+            interaction.client,
+            interaction.user.id,
+            'casino_plays'
+        );
 
         const payout =
             result.coins > 0

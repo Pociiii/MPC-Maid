@@ -26,16 +26,20 @@ const {
     spendCoins
 } = require('../../utils/users');
 
+const {
+    incrementAchievementProgress
+} = require('../achievements/achievements');
+
 const emojis =
     require('../../utils/emojis');
 
 const statEmojis = {
     performance:
-        '💪',
+        '\uD83D\uDCAA',
     stamina:
-        '❤️',
+        '\u2764\uFE0F',
     fame:
-        '👑'
+        '\uD83D\uDC51'
 };
 
 function getTierKeys() {
@@ -288,6 +292,12 @@ async function buyShopBooster(
         interaction.user.id,
         stat,
         numericTier
+    );
+
+    await incrementAchievementProgress(
+        interaction.client,
+        interaction.user.id,
+        'shop_purchases'
     );
 
     await interaction.editReply(
