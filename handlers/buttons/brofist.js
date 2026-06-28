@@ -50,6 +50,10 @@ const {
     recordActivityMoment
 } = require('../../features/activity/activityMoments');
 
+const {
+    postShowcaseButtonReply
+} = require('../../utils/showcaseReplies');
+
 function buildDisabledRow(
     interaction
 ) {
@@ -179,11 +183,15 @@ module.exports = async (
         ]
     });
 
-    await interaction.followUp({
-        embeds: [
-            embed
-        ]
-    });
+    await postShowcaseButtonReply(
+        interaction,
+        targetUserId,
+        {
+            embeds: [
+                embed
+            ]
+        }
+    );
 
     await Promise.all([
         addBrofistGiven(

@@ -51,6 +51,10 @@ const {
     recordActivityMoment
 } = require('../../features/activity/activityMoments');
 
+const {
+    postShowcaseButtonReply
+} = require('../../utils/showcaseReplies');
+
 module.exports = async (
     interaction
 ) => {
@@ -149,11 +153,15 @@ module.exports = async (
 
     });
 
-    await interaction.followUp({
-
-        embeds: [embed]
-
-    });
+    await postShowcaseButtonReply(
+        interaction,
+        targetUserId,
+        {
+            embeds: [
+                embed
+            ]
+        }
+    );
 
     await addKissGiven(
         interaction.user.id

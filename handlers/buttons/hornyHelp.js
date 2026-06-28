@@ -56,6 +56,10 @@ const {
     recordActivityMoment
 } = require('../../features/activity/activityMoments');
 
+const {
+    postShowcaseButtonReply
+} = require('../../utils/showcaseReplies');
+
 const sceneRoot =
     path.join(
         __dirname,
@@ -374,11 +378,15 @@ module.exports = async (
 
     });
 
-    await interaction.followUp({
-
-        embeds: [embed]
-
-    });
+    await postShowcaseButtonReply(
+        interaction,
+        targetUserId,
+        {
+            embeds: [
+                embed
+            ]
+        }
+    );
 
     await Promise.all([
         addHornyHelp(
