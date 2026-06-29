@@ -5,9 +5,12 @@ online.
 
 ## Before Moving
 
-- Run `npm run preflight` locally and fix any failures.
+- Run `npm run preflight:nodb` locally and fix non-database failures while the
+  bot can stay online on your PC.
 - Stop the local bot before copying `database.db`.
 - Back up `database.db` before moving it.
+- Run the full `npm run preflight` only after the live database is ready to move
+  or already copied into place.
 - Do not delete `database.db` to pick up new features. Missing tables are
   created by the schema/migration path when the bot starts or preflight runs.
 - Copy these private files to the server by hand:
@@ -40,13 +43,14 @@ Create `/opt/mpc-maid/.env` from `.env.example`, then copy the live
 Test once in the foreground:
 
 ```bash
+npm run preflight:nodb
 npm run preflight
 npm start
 ```
 
-Preflight should pass before the service is enabled. It validates commands,
-JSON data, GIF pools, scene titles, Daily WYR questions, and the database
-schema.
+The no-database preflight can run before the live database move. The full
+preflight should pass before the service is enabled; it validates commands, JSON
+data, GIF pools, scene titles, Daily WYR questions, and the database schema.
 
 ## systemd Service
 

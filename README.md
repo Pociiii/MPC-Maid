@@ -13,13 +13,16 @@ Custom Discord bot for MPC.
 ```bash
 npm install
 npm run check
+npm run preflight:nodb
 npm run preflight
 npm start
 ```
 
-`npm run preflight` is the main readiness check before hosting. It checks
-syntax, JSON data, command registration, GIF pools, scene title data, Daily WYR
-questions, and the SQLite schema.
+`npm run preflight:nodb` checks code, config, commands, assets, and JSON content
+without opening `database.db` or preparing SQLite schemas. Use it while the bot
+is still running locally. `npm run preflight` is the final readiness check after
+the local bot is stopped and the live database is ready to move; it also checks
+the SQLite schema.
 
 ## Current Systems
 
@@ -39,8 +42,10 @@ questions, and the SQLite schema.
 
 ## Hosting Notes
 
-- Run `npm run preflight` and fix failures before copying the bot to a server.
+- Run `npm run preflight:nodb` and fix non-database failures before copying the
+  bot to a server.
 - Stop the local bot before copying `database.db`.
+- Run `npm run preflight` after the live database is in place.
 - Do not delete `database.db` just because new tables were added; schemas and
   migrations create missing tables.
 - Keep `.env`, `database.db`, `node_modules`, and `backups` out of git.

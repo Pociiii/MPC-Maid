@@ -5,17 +5,28 @@ const path = require('path');
 const {
     spawnSync
 } = require('child_process');
-const sqlite3 = require('sqlite3').verbose();
 const dotenv = require('dotenv');
-
-const {
-    runMigrations
-} = require('../database/migrations');
 
 const root = path.join(
     __dirname,
     '..'
 );
+
+const preflightArgs =
+    new Set(
+        process.argv.slice(
+            2
+        )
+    );
+
+const skipDatabase =
+    preflightArgs.has(
+        '--skip-db'
+    ) ||
+    preflightArgs.has(
+        '--no-db'
+    ) ||
+    process.env.MPC_SKIP_DATABASE_PREFLIGHT === '1';
 
 const dotenvPath = path.join(
     root,
@@ -292,6 +303,15 @@ function checkRequiredFiles() {
         );
 
     if (
+        skipDatabase
+    ) {
+
+        addWarning(
+            'Database file and schema checks are skipped. Stop the local bot, back up/copy database.db, then run the full preflight before hosting.'
+        );
+
+    }
+    else if (
         !exists(
             'database.db'
         )
@@ -1283,6 +1303,18 @@ function checkSceneSubmitGroups() {
 
 function checkDatabase() {
 
+    if (
+        skipDatabase
+    )
+        return Promise.resolve();
+
+    const sqlite3 =
+        require('sqlite3').verbose();
+
+    const {
+        runMigrations
+    } = require('../database/migrations');
+
     const dbPath =
         path.join(
             root,
@@ -1474,7 +1506,9 @@ function checkDatabase() {
 function printReport() {
 
     console.log(
-        'MPC Maid preflight'
+        skipDatabase
+            ? 'MPC Maid preflight (database skipped)'
+            : 'MPC Maid preflight'
     );
     console.log(
         '=================='
@@ -1550,6 +1584,17 @@ function printReport() {
             '\nPreflight failed. Fix the failures before moving the bot to a server.'
         );
         process.exitCode = 1;
+        return;
+
+    }
+
+    if (
+        skipDatabase
+    ) {
+
+        console.log(
+            '\nNon-database preflight passed. Stop the local bot, back up/copy database.db, rotate the token, then run npm run preflight before enabling hosting.'
+        );
         return;
 
     }

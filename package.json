@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "check": "node --check index.js",
+    "preflight:nodb": "node scripts/preflight.js --skip-db",
     "preflight": "node scripts/preflight.js"
   },
   "engines": {

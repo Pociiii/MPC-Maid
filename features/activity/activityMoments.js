@@ -11,8 +11,7 @@ const {
 } = require('../../data/constants');
 
 const {
-    buildMomentEmbed,
-    postMoment
+    buildMomentEmbed
 } = require('../../utils/moments');
 
 const {
@@ -491,22 +490,6 @@ function pickMilestone(
     weeklyCount
 ) {
 
-    const lifetimeMilestone =
-        findLifetimeMilestone(
-            lifetimeCount,
-            config.lifetimeEvery
-        );
-
-    if (
-        lifetimeMilestone
-    )
-        return {
-            milestone:
-                lifetimeMilestone,
-            periodType:
-                'lifetime'
-        };
-
     const weeklyMilestone =
         findPeriodMilestone(
             weeklyCount,
@@ -537,6 +520,22 @@ function pickMilestone(
                 dailyMilestone,
             periodType:
                 'daily'
+        };
+
+    const lifetimeMilestone =
+        findLifetimeMilestone(
+            lifetimeCount,
+            config.lifetimeEvery
+        );
+
+    if (
+        lifetimeMilestone
+    )
+        return {
+            milestone:
+                lifetimeMilestone,
+            periodType:
+                'lifetime'
         };
 
     return null;
@@ -670,7 +669,8 @@ function isActivityFeedMilestone(
 
     return [
         'daily',
-        'weekly'
+        'weekly',
+        'lifetime'
     ].includes(
         milestone.periodType
     );
@@ -916,18 +916,9 @@ async function postActivityMilestone(
     };
 
     const message =
-        await (
-            isActivityFeedMilestone(
-                milestone
-            )
-                ? postActivityFeed(
-                    client,
-                    postOptions
-                )
-                : postMoment(
-                    client,
-                    postOptions
-                )
+        await postActivityFeed(
+            client,
+            postOptions
         ).catch(
             (error) => {
 
