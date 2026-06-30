@@ -444,7 +444,7 @@ function buildCommandOverviewEmbed(
                 value:
                     section.summary,
                 inline:
-                    false
+                    true
             })
         )
     );
@@ -483,7 +483,7 @@ function buildCommandSectionEmbed(
                 value:
                     command.value,
                 inline:
-                    false
+                    true
             })
         )
     );
