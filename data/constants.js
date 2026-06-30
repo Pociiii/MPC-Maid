@@ -30,6 +30,7 @@ function getRandomColor() {
 const ECONOMY = {
     STARTING_COINS: 500,
     CUSTOM_SCENE_PART_COST: 20,
+    DROP_COST: 15,
     DRINK_COST: 250,
     DRINK_XP_REWARD: 3,
     FIREWORK_COST: 1000,

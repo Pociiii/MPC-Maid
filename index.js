@@ -15,7 +15,8 @@ Collection,
 GatewayIntentBits,
 Events,
 REST,
-Routes
+Routes,
+PermissionFlagsBits
 } = require('discord.js');
 
 const ROLES =
@@ -56,7 +57,8 @@ const {
 
 const {
     logBotEvent,
-    logError
+    logError,
+    logWarning
 } = require('./utils/inboxLogger');
 
 const {
@@ -125,6 +127,84 @@ async function sendGameChatMessage(
         }).catch(
             () => null
         )
+    );
+
+}
+
+async function ensureCustomSceneCommandsUnlocked(
+    client
+) {
+
+    const channel =
+        client.channels.cache.get(
+            CHANNELS.CUSTOM_SCENE
+        ) ??
+        await client.channels.fetch(
+            CHANNELS.CUSTOM_SCENE
+        ).catch(
+            () => null
+        );
+
+    if (
+        !channel?.permissionOverwrites?.edit ||
+        !channel.guild?.roles?.everyone
+    ) {
+
+        void logWarning(
+            client,
+            {
+                title:
+                    'Custom Scene Commands Still Locked',
+                description:
+                    `Could not edit permissions for <#${CHANNELS.CUSTOM_SCENE}>.`
+            }
+        );
+
+        return;
+
+    }
+
+    await channel.permissionOverwrites.edit(
+        channel.guild.roles.everyone,
+        {
+            UseApplicationCommands:
+                true
+        },
+        {
+            reason:
+                'Allow slash commands in the custom scene channel'
+        }
+    ).catch(
+        error => {
+
+            void logError(
+                client,
+                {
+                    title:
+                        'Custom Scene Command Unlock Failed',
+                    error,
+                    fields: [
+                        {
+                            name:
+                                '\uD83D\uDCCD Channel',
+                            value:
+                                `<#${CHANNELS.CUSTOM_SCENE}>`,
+                            inline:
+                                true
+                        },
+                        {
+                            name:
+                                '\uD83D\uDD10 Permission',
+                            value:
+                                PermissionFlagsBits.UseApplicationCommands.toString(),
+                            inline:
+                                true
+                        }
+                    ]
+                }
+            );
+
+        }
     );
 
 }
@@ -285,6 +365,10 @@ async readyClient => {
         );
 
         startDatabaseBackups(
+            readyClient
+        );
+
+        await ensureCustomSceneCommandsUnlocked(
             readyClient
         );
 

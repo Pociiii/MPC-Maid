@@ -1,4 +1,10 @@
 const {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle
+} = require('discord.js');
+
+const {
     CHANNELS
 } = require('../../data/constants');
 
@@ -39,6 +45,36 @@ const {
 const {
     recordActivityMoment
 } = require('../activity/activityMoments');
+
+function buildSexPartComponents(
+    requesterId,
+    targetId,
+    sceneCategory,
+    phase
+) {
+
+    if (
+        phase !== 'sex'
+    )
+        return [];
+
+    return [
+        new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId(
+                        `pornscene_spank:${requesterId}:${targetId}:${sceneCategory}`
+                    )
+                    .setLabel(
+                        'Spank'
+                    )
+                    .setStyle(
+                        ButtonStyle.Danger
+                    )
+            )
+    ];
+
+}
 
 async function finishScene(
     channel,
@@ -316,7 +352,14 @@ function scheduleScene(
                                         result,
                                         index
                                     )
-                                ]
+                                ],
+                                components:
+                                    buildSexPartComponents(
+                                        requesterId,
+                                        targetId,
+                                        sceneCategory,
+                                        phase
+                                    )
                             });
 
                         sceneLinks[index] =

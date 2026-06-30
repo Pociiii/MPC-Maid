@@ -518,7 +518,7 @@ async function handleSpankDilli(
     await incrementAchievementProgress(
         interaction.client,
         interaction.user.id,
-        'casino_plays'
+        'spank_dilli_spanks'
     );
 
     const previousState =

@@ -203,17 +203,14 @@ function buildSections() {
                 )
             ]
         },
-        showcase: {
+        drops: {
             label:
-                'Showcase',
+                'Drops',
             emoji:
-                '🔥',
+                'Drop',
             summary:
                 commandSummary([
-                    '/drop',
-                    '/wiggle',
-                    '/flex',
-                    '/horny'
+                    '/drop'
                 ]),
             commands: [
                 commandDetail(
@@ -222,8 +219,22 @@ function buildSections() {
                     cooldownLabel(
                         COOLDOWNS.DROP
                     ),
-                    'Post a titty drop.'
-                ),
+                    `Post a standalone titty drop. Costs ${ECONOMY.DROP_COST} coins.`
+                )
+            ]
+        },
+        showcase: {
+            label:
+                'Showcase',
+            emoji:
+                '🔥',
+            summary:
+                commandSummary([
+                    '/wiggle',
+                    '/flex',
+                    '/horny'
+                ]),
+            commands: [
                 commandDetail(
                     '/wiggle',
                     `<#${CHANNELS.SHOWCASE}>`,

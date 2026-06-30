@@ -50,6 +50,8 @@ const views = {
                 'drinks_bought',
                 'fireworks_launched',
                 'casino_plays',
+                'spank_dilli_spanks',
+                'titty_drops',
                 'training_sessions',
                 'shop_purchases',
                 'button_interactions',
@@ -111,6 +113,8 @@ const views = {
         keys:
             [
                 'casino_plays',
+                'spank_dilli_spanks',
+                'titty_drops',
                 'training_sessions',
                 'shop_purchases'
             ]
@@ -176,6 +180,10 @@ const categoryLabels = {
         '\uD83D\uDD18 Interaction Buttons',
     casino_plays:
         '\uD83C\uDFB0 Casino Plays',
+    spank_dilli_spanks:
+        '\uD83D\uDC4B Spank Dilli',
+    titty_drops:
+        '\uD83D\uDD25 Titty Drops',
     daily_wyr_votes:
         '\u2753 Daily WYR Votes',
     drinks_bought:

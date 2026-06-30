@@ -5,10 +5,15 @@ const {
 } = require('../../utils/dropPost');
 const {
     COOLDOWNS,
+    ECONOMY
 } = require('../../data/constants');
 const {
     handleCooldown
 } = require('../../utils/cooldowns');
+
+const {
+    spendCoins
+} = require('../../utils/users');
 
 const {
     trackDailyQuest
@@ -76,6 +81,25 @@ module.exports = {
 
         }
 
+        const paid =
+            await spendCoins(
+                interaction.user.id,
+                ECONOMY.DROP_COST
+            );
+
+        if (
+            !paid
+        ) {
+
+            await interaction.editReply({
+                content:
+                    `You need **${ECONOMY.DROP_COST} coins** to post a titty drop.`
+            });
+
+            return;
+
+        }
+
         const dropOptions = {
             authorName:
                 interaction.member.displayName,
@@ -111,13 +135,13 @@ module.exports = {
         await trackDailyQuest(
             interaction.client,
             interaction.user.id,
-            'showcase'
+            'titty_drop'
         );
 
         await incrementAchievementProgress(
             interaction.client,
             interaction.user.id,
-            'showcase_posts'
+            'titty_drops'
         );
 
     }

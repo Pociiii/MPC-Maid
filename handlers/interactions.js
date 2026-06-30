@@ -16,6 +16,9 @@ const customScene =
 const pornScene =
     require('./buttons/pornScene');
 
+const pornSceneSpank =
+    require('./buttons/pornSceneSpank');
+
 const commandsPornCareerInfo =
     require('./buttons/commandsPornCareerInfo');
 
@@ -304,6 +307,12 @@ async function routeInteraction(
             case 'pornscene_accept':
             case 'pornscene_decline':
                 await pornScene.execute(
+                    interaction
+                );
+                return true;
+
+            case 'pornscene_spank':
+                await pornSceneSpank(
                     interaction
                 );
                 return true;

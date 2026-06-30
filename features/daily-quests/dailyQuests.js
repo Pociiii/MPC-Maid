@@ -280,6 +280,42 @@ const questPool = [
     },
     {
         id:
+            'titty_drop_1',
+        action:
+            'titty_drop',
+        label:
+            'Post 1 titty drop',
+        target:
+            1,
+        tier:
+            'easy'
+    },
+    {
+        id:
+            'titty_drop_2',
+        action:
+            'titty_drop',
+        label:
+            'Post 2 titty drops',
+        target:
+            2,
+        tier:
+            'medium'
+    },
+    {
+        id:
+            'titty_drop_3',
+        action:
+            'titty_drop',
+        label:
+            'Post 3 titty drops',
+        target:
+            3,
+        tier:
+            'hard'
+    },
+    {
+        id:
             'showcase_1',
         action:
             'showcase',

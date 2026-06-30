@@ -46,9 +46,6 @@ const {
     syncUserAchievementCounters
 } = require('../achievements/achievements');
 
-const dayMs =
-    24 * 60 * 60 * 1000;
-
 const resetHourUtc =
     12;
 
@@ -840,6 +837,8 @@ async function postDailyWyr(
     )
         return null;
 
+    let session;
+
     const questionDate =
         getDailyQuestDate(
             now
@@ -852,21 +851,69 @@ async function postDailyWyr(
 
     if (
         existingForDate
-    )
-        return existingForDate;
+    ) {
 
-    const activeSession =
-        await getActiveSession();
+        if (
+            existingForDate.posted_at ||
+            existingForDate.message_id
+        )
+            return existingForDate;
+
+        session =
+            await retryUnpostedDailyWyrSession(
+                questionDate
+            );
+
+        if (
+            !session
+        )
+            return existingForDate;
+
+    }
+    else {
+
+        let activeSession =
+            await getActiveSession();
+
+        if (
+            activeSession &&
+            new Date(
+                activeSession.closes_at
+            ) <= now
+        ) {
+
+            await closeDailyWyrSession(
+                client,
+                activeSession
+            );
+
+            activeSession =
+                await getActiveSession();
+
+        }
+
+        if (
+            activeSession
+        )
+            return activeSession;
+
+        session =
+            await createSession(
+                questionDate
+            );
+
+    }
 
     if (
-        activeSession
+        !session
     )
-        return activeSession;
+        return null;
 
-    const session =
-        await createSession(
-            questionDate
-        );
+    if (
+        session.posted_at ||
+        session.message_id
+    )
+        return session;
 
     try {
 
@@ -1316,33 +1363,8 @@ function startDailyWyrScheduler(
         client
     );
 
-    const nextResetMs =
-        getNextResetTimestamp() * 1000;
-
-    const delayMs =
-        Math.max(
-            1000,
-            nextResetMs - Date.now()
-        );
-
-    setTimeout(
-        () => {
-
-            void runDailyWyrTick(
-                client
-            );
-
-            dailyWyrTimer =
-                setInterval(
-                    () =>
-                        void runDailyWyrTick(
-                            client
-                        ),
-                    dayMs
-                );
-
-        },
-        delayMs
+    scheduleNextDailyWyrTick(
+        client
     );
 
     void logBotEvent(
@@ -1353,6 +1375,83 @@ function startDailyWyrScheduler(
             description:
                 `Daily Would You Rather will post in <#${CHANNELS.GENERAL}> at 12:00 UTC.`
         }
+    );
+
+}
+
+function scheduleNextDailyWyrTick(
+    client
+) {
+
+    const nextResetMs =
+        getNextResetTimestamp() * 1000;
+
+    const delayMs =
+        Math.max(
+            1000,
+            nextResetMs - Date.now()
+        );
+
+    dailyWyrTimer =
+        setTimeout(
+            async () => {
+
+                await runDailyWyrTick(
+                    client
+                );
+
+                scheduleNextDailyWyrTick(
+                    client
+                );
+
+            },
+            delayMs
+        );
+
+}
+
+async function retryUnpostedDailyWyrSession(
+    questionDate
+) {
+
+    const question =
+        await pickQuestion();
+
+    const result =
+        await dbRun(
+            `UPDATE daily_wyr_sessions
+             SET question_id = ?,
+                 option_a = ?,
+                 option_b = ?,
+                 channel_id = NULL,
+                 message_id = NULL,
+                 thread_id = NULL,
+                 posted_at = NULL,
+                 closes_at = ?,
+                 closed_at = NULL,
+                 status = 'active',
+                 thread_reply_count = 0
+             WHERE question_date = ?
+             AND posted_at IS NULL
+             AND message_id IS NULL`,
+            [
+                question.id,
+                question.optionA,
+                question.optionB,
+                getCloseTimestamp(
+                    questionDate
+                ),
+                questionDate
+            ]
+        );
+
+    if (
+        result.changes === 0
+    )
+        return null;
+
+    return getSessionForDate(
+        questionDate
     );
 
 }

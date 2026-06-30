@@ -706,8 +706,7 @@ function buildStartEmbed(
                 value:
                     formatCast(
                         requesterId,
-                        targetId,
-                        sceneCategory
+                        targetId
                     ),
                 inline:
                     false
