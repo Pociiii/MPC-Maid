@@ -14,7 +14,7 @@ const {
 
 const ONE_HOUR =
     60 * 60 * 1000;
-
+const THREE_HOURS = 3 * ONE_HOUR;
 const STARTUP_DROP_DELAY =
     15 * 1000;
 
@@ -105,7 +105,7 @@ function startShowcaseAutoDrop(
                 sendAutoDrop(
                     client
                 ),
-            ONE_HOUR
+            THREE_HOURS
         );
 
     startupDropTimer =

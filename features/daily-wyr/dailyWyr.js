@@ -701,8 +701,17 @@ async function closeOverdueDailyWyr(
     client
 ) {
 
-    const now =
-        new Date().toISOString();
+    await closeBlockingDailyWyrSessions(
+        client,
+        new Date()
+    );
+
+}
+
+async function closeBlockingDailyWyrSessions(
+    client,
+    now
+) {
 
     const sessions =
         await dbAll(
@@ -712,7 +721,7 @@ async function closeOverdueDailyWyr(
              AND closes_at <= ?
              ORDER BY closes_at ASC`,
             [
-                now
+                now.toISOString()
             ]
         );
 
@@ -872,25 +881,13 @@ async function postDailyWyr(
     }
     else {
 
-        let activeSession =
+        await closeBlockingDailyWyrSessions(
+            client,
+            now
+        );
+
+        const activeSession =
             await getActiveSession();
-
-        if (
-            activeSession &&
-            new Date(
-                activeSession.closes_at
-            ) <= now
-        ) {
-
-            await closeDailyWyrSession(
-                client,
-                activeSession
-            );
-
-            activeSession =
-                await getActiveSession();
-
-        }
 
         if (
             activeSession

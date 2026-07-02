@@ -207,7 +207,7 @@ function buildSections() {
             label:
                 'Drops',
             emoji:
-                'Drop',
+                '🍈',
             summary:
                 commandSummary([
                     '/drop'

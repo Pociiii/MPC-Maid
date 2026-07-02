@@ -57,7 +57,7 @@ function formatRankingRows(
         visibleUsers
         .map(
             (user, index) =>
-                `- ${index + 1}. <@${user.id}> - **${Number(
+                `${index + 1}. <@${user.id}> - **${Number(
                     user.ranking
                 ).toLocaleString()}**`
         );
@@ -70,7 +70,7 @@ function formatRankingRows(
         hiddenCount > 0
     )
         rows.push(
-            `- + **${hiddenCount} more**`
+            `+ **${hiddenCount} more**`
         );
 
     return rows.join(
@@ -111,7 +111,7 @@ function formatPositionLine(
     if (
         !rankInfo
     )
-        return `- ${label}: Not ranked yet`;
+        return `${label}: Not ranked yet`;
 
     const value =
         Number.isFinite(
@@ -125,7 +125,7 @@ function formatPositionLine(
             ? ` (${detail})`
             : '';
 
-    return `- ${label}: **#${rankInfo.rank}** - **${value.toLocaleString()}${suffix}**${detailText}`;
+    return `${label}: **#${rankInfo.rank}** - **${value.toLocaleString()}${suffix}**${detailText}`;
 
 }
 

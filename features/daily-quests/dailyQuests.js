@@ -45,6 +45,9 @@ const assignmentLocks =
 const RESET_HOUR_UTC =
     12;
 
+const WEEK_START_DAY_UTC =
+    1;
+
 const DAILY_BONUS = {
     coins:
         100,
@@ -496,18 +499,26 @@ function getWeeklyQuestDate(
     now = new Date()
 ) {
 
+    const weeklyResetDate =
+        getDailyQuestDate(
+            now
+        );
+
     const weekDate =
         new Date(
-            `${getDailyQuestDate(
-                now
-            )}T00:00:00.000Z`
+            `${weeklyResetDate}T${String(
+                RESET_HOUR_UTC
+            ).padStart(
+                2,
+                '0'
+            )}:00:00.000Z`
         );
 
     const day =
         weekDate.getUTCDay() || 7;
 
     weekDate.setUTCDate(
-        weekDate.getUTCDate() - day + 1
+        weekDate.getUTCDate() - day + WEEK_START_DAY_UTC
     );
 
     return weekDate

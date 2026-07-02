@@ -45,81 +45,20 @@ function buildPhaseOrder(
             8
         );
 
-    const phaseCaps = {
-        foreplay:
-            2,
-        oral:
-            2,
-        sex:
-            3,
-        finale:
-            1
-    };
-
-    const counts = {
-        foreplay:
-            1,
-        oral:
-            1,
-        sex:
-            1,
-        finale:
-            1
-    };
-
-    let extraParts =
-        cappedTotalParts - 4;
-
-    while (
-        extraParts > 0
-    ) {
-
-        const availablePhases =
-            [
-                'foreplay',
-                'oral',
-                'sex'
-            ].filter(
-                (phase) =>
-                    counts[phase] < phaseCaps[phase]
-            );
-
-        if (
-            availablePhases.length === 0
-        )
-            break;
-
-        const phase =
-            availablePhases[
-                randomInt(
-                    0,
-                    availablePhases.length - 1
-                )
-            ];
-
-        counts[phase] +=
-            1;
-
-        extraParts -=
-            1;
-
-    }
+    const extraPhaseOrder = [
+        'foreplay',
+        'oral',
+        'sex',
+        'sex'
+    ];
 
     return [
-        ...Array(
-            counts.foreplay
-        ).fill(
-            'foreplay'
-        ),
-        ...Array(
-            counts.oral
-        ).fill(
-            'oral'
-        ),
-        ...Array(
-            counts.sex
-        ).fill(
-            'sex'
+        'foreplay',
+        'oral',
+        'sex',
+        ...extraPhaseOrder.slice(
+            0,
+            cappedTotalParts - 4
         ),
         'finale'
     ];
