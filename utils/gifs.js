@@ -25,10 +25,57 @@ function getGifFilePath(category) {
 
 }
 
+function resolveExistingPath(filePath) {
+
+    if (
+        fs.existsSync(
+            filePath
+        )
+    )
+        return filePath;
+
+    const folder =
+        path.dirname(
+            filePath
+        );
+
+    if (
+        !fs.existsSync(
+            folder
+        )
+    )
+        return filePath;
+
+    const fileName =
+        path.basename(
+            filePath
+        ).toLowerCase();
+
+    const matchingFile =
+        fs.readdirSync(
+            folder
+        ).find(
+            (entry) =>
+                entry.toLowerCase() === fileName
+        );
+
+    return matchingFile
+        ? path.join(
+            folder,
+            matchingFile
+        )
+        : filePath;
+
+}
+
 function getGifList(category) {
 
     const filePath =
-        getGifFilePath(category);
+        resolveExistingPath(
+            getGifFilePath(
+                category
+            )
+        );
 
     return JSON.parse(
         fs.readFileSync(
@@ -341,16 +388,21 @@ function getSmartGifFromFile(
     userIds = []
 ) {
 
+    const resolvedPath =
+        resolveExistingPath(
+            filePath
+        );
+
     const gifs =
         JSON.parse(
             fs.readFileSync(
-                filePath,
+                resolvedPath,
                 'utf8'
             )
         );
 
     return getSmartGifFromList(
-        filePath,
+        resolvedPath,
         gifs,
         userIds
     );
@@ -378,10 +430,15 @@ function addGifToFile(
     url
 ) {
 
+    const resolvedPath =
+        resolveExistingPath(
+            filePath
+        );
+
     const gifs =
         JSON.parse(
             fs.readFileSync(
-                filePath,
+                resolvedPath,
                 'utf8'
             )
         );
@@ -394,7 +451,7 @@ function addGifToFile(
     gifs.push(url);
 
     fs.writeFileSync(
-        filePath,
+        resolvedPath,
         JSON.stringify(
             gifs,
             null,
@@ -510,10 +567,15 @@ function getGifCount(
 
     try {
 
+        const resolvedPath =
+            resolveExistingPath(
+                filePath
+            );
+
         const gifs =
             JSON.parse(
                 fs.readFileSync(
-                    filePath,
+                    resolvedPath,
                     'utf8'
                 )
             );
