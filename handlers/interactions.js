@@ -122,7 +122,7 @@ const pornSceneBooster =
     require('./menus/pornSceneBooster');
 
 const gifReject =
-    require('./buttons/gifReject');
+    require('./buttons/gifreject');
 
 const gifRejectModal =
     require('./modals/gifRejectModal');
