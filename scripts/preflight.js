@@ -48,6 +48,14 @@ if (
 
 }
 
+const {
+    ensureRuntimeData,
+    getRuntimeDataDir
+} = require('../utils/runtimeData');
+
+let runtimeDataDir =
+    getRuntimeDataDir();
+
 const failures = [];
 const warnings = [];
 const notes = [];
@@ -370,7 +378,8 @@ function checkRequiredFiles() {
                 '.env',
                 'database.db',
                 'node_modules',
-                'backups/'
+                'backups/',
+                'runtime-data/'
             ]
         ) {
 
@@ -448,6 +457,21 @@ function checkEnv() {
             );
 
     if (
+        !process.env.MPC_DATA_DIR?.trim()
+    )
+        addWarning(
+            `MPC_DATA_DIR is not set. The bot will use local runtime-data fallback at ${runtimeDataDir}.`
+        );
+    else if (
+        !path.isAbsolute(
+            process.env.MPC_DATA_DIR.trim()
+        )
+    )
+        addFailure(
+            'MPC_DATA_DIR must be an absolute path.'
+        );
+
+    if (
         ownerIds.length === 0 ||
         ownerIds.some(
             (id) =>
@@ -474,6 +498,28 @@ function checkEnv() {
     addReminder(
         'Rotate the Discord bot token before final hosting, even if this file passes.'
     );
+
+}
+
+function checkRuntimeData() {
+
+    try {
+
+        runtimeDataDir =
+            ensureRuntimeData();
+
+        addNote(
+            `Runtime GIF data directory ready: ${runtimeDataDir}`
+        );
+
+    }
+    catch (error) {
+
+        addFailure(
+            `Runtime GIF data directory could not be prepared: ${error.message}`
+        );
+
+    }
 
 }
 
@@ -825,10 +871,14 @@ function summarizeArrayContent(
 ) {
 
     const folderPath =
-        path.join(
-            root,
+        path.isAbsolute(
             folder
-        );
+        )
+            ? folder
+            : path.join(
+                root,
+                folder
+            );
 
     const jsonFiles =
         walk(
@@ -919,8 +969,11 @@ function checkContent() {
 
     const gifSummary =
         summarizeArrayContent(
-            'data/gifs',
-            'Interaction and horny GIFs'
+            path.join(
+                runtimeDataDir,
+                'gifs'
+            ),
+            'Runtime interaction and horny GIFs'
         );
 
     if (
@@ -928,7 +981,7 @@ function checkContent() {
         gifSummary.total === 0
     )
         addFailure(
-            'No interaction GIF content found under data/gifs.'
+            'No interaction GIF content found under the runtime gifs folder.'
         );
 
     for (
@@ -947,8 +1000,11 @@ function checkContent() {
 
     const coreSceneSummary =
         summarizeArrayContent(
-            'data/scenes',
-            'Core two-person scene GIFs'
+            path.join(
+                runtimeDataDir,
+                'scenes'
+            ),
+            'Runtime core two-person scene GIFs'
         );
 
     if (
@@ -956,7 +1012,7 @@ function checkContent() {
         coreSceneSummary.total === 0
     )
         addFailure(
-            'No core two-person scene content found under data/scenes.'
+            'No core two-person scene content found under the runtime scenes folder.'
         );
 
     for (
@@ -995,8 +1051,14 @@ function checkContent() {
 
         const summary =
             summarizeArrayContent(
-                folder,
-                label
+                path.join(
+                    runtimeDataDir,
+                    folder.replace(
+                        /^data[\\/]/,
+                        ''
+                    )
+                ),
+                `Runtime ${label}`
             );
 
         if (
@@ -1610,6 +1672,7 @@ async function main() {
     checkNodeVersion();
     checkRequiredFiles();
     checkEnv();
+    checkRuntimeData();
     checkConfiguredIds();
     checkJavaScriptSyntax();
     checkJsonData();

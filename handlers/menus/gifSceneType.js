@@ -15,6 +15,10 @@ const {
     '../../data/sceneSubmitGroups'
 );
 
+const {
+    getRuntimeDataPath
+} = require('../../utils/runtimeData');
+
 module.exports = {
 
     async execute(
@@ -47,11 +51,7 @@ module.exports = {
             );
 
         const filePath =
-            path.join(
-                __dirname,
-                '..',
-                '..',
-                'data',
+            getRuntimeDataPath(
                 sceneGroup.folder,
                 category,
                 `${sceneType}.json`

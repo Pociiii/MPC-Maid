@@ -232,7 +232,7 @@ function buildDuplicateEmbed(
         title:
             'Duplicate GIF',
         description:
-            'This GIF already exists in the data folder, so it was not sent for review.',
+            'This GIF already exists in runtime GIF storage, so it was not sent for review.',
         image:
             gifUrl,
         footerText:

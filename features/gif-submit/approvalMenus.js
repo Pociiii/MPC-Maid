@@ -16,15 +16,15 @@ const {
     castSymbol
 } = require('../../data/sceneSubmitGroups');
 
+const {
+    getRuntimeDataPath
+} = require('../../utils/runtimeData');
+
 function dataPath(
     ...parts
 ) {
 
-    return path.join(
-        __dirname,
-        '..',
-        '..',
-        'data',
+    return getRuntimeDataPath(
         ...parts
     );
 

@@ -4,6 +4,9 @@ const requiredEnv = [
     'GUILD_ID'
 ];
 
+const path =
+    require('path');
+
 function isPlaceholder(
     value
 ) {
@@ -39,6 +42,16 @@ function validateEnv() {
         );
 
     }
+
+    if (
+        process.env.MPC_DATA_DIR?.trim() &&
+        !path.isAbsolute(
+            process.env.MPC_DATA_DIR.trim()
+        )
+    )
+        throw new Error(
+            'MPC_DATA_DIR must be an absolute path.'
+        );
 
 }
 

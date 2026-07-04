@@ -1,6 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
+const {
+    getRuntimeDataPath
+} = require('./runtimeData');
+
 const recentHistorySize =
     30;
 
@@ -15,10 +19,7 @@ const userGifHistory =
 
 function getGifFilePath(category) {
 
-    return path.join(
-        __dirname,
-        '..',
-        'data',
+    return getRuntimeDataPath(
         'gifs',
         `${category}.json`
     );
@@ -538,11 +539,7 @@ function findGifInData(
 ) {
 
     const dataFolder =
-        path.join(
-            __dirname,
-            '..',
-            'data'
-        );
+        getRuntimeDataPath();
 
     for (
         const filePath of getJsonFiles(

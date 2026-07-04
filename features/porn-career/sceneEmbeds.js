@@ -34,15 +34,15 @@ const {
     getSmartGifFromFile
 } = require('../../utils/gifs');
 
+const {
+    getRuntimeDataPath
+} = require('../../utils/runtimeData');
+
 const emojis =
     require('../../utils/emojis');
 
 const sceneRoot =
-    path.join(
-        __dirname,
-        '..',
-        '..',
-        'data',
+    getRuntimeDataPath(
         'scenes'
     );
 

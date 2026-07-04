@@ -1,6 +1,3 @@
-const path =
-    require('path');
-
 const {
     approveGif
 } = require('../../utils/gifApproval');
@@ -8,6 +5,10 @@ const {
 const {
     castSymbol
 } = require('../../data/sceneSubmitGroups');
+
+const {
+    getRuntimeDataPath
+} = require('../../utils/runtimeData');
 
 module.exports = {
 
@@ -19,11 +20,7 @@ module.exports = {
             interaction.values[0];
 
         const filePath =
-            path.join(
-                __dirname,
-                '..',
-                '..',
-                'data',
+            getRuntimeDataPath(
                 'gifs',
                 `${flexType}.json`
             );

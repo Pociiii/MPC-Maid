@@ -17,15 +17,15 @@ const {
     getRandomSceneName
 } = require('../porn-career/sceneEmbeds');
 
+const {
+    getRuntimeDataPath
+} = require('../../utils/runtimeData');
+
 const sceneDurationMs =
     30 * 60 * 1000;
 
 const sceneRoot =
-    path.join(
-        __dirname,
-        '..',
-        '..',
-        'data',
+    getRuntimeDataPath(
         'scenes'
     );
 

@@ -14,7 +14,11 @@ const {
     sceneGroups
 } = require('../../data/sceneSubmitGroups');
 
-const dataFolder = path.join(__dirname, '..', '..', 'data');
+const {
+    getRuntimeDataPath
+} = require('../../utils/runtimeData');
+
+const dataFolder = getRuntimeDataPath();
 
 const interactionLabels = {
     blowkiss: 'Blow Kiss',

@@ -16,6 +16,8 @@ online.
 - Copy these private files to the server by hand:
   - `.env`
   - `database.db`
+- Set `MPC_DATA_DIR` in `.env` to an absolute persistent folder outside the
+  repo, for example `/opt/mpc-maid-data`.
 - Do not commit `.env`, `database.db`, `node_modules`, or `backups`.
 - Rotate the Discord bot token before final hosting.
 
@@ -37,8 +39,13 @@ cd /opt/mpc-maid
 npm install
 ```
 
-Create `/opt/mpc-maid/.env` from `.env.example`, then copy the live
-`database.db` into `/opt/mpc-maid/database.db`.
+Create `/opt/mpc-maid/.env` from `.env.example`, set
+`MPC_DATA_DIR=/opt/mpc-maid-data`, then copy the live `database.db` into
+`/opt/mpc-maid/database.db`.
+
+The bot seeds missing GIF files from repo `data/` into `MPC_DATA_DIR` on
+startup. Existing runtime files are never overwritten, so GIFs added through
+Discord survive `git pull` updates.
 
 Test once in the foreground:
 
@@ -110,3 +117,6 @@ spawning a second copy.
 Back up `database.db` before updates and before moving hosts. The bot also keeps
 its own `backups/` folder locally, but a server-level backup is still the safer
 copy.
+
+Back up the persistent `MPC_DATA_DIR` folder too. It contains live GIF pools
+added or changed through Discord.

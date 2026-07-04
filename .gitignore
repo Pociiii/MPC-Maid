@@ -3,6 +3,7 @@ node_modules
 .env
 database.db
 backups/
+runtime-data/
 *.log
 
 # Local planning / handoff notes

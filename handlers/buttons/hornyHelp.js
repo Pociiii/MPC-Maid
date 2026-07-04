@@ -60,12 +60,12 @@ const {
     postShowcaseButtonReply
 } = require('../../utils/showcaseReplies');
 
+const {
+    getRuntimeDataPath
+} = require('../../utils/runtimeData');
+
 const sceneRoot =
-    path.join(
-        __dirname,
-        '..',
-        '..',
-        'data',
+    getRuntimeDataPath(
         'scenes'
     );
 

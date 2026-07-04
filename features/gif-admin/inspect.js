@@ -37,13 +37,12 @@ const {
     commandFooter
 } = require('../../utils/version');
 
+const {
+    getRuntimeDataPath
+} = require('../../utils/runtimeData');
+
 const dataRoot =
-    path.join(
-        __dirname,
-        '..',
-        '..',
-        'data'
-    );
+    getRuntimeDataPath();
 
 const poolLabels = {
     scene2:

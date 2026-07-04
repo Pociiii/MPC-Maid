@@ -6,6 +6,12 @@ const {
 
 validateEnv();
 
+const {
+    ensureRuntimeData
+} = require('./utils/runtimeData');
+
+ensureRuntimeData();
+
 const fs = require('fs');
 const path = require('path');
 
