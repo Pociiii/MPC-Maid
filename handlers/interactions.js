@@ -141,6 +141,9 @@ const {
     submitSceneTitleSuggestion
 } = require('../features/gif-submit/sceneTitleSubmission');
 
+const gifAdminInspect =
+    require('../features/gif-admin/inspect');
+
 async function replyInteractionError(
     interaction
 ) {
@@ -511,6 +514,47 @@ async function routeInteraction(
                 );
 
                 return true;
+
+            case 'gifadmin_prev':
+            case 'gifadmin_next':
+
+                await gifAdminInspect.handleNavigation(
+                    interaction
+                );
+
+                return true;
+
+            case 'gifadmin_move':
+
+                await gifAdminInspect.showMoveCategoryMenu(
+                    interaction
+                );
+
+                return true;
+
+            case 'gifadmin_delete':
+
+                await gifAdminInspect.showDeleteConfirmation(
+                    interaction
+                );
+
+                return true;
+
+            case 'gifadmin_delete_confirm':
+
+                await gifAdminInspect.confirmDelete(
+                    interaction
+                );
+
+                return true;
+
+            case 'gifadmin_delete_cancel':
+
+                await gifAdminInspect.cancelDelete(
+                    interaction
+                );
+
+                return true;
         }
 
     }
@@ -651,6 +695,22 @@ async function routeInteraction(
                     `${interaction.customId}:${interaction.values[0]}`;
 
                 await customScene.execute(
+                    interaction
+                );
+
+                return true;
+
+            case 'gifadmin_dest_cat':
+
+                await gifAdminInspect.handleDestinationCategory(
+                    interaction
+                );
+
+                return true;
+
+            case 'gifadmin_dest_sub':
+
+                await gifAdminInspect.handleDestinationSubcategory(
                     interaction
                 );
 

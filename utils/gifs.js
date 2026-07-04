@@ -409,6 +409,26 @@ function getSmartGifFromFile(
 
 }
 
+function clearGifCache(
+    key
+) {
+
+    const resolvedKey =
+        typeof key === 'string' &&
+        key.includes(
+            path.sep
+        )
+            ? resolveExistingPath(
+                key
+            )
+            : key;
+
+    shuffleBags.delete(
+        resolvedKey
+    );
+
+}
+
 function getRandomGif(
     category,
     userIds = []
@@ -590,6 +610,7 @@ function getGifCount(
 
 }
 module.exports = {
+    clearGifCache,
     getRandomGif,
     getSmartGifFromList,
     getSmartGifFromFile,

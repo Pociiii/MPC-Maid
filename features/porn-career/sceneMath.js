@@ -45,20 +45,37 @@ function buildPhaseOrder(
             8
         );
 
-    const extraPhaseOrder = [
-        'foreplay',
-        'oral',
-        'sex',
-        'sex'
-    ];
+    const foreplayParts =
+        cappedTotalParts >= 5
+            ? 2
+            : 1;
+
+    const oralParts =
+        cappedTotalParts >= 6
+            ? 2
+            : 1;
+
+    const sexParts =
+        Math.max(
+            1,
+            cappedTotalParts - foreplayParts - oralParts - 1
+        );
 
     return [
-        'foreplay',
-        'oral',
-        'sex',
-        ...extraPhaseOrder.slice(
-            0,
-            cappedTotalParts - 4
+        ...Array(
+            foreplayParts
+        ).fill(
+            'foreplay'
+        ),
+        ...Array(
+            oralParts
+        ).fill(
+            'oral'
+        ),
+        ...Array(
+            sexParts
+        ).fill(
+            'sex'
         ),
         'finale'
     ];
