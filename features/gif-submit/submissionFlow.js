@@ -37,7 +37,7 @@ const interactionCategoryLabels = {
     spank:
         'Spank',
     titty_drop:
-        'Drop',
+        'Titty Drop',
     wiggle:
         'Wiggle'
 };

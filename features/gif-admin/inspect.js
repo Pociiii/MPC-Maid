@@ -81,6 +81,29 @@ const interactionCategories = [
     'wiggle'
 ];
 
+const interactionCategoryLabels = {
+    blowkiss:
+        'Blow Kiss',
+    brofist:
+        'Brofist',
+    drink:
+        'Drink',
+    firework:
+        'Firework',
+    flex_b:
+        'Flex B',
+    flex_w:
+        'Flex W',
+    horny:
+        'Horny',
+    spank:
+        'Spank',
+    titty_drop:
+        'Titty Drop',
+    wiggle:
+        'Wiggle'
+};
+
 const scene2Subcategories = [
     'foreplay',
     'oral',
@@ -461,9 +484,50 @@ function getCategoryLabel(
     )
         return sceneGroups[category].label;
 
-    return titleCase(
-        category
-    );
+    return interactionCategoryLabels[category] ??
+        titleCase(
+            category
+        );
+
+}
+
+function choiceMatches(
+    pool,
+    choice,
+    focusedValue
+) {
+
+    const search =
+        focusedValue.toLowerCase();
+
+    return choice.includes(
+        search
+    ) ||
+        getCategoryLabel(
+            pool,
+            choice
+        ).toLowerCase().includes(
+            search
+        );
+
+}
+
+function buildAutocompleteChoice(
+    pool,
+    choice
+) {
+
+    return {
+        name:
+            pool === 'interaction'
+                ? getCategoryLabel(
+                    pool,
+                    choice
+                )
+                : choice,
+        value:
+            choice
+    };
 
 }
 
@@ -1034,21 +1098,33 @@ async function autocomplete(
         choices
             .filter(
                 (choice) =>
-                    choice.includes(
-                        focused.value.toLowerCase()
-                    )
+                    focused.name === 'category'
+                        ? choiceMatches(
+                            pool,
+                            choice,
+                            focused.value
+                        )
+                        : choice.includes(
+                            focused.value.toLowerCase()
+                        )
             )
             .slice(
                 0,
                 25
             )
             .map(
-                (choice) => ({
-                    name:
-                        choice,
-                    value:
-                        choice
-                })
+                (choice) =>
+                    focused.name === 'category'
+                        ? buildAutocompleteChoice(
+                            pool,
+                            choice
+                        )
+                        : {
+                            name:
+                                choice,
+                            value:
+                                choice
+                        }
             )
     );
 
@@ -1111,7 +1187,10 @@ function buildDestinationCategoryMenu(
                         ).map(
                             (category) => ({
                                 label:
-                                    category,
+                                    getCategoryLabel(
+                                        state.pool,
+                                        category
+                                    ),
                                 value:
                                     category
                             })

@@ -39,7 +39,7 @@ module.exports = {
 
                     {
                         label:
-                            'Drop',
+                            'Titty Drop',
 
                         value:
                             'titty_drop'

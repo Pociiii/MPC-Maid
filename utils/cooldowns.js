@@ -40,6 +40,47 @@ function checkCooldown(
 
 }
 
+function getCooldownRemaining(
+    userId,
+    command
+) {
+
+    const key =
+        `${userId}-${command}`;
+
+    const now =
+        Date.now();
+
+    const expiresAt =
+        cooldowns.get(
+            key
+        );
+
+    if (
+        expiresAt &&
+        now < expiresAt
+    )
+        return Math.ceil(
+            (expiresAt - now) / 1000
+        );
+
+    return 0;
+
+}
+
+function startCooldown(
+    userId,
+    command,
+    seconds
+) {
+
+    cooldowns.set(
+        `${userId}-${command}`,
+        Date.now() + seconds * 1000
+    );
+
+}
+
 function formatCooldownTimestamp(
     remaining
 ) {
@@ -97,5 +138,7 @@ async function handleCooldown(
 module.exports = {
     checkCooldown,
     formatCooldownTimestamp,
+    getCooldownRemaining,
+    startCooldown,
     handleCooldown
 };

@@ -26,7 +26,7 @@ const interactionLabels = {
     drink: 'Drink',
     spank: 'Spank',
     firework: 'Firework',
-    titty_drop: 'Drop',
+    titty_drop: 'Titty Drop',
     wiggle: 'Wiggle'
 };
 
