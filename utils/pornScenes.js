@@ -57,6 +57,33 @@ function getPendingRequest(
 
 }
 
+function consumePendingRequest(
+    requesterId,
+    targetId
+) {
+
+    const key =
+        getPendingKey(
+            requesterId,
+            targetId
+        );
+
+    const request =
+        pendingRequests.get(
+            key
+        );
+
+    if (
+        request
+    )
+        pendingRequests.delete(
+            key
+        );
+
+    return request ?? null;
+
+}
+
 function removePendingRequest(
     requesterId,
     targetId
@@ -178,6 +205,7 @@ module.exports = {
     hasPendingRequest,
     addPendingRequest,
     getPendingRequest,
+    consumePendingRequest,
     removePendingRequest,
     isBusy,
     setSceneBusy,

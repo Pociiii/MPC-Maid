@@ -14,7 +14,9 @@ const {
 } = require('../../utils/embeds');
 
 const {
-    addPendingRequest
+    addPendingRequest,
+    getPendingRequest,
+    removePendingRequest
 } = require('../../utils/pornScenes');
 
 const {
@@ -47,6 +49,9 @@ const {
     postMoment
 } = require('../../utils/moments');
 
+const requestExpiryMs =
+    24 * 60 * 60 * 1000;
+
 function getSceneCategoryName(
     sceneCategory
 ) {
@@ -69,6 +74,54 @@ function getSceneCategoryName(
         group,
         sceneCategory
     );
+
+}
+
+function scheduleRequestExpiry(
+    message,
+    requesterId,
+    targetId
+) {
+
+    const timeout =
+        setTimeout(
+            async () => {
+
+                const pendingRequest =
+                    getPendingRequest(
+                        requesterId,
+                        targetId
+                    );
+
+                if (
+                    !pendingRequest ||
+                    pendingRequest.messageId !== message.id
+                )
+                    return;
+
+                removePendingRequest(
+                    requesterId,
+                    targetId
+                );
+
+                await message.edit({
+                    content:
+                        'Scene request expired.',
+                    embeds:
+                        [],
+                    components:
+                        [],
+                    attachments:
+                        []
+                }).catch(
+                    () => null
+                );
+
+            },
+            requestExpiryMs
+        );
+
+    timeout.unref?.();
 
 }
 
@@ -272,9 +325,17 @@ async function sendPornSceneRequest(
                 CHANNELS.PORN_CAREER,
             messageId:
                 message.id,
+            expiresAt:
+                Date.now() + requestExpiryMs,
             sceneCategory,
             booster
         }
+    );
+
+    scheduleRequestExpiry(
+        message,
+        interaction.user.id,
+        targetId
     );
 
     try {

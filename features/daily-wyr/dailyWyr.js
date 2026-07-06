@@ -52,6 +52,9 @@ const resetHourUtc =
 const recentQuestionBuffer =
     100;
 
+const postClaimTtlMs =
+    5 * 60 * 1000;
+
 const questionsPath =
     path.join(
         __dirname,
@@ -219,6 +222,42 @@ function toUnixTimestamp(
             timestamp
         ).getTime() / 1000
     );
+
+}
+
+function createPostClaimToken() {
+
+    return `${process.pid}:${Date.now()}:${Math.random()
+        .toString(
+            36
+        )
+        .slice(
+            2
+        )}`;
+
+}
+
+function getStalePostClaimCutoff() {
+
+    return new Date(
+        Date.now() - postClaimTtlMs
+    ).toISOString();
+
+}
+
+function hasFreshPostClaim(
+    session
+) {
+
+    if (
+        !session?.post_claim_token ||
+        !session.post_claimed_at
+    )
+        return false;
+
+    return new Date(
+        session.post_claimed_at
+    ).getTime() > Date.now() - postClaimTtlMs;
 
 }
 
@@ -775,11 +814,55 @@ async function markSessionClosedAfterPostFailure(
     await dbRun(
         `UPDATE daily_wyr_sessions
          SET status = 'closed',
-             closed_at = CURRENT_TIMESTAMP
+             closed_at = CURRENT_TIMESTAMP,
+             post_claim_token = NULL,
+             post_claimed_at = NULL
          WHERE id = ?`,
         [
             session.id
         ]
+    );
+
+}
+
+async function claimSessionForPost(
+    session
+) {
+
+    const claimToken =
+        createPostClaimToken();
+
+    const claimedAt =
+        new Date().toISOString();
+
+    const result =
+        await dbRun(
+            `UPDATE daily_wyr_sessions
+             SET post_claim_token = ?,
+                 post_claimed_at = ?
+             WHERE id = ?
+             AND posted_at IS NULL
+             AND message_id IS NULL
+             AND (
+                 post_claim_token IS NULL
+                 OR post_claimed_at IS NULL
+                 OR post_claimed_at <= ?
+             )`,
+            [
+                claimToken,
+                claimedAt,
+                session.id,
+                getStalePostClaimCutoff()
+            ]
+        );
+
+    if (
+        result.changes === 0
+    )
+        return null;
+
+    return getSession(
+        session.id
     );
 
 }
@@ -820,6 +903,8 @@ async function updatePostedSession(
          SET channel_id = ?,
              message_id = ?,
              thread_id = ?,
+             post_claim_token = NULL,
+             post_claimed_at = NULL,
              posted_at = CURRENT_TIMESTAMP
          WHERE id = ?`,
         [
@@ -868,6 +953,13 @@ async function postDailyWyr(
         )
             return existingForDate;
 
+        if (
+            hasFreshPostClaim(
+                existingForDate
+            )
+        )
+            return existingForDate;
+
         session =
             await retryUnpostedDailyWyrSession(
                 questionDate
@@ -911,6 +1003,18 @@ async function postDailyWyr(
         session.message_id
     )
         return session;
+
+    session =
+        await claimSessionForPost(
+            session
+        );
+
+    if (
+        !session
+    )
+        return getSessionForDate(
+            questionDate
+        );
 
     try {
 
@@ -1430,7 +1534,12 @@ async function retryUnpostedDailyWyrSession(
                  thread_reply_count = 0
              WHERE question_date = ?
              AND posted_at IS NULL
-             AND message_id IS NULL`,
+             AND message_id IS NULL
+             AND (
+                 post_claim_token IS NULL
+                 OR post_claimed_at IS NULL
+                 OR post_claimed_at <= ?
+             )`,
             [
                 question.id,
                 question.optionA,
@@ -1438,7 +1547,8 @@ async function retryUnpostedDailyWyrSession(
                 getCloseTimestamp(
                     questionDate
                 ),
-                questionDate
+                questionDate,
+                getStalePostClaimCutoff()
             ]
         );
 

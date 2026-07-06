@@ -95,6 +95,8 @@ async function runMigrations(
             channel_id TEXT,
             message_id TEXT,
             thread_id TEXT,
+            post_claim_token TEXT,
+            post_claimed_at TEXT,
             posted_at TEXT,
             closes_at TEXT NOT NULL,
             closed_at TEXT,
@@ -116,6 +118,20 @@ async function runMigrations(
         db,
         `CREATE INDEX IF NOT EXISTS idx_daily_wyr_sessions_status_close
          ON daily_wyr_sessions(status, closes_at)`
+    );
+
+    await addColumnIfMissing(
+        db,
+        'daily_wyr_sessions',
+        'post_claim_token',
+        'TEXT'
+    );
+
+    await addColumnIfMissing(
+        db,
+        'daily_wyr_sessions',
+        'post_claimed_at',
+        'TEXT'
     );
 
     await run(

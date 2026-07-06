@@ -16,9 +16,8 @@ const {
 
 const {
     clearSceneBusy,
-    getPendingRequest,
+    consumePendingRequest,
     isBusy,
-    removePendingRequest,
     setSceneBusy
 } = require('../../utils/pornScenes');
 
@@ -157,6 +156,31 @@ async function acceptScene(
 
     }
 
+    const pendingRequest =
+        consumePendingRequest(
+            requesterId,
+            targetId
+        );
+
+    if (
+        !pendingRequest
+    ) {
+
+        await interaction.update({
+            content:
+                'This scene request is no longer active.',
+            embeds:
+                [],
+            components:
+                [],
+            attachments:
+                []
+        });
+
+        return;
+
+    }
+
     await interaction.deferUpdate();
 
     const requesterMember =
@@ -275,12 +299,6 @@ async function acceptScene(
             targetId
         );
 
-    const pendingRequest =
-        getPendingRequest(
-            requesterId,
-            targetId
-        );
-
     const booster =
         pendingRequest?.booster ?? null;
 
@@ -324,11 +342,6 @@ async function acceptScene(
             startedAt:
                 Date.now()
         }
-    );
-
-    removePendingRequest(
-        requesterId,
-        targetId
     );
 
     await interaction.editReply({
@@ -433,10 +446,30 @@ async function declineScene(
 
     }
 
-    removePendingRequest(
-        requesterId,
-        targetId
-    );
+    const pendingRequest =
+        consumePendingRequest(
+            requesterId,
+            targetId
+        );
+
+    if (
+        !pendingRequest
+    ) {
+
+        await interaction.update({
+            content:
+                'This scene request is no longer active.',
+            embeds:
+                [],
+            components:
+                [],
+            attachments:
+                []
+        });
+
+        return;
+
+    }
 
     await interaction.update({
         content:

@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS daily_wyr_sessions (
     channel_id TEXT,
     message_id TEXT,
     thread_id TEXT,
+    post_claim_token TEXT,
+    post_claimed_at TEXT,
     posted_at TEXT,
     closes_at TEXT NOT NULL,
     closed_at TEXT,
