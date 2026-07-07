@@ -141,12 +141,75 @@ const scorePerStatThreshold =
 const xpPerExtraPart =
     2;
 
+const viewerBonusPerFameThreshold =
+    500;
+
+const criticalChancePerPerformanceThreshold =
+    1;
+
+const viewerBonusPerFamePoint =
+    viewerBonusPerFameThreshold / SCENE_BALANCE.STAT_BONUS_THRESHOLD;
+
 function getStatBonus(
     combinedStat
 ) {
 
     return Math.floor(
         combinedStat / SCENE_BALANCE.STAT_BONUS_THRESHOLD
+    );
+
+}
+
+function getSmoothStatBonus(
+    combinedStat,
+    bonusPerThreshold
+) {
+
+    return (
+        combinedStat /
+        SCENE_BALANCE.STAT_BONUS_THRESHOLD
+    ) * bonusPerThreshold;
+
+}
+
+function getScoreBonus(
+    combinedStat
+) {
+
+    return getSmoothStatBonus(
+        combinedStat,
+        scorePerStatThreshold
+    );
+
+}
+
+function getCriticalChance(
+    combinedPerformance
+) {
+
+    return clamp(
+        3 +
+        getSmoothStatBonus(
+            combinedPerformance,
+            criticalChancePerPerformanceThreshold
+        ),
+        3,
+        15
+    );
+
+}
+
+function getTotalParts(
+    combinedStamina
+) {
+
+    return clamp(
+        4 +
+        getStatBonus(
+            combinedStamina
+        ),
+        4,
+        8
     );
 
 }
@@ -272,21 +335,9 @@ function calculateScene(
             combinedStamina
         );
 
-    const performanceBonus =
-        getStatBonus(
-            combinedPerformance
-        );
-
-    const fameBonus =
-        getStatBonus(
-            combinedFame
-        );
-
     const totalParts =
-        clamp(
-            4 + staminaBonus,
-            4,
-            8
+        getTotalParts(
+            combinedStamina
         );
 
     const extraParts =
@@ -299,13 +350,19 @@ function calculateScene(
         extraParts * xpPerExtraPart;
 
     const performanceScoreBonus =
-        performanceBonus * scorePerStatThreshold;
+        getScoreBonus(
+            combinedPerformance
+        );
 
     const staminaScoreBonus =
-        staminaBonus * scorePerStatThreshold;
+        getScoreBonus(
+            combinedStamina
+        );
 
     const fameScoreBonus =
-        fameBonus * scorePerStatThreshold;
+        getScoreBonus(
+            combinedFame
+        );
 
     const statScoreBonus =
         performanceScoreBonus +
@@ -313,12 +370,14 @@ function calculateScene(
         fameScoreBonus;
 
     const viewers =
-        100 +
-        (combinedFame * 50) +
-        (fameBonus * 500) +
-        randomInt(
-            0,
-            250
+        Math.round(
+            100 +
+            (combinedFame * 50) +
+            (combinedFame * viewerBonusPerFamePoint) +
+            randomInt(
+                0,
+                250
+            )
         );
 
     const partViewers =
@@ -381,20 +440,13 @@ function calculateScene(
         ) <= flopChance;
 
     const critChance =
-        clamp(
-            3 + getStatBonus(
-                combinedPerformance
-            ),
-            3,
-            15
+        getCriticalChance(
+            combinedPerformance
         );
 
     const criticalScene =
         !criticalFlop &&
-        randomInt(
-            1,
-            100
-        ) <= critChance;
+        (Math.random() * 100) < critChance;
 
     let outcome =
         getOutcomeFromScore(
@@ -486,6 +538,9 @@ module.exports = {
     buildPhaseOrder,
     calculateScene,
     formatStatValue,
+    getCriticalChance,
+    getScoreBonus,
     getStatBonus,
+    getTotalParts,
     getIntervalMs
 };

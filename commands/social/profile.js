@@ -14,7 +14,10 @@ const {
 } = require('../../features/achievements/achievements');
 
 const {
-    getStatBonus
+    getCriticalChance,
+    getScoreBonus,
+    getStatBonus,
+    getTotalParts
 } = require('../../features/porn-career/sceneMath');
 
 const {
@@ -53,22 +56,6 @@ const COMMAND_CONFIG = {
     ephemeral:
         true
 };
-
-function clamp(
-    value,
-    min,
-    max
-) {
-
-    return Math.max(
-        min,
-        Math.min(
-            value,
-            max
-        )
-    );
-
-}
 
 function getStatDelta(
     first,
@@ -219,6 +206,20 @@ function buildProfileEmbed(
 
 }
 
+function formatDecimal(
+    value
+) {
+
+    return Number.isInteger(
+        value
+    )
+        ? `${value}`
+        : value.toFixed(
+            1
+        );
+
+}
+
 function buildProfileComponents(
     targetId,
     viewerId,
@@ -281,21 +282,13 @@ function buildCompareEmbed(
         secondUser.fame;
 
     const critChance =
-        clamp(
-            3 + getStatBonus(
-                combinedPerformance
-            ),
-            3,
-            15
+        getCriticalChance(
+            combinedPerformance
         );
 
     const totalParts =
-        clamp(
-            4 + getStatBonus(
-                combinedStamina
-            ),
-            4,
-            8
+        getTotalParts(
+            combinedStamina
         );
 
     const staminaXpBonus =
@@ -304,21 +297,16 @@ function buildCompareEmbed(
             totalParts - 4
         ) * 2;
 
-    const fameBonus =
-        getStatBonus(
+    const scoreBonus =
+        getScoreBonus(
+            combinedPerformance
+        ) +
+        getScoreBonus(
+            combinedStamina
+        ) +
+        getScoreBonus(
             combinedFame
         );
-
-    const scoreBonus =
-        (
-            getStatBonus(
-                combinedPerformance
-            ) +
-            getStatBonus(
-                combinedStamina
-            ) +
-            fameBonus
-        ) * 3;
 
     const embed =
         createEmbed({
@@ -390,10 +378,14 @@ function buildCompareEmbed(
             name:
                 `${emojis.performance} Combined Scene Stats`,
             value:
-`- Performance: **${combinedPerformance}** | Crit: **${critChance}%**
+`- Performance: **${combinedPerformance}** | Crit: **${formatDecimal(
+    critChance
+)}%**
 - Stamina: **${combinedStamina}** | Parts: **${totalParts}/8** | XP bonus: **+${staminaXpBonus}**
-- Fame: **${combinedFame}** | Fame bonus: **+${fameBonus}**
-- Scene score bonus: **+${scoreBonus}**`,
+- Fame: **${combinedFame}** | Viewer/revenue bonus scales every point
+- Scene score bonus: **+${formatDecimal(
+    scoreBonus
+)}**`,
             inline:
                 false
         }

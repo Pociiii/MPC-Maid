@@ -153,7 +153,7 @@ async function buildShopReply(
                 description:
 `${notice?.text ? `${notice.text}\n\n` : ''}Balance: **${user.coins} coins**
 Buy boosters for future \`/pornscene\` requests. One booster can be spent per scene.
-Best use: push a combined stat over a **${SCENE_BALANCE.STAT_BONUS_THRESHOLD} / ${SCENE_BALANCE.STAT_BONUS_THRESHOLD * 2} / ${SCENE_BALANCE.STAT_BONUS_THRESHOLD * 3}** threshold. Stronger tiers add more burnout risk.`
+Every boosted stat point helps scene score, crit chance, or viewers. Stamina scene length still improves at **${SCENE_BALANCE.STAT_BONUS_THRESHOLD}**-point combined milestones. Stronger tiers add more burnout risk.`
             }
         );
 

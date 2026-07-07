@@ -56,10 +56,10 @@ module.exports = {
 - Fame increases viewers and revenue.
 - Ranking changes based on the final scene outcome.
 - Partner stats are combined for the scene.
-- Every stat adds the same scene score bonus every **${SCENE_BALANCE.STAT_BONUS_THRESHOLD} combined points**.
-- Performance gets more critical chance every **${SCENE_BALANCE.STAT_BONUS_THRESHOLD} combined points**, capped at **15%**.
+- Every combined stat point adds partial scene score progress.
+- Performance adds partial critical chance every point, capped at **15%**.
 - Stamina adds scene parts every **${SCENE_BALANCE.STAT_BONUS_THRESHOLD} combined points**, up to **8 parts**.
-- Fame gets a bigger viewer/revenue bonus every **${SCENE_BALANCE.STAT_BONUS_THRESHOLD} combined points**.
+- Fame adds partial viewer and revenue progress every point.
 - A critical scene upgrades the outcome by one tier and adds a small XP bonus.
 - Boosters count for that scene's combined stat check only.
 - Stats keep counting after **40**, but training costs get much steeper.
@@ -71,7 +71,7 @@ module.exports = {
 - Use \`/train\` to spend XP and coins on Performance, Stamina, and Fame.
 - Boosters are one-use scene bonuses for the requester only.
 - Booster tiers: T1 **120**, T2 **350**, T3 **800**, T4 **1400** coins.
-- Boosters are best used when they push a combined stat over a **${SCENE_BALANCE.STAT_BONUS_THRESHOLD} / ${SCENE_BALANCE.STAT_BONUS_THRESHOLD * 2} / ${SCENE_BALANCE.STAT_BONUS_THRESHOLD * 3}** threshold.
+- Boosters now help even when they do not cross a **${SCENE_BALANCE.STAT_BONUS_THRESHOLD}**-point scene-part threshold.
 - Stronger boosters add more stat power and more burnout/flop risk.
 - Use \`/shop\` to buy boosters and \`/inventory\` to check owned boosters.`,
                 footerText:

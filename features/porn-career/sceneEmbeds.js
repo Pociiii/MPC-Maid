@@ -475,6 +475,20 @@ function formatSignedNumber(
 
 }
 
+function formatBonusNumber(
+    value
+) {
+
+    return Number.isInteger(
+        value
+    )
+        ? `${value}`
+        : value.toFixed(
+            1
+        );
+
+}
+
 function formatSceneLinks(
     sceneLinks
 ) {
@@ -730,7 +744,9 @@ function buildStartEmbed(
                         requesterUser.performance,
                         result.requesterPerformanceBoost
                     )} + ${targetUser.performance} = ${result.combinedPerformance}
-- Score: **+${result.performanceScoreBonus}**`,
+- Score: **+${formatBonusNumber(
+                        result.performanceScoreBonus
+                    )}**`,
                 inline:
                     true
             },
@@ -742,7 +758,9 @@ function buildStartEmbed(
                         requesterUser.stamina,
                         result.requesterStaminaBoost
                     )} + ${targetUser.stamina} = ${result.combinedStamina}
-- Score: **+${result.staminaScoreBonus}**`,
+- Score: **+${formatBonusNumber(
+                        result.staminaScoreBonus
+                    )}**`,
                 inline:
                     true
             },
@@ -754,7 +772,9 @@ function buildStartEmbed(
                         requesterUser.fame,
                         result.requesterFameBoost
                     )} + ${targetUser.fame} = ${result.combinedFame}
-- Score: **+${result.fameScoreBonus}**`,
+- Score: **+${formatBonusNumber(
+                        result.fameScoreBonus
+                    )}**`,
                 inline:
                     true
             }
