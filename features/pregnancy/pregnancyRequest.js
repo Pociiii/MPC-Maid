@@ -5,6 +5,7 @@ const {
 } = require('discord.js');
 
 const {
+    CHANNELS,
     getRandomColor
 } = require('../../data/constants');
 
@@ -501,6 +502,8 @@ async function handleBreedDecision(
             {
                 type:
                     'breed_accepted',
+                channelId:
+                    CHANNELS.PILLOW_TALK,
                 color:
                     getRandomColor(),
                 title:

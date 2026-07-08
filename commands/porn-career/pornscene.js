@@ -22,7 +22,8 @@ const {
 } = require('../../utils/userCategory');
 
 const {
-    hasPendingRequest
+    hasPendingRequest,
+    isBusy
 } = require('../../utils/pornScenes');
 
 const {
@@ -152,14 +153,10 @@ module.exports = {
         interaction
     ) {
 
-        if (
-            await handleCooldown(
-                interaction,
-                interaction.commandName,
-                COOLDOWNS.PORN_SCENE_REQUEST
-            )
-        )
-            return;
+        await interaction.deferReply({
+            flags:
+                64
+        });
 
         const target =
             interaction.options.getUser(
@@ -170,10 +167,9 @@ module.exports = {
             target.bot
         ) {
 
-            await interaction.reply({
+            await interaction.editReply({
                 content:
-                    'You cannot request a porn scene with a bot.',
-                flags: 64
+                    'You cannot request a porn scene with a bot.'
             });
 
             return;
@@ -184,10 +180,9 @@ module.exports = {
             target.id === interaction.user.id
         ) {
 
-            await interaction.reply({
+            await interaction.editReply({
                 content:
-                    'You cannot request a porn scene with yourself.',
-                flags: 64
+                    'You cannot request a porn scene with yourself.'
             });
 
             return;
@@ -201,20 +196,29 @@ module.exports = {
             )
         ) {
 
-            await interaction.reply({
+            await interaction.editReply({
                 content:
-                    'You already have a pending porn scene request with this user.',
-                flags: 64
+                    'You already have a pending porn scene request with this user.'
             });
 
             return;
 
         }
 
-        await interaction.deferReply({
-            flags:
-                64
-        });
+        if (
+            isBusy(
+                interaction.user.id
+            )
+        ) {
+
+            await interaction.editReply({
+                content:
+                    'You are already filming another scene. Finish it before sending a new request.'
+            });
+
+            return;
+
+        }
 
         const targetMember =
             await interaction.guild.members.fetch(
@@ -259,6 +263,15 @@ module.exports = {
             return;
 
         }
+
+        if (
+            await handleCooldown(
+                interaction,
+                interaction.commandName,
+                COOLDOWNS.PORN_SCENE_REQUEST
+            )
+        )
+            return;
 
         const boosters =
             await getUserBoosters(

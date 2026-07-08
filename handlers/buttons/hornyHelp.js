@@ -64,6 +64,11 @@ const {
     getRuntimeDataPath
 } = require('../../utils/runtimeData');
 
+const {
+    claimButton,
+    replyButtonAlreadyUsed
+} = require('../../utils/buttonDedup');
+
 const sceneRoot =
     getRuntimeDataPath(
         'scenes'
@@ -316,6 +321,20 @@ module.exports = async (
             flags: 64
 
         });
+
+    }
+
+    if (
+        !claimButton(
+            interaction
+        )
+    ) {
+
+        await replyButtonAlreadyUsed(
+            interaction
+        );
+
+        return;
 
     }
 

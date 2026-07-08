@@ -6,6 +6,7 @@ const {
 } = require('discord.js');
 
 const {
+    CHANNELS,
     getRandomColor
 } = require('../../data/constants');
 
@@ -46,6 +47,8 @@ const requestTypeBySubcommand = {
         'adopt',
     sibling:
         'sibling',
+    'extended-family':
+        'extended_family',
     marry:
         'marriage',
     date:
@@ -118,6 +121,11 @@ function relationshipLinkLabel(
         type === 'sibling'
     )
         return 'Siblings';
+
+    if (
+        type === 'extended_family'
+    )
+        return 'Extended Family';
 
     if (
         type === 'marriage'
@@ -282,6 +290,22 @@ async function buildRelationshipEmbed(
                     )
             );
 
+    const extendedFamily =
+        rows
+            .filter(
+                (row) =>
+                    row.type === 'extended_family'
+            )
+            .map(
+                (row) =>
+                    userMention(
+                        otherUserId(
+                            row,
+                            target.id
+                        )
+                    )
+            );
+
     const marriage =
         rows.find(
             (row) =>
@@ -392,6 +416,10 @@ async function buildRelationshipEmbed(
         ...bulletLineList(
             'Sibling',
             siblings
+        ),
+        ...bulletLineList(
+            'Extended Family',
+            extendedFamily
         )
     ];
 
@@ -570,6 +598,16 @@ function getRequestCopy(
         };
 
     if (
+        type === 'extended_family'
+    )
+        return {
+            description:
+                `${requester} wants to add you as extended family.`,
+            fields:
+                []
+        };
+
+    if (
         type === 'marriage'
     )
         return {
@@ -727,6 +765,17 @@ async function validateRequestStart(
 
     if (
         type === 'sibling'
+    ) {
+
+        await assertNoFamilyRelationshipBetween(
+            interaction.user.id,
+            target.id
+        );
+
+    }
+
+    if (
+        type === 'extended_family'
     ) {
 
         await assertNoFamilyRelationshipBetween(
@@ -947,6 +996,8 @@ async function postRelationshipBrokenMoment(
         {
             type:
                 'relationship_broken',
+            channelId:
+                CHANNELS.PILLOW_TALK,
             color:
                 getRandomColor(),
             authorName,
@@ -1195,6 +1246,38 @@ module.exports = {
                             userOption(
                                 'user',
                                 'Sibling user'
+                            )
+                        )
+            )
+            .addSubcommand(
+                (subcommand) =>
+                    subcommand
+                        .setName(
+                            'extended-family'
+                        )
+                        .setDescription(
+                            'Ask someone to become extended family'
+                        )
+                        .addUserOption(
+                            userOption(
+                                'user',
+                                'Extended family user'
+                            )
+                        )
+            )
+            .addSubcommand(
+                (subcommand) =>
+                    subcommand
+                        .setName(
+                            'unextended-family'
+                        )
+                        .setDescription(
+                            'Remove an extended family link'
+                        )
+                        .addUserOption(
+                            userOption(
+                                'user',
+                                'Extended family user'
                             )
                         )
             )
@@ -1466,6 +1549,17 @@ module.exports = {
                     target.id,
                     `Your sibling relationship with ${target} was removed.`,
                     `You are not siblings with ${target}.`
+                );
+            else if (
+                subcommand === 'unextended-family'
+            )
+                await removeOrReply(
+                    interaction,
+                    'extended_family',
+                    interaction.user.id,
+                    target.id,
+                    `Your extended family relationship with ${target} was removed.`,
+                    `You are not extended family with ${target}.`
                 );
             else if (
                 subcommand === 'divorce'

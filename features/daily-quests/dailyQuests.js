@@ -504,9 +504,19 @@ function getWeeklyQuestDate(
             now
         );
 
+    return getWeeklyQuestDateFromQuestDate(
+        weeklyResetDate
+    );
+
+}
+
+function getWeeklyQuestDateFromQuestDate(
+    questDate
+) {
+
     const weekDate =
         new Date(
-            `${weeklyResetDate}T${String(
+            `${questDate}T${String(
                 RESET_HOUR_UTC
             ).padStart(
                 2,
@@ -527,6 +537,25 @@ function getWeeklyQuestDate(
             0,
             10
         );
+
+}
+
+function isSameWeeklyQuestPeriod(
+    firstQuestDate,
+    secondQuestDate
+) {
+
+    if (
+        !firstQuestDate ||
+        !secondQuestDate
+    )
+        return false;
+
+    return getWeeklyQuestDateFromQuestDate(
+        firstQuestDate
+    ) === getWeeklyQuestDateFromQuestDate(
+        secondQuestDate
+    );
 
 }
 
@@ -830,14 +859,29 @@ function formatWeeklyStreakProgress(
     questDate
 ) {
 
+    const currentWeekStreak =
+        isSameWeeklyQuestPeriod(
+            streak.lastCompletedDate,
+            questDate
+        )
+            ? streak
+            : {
+                lastCompletedDate:
+                    null,
+                streakCount:
+                    0,
+                weeklyRewardsClaimed:
+                    0
+            };
+
     if (
-        streak.lastCompletedDate === questDate &&
-        streak.streakCount === 0 &&
-        streak.weeklyRewardsClaimed > 0
+        currentWeekStreak.lastCompletedDate === questDate &&
+        currentWeekStreak.streakCount === 0 &&
+        currentWeekStreak.weeklyRewardsClaimed > 0
     )
         return `${WEEKLY_STREAK_TARGET}/${WEEKLY_STREAK_TARGET} - reward claimed today`;
 
-    return `${streak.streakCount}/${WEEKLY_STREAK_TARGET}`;
+    return `${currentWeekStreak.streakCount}/${WEEKLY_STREAK_TARGET}`;
 
 }
 
@@ -946,10 +990,25 @@ async function updateWeeklyStreak(
     questDate
 ) {
 
-    const streak =
+    const storedStreak =
         await getWeeklyStreak(
             userId
         );
+
+    const streak =
+        isSameWeeklyQuestPeriod(
+            storedStreak.lastCompletedDate,
+            questDate
+        )
+            ? storedStreak
+            : {
+                lastCompletedDate:
+                    null,
+                streakCount:
+                    0,
+                weeklyRewardsClaimed:
+                    0
+            };
 
     if (
         streak.lastCompletedDate === questDate

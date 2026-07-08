@@ -31,10 +31,10 @@ async function getMomentsChannel(
 ) {
 
     return client.channels.cache.get(
-        CHANNELS.MOMENTS
+        CHANNELS.PILLOW_TALK
     ) ||
         await client.channels.fetch(
-            CHANNELS.MOMENTS
+            CHANNELS.PILLOW_TALK
         ).catch(
             () => null
         );

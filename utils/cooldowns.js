@@ -120,7 +120,7 @@ async function handleCooldown(
     const secs =
         remaining % 60;
 
-    await interaction.reply({
+    const payload = {
         content:
             `\u23F3 /${command} is still on cooldown. ${pickOne(
                 cooldownFlavor
@@ -129,7 +129,24 @@ async function handleCooldown(
             )}. (${minutes}m ${secs}s)`,
         flags:
             64
-    });
+    };
+
+    if (
+        interaction.replied
+    )
+        await interaction.followUp(
+            payload
+        );
+    else if (
+        interaction.deferred
+    )
+        await interaction.editReply(
+            payload
+        );
+    else
+        await interaction.reply(
+            payload
+        );
 
     return true;
 

@@ -96,6 +96,46 @@ function getSceneCategory(
 
 }
 
+function displayNameFor(
+    member,
+    user
+) {
+
+    return member?.displayName ??
+        user?.globalName ??
+        user?.username ??
+        'that user';
+
+}
+
+async function safeSendUserDm(
+    client,
+    userId,
+    content
+) {
+
+    try {
+
+        const user =
+            await client.users.fetch(
+                userId
+            );
+
+        await user.send({
+            content
+        });
+
+        return true;
+
+    }
+    catch {
+
+        return false;
+
+    }
+
+}
+
 async function fetchGuildMember(
     interaction,
     userId
@@ -111,6 +151,29 @@ async function fetchGuildMember(
 
     return guild.members.fetch(
         userId
+    );
+
+}
+
+async function editSceneRequestMessage(
+    interaction,
+    payload
+) {
+
+    if (
+        interaction.message?.editable !== false
+    ) {
+
+        await interaction.message.edit(
+            payload
+        );
+
+        return;
+
+    }
+
+    await interaction.editReply(
+        payload
     );
 
 }
@@ -136,6 +199,8 @@ async function acceptScene(
 
     }
 
+    await interaction.deferUpdate();
+
     if (
         isBusy(
             requesterId
@@ -145,7 +210,7 @@ async function acceptScene(
         )
     ) {
 
-        await interaction.reply({
+        await interaction.followUp({
             content:
                 'One of you is currently filming another scene. Try accepting again later.',
             flags:
@@ -166,22 +231,23 @@ async function acceptScene(
         !pendingRequest
     ) {
 
-        await interaction.update({
-            content:
-                'This scene request is no longer active.',
-            embeds:
-                [],
-            components:
-                [],
-            attachments:
-                []
-        });
+        await editSceneRequestMessage(
+            interaction,
+            {
+                content:
+                    'This scene request is no longer active.',
+                embeds:
+                    [],
+                components:
+                    [],
+                attachments:
+                    []
+            }
+        );
 
         return;
 
     }
-
-    await interaction.deferUpdate();
 
     const requesterMember =
         await fetchGuildMember(
@@ -212,14 +278,17 @@ async function acceptScene(
     }
     catch (error) {
 
-        await interaction.editReply({
-            content:
-                `Missing role info: ${error.message}`,
-            embeds:
-                [],
-            components:
-                []
-        });
+        await editSceneRequestMessage(
+            interaction,
+            {
+                content:
+                    `Missing role info: ${error.message}`,
+                embeds:
+                    [],
+                components:
+                    []
+            }
+        );
 
         return;
 
@@ -229,14 +298,17 @@ async function acceptScene(
         !sceneCategory
     ) {
 
-        await interaction.editReply({
-            content:
-                'No matching scene category exists for this role combination.',
-            embeds:
-                [],
-            components:
-                []
-        });
+        await editSceneRequestMessage(
+            interaction,
+            {
+                content:
+                    'No matching scene category exists for this role combination.',
+                embeds:
+                    [],
+                components:
+                    []
+            }
+        );
 
         return;
 
@@ -256,14 +328,17 @@ async function acceptScene(
         !channel
     ) {
 
-        await interaction.editReply({
-            content:
-                'I could not find the porn career channel.',
-            embeds:
-                [],
-            components:
-                []
-        });
+        await editSceneRequestMessage(
+            interaction,
+            {
+                content:
+                    'I could not find the porn career channel.',
+                embeds:
+                    [],
+                components:
+                    []
+            }
+        );
 
         await logWarning(
             interaction.client,
@@ -344,16 +419,31 @@ async function acceptScene(
         }
     );
 
-    await interaction.editReply({
-        content:
-            `Scene accepted. Filming has started in <#${CHANNELS.PORN_CAREER}>.`,
-        embeds:
-            [],
-        components:
-            [],
-        attachments:
-            []
-    });
+    await editSceneRequestMessage(
+        interaction,
+        {
+            content:
+                `Scene accepted. Filming has started in <#${CHANNELS.PORN_CAREER}>.`,
+            embeds:
+                [],
+            components:
+                [],
+            attachments:
+                []
+        }
+    );
+
+    const targetDisplayName =
+        displayNameFor(
+            targetMember,
+            targetMember.user
+        );
+
+    await safeSendUserDm(
+        interaction.client,
+        requesterId,
+        `${targetDisplayName} accepted your scene request. The scene is starting in <#${CHANNELS.PORN_CAREER}>.`
+    );
 
     const momentsChannel =
         interaction.client.channels.cache.get(
@@ -446,6 +536,8 @@ async function declineScene(
 
     }
 
+    await interaction.deferUpdate();
+
     const pendingRequest =
         consumePendingRequest(
             requesterId,
@@ -456,31 +548,50 @@ async function declineScene(
         !pendingRequest
     ) {
 
-        await interaction.update({
+        await editSceneRequestMessage(
+            interaction,
+            {
+                content:
+                    'This scene request is no longer active.',
+                embeds:
+                    [],
+                components:
+                    [],
+                attachments:
+                    []
+            }
+        );
+
+        return;
+
+    }
+
+    await editSceneRequestMessage(
+        interaction,
+        {
             content:
-                'This scene request is no longer active.',
+                'Scene request declined.',
             embeds:
                 [],
             components:
                 [],
             attachments:
                 []
-        });
+        }
+    );
 
-        return;
+    const targetDisplayName =
+        pendingRequest.targetDisplayName ??
+        displayNameFor(
+            interaction.member,
+            interaction.user
+        );
 
-    }
-
-    await interaction.update({
-        content:
-            'Scene request declined.',
-        embeds:
-            [],
-        components:
-            [],
-        attachments:
-            []
-    });
+    await safeSendUserDm(
+        interaction.client,
+        requesterId,
+        `${targetDisplayName} declined your scene request. Nothing was posted publicly.`
+    );
 
 }
 

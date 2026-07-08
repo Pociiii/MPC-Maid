@@ -111,21 +111,21 @@ async function approveGif(
             []
     });
 
-    const maidFeedChannel =
+    const editingRoomChannel =
         interaction.client.channels.cache.get(
-            CHANNELS.MAID_FEED
+            CHANNELS.EDITING_ROOM
         ) ||
         await interaction.client.channels.fetch(
-            CHANNELS.MAID_FEED
+            CHANNELS.EDITING_ROOM
         ).catch(
             () => null
         );
 
     if (
-        maidFeedChannel?.send
+        editingRoomChannel?.send
     ) {
 
-        await maidFeedChannel.send({
+        await editingRoomChannel.send({
             embeds: [
                 buildApprovalFeedEmbed(
                     approvedEmbed,

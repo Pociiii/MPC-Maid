@@ -55,6 +55,11 @@ const {
     postShowcaseButtonReply
 } = require('../../utils/showcaseReplies');
 
+const {
+    claimButton,
+    replyButtonAlreadyUsed
+} = require('../../utils/buttonDedup');
+
 module.exports = async (
     interaction
 ) => {
@@ -76,6 +81,20 @@ module.exports = async (
     }
     const targetUserId =
         interaction.customId.split(':')[1];
+
+    if (
+        !claimButton(
+            interaction
+        )
+    ) {
+
+        await replyButtonAlreadyUsed(
+            interaction
+        );
+
+        return;
+
+    }
 
     const kissGif =
         getRandomGif(

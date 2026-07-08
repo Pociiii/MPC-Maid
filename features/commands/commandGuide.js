@@ -288,7 +288,7 @@ function buildSections() {
                     '/relationship',
                     privateReply,
                     'None',
-                    'Manage RP relationships and view links.'
+                    `Manage RP relationships, including Extended Family links. Notices in <#${CHANNELS.PILLOW_TALK}>.`
                 ),
                 commandDetail(
                     '/drink',
@@ -308,7 +308,7 @@ function buildSections() {
                 ),
                 commandDetail(
                     '/breed',
-                    `Any channel. Notices in <#${CHANNELS.MOMENTS}>.`,
+                    `Any channel. Notices in <#${CHANNELS.PILLOW_TALK}>.`,
                     'None',
                     'Send a pregnancy RP request.'
                 ),
@@ -373,19 +373,31 @@ function buildSections() {
             emoji:
                 '📣',
             summary:
-                `<#${CHANNELS.MAID_FEED}> <#${CHANNELS.MOMENTS}> <#${CHANNELS.UPDATES}>`,
+                `<#${CHANNELS.MAID_FEED}> <#${CHANNELS.MOMENTS}> <#${CHANNELS.PILLOW_TALK}> <#${CHANNELS.EDITING_ROOM}> <#${CHANNELS.UPDATES}>`,
             commands: [
                 commandDetail(
                     'Maid Feed',
                     `<#${CHANNELS.MAID_FEED}>`,
                     'Automatic',
-                    'Daily quests, achievements, GIF approvals, and bot feed posts.'
+                    'Daily quests, achievements, and bot feed posts.'
                 ),
                 commandDetail(
                     'Moments',
                     `<#${CHANNELS.MOMENTS}>`,
                     'Automatic',
-                    'Porn scene notices, relationship links, pregnancy RP notices, and group moments.'
+                    'Porn scene notices and group moments.'
+                ),
+                commandDetail(
+                    'Pillow Talk',
+                    `<#${CHANNELS.PILLOW_TALK}>`,
+                    'Automatic',
+                    'Relationship links and pregnancy RP notices.'
+                ),
+                commandDetail(
+                    'Editing Room',
+                    `<#${CHANNELS.EDITING_ROOM}>`,
+                    'Automatic',
+                    'Accepted GIF notifications.'
                 ),
                 commandDetail(
                     'Updates',

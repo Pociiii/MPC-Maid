@@ -13,19 +13,143 @@ const {
     syncUserAchievementCounters
 } = require('../achievements/achievements');
 
-function getRequesterSceneXp(
-    result
+function getEmptySceneRewardBonuses() {
+
+    return {
+        requester: {
+            serverTag:
+                0
+        },
+        target: {
+            serverTag:
+                0
+        }
+    };
+
+}
+
+function normalizeSceneRewardBonuses(
+    rewardBonuses
 ) {
 
-    return result.xp + ECONOMY.PORN_SCENE_STARTER_XP_BONUS;
+    return {
+        requester: {
+            serverTag:
+                rewardBonuses?.requester?.serverTag ?? 0
+        },
+        target: {
+            serverTag:
+                rewardBonuses?.target?.serverTag ?? 0
+        }
+    };
+
+}
+
+function hasMpcServerTag(
+    user
+) {
+
+    const primaryGuild =
+        user?.primaryGuild;
+
+    return Boolean(
+        primaryGuild?.identityEnabled === true &&
+        primaryGuild.identityGuildId === process.env.GUILD_ID &&
+        primaryGuild.tag
+    );
+
+}
+
+async function fetchUserForServerTag(
+    client,
+    userId
+) {
+
+    return await client.users.fetch(
+        userId,
+        {
+            force:
+                true
+        }
+    ).catch(
+        () =>
+            client.users.cache.get(
+                userId
+            ) ?? null
+    );
+
+}
+
+async function buildSceneRewardBonuses(
+    client,
+    requesterId,
+    targetId
+) {
+
+    const [
+        requester,
+        target
+    ] =
+        await Promise.all([
+            fetchUserForServerTag(
+                client,
+                requesterId
+            ),
+            fetchUserForServerTag(
+                client,
+                targetId
+            )
+        ]);
+
+    return {
+        requester: {
+            serverTag:
+                hasMpcServerTag(
+                    requester
+                )
+                    ? ECONOMY.PORN_SCENE_SERVER_TAG_XP_BONUS
+                    : 0
+        },
+        target: {
+            serverTag:
+                hasMpcServerTag(
+                    target
+                )
+                    ? ECONOMY.PORN_SCENE_SERVER_TAG_XP_BONUS
+                    : 0
+        }
+    };
+
+}
+
+function getRequesterSceneXp(
+    result,
+    rewardBonuses = getEmptySceneRewardBonuses()
+) {
+
+    const normalizedBonuses =
+        normalizeSceneRewardBonuses(
+            rewardBonuses
+        );
+
+    return result.xp +
+        ECONOMY.PORN_SCENE_STARTER_XP_BONUS +
+        normalizedBonuses.requester.serverTag;
 
 }
 
 function getTargetSceneXp(
-    result
+    result,
+    rewardBonuses = getEmptySceneRewardBonuses()
 ) {
 
-    return result.xp;
+    const normalizedBonuses =
+        normalizeSceneRewardBonuses(
+            rewardBonuses
+        );
+
+    return result.xp +
+        normalizedBonuses.target.serverTag;
 
 }
 
@@ -33,20 +157,28 @@ async function applyRewards(
     client,
     requesterId,
     targetId,
-    result
+    result,
+    rewardBonuses = getEmptySceneRewardBonuses()
 ) {
+
+    const normalizedBonuses =
+        normalizeSceneRewardBonuses(
+            rewardBonuses
+        );
 
     await Promise.all([
         addXP(
             requesterId,
             getRequesterSceneXp(
-                result
+                result,
+                normalizedBonuses
             )
         ),
         addXP(
             targetId,
             getTargetSceneXp(
-                result
+                result,
+                normalizedBonuses
             )
         ),
         addCoins(
@@ -98,6 +230,8 @@ async function applyRewards(
 
 module.exports = {
     applyRewards,
+    buildSceneRewardBonuses,
     getRequesterSceneXp,
-    getTargetSceneXp
+    getTargetSceneXp,
+    normalizeSceneRewardBonuses
 };

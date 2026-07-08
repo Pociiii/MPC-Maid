@@ -10,6 +10,7 @@ const requestExpiryMs =
 const mutualTypes =
     new Set([
         'sibling',
+        'extended_family',
         'marriage',
         'dating',
         'bestie'
@@ -19,7 +20,8 @@ const familyTypes =
     new Set([
         'mother',
         'father',
-        'sibling'
+        'sibling',
+        'extended_family'
     ]);
 
 function dbAll(
@@ -411,7 +413,7 @@ async function familyRelationshipExistsBetween(
         await dbGet(
             `SELECT id
              FROM relationships
-             WHERE type IN ('mother', 'father', 'sibling')
+             WHERE type IN ('mother', 'father', 'sibling', 'extended_family')
              AND (
                 (user_a_id = ? AND user_b_id = ?)
                 OR (user_a_id = ? AND user_b_id = ?)

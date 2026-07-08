@@ -54,6 +54,11 @@ const {
     postShowcaseButtonReply
 } = require('../../utils/showcaseReplies');
 
+const {
+    claimButton,
+    replyButtonAlreadyUsed
+} = require('../../utils/buttonDedup');
+
 function buildDisabledRow(
     interaction
 ) {
@@ -132,6 +137,20 @@ module.exports = async (
             flags:
                 64
         });
+
+        return;
+
+    }
+
+    if (
+        !claimButton(
+            interaction
+        )
+    ) {
+
+        await replyButtonAlreadyUsed(
+            interaction
+        );
 
         return;
 

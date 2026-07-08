@@ -243,14 +243,15 @@ function buildMomentEmbed(
 }
 
 async function getMomentsChannel(
-    client
+    client,
+    channelId = CHANNELS.MOMENTS
 ) {
 
     return client.channels.cache.get(
-        CHANNELS.MOMENTS
+        channelId
     ) ??
         await client.channels.fetch(
-            CHANNELS.MOMENTS
+            channelId
         ).catch(
             () => null
         );
@@ -264,7 +265,8 @@ async function postMoment(
 
     const channel =
         await getMomentsChannel(
-            client
+            client,
+            options.channelId
         );
 
     if (

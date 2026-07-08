@@ -38,6 +38,7 @@ const {
 
 const {
     applyRewards,
+    buildSceneRewardBonuses,
     getRequesterSceneXp,
     getTargetSceneXp
 } = require('./sceneRewards');
@@ -87,11 +88,19 @@ async function finishScene(
     sceneColor
 ) {
 
+    const rewardBonuses =
+        await buildSceneRewardBonuses(
+            channel.client,
+            requesterId,
+            targetId
+        );
+
     await applyRewards(
         channel.client,
         requesterId,
         targetId,
-        result
+        result,
+        rewardBonuses
     );
 
     const highestCombinedStat =
@@ -201,7 +210,8 @@ async function finishScene(
                         result,
                         sceneLinks,
                         requesterAuthor,
-                        sceneColor
+                        sceneColor,
+                        rewardBonuses
                     )
                 ]
             });
@@ -273,7 +283,8 @@ async function finishScene(
                     result.rankingChange,
                 xp:
                     getRequesterSceneXp(
-                        result
+                        result,
+                        rewardBonuses
                     )
             }
         ),
@@ -294,7 +305,8 @@ async function finishScene(
                     result.rankingChange,
                 xp:
                     getTargetSceneXp(
-                        result
+                        result,
+                        rewardBonuses
                     )
             }
         )

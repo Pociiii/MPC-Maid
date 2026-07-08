@@ -52,6 +52,46 @@ const {
 const requestExpiryMs =
     24 * 60 * 60 * 1000;
 
+function displayNameFor(
+    member,
+    user
+) {
+
+    return member?.displayName ??
+        user?.globalName ??
+        user?.username ??
+        'that user';
+
+}
+
+async function safeSendUserDm(
+    client,
+    userId,
+    content
+) {
+
+    try {
+
+        const user =
+            await client.users.fetch(
+                userId
+            );
+
+        await user.send({
+            content
+        });
+
+        return true;
+
+    }
+    catch {
+
+        return false;
+
+    }
+
+}
+
 function getSceneCategoryName(
     sceneCategory
 ) {
@@ -104,6 +144,12 @@ function scheduleRequestExpiry(
                     targetId
                 );
 
+                await safeSendUserDm(
+                    message.client,
+                    requesterId,
+                    `${pendingRequest.targetDisplayName ?? 'Your partner'} did not answer the scene request in time. The request expired.`
+                );
+
                 await message.edit({
                     content:
                         'Scene request expired.',
@@ -135,6 +181,19 @@ async function sendPornSceneRequest(
     const target =
         await interaction.client.users.fetch(
             targetId
+        );
+
+    const targetMember =
+        await interaction.guild.members.fetch(
+            targetId
+        ).catch(
+            () => null
+        );
+
+    const targetDisplayName =
+        displayNameFor(
+            targetMember,
+            target
         );
 
     const requesterUser =
@@ -327,9 +386,16 @@ async function sendPornSceneRequest(
                 message.id,
             expiresAt:
                 Date.now() + requestExpiryMs,
+            targetDisplayName,
             sceneCategory,
             booster
         }
+    );
+
+    await safeSendUserDm(
+        interaction.client,
+        interaction.user.id,
+        `Your scene request was sent to ${targetDisplayName}. Waiting for them to accept or decline.`
     );
 
     scheduleRequestExpiry(

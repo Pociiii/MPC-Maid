@@ -2,6 +2,11 @@ const {
     sendPornSceneRequest
 } = require('../../features/porn-career/pornSceneRequest');
 
+const {
+    hasPendingRequest,
+    isBusy
+} = require('../../utils/pornScenes');
+
 function parseBooster(
     selected
 ) {
@@ -50,6 +55,49 @@ module.exports = {
             );
 
         await interaction.deferUpdate();
+
+        if (
+            hasPendingRequest(
+                interaction.user.id,
+                targetId
+            )
+        ) {
+
+            await interaction.editReply({
+                content:
+                    'You already have a pending porn scene request with this user.',
+                embeds:
+                    [],
+                components:
+                    [],
+                attachments:
+                    []
+            });
+
+            return;
+
+        }
+
+        if (
+            isBusy(
+                interaction.user.id
+            )
+        ) {
+
+            await interaction.editReply({
+                content:
+                    'You are already filming another scene. Finish it before sending a new request.',
+                embeds:
+                    [],
+                components:
+                    [],
+                attachments:
+                    []
+            });
+
+            return;
+
+        }
 
         try {
 

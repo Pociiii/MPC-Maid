@@ -25,7 +25,7 @@ module.exports = {
 **How it works**
 - Relationship requests are sent by DM.
 - The other user must press Accept before the link is created.
-- Accepted and broken links can appear in <#${CHANNELS.MOMENTS}> as small RP notices.
+- Accepted and broken links can appear in <#${CHANNELS.PILLOW_TALK}> as small RP notices.
 - Use \`/relationship view user:@user\` to privately check someone's links.
 
 **Romance**
@@ -40,7 +40,9 @@ module.exports = {
 - \`/relationship leave-parent parent:mother/father\` removes your parent link.
 - \`/relationship sibling user:@user\` creates a sibling link.
 - \`/relationship unsibling user:@user\` removes a sibling link.
-- The bot blocks family overlaps between the same two users, so someone cannot be parent, child, or sibling of the same person.
+- \`/relationship extended-family user:@user\` creates an Extended Family link.
+- \`/relationship unextended-family user:@user\` removes an Extended Family link.
+- The bot blocks family overlaps between the same two users, so someone cannot be parent, child, sibling, or extended family of the same person.
 - Romantic links stay separate from family links.
 
 **Social**

@@ -18,8 +18,7 @@ const {
 } = require('../../utils/moments');
 
 const {
-    pickOne,
-    sceneFinalReview
+    pickOne
 } = require('../../utils/flavorText');
 
 const {
@@ -38,8 +37,11 @@ const {
     getRuntimeDataPath
 } = require('../../utils/runtimeData');
 
-const emojis =
-    require('../../utils/emojis');
+const {
+    getRequesterSceneXp,
+    getTargetSceneXp,
+    normalizeSceneRewardBonuses
+} = require('./sceneRewards');
 
 const sceneRoot =
     getRuntimeDataPath(
@@ -501,40 +503,97 @@ function formatSceneLinks(
     return sceneLinks
         .map(
             (link, index) =>
-                `- Part ${index + 1}: ${link}`
+                `[${index + 1}](${link})`
         )
         .join(
-            '\n'
+            ' '
         );
+
+}
+
+function formatBonusNotes(
+    notes
+) {
+
+    const filteredNotes =
+        notes.filter(
+            Boolean
+        );
+
+    return filteredNotes.length > 0
+        ? ` (${filteredNotes.join(
+            ', '
+        )})`
+        : '';
 
 }
 
 function formatXpRewards(
     requesterId,
     targetId,
+    result,
+    rewardBonuses
+) {
+
+    const normalizedBonuses =
+        normalizeSceneRewardBonuses(
+            rewardBonuses
+        );
+
+    const requesterNotes = [
+        `+${ECONOMY.PORN_SCENE_STARTER_XP_BONUS} starter`,
+        normalizedBonuses.requester.serverTag > 0
+            ? `+${normalizedBonuses.requester.serverTag} MPC tag`
+            : null
+    ];
+
+    const targetNotes = [
+        normalizedBonuses.target.serverTag > 0
+            ? `+${normalizedBonuses.target.serverTag} MPC tag`
+            : null
+    ];
+
+    return [
+        `<@${requesterId}>: **${getRequesterSceneXp(
+            result,
+            normalizedBonuses
+        )} XP**${formatBonusNotes(
+            requesterNotes
+        )}`,
+        `<@${targetId}>: **${getTargetSceneXp(
+            result,
+            normalizedBonuses
+        )} XP**${formatBonusNotes(
+            targetNotes
+        )}`
+    ]
+        .join(
+            '\n'
+        );
+
+}
+
+function formatFinalSummary(
     result
 ) {
 
-    const requesterXp =
-        result.xp +
-        ECONOMY.PORN_SCENE_STARTER_XP_BONUS;
-
     return [
-        `- <@${requesterId}>: **${requesterXp} XP**`,
-        `- <@${targetId}>: **${result.xp} XP**`,
-        `- Requester starter bonus: **+${ECONOMY.PORN_SCENE_STARTER_XP_BONUS} XP**`,
+        `**${result.outcome}**`,
+        `${result.viewers.toLocaleString()} viewers`,
+        `${result.coins} coins each`,
+        `${formatSignedNumber(
+            result.rankingChange
+        )} ranking`,
+        `${result.totalParts} parts`,
         result.criticalScene
-            ? '- Critical scene bonus included'
-            : null,
-        result.staminaXpBonus > 0
-            ? `- Stamina bonus included: **+${result.staminaXpBonus} XP**`
+            ? 'critical'
             : null
     ]
         .filter(
             Boolean
         )
         .join(
-            '\n'
+            ' | '
         );
 
 }
@@ -546,19 +605,14 @@ function buildFinalEmbed(
     result,
     sceneLinks,
     requesterAuthor,
-    sceneColor
+    sceneColor,
+    rewardBonuses
 ) {
 
     const finalTitle =
         result.criticalScene
             ? 'Midnight Headline'
             : 'Porn Scene Finished';
-
-    const review =
-        pickOne(
-            sceneFinalReview[result.outcome],
-            'The studio has another release to talk about.'
-        );
 
     const embed =
         createEmbed({
@@ -573,9 +627,9 @@ function buildFinalEmbed(
             title:
                 finalTitle,
             description:
-                `${pickMomentFlavor(
+                pickMomentFlavor(
                     'scene_final'
-                )}\n\n${review}`,
+                ),
             footerText:
                 commandFooter(
                     '/pornscene'
@@ -599,27 +653,13 @@ function buildFinalEmbed(
         },
         {
             name:
-                '\uD83C\uDFAC Outcome',
+                '\uD83C\uDFAC Result',
             value:
-                `**${result.outcome}**`,
+                formatFinalSummary(
+                    result
+                ),
             inline:
-                true
-        },
-        {
-            name:
-                '\uD83D\uDCFA Viewers',
-            value:
-                `**${result.viewers.toLocaleString()}**`,
-            inline:
-                true
-        },
-        {
-            name:
-                `${emojis.coin} Revenue`,
-            value:
-                `**${result.coins} coins each**`,
-            inline:
-                true
+                false
         },
         {
             name:
@@ -628,38 +668,11 @@ function buildFinalEmbed(
                 formatXpRewards(
                     requesterId,
                     targetId,
-                    result
+                    result,
+                    rewardBonuses
                 ),
             inline:
                 false
-        },
-        {
-            name:
-                '\uD83C\uDFC6 Ranking',
-            value:
-                `**${formatSignedNumber(
-                    result.rankingChange
-                )}**`,
-            inline:
-                true
-        },
-        {
-            name:
-                '\uD83C\uDF9E\uFE0F Parts',
-            value:
-                `**${result.totalParts}**`,
-            inline:
-                true
-        },
-        {
-            name:
-                '\uD83C\uDFB2 Critical',
-            value:
-                result.criticalScene
-                    ? '**Yes**'
-                    : 'No',
-            inline:
-                true
         },
         {
             name:

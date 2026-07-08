@@ -1,4 +1,5 @@
 const {
+    CHANNELS,
     getRandomColor
 } = require('../../data/constants');
 
@@ -140,6 +141,31 @@ async function acceptRequest(
         return buildAcceptResult(
             `You and <@${request.requester_id}> are now siblings.`,
             'Siblings',
+            requesterMember,
+            targetMember,
+            request
+        );
+
+    }
+
+    if (
+        request.type === 'extended_family'
+    ) {
+
+        await assertNoFamilyRelationshipBetween(
+            request.requester_id,
+            request.target_id
+        );
+
+        await createRelationship(
+            'extended_family',
+            request.requester_id,
+            request.target_id
+        );
+
+        return buildAcceptResult(
+            `You and <@${request.requester_id}> are now extended family.`,
+            'Extended Family',
             requesterMember,
             targetMember,
             request
@@ -318,6 +344,8 @@ async function postRelationshipMoment(
         {
             type:
                 'relationship_created',
+            channelId:
+                CHANNELS.PILLOW_TALK,
             color:
                 getRandomColor(),
             authorName:

@@ -53,6 +53,11 @@ const {
     postShowcaseButtonReply
 } = require('../../utils/showcaseReplies');
 
+const {
+    claimButton,
+    replyButtonAlreadyUsed
+} = require('../../utils/buttonDedup');
+
 module.exports = async (
     interaction
 ) => {
@@ -100,6 +105,20 @@ module.exports = async (
             flags:
                 64
         });
+
+    }
+
+    if (
+        !claimButton(
+            interaction
+        )
+    ) {
+
+        await replyButtonAlreadyUsed(
+            interaction
+        );
+
+        return;
 
     }
 
