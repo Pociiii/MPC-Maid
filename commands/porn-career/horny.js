@@ -1,18 +1,11 @@
 const {
-    SlashCommandBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle
-} =
-    require('discord.js');
+    ButtonStyle,
+    SlashCommandBuilder
+} = require('discord.js');
 
 const {
-    createEmbed
-} = require('../../utils/embeds');
-
-const {
-    mpcLogoAttachment
-} = require('../../utils/mpcLogo');
+    COOLDOWNS
+} = require('../../data/constants');
 
 const {
     getRandomGif
@@ -27,33 +20,25 @@ const {
 } = require('../../utils/userCategory');
 
 const {
-    COOLDOWNS,
-    getRandomColor
-} = require('../../data/constants');
-
-const {
-    trackDailyQuest
-} = require('../../features/daily-quests/dailyQuests');
-
-const {
-    incrementAchievementProgress
-} = require('../../features/achievements/achievements');
-
-const {
-    commandFooter
-} = require('../../utils/version');
+    buildShowcaseButtons,
+    buildShowcaseEmbed,
+    trackShowcasePost
+} = require('../../features/showcase/showcasePosts');
 
 module.exports = {
 
-    data: new SlashCommandBuilder()
+    data:
+        new SlashCommandBuilder()
+            .setName(
+                'horny'
+            )
+            .setDescription(
+                'Feeling a little needy?'
+            ),
 
-        .setName('horny')
-
-        .setDescription(
-            'Feeling a little needy?'
-        ),
-
-    async execute(interaction) {
+    async execute(
+        interaction
+    ) {
 
         if (
             await handleCooldown(
@@ -79,10 +64,8 @@ module.exports = {
         catch (error) {
 
             return interaction.editReply({
-
                 content:
-                    `❌ ${error.message}`,
-
+                    `\u274C ${error.message}`
             });
 
         }
@@ -96,39 +79,21 @@ module.exports = {
             );
 
         const embed =
-            createEmbed({
-
-                color:
-                    getRandomColor(),
-
-                authorName:
-                    interaction.member.displayName,
-
-                authorIcon:
-                    mpcLogoAttachment,
-
-                thumbnail:
-                    interaction.user.displayAvatarURL(),
-
-                title:
-                    'Horny',
-
-                description:
-                    `<@${interaction.user.id}> is feeling needy...`,
-
-                image:
-                    result.url,
-
-                footerText:
-                    commandFooter(
+            buildShowcaseEmbed(
+                interaction,
+                {
+                    commandName:
                         '/horny',
+                    title:
+                        'Horny',
+                    description:
+                        `<@${interaction.user.id}> is feeling needy...`,
+                    imageUrl:
+                        result.url,
+                    footerText:
                         `GIF #${result.index}/${result.total}`
-                    ),
-
-                timestamp:
-                    true
-
-            });
+                }
+            );
 
         const helpLabel =
             `Help ${interaction.member.displayName}`
@@ -138,46 +103,32 @@ module.exports = {
                 );
 
         const row =
-            new ActionRowBuilder()
-                .addComponents(
-
-                    new ButtonBuilder()
-
-                        .setCustomId(
-                            `horny_help:${interaction.user.id}`
-                        )
-
-                        .setLabel(
-                            helpLabel
-                        )
-                        .setEmoji(
-                            '🤝'
-                        )
-
-                        .setStyle(
-                            ButtonStyle.Secondary
-                        )
-
-                );
+            buildShowcaseButtons([
+                {
+                    customId:
+                        `horny_help:${interaction.user.id}`,
+                    label:
+                        helpLabel,
+                    emoji:
+                        '\uD83E\uDD1D',
+                    style:
+                        ButtonStyle.Secondary
+                }
+            ]);
 
         await interaction.editReply({
-
-            embeds: [embed],
-
-            components: [row]
-
+            embeds:
+                [
+                    embed
+                ],
+            components:
+                [
+                    row
+                ]
         });
 
-        await trackDailyQuest(
-            interaction.client,
-            interaction.user.id,
-            'showcase'
-        );
-
-        await incrementAchievementProgress(
-            interaction.client,
-            interaction.user.id,
-            'showcase_posts'
+        await trackShowcasePost(
+            interaction
         );
 
     }

@@ -31,7 +31,7 @@ function createEmbed(options = {}) {
 
         embed.setAuthor({
             name: options.authorName,
-            iconURL: mpcLogoAttachment
+            iconURL: options.authorIcon ?? mpcLogoAttachment
         });
 
     }

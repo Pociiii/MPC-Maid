@@ -14,6 +14,7 @@ const {
     formatBoosterInventoryLine,
     getUserBoosters
 } = require('../../utils/boosters');
+const { showGiftInventory } = require('../../features/gifts/giftSystem');
 
 function formatBoosters(
     boosters
@@ -22,7 +23,7 @@ function formatBoosters(
     if (
         boosters.length === 0
     )
-        return 'Your booster inventory is empty. Use `/shop` to buy boosters.';
+        return 'Your booster inventory is empty. Use `/shop boosters` to buy boosters.';
 
         return boosters
         .map(
@@ -41,9 +42,9 @@ module.exports = {
             .setName(
                 'inventory'
             )
-            .setDescription(
-                'View your booster inventory'
-            ),
+            .setDescription('View your inventories')
+            .addSubcommand((subcommand) => subcommand.setName('boosters').setDescription('View scene boosters'))
+            .addSubcommand((subcommand) => subcommand.setName('gifts').setDescription('View gifts you can send')),
 
     async execute(
         interaction
@@ -53,6 +54,11 @@ module.exports = {
             flags:
                 64
         });
+
+        if (interaction.options.getSubcommand() === 'gifts') {
+            await showGiftInventory(interaction);
+            return;
+        }
 
         const boosters =
             await getUserBoosters(
@@ -66,7 +72,7 @@ module.exports = {
                 color:
                     COLORS.DEFAULT,
                 command:
-                    '/inventory',
+                    '/inventory boosters',
                 title:
                     'Inventory',
                 description:

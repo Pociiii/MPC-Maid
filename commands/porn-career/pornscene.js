@@ -45,85 +45,9 @@ const {
 } = require('../../utils/mpcLogo');
 
 const {
-    getSceneCategoryLabel
-} = require('../../data/sceneSubmitGroups');
-
-function getSceneCategoryName(
-    sceneCategory
-) {
-
-    const group =
-        sceneCategory
-            .split(
-                '_'
-            )
-            .every(
-                (part) =>
-                    part.endsWith(
-                        'f'
-                    )
-            )
-            ? 'ff'
-            : 'mf';
-
-    return getSceneCategoryLabel(
-        group,
-        sceneCategory
-    );
-
-}
-
-function getSceneCategory(
-    firstCategory,
-    secondCategory
-) {
-
-    const categories =
-        [
-            firstCategory,
-            secondCategory
-        ];
-
-    const maleCategory =
-        categories.find(
-            (category) =>
-                category.endsWith(
-                    'm'
-                )
-        );
-
-    const femaleCategories =
-        categories.filter(
-            (category) =>
-                category.endsWith(
-                    'f'
-                )
-        );
-
-    if (
-        maleCategory &&
-        femaleCategories.length === 1
-    )
-        return `${maleCategory}_${femaleCategories[0]}`;
-
-    if (
-        femaleCategories.length === 2
-    ) {
-
-        const uniqueCategories =
-            [...new Set(
-                femaleCategories
-            )];
-
-        return uniqueCategories.length === 1
-            ? `${uniqueCategories[0]}_${uniqueCategories[0]}`
-            : 'wf_bf';
-
-    }
-
-    return null;
-
-}
+    getSceneCategoryName,
+    getTwoPersonSceneCategory
+} = require('../../features/porn-career/sceneCommon');
 
 module.exports = {
 
@@ -230,7 +154,7 @@ module.exports = {
         try {
 
             sceneCategory =
-                getSceneCategory(
+                getTwoPersonSceneCategory(
                     getMemberCategory(
                         interaction.member
                     ),

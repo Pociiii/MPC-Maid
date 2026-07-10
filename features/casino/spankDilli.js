@@ -48,11 +48,6 @@ const GIF_DURATION_MS =
 const spankDilliGifUrl =
     'https://cdn.discordapp.com/attachments/1519544070983258203/1519544182119862302/spank_dilli.webp?ex=6a3df14c&is=6a3c9fcc&hm=728ee19cd7e167b8f997af99b57c9fc2601c7499c954ddf84bf7a458d8f95598&';
 
-const queue = [];
-
-let playing =
-    false;
-
 function dbGet(
     sql,
     params = []
@@ -214,7 +209,7 @@ function buildPanelEmbed(
             title:
                 'Spank Dilli',
             description:
-                'Click the button, join the queue, and see if Dilli pays out.',
+                'Click the button, play the spank, and see if Dilli pays out.',
             footerText:
                 '/spankdilli',
             timestamp:
@@ -227,7 +222,6 @@ function buildPanelEmbed(
                 `${emojis.spank_given} Stats`,
             value:
 `- Total spanks: **${Number(state.total_spanks).toLocaleString()}**
-- Queue: **${queue.length}**
 - Current prize: **${prize.toLocaleString()} coins**
 - Win chance: **${getWinChance(prize)}%**`,
             inline:
@@ -313,6 +307,22 @@ function wait(
 
 }
 
+async function deleteMessageAfter(
+    message,
+    delayMs
+) {
+
+    await wait(
+        delayMs
+    );
+
+    await message.delete()
+        .catch(
+            () => null
+        );
+
+}
+
 async function announceWinner(
     interaction,
     prize
@@ -395,71 +405,6 @@ async function announceWinner(
     }).catch(
         () => null
     );
-
-}
-
-async function processQueue() {
-
-    if (
-        playing
-    )
-        return;
-
-    playing =
-        true;
-
-    while (
-        queue.length > 0
-    ) {
-
-        const item =
-            queue.shift();
-
-        await updatePanelMessage(
-            item.panelMessage,
-            item.source
-        );
-
-        const message =
-            await item.channel.send({
-                content:
-                    `${emojis.spank_given} Spank from <@${item.userId}>`,
-                embeds: [
-                    createEmbed({
-                        color:
-                            getRandomColor(),
-                        image:
-                            spankDilliGifUrl
-                    })
-                ]
-            }).catch(
-                () => null
-            );
-
-        if (
-            message
-        ) {
-
-            await wait(
-                GIF_DURATION_MS
-            );
-
-            await message.delete()
-                .catch(
-                    () => null
-                );
-
-        }
-
-        await updatePanelMessage(
-            item.panelMessage,
-            item.source
-        );
-
-    }
-
-    playing =
-        false;
 
 }
 
@@ -586,20 +531,25 @@ async function handleSpankDilli(
         ]
     );
 
-    queue.push({
-        channel:
-            interaction.channel,
-        panelMessage:
-            interaction.message,
-        source:
-            interaction,
-        userId:
-            interaction.user.id
-    });
-
     await updatePanel(
         interaction
     );
+
+    const message =
+        await interaction.channel.send({
+            content:
+                `${emojis.spank_given} Spank from <@${interaction.user.id}>`,
+            embeds: [
+                createEmbed({
+                    color:
+                        getRandomColor(),
+                    image:
+                        spankDilliGifUrl
+                })
+            ]
+        }).catch(
+            () => null
+        );
 
     if (
         won
@@ -612,7 +562,13 @@ async function handleSpankDilli(
 
     }
 
-    void processQueue();
+    if (
+        message
+    )
+        void deleteMessageAfter(
+            message,
+            GIF_DURATION_MS
+        );
 
 }
 

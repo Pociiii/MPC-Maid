@@ -17,6 +17,8 @@ const {
 const {
     clearSceneBusy,
     consumePendingRequest,
+    getBusyUser,
+    getPendingRequest,
     isBusy,
     setSceneBusy
 } = require('../../utils/pornScenes');
@@ -44,116 +46,12 @@ const {
     scheduleScene
 } = require('./sceneScheduler');
 
-function getSceneCategory(
-    firstCategory,
-    secondCategory
-) {
-
-    const categories =
-        [
-            firstCategory,
-            secondCategory
-        ];
-
-    const maleCategory =
-        categories.find(
-            (category) =>
-                category.endsWith(
-                    'm'
-                )
-        );
-
-    const femaleCategories =
-        categories.filter(
-            (category) =>
-                category.endsWith(
-                    'f'
-                )
-        );
-
-    if (
-        maleCategory &&
-        femaleCategories.length === 1
-    )
-        return `${maleCategory}_${femaleCategories[0]}`;
-
-    if (
-        femaleCategories.length === 2
-    ) {
-
-        const uniqueCategories =
-            [...new Set(
-                femaleCategories
-            )];
-
-        return uniqueCategories.length === 1
-            ? `${uniqueCategories[0]}_${uniqueCategories[0]}`
-            : 'wf_bf';
-
-    }
-
-    return null;
-
-}
-
-function displayNameFor(
-    member,
-    user
-) {
-
-    return member?.displayName ??
-        user?.globalName ??
-        user?.username ??
-        'that user';
-
-}
-
-async function safeSendUserDm(
-    client,
-    userId,
-    content
-) {
-
-    try {
-
-        const user =
-            await client.users.fetch(
-                userId
-            );
-
-        await user.send({
-            content
-        });
-
-        return true;
-
-    }
-    catch {
-
-        return false;
-
-    }
-
-}
-
-async function fetchGuildMember(
-    interaction,
-    userId
-) {
-
-    const guild =
-        interaction.client.guilds.cache.get(
-            process.env.GUILD_ID
-        ) ??
-        await interaction.client.guilds.fetch(
-            process.env.GUILD_ID
-        );
-
-    return guild.members.fetch(
-        userId
-    );
-
-}
+const {
+    displayNameFor,
+    fetchConfiguredGuildMember,
+    getTwoPersonSceneCategory,
+    safeSendUserDm
+} = require('./sceneCommon');
 
 async function editSceneRequestMessage(
     interaction,
@@ -175,6 +73,20 @@ async function editSceneRequestMessage(
     await interaction.editReply(
         payload
     );
+
+}
+
+function isBusyWithEachOther(
+    requesterId,
+    targetId
+) {
+
+    return getBusyUser(
+        requesterId
+    )?.partnerId === targetId &&
+        getBusyUser(
+            targetId
+        )?.partnerId === requesterId;
 
 }
 
@@ -200,6 +112,42 @@ async function acceptScene(
     }
 
     await interaction.deferUpdate();
+
+    const existingRequest =
+        getPendingRequest(
+            requesterId,
+            targetId
+        );
+
+    if (
+        !existingRequest
+    ) {
+
+        if (
+            isBusyWithEachOther(
+                requesterId,
+                targetId
+            )
+        )
+            return;
+
+        await editSceneRequestMessage(
+            interaction,
+            {
+                content:
+                    'This scene request is no longer active.',
+                embeds:
+                    [],
+                components:
+                    [],
+                attachments:
+                    []
+            }
+        );
+
+        return;
+
+    }
 
     if (
         isBusy(
@@ -250,14 +198,14 @@ async function acceptScene(
     }
 
     const requesterMember =
-        await fetchGuildMember(
-            interaction,
+        await fetchConfiguredGuildMember(
+            interaction.client,
             requesterId
         );
 
     const targetMember =
-        await fetchGuildMember(
-            interaction,
+        await fetchConfiguredGuildMember(
+            interaction.client,
             targetId
         );
 
@@ -266,7 +214,7 @@ async function acceptScene(
     try {
 
         sceneCategory =
-            getSceneCategory(
+            getTwoPersonSceneCategory(
                 getMemberCategory(
                     requesterMember
                 ),

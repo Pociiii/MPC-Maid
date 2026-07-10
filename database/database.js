@@ -60,7 +60,12 @@ const db = new sqlite3.Database('./database.db', (err) => {
         'utf8'
     );
 
-    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${dailyWyrSchema}\n${profileLikesSchema}\n${achievementsSchema}\n${pregnancySchema}\n${relationshipsSchema}\n${spankDilliSchema}`, async (err) => {
+    const giftsSchema = fs.readFileSync(
+        path.join(__dirname, 'schemas', 'gifts.sql'),
+        'utf8'
+    );
+
+    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${dailyWyrSchema}\n${profileLikesSchema}\n${achievementsSchema}\n${pregnancySchema}\n${relationshipsSchema}\n${spankDilliSchema}\n${giftsSchema}`, async (err) => {
 
         if (err) {
             console.error(err);

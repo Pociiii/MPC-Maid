@@ -1,14 +1,10 @@
-const { SlashCommandBuilder } = require('discord.js');
-
-const { createEmbed } = require('../../utils/embeds');
 const {
-    mpcLogoAttachment
-} = require('../../utils/mpcLogo');
-const { getRandomGif } = require('../../utils/gifs');
+    ButtonStyle,
+    SlashCommandBuilder
+} = require('discord.js');
 
 const {
-    COOLDOWNS,
-    getRandomColor
+    COOLDOWNS
 } = require('../../data/constants');
 
 const {
@@ -16,47 +12,55 @@ const {
 } = require('../../utils/cooldowns');
 
 const {
-    trackDailyQuest
-} = require('../../features/daily-quests/dailyQuests');
-
-const {
-    incrementAchievementProgress
-} = require('../../features/achievements/achievements');
-
-const {
-    commandFooter
-} = require('../../utils/version');
+    buildShowcaseButtons,
+    buildShowcaseEmbed,
+    getShowcaseMedia,
+    isValidShowcaseAttachment,
+    trackShowcasePost
+} = require('../../features/showcase/showcasePosts');
 
 const ROLES =
     require('../../data/roles.json');
 
-    const {
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle
-} = require('discord.js');
+function getFlexCategory(
+    interaction
+) {
+
+    return interaction.member.roles.cache.has(
+        ROLES.DARK_SKIN
+    )
+        ? 'flex_b'
+        : 'flex_w';
+
+}
 
 module.exports = {
 
-    data: new SlashCommandBuilder()
-    .setName('flex')
-    .setDescription('Show off your muscles')
-
-    .addAttachmentOption(option =>
-
-        option
-
-            .setName('media')
-
-            .setDescription(
-                'Custom media'
+    data:
+        new SlashCommandBuilder()
+            .setName(
+                'flex'
             )
+            .setDescription(
+                'Show off your muscles'
+            )
+            .addAttachmentOption(
+                (option) =>
+                    option
+                        .setName(
+                            'media'
+                        )
+                        .setDescription(
+                            'Custom media'
+                        )
+                        .setRequired(
+                            false
+                        )
+            ),
 
-            .setRequired(false)
-
-    ),
-
-    async execute(interaction) {
+    async execute(
+        interaction
+    ) {
 
         if (
             await handleCooldown(
@@ -69,163 +73,78 @@ module.exports = {
 
         await interaction.deferReply();
 
-        const attachment =
-            interaction.options.getAttachment(
-                'media'
+        const media =
+            getShowcaseMedia(
+                interaction,
+                getFlexCategory(
+                    interaction
+                )
             );
 
         if (
-            attachment &&
-            !attachment.contentType?.startsWith(
-                'image/'
-            ) &&
-            !attachment.contentType?.startsWith(
-                'video/'
+            !isValidShowcaseAttachment(
+                media.attachment
             )
-        ) {
-
+        )
             return interaction.editReply({
-
                 content:
-                    '❌ Please upload an image, GIF, or video.',
-
+                    '\u274C Please upload an image, GIF, or video.'
             });
 
-        }
+        const embed =
+            buildShowcaseEmbed(
+                interaction,
+                {
+                    commandName:
+                        '/flex',
+                    title:
+                        'Flex',
+                    description:
+                        `<@${interaction.user.id}> flexes confidently.`,
+                    imageUrl:
+                        media.imageUrl,
+                    footerText:
+                        media.footerText
+                }
+            );
 
-        let imageUrl;
-        let footerText;
-
-        if (attachment) {
-
-            imageUrl =
-                attachment.url;
-
-            footerText =
-                `Custom media by ${interaction.member.displayName}`;
-
-        }
-        else {
-
-            let category = 'flex_w';
-
-            if (
-                interaction.member.roles.cache.has(
-                    ROLES.DARK_SKIN
-                )
-            ) {
-
-                category = 'flex_b';
-
-            }
-
-            const result =
-                getRandomGif(
-                    category,
-                    [
-                        interaction.user.id
-                    ]
-                );
-
-            imageUrl =
-                result.url;
-
-            footerText =
-                `GIF #${result.index}/${result.total}`;
-
-        }
-
-        const embed = createEmbed({
-
-            color: getRandomColor(),
-
-            authorName:
-                interaction.member.displayName,
-
-            authorIcon:
-                mpcLogoAttachment,
-
-            thumbnail:
-                interaction.user.displayAvatarURL(),
-
-            title: 'Flex',
-
-            description:
-                `<@${interaction.user.id}> flexes confidently.`,
-
-            image:
-                imageUrl,
-
-            footerText:
-                commandFooter(
-                    '/flex',
-                    footerText
-                ),
-
-            timestamp:
-                true
-
-        });
         const row =
-    new ActionRowBuilder()
-        .addComponents(
-
-            new ButtonBuilder()
-
-                .setCustomId(
-                    `blowkiss:${interaction.user.id}`
-                )
-
-                .setLabel(
-                    'Blow Kiss'
-                )
-
-                .setEmoji(
-                    '<a:ADP_kiss:1450797539862511720>'
-                )
-
-                .setStyle(
-                    ButtonStyle.Secondary
-                ),
-
-            new ButtonBuilder()
-
-                .setCustomId(
-                    `brofist:${interaction.user.id}`
-                )
-
-                .setLabel(
-                    'Brofist'
-                )
-
-                .setEmoji(
-                    '🤜'
-                )
-
-                .setStyle(
-                    ButtonStyle.Secondary
-                )
-
-        );
+            buildShowcaseButtons([
+                {
+                    customId:
+                        `blowkiss:${interaction.user.id}`,
+                    label:
+                        'Blow Kiss',
+                    emoji:
+                        '<a:ADP_kiss:1450797539862511720>',
+                    style:
+                        ButtonStyle.Secondary
+                },
+                {
+                    customId:
+                        `brofist:${interaction.user.id}`,
+                    label:
+                        'Brofist',
+                    emoji:
+                        '\uD83E\uDD1C',
+                    style:
+                        ButtonStyle.Secondary
+                }
+            ]);
 
         await interaction.editReply({
-
-            embeds: [embed],
-
-            components: [row]
-
+            embeds:
+                [
+                    embed
+                ],
+            components:
+                [
+                    row
+                ]
         });
 
-        await trackDailyQuest(
-            interaction.client,
-            interaction.user.id,
-            'showcase'
-        );
-
-        await incrementAchievementProgress(
-            interaction.client,
-            interaction.user.id,
-            'showcase_posts'
+        await trackShowcasePost(
+            interaction
         );
 
     }

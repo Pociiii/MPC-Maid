@@ -541,15 +541,21 @@ function formatXpRewards(
         );
 
     const requesterNotes = [
+        result.staminaXpBonus > 0
+            ? `+${result.staminaXpBonus} stamina`
+            : null,
         `+${ECONOMY.PORN_SCENE_STARTER_XP_BONUS} starter`,
         normalizedBonuses.requester.serverTag > 0
-            ? `+${normalizedBonuses.requester.serverTag} MPC tag`
+            ? `+${normalizedBonuses.requester.serverTag} MPC server tag`
             : null
     ];
 
     const targetNotes = [
+        result.staminaXpBonus > 0
+            ? `+${result.staminaXpBonus} stamina`
+            : null,
         normalizedBonuses.target.serverTag > 0
-            ? `+${normalizedBonuses.target.serverTag} MPC tag`
+            ? `+${normalizedBonuses.target.serverTag} MPC server tag`
             : null
     ];
 

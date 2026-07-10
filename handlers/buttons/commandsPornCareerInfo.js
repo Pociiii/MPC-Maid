@@ -6,7 +6,6 @@ const {
     CHANNELS,
     COOLDOWNS,
     ECONOMY,
-    SCENE_BALANCE,
     getRandomColor
 } = require('../../data/constants');
 
@@ -33,47 +32,36 @@ module.exports = {
                 title:
                     'Porn Career Minigame',
                 description:
-`The porn career system lets users build a pornstar character through shared scenes, XP, coins, fame, and ranking.
+`Quick guide for scenes, stats, boosters, and rewards.
 
 **Requests**
-- Use \`/pornscene partner:@user\` to send a DM request.
+- Use \`/pornscene partner:@user\`.
+- The partner gets a DM with Accept / Decline.
 - Request cooldown: **${minutes(COOLDOWNS.PORN_SCENE_REQUEST)}**.
-- Before the DM is sent, the requester chooses no booster or spends one owned booster from \`/inventory\`.
-- A booster is consumed when the request is sent. It is not refunded if the partner declines.
-- Requests can wait. Busy is checked only when the partner presses Accept.
-- You can only have one pending request with the same target while the bot is running.
+- You pick no booster, or one booster from \`/inventory\`.
+- The booster is spent when the request is sent.
+- If they decline, nothing posts publicly.
 
 **Scenes**
-- Accepted scenes post in <#${CHANNELS.PORN_CAREER}>.
-- Moments and final scene links post in <#${CHANNELS.MOMENTS}>.
-- Parts are posted over time, one every 8-12 minutes.
-- The scene lasts up to about 1 hour.
-- Custom scenes post in <#${CHANNELS.CUSTOM_SCENE}> over 30 minutes and cost **${ECONOMY.CUSTOM_SCENE_PART_COST} coins per selected part**.
+- Accepted scenes run in <#${CHANNELS.PORN_CAREER}>.
+- Final results and scene links post in <#${CHANNELS.MOMENTS}>.
+- Scenes post in parts over about 1 hour.
+- Custom scenes use \`/customscene\` and cost **${ECONOMY.CUSTOM_SCENE_PART_COST} coins per selected part**.
 
 **Stats**
-- Performance improves scene score and critical scene chance.
-- Stamina increases total scene parts.
-- Fame increases viewers and revenue.
-- Ranking changes based on the final scene outcome.
-- Partner stats are combined for the scene.
-- Every combined stat point adds partial scene score progress.
-- Performance adds partial critical chance every point, capped at **15%**.
-- Stamina adds scene parts every **${SCENE_BALANCE.STAT_BONUS_THRESHOLD} combined points**, up to **8 parts**.
-- Fame adds partial viewer and revenue progress every point.
-- A critical scene upgrades the outcome by one tier and adds a small XP bonus.
-- Boosters count for that scene's combined stat check only.
-- Stats keep counting after **40**, but training costs get much steeper.
-- Scene stat achievements unlock at combined stat thresholds like **${SCENE_BALANCE.STAT_BONUS_THRESHOLD}**, **${SCENE_BALANCE.STAT_BONUS_THRESHOLD * 2}**, **${SCENE_BALANCE.STAT_BONUS_THRESHOLD * 3}**, and beyond.
+- **Performance**: better result and higher critical chance.
+- **Stamina**: more scene parts and bonus XP.
+- **Fame**: more viewers and coins.
+- Both partners' stats are added together.
+- Boosters add stats for one scene only.
 
 **Progression**
-- Completed scenes grant XP based on outcome, plus coins, ranking points, and scenes completed.
-- Scene XP: Awkward **10**, Solid **20**, Hot **35**, Viral **55**. Critical scenes add **+10 XP**. The requester gets **+${ECONOMY.PORN_SCENE_STARTER_XP_BONUS} XP** for starting the scene.
-- Use \`/train\` to spend XP and coins on Performance, Stamina, and Fame.
-- Boosters are one-use scene bonuses for the requester only.
-- Booster tiers: T1 **120**, T2 **350**, T3 **800**, T4 **1400** coins.
-- Boosters now help even when they do not cross a **${SCENE_BALANCE.STAT_BONUS_THRESHOLD}**-point scene-part threshold.
-- Stronger boosters add more stat power and more burnout/flop risk.
-- Use \`/shop\` to buy boosters and \`/inventory\` to check owned boosters.`,
+- Scene XP: Awkward **10**, Solid **20**, Hot **35**, Viral **55**.
+- Critical scenes add **+10 XP**.
+- More Stamina can add extra XP.
+- The requester gets **+${ECONOMY.PORN_SCENE_STARTER_XP_BONUS} XP** for starting.
+- Use \`/train\` to upgrade stats.
+- Use \`/shop\` to buy boosters and \`/inventory\` to see them.`,
                 footerText:
                     '/commands - Porn Career Info',
                 timestamp:

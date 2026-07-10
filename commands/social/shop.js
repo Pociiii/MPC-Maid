@@ -5,6 +5,7 @@ const {
 const {
     buildShopReply
 } = require('../../features/shop/boosterShop');
+const { buildGiftShopReply } = require('../../features/gifts/giftSystem');
 
 module.exports = {
 
@@ -14,8 +15,10 @@ module.exports = {
                 'shop'
             )
             .setDescription(
-                'Buy boosters with coins'
-            ),
+                'Buy boosters or gifts with coins'
+            )
+            .addSubcommand((subcommand) => subcommand.setName('boosters').setDescription('Buy scene boosters'))
+            .addSubcommand((subcommand) => subcommand.setName('gifts').setDescription('Browse your daily gift shop')),
 
     async execute(
         interaction
@@ -26,11 +29,7 @@ module.exports = {
                 64
         });
 
-        await interaction.editReply(
-            await buildShopReply(
-                interaction
-            )
-        );
+        await interaction.editReply(await (interaction.options.getSubcommand() === 'gifts' ? buildGiftShopReply(interaction) : buildShopReply(interaction)));
 
     }
 

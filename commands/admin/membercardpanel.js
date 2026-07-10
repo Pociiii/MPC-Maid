@@ -62,9 +62,7 @@ Card priority:
 
 Pick your roles first if you want at least the Midnight Circle card.
 
-Remember to change your nick to your in-game name first.
-
--# Bot is not hosted on a server yet and buttons may not be working all the time, check if <@1510634400986042510> is online`,
+Remember to change your nick to your in-game name first.`,
 
                 timestamp:
                     true

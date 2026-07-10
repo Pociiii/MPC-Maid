@@ -132,7 +132,7 @@ async function approveGif(
                     {
                         categoryName,
                         gifChannelId:
-                            CHANNELS.GIFS,
+                            CHANNELS.EDITING_ROOM,
                         submitter,
                         totalCount
                     }

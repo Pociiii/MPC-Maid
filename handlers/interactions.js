@@ -39,6 +39,14 @@ const {
 const {
     buyShopBooster
 } = require('../features/shop/boosterShop');
+const {
+    cancelGiftInteraction,
+    confirmGiftPurchase,
+    confirmGiftSend,
+    showGiftPurchaseConfirmation,
+    showGiftSendConfirmation,
+    showReceivedCollection
+} = require('../features/gifts/giftSystem');
 
 const {
     handleAchievementsView
@@ -174,6 +182,31 @@ async function replyInteractionError(
     await interaction.reply(
         payload
     );
+
+}
+
+function isExpiredInteractionError(
+    error
+) {
+
+    return error?.code === 10062 ||
+        error?.rawError?.code === 10062;
+
+}
+
+function isInteractionAckTimeout(
+    error
+) {
+
+    const message =
+        String(
+            error?.message ?? ''
+        );
+
+    return error?.name === 'ConnectTimeoutError' ||
+        message.includes(
+            'Connect Timeout Error'
+        );
 
 }
 
@@ -410,6 +443,23 @@ async function routeInteraction(
                 return true;
 
             }
+
+            case 'gift_buy':
+                await confirmGiftPurchase(interaction);
+                return true;
+
+            case 'gift_send_confirm':
+                await confirmGiftSend(interaction);
+                return true;
+
+            case 'gift_cancel_shop':
+            case 'gift_cancel_send':
+                await cancelGiftInteraction(interaction);
+                return true;
+
+            case 'gift_collection':
+                await showReceivedCollection(interaction, interaction.customId.split(':')[1]);
+                return true;
 
             case 'achievements_view':
                 await handleAchievementsView(
@@ -686,6 +736,14 @@ async function routeInteraction(
 
             }
 
+            case 'gift_shop':
+                await showGiftPurchaseConfirmation(interaction);
+                return true;
+
+            case 'gift_send_select':
+                await showGiftSendConfirmation(interaction);
+                return true;
+
             case 'leaderboard_select':
 
                 await interaction.deferUpdate();
@@ -814,11 +872,22 @@ module.exports = async (
             error
         );
 
-        await replyInteractionError(
-            interaction
-        ).catch(
-            () => null
-        );
+        if (
+            !isExpiredInteractionError(
+                error
+            ) &&
+            !isInteractionAckTimeout(
+                error
+            )
+        ) {
+
+            await replyInteractionError(
+                interaction
+            ).catch(
+                () => null
+            );
+
+        }
 
         void logError(
             interaction.client,

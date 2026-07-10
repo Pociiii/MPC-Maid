@@ -190,13 +190,13 @@ function buildSections() {
                     'Spend XP and coins on Performance, Stamina, and Fame.'
                 ),
                 commandDetail(
-                    '/shop',
+                    '/shop boosters',
                     privateReply,
                     'None',
                     'Buy tiered scene boosters.'
                 ),
                 commandDetail(
-                    '/inventory',
+                    '/inventory boosters',
                     privateReply,
                     'None',
                     'Check your boosters.'
@@ -270,12 +270,33 @@ function buildSections() {
                 commandSummary([
                     '/matchme',
                     '/relationship',
+                    '/gift send',
+                    '/shop gifts',
+                    '/inventory gifts',
                     '/drink',
                     '/firework',
                     '/breed',
                     '/pregnancy'
                 ]),
             commands: [
+                commandDetail(
+                    '/gift send',
+                    `Any channel, private flow. Gift notice in <#${CHANNELS.PILLOW_TALK}>.`,
+                    'None',
+                    'Send an owned gift as a permanent profile collectible.'
+                ),
+                commandDetail(
+                    '/shop gifts',
+                    privateReply,
+                    `Rotates ${dailyReset}`,
+                    'Browse your personal daily gift selection.'
+                ),
+                commandDetail(
+                    '/inventory gifts',
+                    privateReply,
+                    'None',
+                    'Check gifts you currently own and can send.'
+                ),
                 commandDetail(
                     '/matchme',
                     'Any channel, public reply',

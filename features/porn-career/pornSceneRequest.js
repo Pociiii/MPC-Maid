@@ -38,10 +38,6 @@ const {
 } = require('../../utils/mpcLogo');
 
 const {
-    getSceneCategoryLabel
-} = require('../../data/sceneSubmitGroups');
-
-const {
     logWarning
 } = require('../../utils/inboxLogger');
 
@@ -49,73 +45,14 @@ const {
     postMoment
 } = require('../../utils/moments');
 
+const {
+    displayNameFor,
+    getSceneCategoryName,
+    safeSendUserDm
+} = require('./sceneCommon');
+
 const requestExpiryMs =
     24 * 60 * 60 * 1000;
-
-function displayNameFor(
-    member,
-    user
-) {
-
-    return member?.displayName ??
-        user?.globalName ??
-        user?.username ??
-        'that user';
-
-}
-
-async function safeSendUserDm(
-    client,
-    userId,
-    content
-) {
-
-    try {
-
-        const user =
-            await client.users.fetch(
-                userId
-            );
-
-        await user.send({
-            content
-        });
-
-        return true;
-
-    }
-    catch {
-
-        return false;
-
-    }
-
-}
-
-function getSceneCategoryName(
-    sceneCategory
-) {
-
-    const group =
-        sceneCategory
-            .split(
-                '_'
-            )
-            .every(
-                (part) =>
-                    part.endsWith(
-                        'f'
-                    )
-            )
-            ? 'ff'
-            : 'mf';
-
-    return getSceneCategoryLabel(
-        group,
-        sceneCategory
-    );
-
-}
 
 function scheduleRequestExpiry(
     message,

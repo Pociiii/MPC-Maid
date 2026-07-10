@@ -559,6 +559,59 @@ function isSameWeeklyQuestPeriod(
 
 }
 
+function getDaysElapsedInWeeklyQuestPeriod(
+    questDate
+) {
+
+    const weekStartDate =
+        getWeeklyQuestDateFromQuestDate(
+            questDate
+        );
+
+    const start =
+        new Date(
+            `${weekStartDate}T00:00:00.000Z`
+        );
+
+    const current =
+        new Date(
+            `${questDate}T00:00:00.000Z`
+        );
+
+    const dayMs =
+        24 * 60 * 60 * 1000;
+
+    return Math.min(
+        WEEKLY_STREAK_TARGET,
+        Math.max(
+            1,
+            Math.floor(
+                (
+                    current.getTime() -
+                    start.getTime()
+                ) / dayMs
+            ) + 1
+        )
+    );
+
+}
+
+function clampWeeklyStreakCount(
+    streakCount,
+    questDate
+) {
+
+    return Math.min(
+        Number(
+            streakCount ?? 0
+        ),
+        getDaysElapsedInWeeklyQuestPeriod(
+            questDate
+        )
+    );
+
+}
+
 function getNextResetTimestamp(
     now = new Date()
 ) {
@@ -876,12 +929,18 @@ function formatWeeklyStreakProgress(
 
     if (
         currentWeekStreak.lastCompletedDate === questDate &&
-        currentWeekStreak.streakCount === 0 &&
+        clampWeeklyStreakCount(
+            currentWeekStreak.streakCount,
+            questDate
+        ) === 0 &&
         currentWeekStreak.weeklyRewardsClaimed > 0
     )
         return `${WEEKLY_STREAK_TARGET}/${WEEKLY_STREAK_TARGET} - reward claimed today`;
 
-    return `${currentWeekStreak.streakCount}/${WEEKLY_STREAK_TARGET}`;
+    return `${clampWeeklyStreakCount(
+        currentWeekStreak.streakCount,
+        questDate
+    )}/${WEEKLY_STREAK_TARGET}`;
 
 }
 
@@ -1010,6 +1069,12 @@ async function updateWeeklyStreak(
                     0
             };
 
+    const currentStreakCount =
+        clampWeeklyStreakCount(
+            streak.streakCount,
+            questDate
+        );
+
     if (
         streak.lastCompletedDate === questDate
     )
@@ -1019,7 +1084,7 @@ async function updateWeeklyStreak(
             booster:
                 null,
             streakCount:
-                streak.streakCount
+                currentStreakCount
         };
 
     const expectedNextDate =
@@ -1032,8 +1097,14 @@ async function updateWeeklyStreak(
 
     let nextStreakCount =
         expectedNextDate === questDate
-            ? streak.streakCount + 1
+            ? currentStreakCount + 1
             : 1;
+
+    nextStreakCount =
+        clampWeeklyStreakCount(
+            nextStreakCount,
+            questDate
+        );
 
     let awarded =
         false;

@@ -967,6 +967,8 @@ function summarizeArrayContent(
 
 function checkContent() {
 
+    checkGiftCatalogue();
+
     const gifSummary =
         summarizeArrayContent(
             path.join(
@@ -1074,6 +1076,24 @@ function checkContent() {
     checkDailyWyrQuestions();
     checkSceneTitles();
 
+}
+
+function checkGiftCatalogue() {
+    const gifts = require('../data/gifts/gifts');
+    const categories = ['common', 'uncommon', 'premium', 'luxury'];
+    const required = { common: 2, uncommon: 2, premium: 1, luxury: 1 };
+    const keys = new Set();
+    for (const [index, gift] of gifts.entries()) {
+        const label = `data/gifts/gifts.js[${index}]`;
+        if (!gift.key || keys.has(gift.key)) addFailure(`${label} has a missing or duplicate gift key.`);
+        keys.add(gift.key);
+        if (!gift.name) addFailure(`${label} has no name.`);
+        if (!gift.emoji) addFailure(`${label} has no emoji.`);
+        if (!categories.includes(gift.category)) addFailure(`${label} has invalid category ${gift.category}.`);
+        if (!Number.isInteger(gift.price) || gift.price < 0) addFailure(`${label} price must be a non-negative integer.`);
+    }
+    for (const category of categories) if (gifts.filter((gift) => gift.category === category).length < required[category]) addFailure(`Gift category ${category} needs at least ${required[category]} configured gifts.`);
+    addNote(`Gift catalogue: ${gifts.length} gifts across ${categories.length} categories.`);
 }
 
 function checkSceneTitles() {
@@ -1410,6 +1430,11 @@ function checkDatabase() {
         'spank_dilli_state',
         'user_activity_period_stats',
         'user_activity_moment_posts'
+        ,'user_gift_inventory'
+        ,'user_received_gifts'
+        ,'gift_transactions'
+        ,'gift_purchases'
+        ,'user_daily_gift_shop'
     ];
 
     const schemaFiles = [
@@ -1422,6 +1447,7 @@ function checkDatabase() {
         'pregnancy.sql',
         'relationships.sql',
         'spank_dilli.sql'
+        ,'gifts.sql'
     ];
 
     const schemaSql =

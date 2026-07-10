@@ -147,7 +147,7 @@ async function buildShopReply(
                         ? COLORS.ERROR
                         : COLORS.DEFAULT,
                 command:
-                    '/shop',
+                    '/shop boosters',
                 title:
                     'Booster Shop',
                 description:

@@ -122,6 +122,8 @@ module.exports = async (
 
     }
 
+    await interaction.deferUpdate();
+
     const spankGif =
         getRandomGif(
             'spank',
@@ -177,8 +179,6 @@ module.exports = async (
                                 )
                     )
             );
-
-    await interaction.deferUpdate();
 
     await interaction.message.edit({
         components: [

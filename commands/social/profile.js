@@ -51,6 +51,7 @@ const {
 
 const emojis =
     require('../../utils/emojis');
+const { getGiftCollectionPreview, getReceivedGiftCollection } = require('../../utils/gifts');
 
 const COMMAND_CONFIG = {
     ephemeral:
@@ -94,7 +95,9 @@ function buildProfileEmbed(
     member,
     user,
     achievementPoints,
-    profileLikes
+    profileLikes,
+    giftPreview,
+    giftTotal
 ) {
 
     const rankTitle =
@@ -199,6 +202,13 @@ function buildProfileEmbed(
                 `- Total Likes: **${profileLikes}**`,
             inline:
                 true
+        },
+        {
+            name: '🎁 Gifts',
+            value: giftPreview.length
+                ? `${giftPreview.map((gift) => `- ${gift.emoji} ×${gift.quantity}`).join('\n')}\n- **${giftTotal} gifts received**`
+                : '- No gifts received yet',
+            inline: true
         }
     );
 
@@ -251,10 +261,16 @@ function buildProfileComponents(
                 alreadyLiked
             );
 
+    const giftsButton = new ButtonBuilder()
+        .setCustomId(`gift_collection:${targetId}`)
+        .setLabel('View Gift Collection')
+        .setStyle(ButtonStyle.Secondary);
+
     return [
         new ActionRowBuilder()
             .addComponents(
-                button
+                button,
+                giftsButton
             )
     ];
 
@@ -500,7 +516,9 @@ module.exports = {
 
         const [
             profileLikes,
-            alreadyLiked
+            alreadyLiked,
+            giftPreview,
+            receivedGifts
         ] =
             await Promise.all([
                 getProfileLikeCount(
@@ -509,7 +527,9 @@ module.exports = {
                 hasProfileLike(
                     target.id,
                     interaction.user.id
-                )
+                ),
+                getGiftCollectionPreview(target.id),
+                getReceivedGiftCollection(target.id)
             ]);
 
         await interaction.editReply({
@@ -519,7 +539,9 @@ module.exports = {
                     member,
                     user,
                     achievementPoints,
-                    profileLikes
+                    profileLikes,
+                    giftPreview,
+                    receivedGifts.reduce((sum, gift) => sum + gift.quantity, 0)
                 )
             ],
             components:
