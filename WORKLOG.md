@@ -2,67 +2,62 @@
 
 ## Current State
 
-- The bot is in a 1.0 preparation pass: core systems are implemented enough to
-  test together, and the next work should favor live testing, balance, and
-  polish over new large systems.
-- `npm run preflight` is the readiness gate before hosting. It checks command
-  syntax, JSON data, GIF pools, scene title data, Daily WYR prompts, and the
-  SQLite schema.
-- New SQL tables are now part of the current build for systems that need
-  restart-safe state. Do not delete `database.db`; run the bot or preflight so
-  migrations can create missing tables.
+MPC Maid is in a 1.0 stabilization pass. Core social, Porn Career, casino,
+daily, profile, relationship, pregnancy, submission, and gift systems are
+implemented. New work should prioritize live testing, balance, recovery, and
+polish over additional large systems.
 
-## Recently Completed
+`npm run preflight` is the release gate. It validates Node compatibility,
+command syntax and uniqueness, configured IDs, JSON content, GIF pools, scene
+titles, Daily WYR questions, the gift catalogue, and SQLite schema readiness.
 
-- Added a preflight script and `npm run preflight`.
-- Cleaned dependency resolution so packages load from the project folder.
-- Added Daily Would You Rather:
-  - posts daily in General at reset time
-  - anonymous voting
-  - one reward per voter
-  - discussion thread
-  - SQL-backed sessions/votes
-  - 40 starter questions
-- Added GIF Submit scene title suggestions:
-  - users can suggest scene titles
-  - staff can approve or reject them
-  - title pools are validated by preflight
-- Updated pornscene extra-part selection:
-  - foreplay max 2
-  - oral max 2
-  - sex max 3
-  - finale max 1
-  - extras are still placed in the correct scene order
-- Improved `/profile`:
-  - split interaction stats into separate readable fields
-  - added profile likes
-  - first likes post a Moments embed
-  - duplicate likes and self-likes are blocked
-  - profile likes use SQL so counts survive restarts
-- Added `/holdem`:
-  - user vs dealer Texas Hold'em
-  - private Peek for hole cards
-  - public board progression
-  - pay per street
-  - real 5-card poker hand evaluation from 7 cards
-- Updated `/commands`:
-  - overview uses separate fields per category
-  - role-based GIF rules are their own field
-  - `/holdem` appears under Casino
-- Kept command guide, changelog, deployment notes, and TODO aligned with the
-  current build.
+The database is upgraded additively. Do not delete `database.db`; back it up,
+then run the bot or preflight to create missing tables.
+
+## Latest: Permanent Gift System
+
+- Changed the existing commands to `/shop boosters`, `/shop gifts`,
+  `/inventory boosters`, and `/inventory gifts`.
+- Added `/gift send user:@member` with private selection and confirmation.
+- Added a configurable 16-gift catalogue using standard Discord emoji.
+- Added persisted personal daily shops with two Common, two Uncommon, one
+  Premium, and one Luxury gift, tied to the daily-quest reset.
+- Added atomic gift purchasing and sending, duplicate-button protection, and
+  expiring confirmations.
+- Added sendable inventory, permanent received collections, transaction
+  history, and FIFO purchase-price history for collection valuation.
+- Added Pillow Talk RP notifications without prices, balances, rewards, or
+  public pings.
+- Added a four-type gift preview to `/profile` and a private full collection
+  viewer.
+- Added gift catalogue and database checks to preflight.
+- Full preflight passed with 25 database tables.
+
+## Earlier 1.0 Work
+
+- Added Daily Would You Rather with anonymous SQL-backed voting, one-time
+  rewards, discussion threads, automatic closing, and archival.
+- Added GIF Submit scene-title suggestions with staff approval/rejection and
+  preflight validation.
+- Added profile likes with duplicate/self-like protection and persistent
+  counts.
+- Added user-versus-dealer Texas Hold'em with private hole cards, public board
+  progression, per-street betting, and real hand evaluation.
+- Enforced Porn Career phase caps while preserving scene order: foreplay 2,
+  oral 2, sex 3, finale 1.
+- Expanded achievement progress for casino play, training, shop purchases, and
+  balanced career-stat milestones.
+- Improved `/commands`, profiles, leaderboards, shared embed styling, and
+  channel routing.
+- Routed daily/weekly progression notices to Maid Feed while keeping RP/story
+  events in their intended channels.
 
 ## Next
 
-- Live test the 1.0 feature set in a small group before server hosting.
-- Watch coin economy pressure from Daily WYR, quests, training, shop, and
-  casino games.
-- Test `/holdem` pacing and payouts; decide later whether it deserves SQL or
-  multiplayer tables.
-- Test Daily WYR timing, thread creation, close handling, and vote rewards.
-- Test profile likes in the live Moments channel.
-- Keep adding scene titles and GIFs where preflight warns about parked empty
-  threesome folders.
-- Continue the embed consistency pass only when touching related commands.
-- Defer new large systems, especially Reputation and `/privatescene`, until the
-  current build has real usage data.
+- Complete the live-test checklists in `TODO.md`.
+- Monitor the economy after gifts become an active coin sink.
+- Verify command registration and gift interactions in the live Discord
+  environment.
+- Keep the three documentation files aligned whenever behavior changes:
+  unfinished work in `TODO.md`, completed changes here, and current rules in
+  `DESIGN_CONTEXT.md`.

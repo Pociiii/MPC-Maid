@@ -1,907 +1,262 @@
 # MPC Maid Design Context
 
-Use this file as the quick context handoff when discussing bot design in
-ChatGPT or another planning thread. Keep it updated when major systems,
-balance rules, channels, or design principles change.
-
-Current bot version: `1.0.0`
-
-## Server Context
-
-- MPC is a 3DXChat adult production server.
-- The server also hosts private events.
-- The bot is for user agency, RP flavor, game loops, GIF interaction, and
-  production-server identity.
-- Moderation is handled by MEE6, so MPC Maid does not need moderation systems.
-- Staff/host/organizer tools should focus on events, cast flow, announcements,
-  and production support.
-- Admin/staff commands must not be listed in the public `/commands` guide.
-- Admin/staff commands must not be included in the public changelog.
-
-## Design Meaning
-
-The bot should make users feel involved and part of the group, not just served
-by commands. The main goal is to make the server feel alive around them.
-
-Prefer improving existing systems before adding new ones:
-
-- Make user actions visible in the right public spaces when it creates social
-  energy: Moments for story moments, Maid Feed for progress moments.
-- Make posts feel like something happened in the shared room, not like a plain
-  bot log.
-- Give users recognition through names, avatars, titles, ranks, milestones,
-  scene links, and clean outcome fields.
-- User display names should prefer the server nickname first. Only fall back to
-  the global Discord display name or username when the guild member cannot be
-  resolved.
-- Turn solo actions into social hooks where possible: buttons, helpers,
-  partner choices, shared scenes, public results, and lightweight story hooks.
-- Keep useful data visible so users understand why stats, quests, training,
-  relationships, and choices matter.
-- Use timestamps for waiting, cooldowns, resets, pregnancy checks, and future
-  events so users can plan instead of guessing.
-- Avoid feature clutter. If the same feeling can be created by better embeds,
-  better routing, better flavor text, or better feedback, do that first.
-- Repeated public posts should use flavor text arrays with enough variety so
-  the bot feels alive without becoming wordy.
-- Every major loop should answer: "Why should users care, talk about it, or
-  come back tomorrow?"
-
-## Design Style
-
-- Discord users do not read walls of text, so embeds should stay short.
-- Use fields, emoji, buttons, and dropdown menus for visual feedback.
-- For gender/skin category labels in buttons and menus, prefer compact symbols:
-  `⚪♂️`, `⚪♀️`, `⚫♂️`, `⚫♀️`.
-- In embeds, emoji belong in field titles, buttons, menus, and rare top-level
-  titles where they help scanning. Field values and embed descriptions should
-  stay clean text with no decorative emoji. Exceptions are only when the emoji
-  is the actual content, such as slot reels, cards, or cast symbols in menus.
-- Embed field titles should always carry a useful emoji or bot emoji unless the
-  title itself is already a compact symbol label, such as cast category labels.
-- When a field value contains a list, every list item should start with `- `.
-  Avoid bare stacked lines for lists.
-- If buttons get cramped, use a dropdown menu.
-- `/commands` should stay as a compact public directory. The overview should
-  use separate fields for role rules and each command category. Exact command
-  details belong in private dropdown replies, with separate info buttons for
-  big systems.
-- Use user avatars as thumbnails for user-centered embeds.
-- Use the MPC logo URL as the small author icon on embeds. The right-side
-  thumbnail should show the command runner or the user the embed is centered on.
-- Use consistent command footers with the bot version where applicable.
-- Keep Moments sexy/story-focused.
-- Keep Maid Feed for progress/system notices.
-- Maid Feed posts should be embed-first: user/avatar when user-centered, one
-  short flavor line, clean useful fields, and no duplicate plain-text content
-  unless the post intentionally pings the user.
-- Moments should be flavor plus useful fields, not flavor-only. Keep key data
-  such as outcome, ranking, XP, Reputation, viewers, parts, and critical state
-  where it helps users understand the event.
-- Avoid making the bot feel like a generic economy bot. Systems should feel
-  like they belong to Midnight Pleasure / After Dinner Productions.
-
-## Key Channels
-
-- Commands: `1495316822646325268`
-- General: `1440755913572090038`
-- Updates: `1518153153860730981`
-- Moments: `1504424543865929888`
-- Maid Feed: `1518308768335528187`
-- Porn Career: `1493483825869754440`
-- Custom Scene: `1517485570656571462`
-- Showcase: `1495980074586083368`
-- Titty Drop: `1518478547067342999`
-- Casino: `1503674706505764915`
-- Spank Dilli: `1506733030629183498`
-- GIF Submission: `1511804100604334330`
-- Inbox Forum: `1515930617068392448`
-- Log Post: `1516017240472813598`
-- Role Request Post: `1515932488223031357`
-- Feedback Post: `1518005640205701362`
-- Game Chat: `1499291222228078715`
-
-## Core Roles
-
-These are used for GIF category logic:
-
-- Male: `1492022010841141370`
-- Female: `1492022133256224768`
-- White/Light skin: `1495332763698724915`
-- Black/Dark skin: `1495332837849698316`
-
-Card/status roles exist, but they should not affect scene GIF selection.
-For scene systems, use only gender and skin tone unless explicitly designing a
-different feature.
-
-## Current Public Command Groups
-
-General:
-
-- `/profile` shows a user profile, wallet, stats, career data, split
-  interaction counters, profile likes, and can compare career stats with
-  another user.
-- `/daily` shows personal daily quests.
-- `/leaderboard` shows ladders through a dropdown menu.
-- `/achievements` shows private achievement progress.
-
-Porn Career:
-
-- `/pornscene` requests a shared career scene with another user.
-- `/customscene` builds a solo custom scene.
-- `/train` spends XP and coins to raise Performance, Stamina, and Fame.
-- `/shop` buys boosters.
-- `/inventory` shows owned boosters.
-
-Showcase:
-
-- `/drop` posts in the titty drop channel.
-- `/wiggle` posts a wiggle GIF with gendered spank buttons.
-- `/flex` posts a flex GIF with a female-only Kiss button and a male-only
-  Brofist button.
-- `/horny` posts a solo horny GIF with a Help button.
-
-Social / RP:
-
-- `/matchme` publicly matches the user with an opposite-gender member.
-- `/relationship` manages consent-based RP relationship links.
-- `/drink` costs coins, posts publicly, and grants a tiny XP toast to visible
-  online members. It uses the `GuildPresences` intent and its own GIF pool.
-- `/firework` costs more coins, posts publicly, grants no rewards, and is a
-  pure flex sink with its own GIF pool.
-- `/breed` sends a pregnancy RP consent request.
-- `/pregnancy` privately shows the user their own pregnancy/fertility state.
-
-Casino:
-
-- `/dice`
-- `/slots`
-- `/blackjack`
-- `/holdem`
-- Spank Dilli is a fixed casino-style button panel in its own channel.
-
-## Porn Career System
-
-The porn career is the main progression minigame.
-
-Scene request flow:
-
-- User runs `/pornscene partner:@user`.
-- Bot checks roles and category compatibility.
-- Requester chooses no booster or one owned booster.
-- Booster is consumed when the request is sent.
-- Partner receives a DM request.
-- Busy status starts only after the partner accepts.
-- Accepted scenes post parts in the Porn Career channel.
-- Start and final notices post in Moments.
-- Scene parts show live viewer counts to make the posts feel like an ongoing
-  recording.
-- Live scene part embeds should stay immersive: flavor in the description, only
-  Cast and Viewers fields, and Cast should show only the two users with no
-  gender/color/category labels.
-- Do not show scene part or progress fields on live scene part embeds.
-- Final result includes outcome, revenue, XP, ranking, and links to parts.
-
-Scene pacing:
-
-- Scene lasts up to about 1 hour.
-- Parts post every 8-12 minutes, adjusted by total part count.
-- Minimum parts: 4.
-- Maximum parts: 8.
-- Extra parts respect phase caps before being ordered into the scene:
-  - foreplay max 2
-  - oral max 2
-  - sex max 3
-  - finale max 1
-
-Scene stats:
-
-- Performance improves scene score and critical scene chance.
-- Stamina increases total scene parts, score, and gives a small XP bonus for
-  extra parts.
-- Fame increases viewers, revenue, and score.
-- Partner stats are combined.
-- Every stat adds a score bonus every 20 combined points.
-- Performance adds critical chance every 20 combined points, capped at 15%.
-- Stamina adds scene parts every 20 combined points, capped at 8 parts.
-- Each stamina-created extra part gives +2 XP each.
-- Fame gives bigger viewer/revenue value every 20 combined points.
-- Ranking can go negative.
-
-Outcomes:
-
-- Awkward Scene
-- Solid Scene
-- Hot Scene
-- Viral Hit
-
-XP by outcome:
-
-- Awkward: 10 XP
-- Solid: 20 XP
-- Hot: 35 XP
-- Viral: 55 XP
-- Critical scenes add +10 XP.
-- Stamina adds +2 XP per extra scene part above 4.
-- The user who starts `/pornscene` gets +5 XP when the accepted scene
-  completes.
-
-Colors:
-
-- `/pornscene` public embeds now use one deterministic color for the same pair.
-- Color is based on the two user IDs sorted together.
-- Rank should stay in text/title areas, not control the embed color.
-
-## Reputation And Moments Planned
-
-Reputation is planned as a social participation layer, not a solo command spam
-reward.
-
-Core rule:
-
-- Porn Career remains the main gameplay/progression system.
-- Relationships remain pure RP flavor.
-- Pregnancy remains pure RP flavor.
-- Relationships and pregnancy must never give coins, XP, Reputation, rank,
-  achievements, or gameplay advantages.
-- Moments is the RP story/newspaper layer.
-- Maid Feed is the progression/system notice layer.
-
-Reputation is separate from:
-
-- Porn career rank
-- XP
-- Coins
-- Fame
-- Achievement points
-
-Initial Reputation reward targets:
-
-- Porn Career outcomes:
-  - Awkward: +4
-  - Solid: +8
-  - Hot: +14
-  - Viral: +25
-  - Critical bonus: +10
-- Daily quests:
-  - completed quest: +3
-  - full daily set: +10
-  - weekly streak: +25
-- Achievements:
-  - normal: +15
-  - major: +30
-  - endless: +5 with anti-spam protection
-- Casino:
-  - no normal win/loss Reputation
-  - notable jackpot/special win: +10
-- Daily WYR later:
-  - first vote of the day: +2
-
-Showcase interaction Reputation:
-
-- Do not award Reputation just for running `/drop`, `/wiggle`, `/flex`, or
-  `/horny`.
-- Award Reputation to the user who clicks a valid public interaction button.
-- Valid button clicks give +2 Reputation to the clicker.
-- The clicker cannot earn Reputation from their own post.
-- Existing gender/role validation must pass first.
-- Daily rewarded click caps by source:
-  - Spank: 5/day
-  - Kiss: 5/day
-  - Brofist: 5/day
-  - Horny Help: 5/day
-- The button can still be used after the cap, but no more Reputation is awarded.
-
-Badge display:
-
-- Reputation badges should support external image URLs.
-- Badge config should include `key`, `name`, `minReputation`, `imageUrl`, and
-  `color`.
-- Initial badge tiers:
-  - Unknown: 0
-  - Fresh Face: 250
-  - Local Favorite: 750
-  - Rising Name: 1500
-  - Midnight Regular: 3000
-  - Group Icon: 5000
-  - MPC Star: 8000
-  - Living Legend: 12000
-- Profile embeds should keep the user avatar as thumbnail.
-- The current Reputation badge image should use the profile embed's main image
-  slot when an `imageUrl` exists.
-- If no `imageUrl` exists, show only the badge name as text.
-- Badge upgrade announcements go to Maid Feed, not Moments.
-
-Moments:
-
-- Moments should feel alive with short RP flavor text, but keep useful fields.
-- Avoid generic venue wording in flavor text. Prefer warmer community language
-  such as room, group, crowd, studio, shared space, or Moments board.
-- Use title + flavor description + data fields.
-- Add a shared Moment helper before refactoring current Moments posts.
-- The helper should support randomized flavor, stable data fields, optional
-  mentions, optional anonymity, embed color, and optional image support.
-- Scene final Moments should keep fields such as Outcome, Ranking, Revenue, XP,
-  Reputation, Viewers, Parts, and Critical.
-- Porn scene start/final Moments should use the same shape as scene embeds:
-  flavor in the description, Cast in a field, and setup/outcome data in fields.
-- Relationship Moments stay mostly flavor because relationships have no rewards,
-  but can keep fields such as Bond and Since.
-- Pregnancy Moments must remain RP-safe:
-  - pregnancy moments: no names, stats, or chance values
-  - reveal: Stage and Day
-  - birth: Stage, Gender, and Journey
-- Career milestones and big casino stories can include Reputation fields when
-  applicable.
-
-Routing:
-
-- Maid Feed is for progression notices, quest completions, daily/weekly
-  activity milestones, badge upgrades, and achievement unlocks.
-- Moments is for story events: scene starts/finals, relationship beats,
-  pregnancy beats, big casino stories, and career milestones.
-
-Activity Moments:
-
-- Scene, help, spank, kiss, and brofist activity is tracked daily, weekly, and
-  across career totals.
-- Weekly Activity Moment counters start on Monday at the same boundary as daily
-  quests: 12:00 UTC, which is 14:00 in Rome during summer time and 13:00 during
-  winter time.
-- Daily/weekly counters live in `user_activity_period_stats`; posted milestones
-  are guarded by `user_activity_moment_posts` so restarts do not duplicate
-  updates.
-- Scene/help thresholds should reach farther than early use: daily
-  `3/5/10/20/40`, weekly `10/25/50/100/200`.
-- Fast button actions use wider thresholds: daily `5/10/20/40/80`, weekly
-  `25/50/100/200/400`.
-- Daily and weekly activity milestones post to Maid Feed as progress updates.
-- Lifetime scene/help Moments post every 10 career actions. Faster social
-  buttons post every 25 career actions and stay in Moments as bigger
-  career/social milestones.
-- A single completed action should post at most one milestone update for the
-  acting user. Priority is lifetime, then weekly, then daily.
-- Activity Moment embeds should follow normal user-centered styling: actor name
-  as author, user avatar as thumbnail, short flavor description, and emoji-led
-  field names.
-
-## Boosters
-
-Boosters are one-use items for `/pornscene`.
-
-Rules:
-
-- One booster per scene max.
-- Booster is selected before the DM request is sent.
-- Booster is consumed immediately when the request is sent.
-- Booster is not refunded if the partner declines.
-- Booster applies only to the requester side of the combined scene stat.
-- Boosters are best used to push a combined stat over a 20-point threshold.
-- Stronger boosters add more burnout/flop risk.
-
-Current tiers:
-
-- T1: +2 stat, 120 coins, +1% burnout
-- T2: +4 stat, 350 coins, +3% burnout
-- T3: +6 stat, 800 coins, +6% burnout
-- T4: +8 stat, 1400 coins, +10% burnout
-
-Shop:
-
-- `/shop` sells all 4 tiers for Performance, Stamina, and Fame.
-- `/shop` uses a dropdown menu because 12 buttons would be too cramped.
-- `/inventory` shows owned boosters.
-
-## Training
-
-Stats:
-
-- Performance
-- Stamina
-- Fame
-
-Training costs:
-
-- Training costs XP and coins.
-- Costs rise with stat level.
-- Costs rise much harder after stat 40.
-- Stats keep counting after 40.
-- Current soft-cap design: reaching 40 in all 3 stats should take months for
-  active users, not years.
-- Current cost target from stat 1:
-  - One stat to 40: about 20,885 XP and 18,600 coins.
-  - All 3 stats to 40: about 62,655 XP and 55,800 coins.
-  - One stat to 80: about 342,395 XP and 220,700 coins.
-  - All 3 stats to 80: about 1,027,185 XP and 662,100 coins.
-- This encourages cooperation because combined stats matter more than one user
-  solo-carrying every scene.
+This is the authoritative summary of behavior implemented in the current code.
+Future plans belong in `TODO.md`.
+
+## Product Context
+
+MPC Maid serves Midnight Pleasure Club, a 3DXChat adult production and private
+events community. Its tone is playful and RP-friendly, while commands should
+remain concise and easy to use on mobile.
+
+- Production and event workflows belong in this bot.
+- General moderation is handled by MEE6.
+- Staff-only commands and workflows must not appear in the public `/commands`
+  guide or public changelog.
+- Social flavor must not accidentally create progression rewards.
+
+## Shared Conventions
+
+- User-facing errors and sensitive flows use private replies.
+- User-centered embeds use server nicknames before global display names and
+  normally show the user's avatar as thumbnail.
+- Shared embed, color, MPC logo, footer, version, database, and error helpers
+  should be reused.
+- Dropdowns are preferred when several equivalent buttons would be cramped.
+- Interaction handlers revalidate state at confirmation time.
+- SQL-backed state must survive restarts and use safe conditional updates or
+  transactions for spend/consume operations.
+- Do not delete `database.db` for schema updates. Startup and preflight execute
+  additive `CREATE TABLE IF NOT EXISTS` schemas and migrations.
+
+## Channel Responsibilities
+
+- General: community chat and Daily WYR.
+- Porn Career: live Porn Career scene parts.
+- Custom Scene: custom scene output.
+- Showcase: wiggle, flex, horny, and related public interactions.
+- Casino: normal casino play.
+- Maid Feed: progression and system notices, including quest/activity updates,
+  achievement unlocks, and Spank Dilli winners.
+- Moments: major story/RP moments where currently configured.
+- Pillow Talk: relationship-oriented RP and successful gift notifications.
+- Commands: command discovery and guidance.
+
+Channel IDs are defined centrally in `data/constants.js`; command code must not
+hardcode them.
+
+## Public Commands
+
+Current public command families include:
+
+- General: `/profile`, `/daily`, `/leaderboard`, `/achievements`, `/commands`.
+- Porn Career: `/pornscene`, `/customscene`, `/train`, `/shop boosters`,
+  `/inventory boosters`.
+- Gifts: `/shop gifts`, `/inventory gifts`, `/gift send`.
+- Social/RP: `/relationship`, `/breed`, `/pregnancy`, `/matchme`, `/drink`,
+  `/firework`.
+- Showcase and interactions: `/drop`, `/wiggle`, `/flex`, `/horny` and their
+  interaction buttons.
+- Casino: `/dice`, `/slots`, `/blackjack`, `/holdem`, `/spankdilli`.
+- Member contribution: GIF submission commands exposed by the current command
+  guide.
+
+The command definitions in `commands/` and the generated `/commands` guide are
+the final source for exact options and channel descriptions.
+
+## Economy and Progression
+
+- Users have coins, XP, Porn Career stats, ranking, scene counts, and social
+  interaction counters.
+- Training spends both XP and coins; costs rise with stat level and increase
+  sharply after stat 40.
+- Performance, Stamina, and Fame combine between scene partners.
+- Achievements track configured milestones and contribute achievement points.
+- Leaderboards include ranking, scenes, coins, social interactions, and
+  achievement points as defined in the current leaderboard configuration.
+- Gifts and relationships are RP/social systems only. They never award XP,
+  ranking, Reputation, career stats, quests, achievements, or gameplay bonuses.
+
+## Daily Reset
+
+Daily quests reset at 12:00 UTC. Weekly activity periods begin Monday at the
+same boundary. Gift shops use the same daily date and next-reset helpers, so
+their persisted rotation changes at exactly the same boundary.
 
 ## Daily Quests
 
-Daily quests are personal and reset daily.
-
-Current design:
-
-- Users get 3 daily quests.
-- `/daily` shows personal progress privately.
-- `/daily` shows weekly streak progress.
-- Quest completion posts to Maid Feed.
-- User mention is only used when all 3 quests are completed.
+- Each user receives three personal daily quests.
+- `/daily` is private and includes quest and weekly-streak progress.
 - Assigned quests must be possible for all supported genders.
-- Removed from quest pool: custom scene, matchme, train stat.
-- No GIF submit quests.
-- Blackjack is included in daily quests.
-
-Examples:
-
-- Be part of 1/2/3 porn scenes.
-- Help someone horny 1/2/3 times.
-- Use showcase commands 1/2/3 times.
-- Give or receive interactions.
-- Play dice/slots/blackjack.
-
-Rewards:
-
-- Easy: 40 coins + 20 XP.
-- Medium: 75 coins + 35 XP.
-- Hard: 120 coins + 60 XP.
-- Full daily set bonus: 100 coins + 50 XP.
-- Each completed quest has a 5% chance to drop 1 random T1 booster.
-- Weekly streak reward: complete all 3 daily quests for 7 consecutive quest
-  days to receive 1 random T2/T3 booster.
+- Individual completion and full-set rewards use configured coin/XP values.
+- Each completed quest has a small chance to award a T1 booster.
+- Seven consecutive completed quest days award a random T2/T3 booster.
+- Progress and completion notices route to Maid Feed.
 
 ## Daily Would You Rather
 
-Daily WYR is implemented as a lightweight community discussion feature,
-completely separate from Porn Career.
-
-Goal:
-
-- Encourage daily General chat activity.
-- Give users a simple vote-and-discuss social ritual.
-- Give a small reward for voting.
-- Avoid controversy; the point is conversation, not drama.
-
-Schedule:
-
-- Runs once per day at daily quest reset time: 12:00 UTC.
-- Posts in General: `1440755913572090038`.
-- Only one Daily WYR should be active at a time.
-
-Question source:
-
-- Store questions in `data/wyr/questions.json`.
-- Question shape:
-  - `id`
-  - `optionA`
-  - `optionB`
-- Avoid repeating recent questions.
-- Target recent-history buffer: last 100 questions.
-- No categories in the first version.
-- Mix funny, flirty, lifestyle, relationships, fashion, gaming, 3DXChat,
-  party, food, travel, and random prompts.
-
-Post flow:
-
-- Bot posts an embed titled `Daily Would You Rather`.
-- Embed shows Option A and Option B.
-- Embed tells users to vote, then join the thread and explain why.
-- Bot creates a thread attached to the message.
-- Suggested thread name: `Daily WYR - June 25`.
-- Voting lasts 24 hours.
-- No Open Thread button; Discord already exposes the thread.
-
-Voting:
-
-- Two buttons only: Option A and Option B.
-- One vote per user.
-- Users can change vote until close.
-- Votes are anonymous.
-- Reward is granted only once, on first vote.
-- Users who only comment get no reward.
-
-Reward:
-
-- First version reward: 30 coins + 15 XP.
-- Reward should be configurable.
-- Reward is intentionally smaller than daily quests.
-
-Closing:
-
-- After 24 hours, disable both buttons.
-- Edit the embed to show:
-  - Voting closed.
-  - Option A percentage.
-  - Option B percentage.
-  - Total votes.
-  - Thread replies.
-- Archive the thread.
-
-Implementation note:
-
-- Daily WYR uses SQL because active vote state, reward claims, and question
-  history need to survive restarts.
-
-## Achievements
-
-Current:
-
-- Achievements unlock automatically.
-- Unlock posts go to Maid Feed.
-- Achievement points exist.
-- Achievement leaderboard exists.
-- `/achievements` shows progress privately.
-
-Achievement categories include:
-
-- Porn scenes completed.
-- Stats trained by 10-point thresholds.
-- Balanced trained stats when Performance, Stamina, and Fame all reach the same
-  10-point threshold.
-- Combined scene stat thresholds.
-- Combined scene 2-stat thresholds.
-- Combined scene all-3-stat thresholds.
-- Showcase command usage.
-- Button interactions.
-- GIF submissions.
-
-Endless achievements are allowed for long-term actions, but reward spam should
-be watched.
-
-## Leaderboards
-
-`/leaderboard` uses a dropdown menu.
-
-Current ladders include:
-
-- Ranking
-- Total scenes
-- Coins
-- Spanks
-- Kisses
-- Horny Help
-- Achievement points
-
-Design notes:
-
-- Ranking can be mixed regardless of gender.
-- Help leaderboard should split male/female where useful.
-- Kisses and spanks need gender logic because interaction direction is not
-  symmetrical.
-
-## Profiles
-
-`/profile` should stay readable and social without turning into a giant stats
-wall.
-
-Current:
-
-- Wallet, stats, and career are grouped separately.
-- Interaction counters are split into separate fields for spanks, kisses, helps,
-  and brofists.
-- Profile likes are stored in `profile_likes`.
-- A user can like another user's profile once.
-- Self-likes and duplicate likes are blocked.
-- First-time profile likes post a small Moment with the liker, profile owner,
-  and total likes.
-
-Future:
-
-- Add Reputation to profile only when the Reputation system is actually live.
-- Watch profile field count as new social data is added.
-
-## Relationship System
-
-Relationships are RP flavor only. They do not give coins, XP, quests, ranking,
-or achievements.
-
-Current rules:
-
-- Relationship creation uses consent requests with Accept and Decline buttons.
-- Removal commands remove only the exact selected link.
-- No removal cascades into other relationship types.
-- Family-style links:
-  - Mother
-  - Father
-  - Children
-  - Siblings
-- Two users can only have one family-style link displayed between them. A pair
-  cannot be parent/child and siblings at the same time.
-- Romantic links remain separate and can still exist between the same users.
-- A user can have max 1 Mother and max 1 Father.
-- Children and siblings are unlimited.
-- Sibling links are stored directly, not calculated dynamically.
-- When adoption is accepted, existing children of that parent become direct
-  siblings with the new child.
-- Romantic links:
-  - Marriage, shown as Husband or Wife based on the other user's gender role.
-  - Dating, shown as Boyfriend or Girlfriend based on the other user's gender role.
-- A user can have max 1 spouse total.
-- Dating partners are unlimited.
-- Being married does not block dating other users. This is intentional for
-  swinger/open-RP use.
-- Romantic links store a start date. Family and Bestie links do not.
-- Social links:
-  - Besties
-  - Max 3 Besties per user.
-- Gender validation uses the existing Male/Female roles and requires exactly
-  one clear gender role where the command needs gender.
-- `/relationship view` is private and uses the user's avatar as thumbnail.
-- Accepted relationship requests post a compact embed in Moments so public RP
-  links feel visible without adding rewards or progression pressure.
-- Broken relationship links also post a compact Moments embed, but only after
-  the removal actually succeeds.
-
-## Pregnancy System
-
-Pregnancy is standalone RP, separate from porn career.
-
-Core rules:
-
-- Full pregnancy lasts 30 days.
-- Gender reveal happens after 7 days.
-- Birth happens automatically at Day 30.
-- Pregnancy check happens once per carrier per day.
-- Failed pregnancy rolls are silent.
-- `/pregnancy` is self-only to avoid users shopping for high fertility partners.
-- `/breed` sends a consent request.
-- Any Female can be carrier.
-- Male or Female can be impregnating partner to support futa RP.
-- Female + Female is valid.
-- Male + Male is not part of the first version.
-
-Daily partner list:
-
-- Accepted partners are added to the carrier's daily partner list.
-- The same partner can appear only once per carrier per day.
-- There is no cap on total partners.
-- For the daily check, use the highest partner fertility value in the list.
-- If pregnancy succeeds and multiple partners tie for highest fertility, choose
-  randomly from those tied partners.
-
-Chance:
-
-- Base: 1%.
-- Carrier fertility:
-  - Infertile: 0%
-  - Low: 2%
-  - Medium: 4%
-  - High: 6%
-  - Peak: 9%
-- Partner fertility:
-  - Low: 0%
-  - Normal: 1%
-  - High: 2%
-  - Hyper: 3%
-- Final chance = base + carrier daily fertility + best partner fertility.
-
-Design goal:
-
-- Pregnancy should feel meaningful, not like a giant child collection.
-- Store enough history to remember carrier, partner, gender, conception date,
-  and birth date.
-- Avoid child stats, big family trees, or endless child lists for now.
-
-## GIF Structure
-
-Two-person scenes:
-
-- Root: `data/scenes`
-- Folders:
-  - `wm_wf`
-  - `wm_bf`
-  - `bm_wf`
-  - `bm_bf`
-  - `wf_wf`
-  - `wf_bf`
-  - `bf_bf`
-- Subcategories:
-  - `foreplay`
-  - `oral`
-  - `sex`
-  - `finale`
-
-Three-person scenes:
-
-- Roots:
-  - `data/scenes_mfm`
-  - `data/scenes_fmf`
-  - `data/scenes_fff`
-- Subcategories:
-  - `foreplay`
-  - `sex`
-  - `finale`
-- No dedicated 3some oral category because most 3some GIFs mix sex/oral.
-
-Interactions:
-
-- `data/gifs/wiggle.json`
-- `data/gifs/flex_w.json`
-- `data/gifs/flex_b.json`
-- `data/gifs/titty_drop.json`
-- `data/gifs/spank.json`
-- `data/gifs/blowkiss.json`
-- `data/gifs/brofist.json`
-- `data/gifs/drink.json`
-- `data/gifs/firework.json`
-- Horny GIFs are split under `data/gifs/horny`.
-
-GIF randomness:
-
-- Random GIF picks use an in-memory shuffle bag per category/file.
-- Every GIF in a category should appear once before that bag repeats.
-- The picker also keeps a small in-memory recent history per user.
-- Current recent history target: last 30 GIF URLs per user.
-- For small folders, the effective recent-history check scales down so folders
-  with fewer than 30 GIFs still rotate naturally.
-- When possible, the picker avoids GIFs recently seen by any involved user.
-- If a category is too small and every option is recent, it falls back to the
-  next bag item instead of failing.
-- This is intentionally in-memory only for now; bot restarts clear bags and
-  recent history.
-- `/pornscene` uses both partners for history.
-- `/customscene` uses the creator.
-- Button interactions use both clicker and target.
-- Auto posts without a user still benefit from the global shuffle bag.
-
-## GIF Submit
-
-GIF Submit supports member submissions and staff review.
-
-Current:
-
-- Members can submit GIFs for interaction and scene pools.
-- Members can suggest scene titles.
-- Staff can approve or reject scene title suggestions.
-- Approved scene titles feed `data/scenes/sceneNamesByCast.json`.
-- Preflight validates scene title pools so empty or malformed title data is
-  caught before hosting.
-
-Design notes:
-
-- Keep title suggestions lightweight so members can help improve scene variety.
-- Staff review should stay private/admin-facing.
-- Public changelog should mention member-visible submit improvements, but not
-  staff-only workflow details.
-
-## Custom Scene
-
-`/customscene` lets users build a solo custom scene.
-
-Current direction:
-
-- User chooses cast with a dropdown menu.
-- User chooses up to 8 parts.
-- Custom scenes cost 20 coins per selected part, paid only when Finish succeeds.
-- Parts are spread across the 30-minute cooldown instead of posted all at once.
-- Posts go to Custom Scene channel.
-- Embed thumbnail uses the user's avatar.
-
-## Private Scene Threads Planned
-
-Goal:
-
-- `/privatescene` creates a paid private RP sandbox thread.
-- Supports 2 or 3 users.
-- First version is not porn career progression.
-- No XP, ranking, quests, achievements, or forced order at first.
-- No SQL in the first basic version.
-
-Rules:
-
-- Creator pays.
-- Couple private scene: 250 coins.
-- 3-user private scene: 400 coins.
-- Max duration: 1 hour.
-- No refund for early close.
-- Only explicitly invited users are added to the thread.
-- Do not add staff roles, host roles, or broad role overwrites.
-- Thread names must not include usernames.
-- Suggested thread name: `private-scene-4217`.
-- A user can only be in one active private scene at a time.
-
-Commands planned:
-
-- `/privatescene create partner:@user partner2:@user?`
-- `/privatescene close`
-- `/privatescene stats`
-- `/privatescene foreplay`
-- `/privatescene oral`
-- `/privatescene sex`
-- `/privatescene finale`
-- `/privatescene threesome`
-
-3-user logic:
-
-- `/privatescene threesome` only works in 3-user rooms.
-- It uses only the 3some folders.
-- It should not fall back to 2-person GIFs.
-- `oral` should be treated as two-person-only unless a future 3some oral
-  category is created.
-
-Anonymous end stats:
-
-- Participants: 2 or 3.
-- Duration.
-- GIFs used.
-- Category counts.
-- Spanks.
-- Messages.
-- Most-used category.
-- No names, no links, no GIFs, no message content.
+- One SQL-backed question is active at a time in General.
+- Questions come from `data/wyr/questions.json` and recent questions are
+  avoided.
+- Voting is anonymous; users may change their choice until close.
+- Coins and XP are awarded only on the user's first vote for that session.
+- A discussion thread is created and archived when voting closes.
+- The closed post shows percentages, total votes, and thread replies.
+
+## Porn Career
+
+- `/pornscene` is a consent-based two-user production flow.
+- Scene parts are selected from role/cast-compatible GIF pools.
+- Maximum phase counts are foreplay 2, oral 2, sex 3, and finale 1.
+- Performance affects score/critical behavior, Stamina affects scene length,
+  and Fame affects viewers/revenue according to current scene math.
+- Final scenes update persistent career values and post through the configured
+  RP/progression routes.
+
+### Boosters
+
+- Boosters are purchased through `/shop boosters` and viewed through
+  `/inventory boosters`.
+- One booster may be selected per requested scene.
+- It applies to the requester's side of the selected combined stat.
+- It is consumed when the request is sent and is not refunded if declined.
+- Stronger tiers provide a larger stat increase and greater burnout risk.
+- Tier values and prices are defined in the booster utilities/configuration.
+
+### Training and Custom Scenes
+
+- `/train` spends XP and coins to improve Performance, Stamina, or Fame.
+- `/customscene` builds a solo scene with cast and part selections.
+- Custom scenes charge per selected part only when Finish succeeds and spread
+  posts across the command cooldown.
+- Custom scenes do not use the shared two-user Porn Career request flow.
+
+## Permanent Gift System
+
+Gifts are a coin sink and RP collectible system with no progression effects.
+
+### Catalogue and Daily Shop
+
+- Definitions live in `data/gifts/gifts.js` with key, name, standard emoji,
+  category, and configurable price.
+- Categories are Common, Uncommon, Premium, and Luxury.
+- `/shop gifts` privately displays a persisted personal daily rotation:
+  two Common, two Uncommon, one Premium, and one Luxury gift.
+- Rotations contain no duplicate entries, vary deterministically by user, remain
+  stable for the reset period, and survive restarts.
+- Purchasing places one copy into sendable inventory; it does not send it.
+- Coin deduction, inventory increment, and purchase-price history are atomic.
+- Gifts cannot be sold, traded, refunded, or converted back into coins.
+
+### Inventory and Sending
+
+- `/inventory gifts` privately groups positive owned quantities by category.
+- `/gift send user:@member` rejects self-targets, bots, and non-members.
+- Selection menus contain only gifts with positive owned quantity.
+- Confirmation rechecks membership and inventory, expires after a short window,
+  and is protected from duplicate submission.
+- A successful send atomically consumes one inventory item, increments the
+  receiver's permanent collection, consumes the oldest recorded purchase lot,
+  and records sender, receiver, gift, historical price, and timestamp.
+- Only after the transaction succeeds does the bot post an RP notification in
+  Pillow Talk.
+
+### Received Collections
+
+- Received gifts are permanent and cannot be consumed by normal commands.
+- `/profile` shows at most four gift types, ordered by rarity, configured price,
+  then quantity, plus total gifts received.
+- `View Gift Collection` privately shows the full grouped collection, total
+  quantity, unique types, and historical collection value.
+- Historical value is accumulated from the price paid for sent items rather
+  than recalculated from current catalogue prices.
+
+### Gift Persistence
+
+- `user_gift_inventory`: unsent owned quantities.
+- `user_received_gifts`: permanent received totals and historical value.
+- `gift_purchases`: purchase lots and remaining quantities.
+- `gift_transactions`: completed sends and price paid.
+- `user_daily_gift_shop`: persisted per-user rotations.
+
+Preflight rejects duplicate keys, missing names/emoji, invalid categories,
+invalid prices, and insufficient catalogue entries for a daily rotation.
+
+## Profiles and Social Systems
+
+### Profiles
+
+- `/profile` is private and requires a target user.
+- It shows wallet, Porn Career stats, career summary, social interaction
+  counters, profile likes, and a compact received-gift summary.
+- Optional comparison shows the two users' career stats and combined scene
+  effects.
+- Profile likes are persistent, one per liker/target pair, and reject self or
+  duplicate likes.
+
+### Relationships
+
+- Relationships are consent-based RP links with no rewards.
+- Supported links include parent/child, siblings, extended family, marriage,
+  dating, and Besties.
+- A user may have at most one mother, one father, one spouse, and three Besties;
+  dating partners and children follow the current relationship rules.
+- Exact removal commands remove only the selected relationship type.
+- Server gender roles are used where a relationship label requires them.
+- Successful public notices use the configured RP channel and existing shared
+  helpers.
+
+### Pregnancy
+
+- Pregnancy is standalone RP and separate from Porn Career progression.
+- `/breed` uses consent; `/pregnancy` is self-only.
+- Female members may be carriers; supported partner combinations follow the
+  current gender-role validation.
+- Checks occur once per carrier per day using configured carrier and best-partner
+  fertility values.
+- A pregnancy lasts 30 days, reveals at day 7, and gives birth at day 30.
+- Persistent state retains enough conception, partner, reveal, and birth history
+  to survive restarts without exposing private chance details publicly.
+
+## Activity, Achievements, and Notifications
+
+- Activity statistics are stored for daily, weekly, and career periods.
+- Posted milestone guards prevent restart-driven duplicate announcements.
+- Daily/weekly activity progress routes to Maid Feed; larger lifetime social/RP
+  moments follow current channel routing.
+- Achievements unlock automatically, persist progress, and post configured
+  notices to Maid Feed.
+- Gift actions deliberately do not call quest, achievement, activity, XP,
+  ranking, or Reputation helpers.
 
 ## Casino
 
-Casino commands are coin-based and should use the same embed style as the rest
-of the bot.
+- `/dice`, `/slots`, `/blackjack`, and `/holdem` are coin games with configured
+  limits and cooldowns.
+- Slots supports an interactive spin-again session.
+- Blackjack and current Hold'em sessions are in memory.
+- Hold'em is user-versus-dealer, reveals hole cards privately, advances a public
+  board, charges by street, and evaluates the best five-card hand from seven.
+- Spank Dilli maintains persistent shared state and posts winner announcements
+  to Maid Feed.
 
-Current:
+## GIF Data and Submission
 
-- `/dice`: max 50 coins.
-- `/slots`: max 25 coins per spin, 1-minute opener cooldown, then Spin Again
-  and Leave buttons control the slot session.
-- `/blackjack`: max 100 coins, uses one standard deck.
-- Blackjack card display uses suit emoji.
-- `/holdem`: max 50 coins per street, user vs dealer, private Peek for hole
-  cards, public board progression, and real best-hand comparison at showdown.
-- Hold'em is intentionally in-memory for the first version, like blackjack.
-- If Hold'em becomes popular, SQL-backed table state should come before
-  multiplayer or all-in/side-pot logic.
-- Spank Dilli has a fixed embed in its own channel and public GIF replies.
-- Spank Dilli uses a hosted GIF URL instead of a local asset attachment so
-  button clicks feel faster.
-- Spank Dilli winner announcements go to Maid Feed.
+- Two-person scene pools are under `data/scenes`; three-person pools are under
+  `data/scenes_mfm`, `data/scenes_fmf`, and `data/scenes_fff`.
+- Interaction GIFs are under `data/gifs`, with horny pools split by cast.
+- Random selection uses in-memory shuffle bags and recent-user history; restart
+  persistence is intentionally unnecessary.
+- Member GIF submissions and scene-title suggestions use staff review flows.
+- Approved titles feed `data/scenes/sceneNamesByCast.json`.
+- Preflight validates content structure and reports intentionally parked empty
+  three-person pools as warnings.
 
-## Member Cards
+## Operational Safety
 
-Card generator uses role priority:
-
-1. MPC Crew
-2. Stiletto Gang / Tailored Few
-3. Midnight Circle
-4. Member
-
-Design notes:
-
-- Cards are generated when users press the member card panel button.
-- The user name is written on the card.
-- User avatar was tested and removed because it did not look good.
-- Member card panel embed should explain that card style depends on role.
-
-## Current Changelog Draft
-
-Next update currently includes:
-
-- Removed unused empty scaffolding files and old helper modules.
-- Rebuilt local dependency resolution so packages load from the project folder.
-- Embed author icons use the MPC logo consistently.
-- `/leaderboard` pages include a runner-specific "Your Position" section.
-- Daily Would You Rather posts in General with anonymous voting, a discussion
-  thread, and a small one-time voting reward.
-- GIF Submit lets members suggest scene titles for staff review.
-- `/profile` splits interaction stats by type and supports profile likes with
-  Moments announcements.
-- `/holdem` adds first playable Texas Hold'em against the dealer.
-- `/commands` overview uses readable fields for role rules and command
-  categories.
-- Pornscene extra parts respect phase caps while staying in proper scene order.
-- Achievements include balanced trained-stat milestones for all three career
-  stats reaching each 10-point threshold.
-- Preflight validates commands, JSON data, GIF pools, scene titles, Daily WYR
-  questions, and the database schema.
-
-## Current Open Design Topics
-
-- Live test Daily WYR timing, voting, rewards, thread close, and archive flow.
-- Live test profile likes and whether Moments posts feel good.
-- Live test `/holdem` pacing, payouts, low-balance handling, and whether it
-  should stay user-vs-dealer for 1.0.
-- Live test booster prices, burnout risk, daily quest rewards, and casino coin
-  pressure.
-- Continue embed/UI consistency cleanup when touching related commands.
-- Decide when to implement `/privatescene`, after the current 1.0 feature set
-  has usage data.
-- Decide whether private scene end stats should go to Maid Feed or Moments.
-- Keep pregnancy meaningful without turning it into a child-list bot.
-- Low-priority future idea: X/Twitter watcher using `X_BEARER_TOKEN`, text/link
-  only, no scraping or bypassing adult-media walls.
+- Keep `.env` private and rotate production credentials when required.
+- Back up `database.db` before migrations or server moves.
+- Run `npm run preflight`; a successful report is required before deployment.
+- Preserve unrelated working-tree changes when editing the project.
+- Update this document whenever implemented rules change, but keep planned
+  designs and speculative schemas in `TODO.md`.
