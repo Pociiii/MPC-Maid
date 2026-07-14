@@ -16,6 +16,7 @@ const {
 const {
     addPendingRequest,
     getPendingRequest,
+    getPendingRequests,
     removePendingRequest
 } = require('../../utils/pornScenes');
 
@@ -55,10 +56,19 @@ const requestExpiryMs =
     24 * 60 * 60 * 1000;
 
 function scheduleRequestExpiry(
-    message,
+    client,
     requesterId,
-    targetId
+    targetId,
+    delay = requestExpiryMs,
+    message = null
 ) {
+
+    const expectedMessageId =
+        message?.id ??
+        getPendingRequest(
+            requesterId,
+            targetId
+        )?.messageId;
 
     const timeout =
         setTimeout(
@@ -72,7 +82,7 @@ function scheduleRequestExpiry(
 
                 if (
                     !pendingRequest ||
-                    pendingRequest.messageId !== message.id
+                    pendingRequest.messageId !== expectedMessageId
                 )
                     return;
 
@@ -82,12 +92,40 @@ function scheduleRequestExpiry(
                 );
 
                 await safeSendUserDm(
-                    message.client,
+                    client,
                     requesterId,
                     `${pendingRequest.targetDisplayName ?? 'Your partner'} did not answer the scene request in time. The request expired.`
                 );
 
-                await message.edit({
+                let requestMessage =
+                    message;
+
+                if (
+                    !requestMessage
+                ) {
+
+                    const target =
+                        await client.users.fetch(
+                            targetId
+                        ).catch(
+                            () => null
+                        );
+
+                    const dmChannel =
+                        await target?.createDM().catch(
+                            () => null
+                        );
+
+                    requestMessage =
+                        await dmChannel?.messages.fetch(
+                            pendingRequest.messageId
+                        ).catch(
+                            () => null
+                        );
+
+                }
+
+                await requestMessage?.edit({
                     content:
                         'Scene request expired.',
                     embeds:
@@ -101,10 +139,39 @@ function scheduleRequestExpiry(
                 );
 
             },
-            requestExpiryMs
+            Math.max(
+                0,
+                delay
+            )
         );
 
     timeout.unref?.();
+
+}
+
+function restorePendingSceneRequests(
+    client
+) {
+
+    const now =
+        Date.now();
+
+    const requests =
+        getPendingRequests();
+
+    for (
+        const request of requests
+    )
+        scheduleRequestExpiry(
+            client,
+            request.requesterId,
+            request.targetId,
+            Number(
+                request.expiresAt
+            ) - now
+        );
+
+    return requests.length;
 
 }
 
@@ -336,9 +403,11 @@ async function sendPornSceneRequest(
     );
 
     scheduleRequestExpiry(
-        message,
+        interaction.client,
         interaction.user.id,
-        targetId
+        targetId,
+        requestExpiryMs,
+        message
     );
 
     try {
@@ -473,5 +542,6 @@ async function sendPornSceneRequest(
 }
 
 module.exports = {
+    restorePendingSceneRequests,
     sendPornSceneRequest
 };

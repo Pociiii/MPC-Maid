@@ -15,7 +15,6 @@ const {
     assertNoFamilyRelationshipBetween,
     countBesties,
     createRelationship,
-    createSiblingLinksForNewChild,
     formatDate,
     getParentTypeForMember,
     getRelationshipRequest,
@@ -103,12 +102,6 @@ async function acceptRequest(
             parentType,
             request.requester_id,
             request.target_id
-        );
-
-        await createSiblingLinksForNewChild(
-            request.requester_id,
-            request.target_id,
-            parentType
         );
 
         return buildAcceptResult(

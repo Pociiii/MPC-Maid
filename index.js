@@ -83,6 +83,10 @@ const {
     clearAllSceneBusy
 } = require('./utils/pornScenes');
 
+const {
+    restorePendingSceneRequests
+} = require('./features/porn-career/pornSceneRequest');
+
 process.on(
     'unhandledRejection',
     error => {
@@ -336,6 +340,11 @@ async readyClient => {
         const clearedBusy =
             clearAllSceneBusy();
 
+        const restoredRequests =
+            restorePendingSceneRequests(
+                readyClient
+            );
+
         void logBotEvent(
             readyClient,
             {
@@ -349,6 +358,16 @@ async readyClient => {
                             '\uD83C\uDFAC Scene Busy Reset',
                         value:
                             `${clearedBusy} in-memory busy entries cleared.`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            '\uD83D\uDCE8 Scene Requests Restored',
+                        value:
+                            String(
+                                restoredRequests
+                            ),
                         inline:
                             true
                     },

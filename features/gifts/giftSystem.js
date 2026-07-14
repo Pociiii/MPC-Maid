@@ -81,11 +81,12 @@ async function showGiftSendConfirmation(interaction) {
 async function postGiftNotification(interaction, receiverId, gift) {
     const receiver = await interaction.guild.members.fetch(receiverId);
     const senderName = interaction.member.displayName;
-    const receiverName = receiver.displayName;
-    const intro = flavor[gift.category][Math.floor(Math.random() * flavor[gift.category].length)].replace('{sender}', senderName).replace('{receiver}', receiverName);
-    const embed = createEmbed({ color: getRandomColor(), authorName: senderName, authorIcon: interaction.user.displayAvatarURL(), thumbnail: receiver.user.displayAvatarURL(), title: gift.category === 'luxury' ? 'Living the Dream' : 'A Midnight Gift', description: `${intro}\n\n${senderName} gave ${receiverName} a ${gift.emoji} **${gift.name}**.\n\nThe gift now has a permanent place in ${receiverName}'s collection.`, footerText: commandFooter('/gift send'), timestamp: true });
+    const senderMention = `<@${interaction.user.id}>`;
+    const receiverMention = `<@${receiverId}>`;
+    const intro = flavor[gift.category][Math.floor(Math.random() * flavor[gift.category].length)].replace('{sender}', senderMention).replace('{receiver}', receiverMention);
+    const embed = createEmbed({ color: getRandomColor(), authorName: senderName, authorIcon: interaction.user.displayAvatarURL(), thumbnail: receiver.user.displayAvatarURL(), title: gift.category === 'luxury' ? 'Living the Dream' : 'A Midnight Gift', description: `${intro}\n\n${senderMention} gave ${receiverMention} a ${gift.emoji} **${gift.name}**.\n\nThe gift now has a permanent place in ${receiverMention}'s collection.`, footerText: commandFooter('/gift send'), timestamp: true });
     const channel = await interaction.client.channels.fetch(CHANNELS.PILLOW_TALK);
-    await channel.send({ embeds: [embed] });
+    await channel.send({ content: receiverMention, embeds: [embed], allowedMentions: { users: [receiverId] } });
 }
 
 async function confirmGiftSend(interaction) {

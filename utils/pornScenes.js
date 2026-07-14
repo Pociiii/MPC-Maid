@@ -1,5 +1,82 @@
+const fs =
+    require('fs');
+
+const path =
+    require('path');
+
+const {
+    getRuntimeDataPath
+} = require('./runtimeData');
+
+const pendingRequestsPath =
+    getRuntimeDataPath(
+        'porn-scene-requests.json'
+    );
+
+function loadPendingRequests() {
+
+    try {
+
+        const stored =
+            JSON.parse(
+                fs.readFileSync(
+                    pendingRequestsPath,
+                    'utf8'
+                )
+            );
+
+        return new Map(
+            Array.isArray(
+                stored
+            )
+                ? stored
+                : []
+        );
+
+    }
+    catch (error) {
+
+        if (
+            error.code !== 'ENOENT'
+        )
+            console.error(
+                'PORN SCENE REQUEST RESTORE ERROR',
+                error
+            );
+
+        return new Map();
+
+    }
+
+}
+
 const pendingRequests =
-    new Map();
+    loadPendingRequests();
+
+function persistPendingRequests() {
+
+    fs.mkdirSync(
+        path.dirname(
+            pendingRequestsPath
+        ),
+        {
+            recursive:
+                true
+        }
+    );
+
+    fs.writeFileSync(
+        pendingRequestsPath,
+        JSON.stringify(
+            Array.from(
+                pendingRequests.entries()
+            ),
+            null,
+            2
+        )
+    );
+
+}
 
 const busyUsers =
     new Map();
@@ -41,6 +118,8 @@ function addPendingRequest(
         data
     );
 
+    persistPendingRequests();
+
 }
 
 function getPendingRequest(
@@ -75,10 +154,15 @@ function consumePendingRequest(
 
     if (
         request
-    )
+    ) {
+
         pendingRequests.delete(
             key
         );
+
+        persistPendingRequests();
+
+    }
 
     return request ?? null;
 
@@ -89,11 +173,41 @@ function removePendingRequest(
     targetId
 ) {
 
-    pendingRequests.delete(
+    const removed =
+        pendingRequests.delete(
         getPendingKey(
             requesterId,
             targetId
         )
+    );
+
+    if (
+        removed
+    )
+        persistPendingRequests();
+
+}
+
+function getPendingRequests() {
+
+    return Array.from(
+        pendingRequests.entries(),
+        ([key, request]) => {
+
+            const [
+                requesterId,
+                targetId
+            ] = key.split(
+                ':'
+            );
+
+            return {
+                requesterId,
+                targetId,
+                ...request
+            };
+
+        }
     );
 
 }
@@ -207,6 +321,7 @@ module.exports = {
     getPendingRequest,
     consumePendingRequest,
     removePendingRequest,
+    getPendingRequests,
     isBusy,
     setSceneBusy,
     clearSceneBusy,

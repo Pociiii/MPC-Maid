@@ -519,7 +519,33 @@ async function removeRelationship(
             ]
         );
 
-    return result.changes > 0;
+    let legacyChanges =
+        0;
+
+    if (
+        type === 'mother' ||
+        type === 'father'
+    ) {
+
+        const legacyResult =
+            await dbRun(
+                `UPDATE users
+                 SET ${type}_id = NULL
+                 WHERE id = ?
+                 AND ${type}_id = ?`,
+                [
+                    secondId,
+                    firstId
+                ]
+            );
+
+        legacyChanges =
+            legacyResult.changes;
+
+    }
+
+    return result.changes > 0 ||
+        legacyChanges > 0;
 
 }
 
@@ -547,69 +573,45 @@ async function removeAllRelationshipsBetween(
             ]
         );
 
-    return result.changes;
-
-}
-
-async function getChildrenOfParent(
-    parentId,
-    type = null
-) {
-
-    return dbAll(
-        `SELECT *
-         FROM relationships
-         WHERE user_a_id = ?
-         AND type IN ('mother', 'father')
-         ${type ? 'AND type = ?' : ''}`,
-        type
-            ? [
-                parentId,
-                type
-            ]
-            : [
-                parentId
-            ]
-    );
-
-}
-
-async function createSiblingLinksForNewChild(
-    parentId,
-    childId,
-    parentType
-) {
-
-    const children =
-        await getChildrenOfParent(
-            parentId,
-            parentType
-        );
-
-    for (
-        const child of children
-    ) {
-
-        if (
-            child.user_b_id === childId
-        )
-            continue;
-
-        if (
-            await familyRelationshipExistsBetween(
-                child.user_b_id,
-                childId
+    const legacyResults =
+        await Promise.all(
+            [
+                'mother',
+                'father'
+            ].map(
+                (type) =>
+                    dbRun(
+                        `UPDATE users
+                         SET ${type}_id = NULL
+                         WHERE (
+                            id = ?
+                            AND ${type}_id = ?
+                         )
+                         OR (
+                            id = ?
+                            AND ${type}_id = ?
+                         )`,
+                        [
+                            firstId,
+                            secondId,
+                            secondId,
+                            firstId
+                        ]
+                    )
             )
-        )
-            continue;
-
-        await createRelationship(
-            'sibling',
-            child.user_b_id,
-            childId
         );
 
-    }
+    const legacyChanges =
+        legacyResults.reduce(
+            (total, legacyResult) =>
+                total + legacyResult.changes,
+            0
+        );
+
+    return Math.max(
+        result.changes,
+        legacyChanges
+    );
 
 }
 
@@ -753,9 +755,7 @@ module.exports = {
     countBesties,
     createRelationship,
     createRelationshipRequest,
-    createSiblingLinksForNewChild,
     formatDate,
-    getChildrenOfParent,
     getRelationshipGender,
     getRelationshipRequest,
     getRelationshipsForUser,

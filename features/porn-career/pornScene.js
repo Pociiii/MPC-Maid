@@ -58,18 +58,6 @@ async function editSceneRequestMessage(
     payload
 ) {
 
-    if (
-        interaction.message?.editable !== false
-    ) {
-
-        await interaction.message.edit(
-            payload
-        );
-
-        return;
-
-    }
-
     await interaction.editReply(
         payload
     );
