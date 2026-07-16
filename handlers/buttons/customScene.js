@@ -17,6 +17,7 @@ const {
 } = require('../../features/custom-scene/scheduler');
 
 const {
+    addCoins,
     getOrCreateUser,
     spendCoins
 } = require('../../utils/users');
@@ -284,12 +285,26 @@ module.exports = {
 
             }
 
-            scheduleCustomScene(
-                channel,
-                interaction,
-                cast,
-                parts
-            );
+            try {
+
+                await scheduleCustomScene(
+                    channel,
+                    interaction,
+                    cast,
+                    parts
+                );
+
+            }
+            catch (error) {
+
+                await addCoins(
+                    interaction.user.id,
+                    cost
+                );
+
+                throw error;
+
+            }
 
             rememberFinishedBuilder(
                 builderKey

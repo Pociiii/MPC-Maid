@@ -2,9 +2,6 @@ const ROLES =
     require('../data/roles.json');
 
 const {
-    CARRIER_FERTILITY_STATES,
-    DEFAULT_PARTNER_FERTILITY,
-    PARTNER_FERTILITY_STATES,
     PREGNANCY
 } = require('../data/pregnancyConfig');
 
@@ -174,78 +171,35 @@ function getBreedingRoles(
 
 }
 
-function rollCarrierFertility(
+function generateDailyFertility(
     random = Math.random
 ) {
 
-    const entries =
-        Object.entries(
-            CARRIER_FERTILITY_STATES
-        );
+    const range =
+        PREGNANCY.MAX_DAILY_FERTILITY -
+        PREGNANCY.MIN_DAILY_FERTILITY +
+        1;
 
-    const totalWeight =
-        entries.reduce(
-            (total, [, state]) =>
-                total + state.weight,
-            0
-        );
-
-    let roll =
-        random() * totalWeight;
-
-    for (
-        const [key, state] of entries
-    ) {
-
-        roll -= state.weight;
-
-        if (
-            roll <= 0
-        )
-            return key;
-
-    }
-
-    return entries[
-        entries.length - 1
-    ][0];
-
-}
-
-function getCarrierFertility(
-    key
-) {
-
-    return CARRIER_FERTILITY_STATES[key] ??
-        CARRIER_FERTILITY_STATES.low;
-
-}
-
-function getPartnerFertility(
-    key = DEFAULT_PARTNER_FERTILITY
-) {
-
-    return PARTNER_FERTILITY_STATES[key] ??
-        PARTNER_FERTILITY_STATES[DEFAULT_PARTNER_FERTILITY];
+    return Math.floor(
+        random() * range
+    ) + PREGNANCY.MIN_DAILY_FERTILITY;
 
 }
 
 function calculatePregnancyChance(
-    carrierFertilityKey,
-    partnerFertilityKey = DEFAULT_PARTNER_FERTILITY
+    carrierDailyFertility,
+    partnerDailyFertility
 ) {
 
-    return PREGNANCY.BASE_CHANCE +
-        getCarrierFertility(
-            carrierFertilityKey
-        ).chance +
-        getPartnerFertility(
-            partnerFertilityKey
-        ).chance;
+    return Number(
+        carrierDailyFertility
+    ) + Number(
+        partnerDailyFertility
+    );
 
 }
 
-function getBestPartnerCandidates(
+function getUniquePartnerCandidates(
     partners
 ) {
 
@@ -261,59 +215,28 @@ function getBestPartnerCandidates(
         )
             continue;
 
-        const fertilityKey =
-            partner.fertilityKey ??
-            DEFAULT_PARTNER_FERTILITY;
-
-        const fertilityChance =
-            getPartnerFertility(
-                fertilityKey
-            ).chance;
-
         const existing =
             uniquePartners.get(
                 partner.userId
             );
 
         if (
-            existing &&
-            existing.fertilityChance >= fertilityChance
+            existing
         )
             continue;
 
         uniquePartners.set(
             partner.userId,
             {
-                ...partner,
-                fertilityKey,
-                fertilityChance
+                ...partner
             }
         );
 
     }
 
-    const values =
-        [
-            ...uniquePartners.values()
-        ];
-
-    if (
-        values.length === 0
-    )
-        return [];
-
-    const bestChance =
-        Math.max(
-            ...values.map(
-                (partner) =>
-                    partner.fertilityChance
-            )
-        );
-
-    return values.filter(
-        (partner) =>
-            partner.fertilityChance === bestChance
-    );
+    return [
+        ...uniquePartners.values()
+    ];
 
 }
 
@@ -337,12 +260,10 @@ function pickRandomPartner(
 
 module.exports = {
     calculatePregnancyChance,
-    getBestPartnerCandidates,
+    generateDailyFertility,
+    getUniquePartnerCandidates,
     getBreedingRoles,
-    getCarrierFertility,
-    getPartnerFertility,
     isCarrierEligible,
     isImpregnatingEligible,
-    pickRandomPartner,
-    rollCarrierFertility
+    pickRandomPartner
 };

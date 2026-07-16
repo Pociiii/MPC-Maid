@@ -228,10 +228,40 @@ async function applyRewards(
 
 }
 
+async function syncSceneRewardCounters(
+    client,
+    requesterId,
+    targetId
+) {
+
+    await Promise.all([
+        syncUserAchievementCounters(
+            client,
+            requesterId,
+            [
+                'xp_earned',
+                'wallet_coins',
+                'ranking_reached'
+            ]
+        ),
+        syncUserAchievementCounters(
+            client,
+            targetId,
+            [
+                'xp_earned',
+                'wallet_coins',
+                'ranking_reached'
+            ]
+        )
+    ]);
+
+}
+
 module.exports = {
     applyRewards,
     buildSceneRewardBonuses,
     getRequesterSceneXp,
     getTargetSceneXp,
-    normalizeSceneRewardBonuses
+    normalizeSceneRewardBonuses,
+    syncSceneRewardCounters
 };

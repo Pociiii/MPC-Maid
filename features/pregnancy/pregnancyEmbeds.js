@@ -18,8 +18,6 @@ const {
 } = require('../../utils/moments');
 
 const {
-    CARRIER_FERTILITY_STATES,
-    PARTNER_FERTILITY_STATES,
     PREGNANCY
 } = require('../../data/pregnancyConfig');
 
@@ -32,19 +30,12 @@ const DAY_MS =
     24 * 60 * 60 * 1000;
 
 function formatFertility(
-    key,
-    states
+    value
 ) {
 
-    const state =
-        states[key];
-
-    if (
-        !state
-    )
-        return 'Unknown';
-
-    return `${state.label} (+${state.chance}%)`;
+    return `**${Number(
+        value
+    )}%**`;
 
 }
 
@@ -180,24 +171,10 @@ function buildPregnancyStatusEmbed(
     embed.addFields(
         {
             name:
-                '\uD83C\uDF38 Fertility Today',
-            value:
-                dailyFertility
-                    ? formatFertility(
-                        dailyFertility,
-                        CARRIER_FERTILITY_STATES
-                    )
-                    : 'Not a carrier.',
-            inline:
-                true
-        },
-        {
-            name:
-                '\uD83D\uDD25 Breeding Fertility',
+                '\uD83C\uDF38 Daily Fertility',
             value:
                 formatFertility(
-                    status.profile.partner_fertility,
-                    PARTNER_FERTILITY_STATES
+                    dailyFertility
                 ),
             inline:
                 true

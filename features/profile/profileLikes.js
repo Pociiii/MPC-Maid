@@ -9,6 +9,7 @@ const db =
     require('../../database/database');
 
 const {
+    CHANNELS,
     getRandomColor
 } = require('../../data/constants');
 
@@ -171,6 +172,8 @@ async function postProfileLikeMoment(
         {
             color:
                 getRandomColor(),
+            channelId:
+                CHANNELS.PILLOW_TALK,
             command:
                 '/profile',
             content:

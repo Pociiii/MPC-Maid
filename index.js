@@ -87,6 +87,26 @@ const {
     restorePendingSceneRequests
 } = require('./features/porn-career/pornSceneRequest');
 
+const {
+    clearCooldown
+} = require('./utils/cooldowns');
+
+const {
+    startLotteryScheduler
+} = require('./features/lottery/lottery');
+
+const {
+    restorePornScenes
+} = require('./features/porn-career/sceneScheduler');
+
+const {
+    restoreCustomScenes
+} = require('./features/custom-scene/scheduler');
+
+const {
+    getRestorableScenes
+} = require('./database/activeScenes');
+
 process.on(
     'unhandledRejection',
     error => {
@@ -220,7 +240,8 @@ async function ensureCustomSceneCommandsUnlocked(
 }
 
 // Initialize database
-require('./database/database');
+const db =
+    require('./database/database');
 
 const client = new Client({
 intents: [
@@ -340,6 +361,23 @@ async readyClient => {
         const clearedBusy =
             clearAllSceneBusy();
 
+        await db.ready;
+
+        const restorableScenes =
+            await getRestorableScenes();
+
+        const restoredPornScenes =
+            await restorePornScenes(
+                readyClient,
+                restorableScenes
+            );
+
+        const restoredCustomScenes =
+            await restoreCustomScenes(
+                readyClient,
+                restorableScenes
+            );
+
         const restoredRequests =
             restorePendingSceneRequests(
                 readyClient
@@ -355,9 +393,9 @@ async readyClient => {
                 fields: [
                     {
                         name:
-                            '\uD83C\uDFAC Scene Busy Reset',
+                            '\uD83C\uDFAC Active Scenes Restored',
                         value:
-                            `${clearedBusy} in-memory busy entries cleared.`,
+                            `${restoredPornScenes} porn, ${restoredCustomScenes} custom. ${clearedBusy} stale busy entries cleared.`,
                         inline:
                             true
                     },
@@ -402,6 +440,10 @@ async readyClient => {
         );
 
         startDailyWyrScheduler(
+            readyClient
+        );
+
+        await startLotteryScheduler(
             readyClient
         );
 
@@ -477,6 +519,15 @@ async function safeReplyInteractionError(
 
 }
 
+function isUnknownInteractionError(
+    error
+) {
+
+    return error?.code === 10062 ||
+        error?.rawError?.code === 10062;
+
+}
+
 // Command handler
 client.on(
 Events.InteractionCreate,
@@ -494,6 +545,30 @@ async interaction => {
 
     }
     catch (error) {
+
+        if (
+            isUnknownInteractionError(
+                error
+            )
+        ) {
+
+            if (
+                interaction.commandName
+            )
+                clearCooldown(
+                    interaction.user.id,
+                    interaction.commandName
+                );
+
+            console.warn(
+                `Expired interaction ignored for ${interaction.commandName
+                    ? `/${interaction.commandName}; cooldown cleared`
+                    : interaction.customId ?? 'component'}.`
+            );
+
+            return;
+
+        }
 
         console.error(
             'INTERACTION HANDLER ERROR'
@@ -589,6 +664,25 @@ async interaction => {
 
     }
     catch (error) {
+
+        if (
+            isUnknownInteractionError(
+                error
+            )
+        ) {
+
+            clearCooldown(
+                interaction.user.id,
+                interaction.commandName
+            );
+
+            console.warn(
+                `Expired interaction ignored for /${interaction.commandName}; cooldown cleared.`
+            );
+
+            return;
+
+        }
 
         console.error(
             `COMMAND ERROR /${interaction.commandName}`

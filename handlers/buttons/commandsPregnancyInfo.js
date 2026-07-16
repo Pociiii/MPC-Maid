@@ -37,8 +37,10 @@ module.exports = {
 **Daily check**
 - Pregnancy rolls happen **once per day**.
 - Next check: <t:${nextCheck}:F> (<t:${nextCheck}:R>).
+- Every user receives a daily fertility value from **3% to 7%**.
+- Pregnancy chance is the carrier's fertility plus one randomly selected partner's fertility (**6% to 14%**).
 - More partners do not create more rolls.
-- The bot uses the best partner fertility from that day's list.
+- If there are multiple partners, one is selected randomly.
 - Failed rolls stay private.
 
 **Pregnancy**

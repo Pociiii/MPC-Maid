@@ -6,10 +6,22 @@ const {
     runMigrations
 } = require('./migrations');
 
+let resolveReady;
+let rejectReady;
+
+const ready =
+    new Promise(
+        (resolve, reject) => {
+            resolveReady = resolve;
+            rejectReady = reject;
+        }
+    );
+
 const db = new sqlite3.Database('./database.db', (err) => {
 
     if (err) {
         console.error(err);
+        rejectReady(err);
         return;
     }
 
@@ -65,19 +77,45 @@ const db = new sqlite3.Database('./database.db', (err) => {
         'utf8'
     );
 
-    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${dailyWyrSchema}\n${profileLikesSchema}\n${achievementsSchema}\n${pregnancySchema}\n${relationshipsSchema}\n${spankDilliSchema}\n${giftsSchema}`, async (err) => {
+    const lotterySchema = fs.readFileSync(
+        path.join(__dirname, 'schemas', 'lottery.sql'),
+        'utf8'
+    );
+
+    const activeScenesSchema = fs.readFileSync(
+        path.join(__dirname, 'schemas', 'active_scenes.sql'),
+        'utf8'
+    );
+
+    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${dailyWyrSchema}\n${profileLikesSchema}\n${achievementsSchema}\n${pregnancySchema}\n${relationshipsSchema}\n${spankDilliSchema}\n${giftsSchema}\n${lotterySchema}\n${activeScenesSchema}`, async (err) => {
 
         if (err) {
             console.error(err);
+            rejectReady(err);
             return;
         }
 
-        await runMigrations(
-            db
-        );
+        try {
+
+            await runMigrations(
+                db
+            );
+
+        }
+        catch (error) {
+
+            console.error(error);
+            rejectReady(error);
+            return;
+
+        }
 
         console.log('Database tables ready.');
+        resolveReady();
     });
 });
+
+db.ready =
+    ready;
 
 module.exports = db;

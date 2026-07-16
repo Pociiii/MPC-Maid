@@ -607,7 +607,6 @@ function formatFinalSummary(
 function buildFinalEmbed(
     requesterId,
     targetId,
-    sceneCategory,
     result,
     sceneLinks,
     requesterAuthor,
@@ -651,8 +650,7 @@ function buildFinalEmbed(
             value:
                 formatCast(
                     requesterId,
-                    targetId,
-                    sceneCategory
+                    targetId
                 ),
             inline:
                 false

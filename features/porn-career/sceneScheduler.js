@@ -9,8 +9,18 @@ const {
 } = require('../../data/constants');
 
 const {
-    clearSceneBusy
+    clearSceneBusy,
+    setSceneBusy
 } = require('../../utils/pornScenes');
+
+const {
+    applyPornSceneRewardsOnce,
+    checkpointScenePart,
+    createActiveScene,
+    getActiveScene,
+    getRestorableScenes,
+    markSceneCompleted
+} = require('../../database/activeScenes');
 
 const {
     logError,
@@ -37,15 +47,18 @@ const {
 } = require('./sceneEmbeds');
 
 const {
-    applyRewards,
     buildSceneRewardBonuses,
     getRequesterSceneXp,
-    getTargetSceneXp
+    getTargetSceneXp,
+    syncSceneRewardCounters
 } = require('./sceneRewards');
 
 const {
     recordActivityMoment
 } = require('../activity/activityMoments');
+
+const sceneTimers =
+    new Map();
 
 function buildSexPartComponents(
     requesterId,
@@ -79,6 +92,7 @@ function buildSexPartComponents(
 
 async function finishScene(
     channel,
+    sceneId,
     requesterId,
     targetId,
     sceneCategory,
@@ -95,13 +109,36 @@ async function finishScene(
             targetId
         );
 
-    await applyRewards(
-        channel.client,
+    const requesterXp =
+        getRequesterSceneXp(
+            result,
+            rewardBonuses
+        );
+
+    const targetXp =
+        getTargetSceneXp(
+            result,
+            rewardBonuses
+        );
+
+    const rewardsApplied =
+        await applyPornSceneRewardsOnce(
+        sceneId,
         requesterId,
         targetId,
         result,
-        rewardBonuses
+        requesterXp,
+        targetXp
     );
+
+    if (
+        rewardsApplied
+    )
+        await syncSceneRewardCounters(
+            channel.client,
+            requesterId,
+            targetId
+        );
 
     const highestCombinedStat =
         Math.max(
@@ -126,7 +163,10 @@ async function finishScene(
     const lowestCombinedStat =
         sortedCombinedStats[2];
 
-    await Promise.all([
+    if (
+        rewardsApplied
+    )
+        await Promise.all([
         trackDailyQuest(
             channel.client,
             requesterId,
@@ -183,7 +223,7 @@ async function finishScene(
             'scene_combined_three_stats',
             lowestCombinedStat
         )
-    ]);
+        ]);
 
     const momentsChannel =
         channel.client.channels.cache.get(
@@ -202,11 +242,18 @@ async function finishScene(
         try {
 
             await momentsChannel.send({
+                content:
+                    `<@${requesterId}> <@${targetId}>`,
+                allowedMentions: {
+                    users: [
+                        requesterId,
+                        targetId
+                    ]
+                },
                 embeds: [
                     buildFinalEmbed(
                         requesterId,
                         targetId,
-                        sceneCategory,
                         result,
                         sceneLinks,
                         requesterAuthor,
@@ -265,7 +312,10 @@ async function finishScene(
 
     }
 
-    await Promise.all([
+    if (
+        rewardsApplied
+    )
+        await Promise.all([
         recordActivityMoment(
             channel.client,
             requesterId,
@@ -310,7 +360,11 @@ async function finishScene(
                     )
             }
         )
-    ]);
+        ]);
+
+    await markSceneCompleted(
+        sceneId
+    );
 
     clearSceneBusy(
         requesterId,
@@ -319,7 +373,272 @@ async function finishScene(
 
 }
 
-function scheduleScene(
+function schedulePornSceneRecord(
+    client,
+    scene,
+    overrideDelay = null
+) {
+
+    const existingTimer =
+        sceneTimers.get(
+            scene.id
+        );
+
+    if (
+        existingTimer
+    )
+        clearTimeout(
+            existingTimer
+        );
+
+    const delay =
+        overrideDelay ??
+        Math.max(
+            0,
+            scene.next_part_at - Date.now()
+        );
+
+    const timer =
+        setTimeout(
+            () =>
+                void postNextPornScenePart(
+                    client,
+                    scene.id
+                ),
+            delay
+        );
+
+    if (
+        typeof timer.unref === 'function'
+    )
+        timer.unref();
+
+    sceneTimers.set(
+        scene.id,
+        timer
+    );
+
+}
+
+async function postNextPornScenePart(
+    client,
+    sceneId
+) {
+
+    sceneTimers.delete(
+        sceneId
+    );
+
+    const scene =
+        await getActiveScene(
+            sceneId
+        );
+
+    if (
+        !scene ||
+        scene.status === 'completed' ||
+        scene.status === 'failed'
+    )
+        return;
+
+    const channel =
+        client.channels.cache.get(
+            scene.channel_id
+        ) ??
+        await client.channels.fetch(
+            scene.channel_id
+        ).catch(
+            () => null
+        );
+
+    if (
+        !channel?.send
+    ) {
+
+        schedulePornSceneRecord(
+            client,
+            scene,
+            60 * 1000
+        );
+
+        return;
+
+    }
+
+    if (
+        scene.status === 'finalizing'
+    ) {
+
+        try {
+
+            await finishScene(
+                channel,
+                scene.id,
+                scene.owner_id,
+                scene.target_id,
+                scene.category,
+                scene.result,
+                scene.sceneLinks,
+                scene.author,
+                scene.color
+            );
+
+        }
+        catch (error) {
+
+            await logError(
+                client,
+                {
+                    title: 'Porn Scene Finale Recovery Failed',
+                    error,
+                    fields: [
+                        {
+                            name: '\uD83C\uDFAC Scene',
+                            value: String(scene.id),
+                            inline: true
+                        }
+                    ]
+                }
+            );
+
+            schedulePornSceneRecord(
+                client,
+                scene,
+                60 * 1000
+            );
+
+        }
+
+        return;
+
+    }
+
+    const index =
+        scene.next_part_index;
+
+    const phase =
+        scene.parts[index];
+
+    if (
+        !phase
+    )
+        return;
+
+    try {
+
+        const message =
+            await channel.send({
+                embeds: [
+                    buildPartEmbed(
+                        scene.owner_id,
+                        scene.target_id,
+                        scene.category,
+                        phase,
+                        scene.title,
+                        scene.author,
+                        scene.color,
+                        scene.result,
+                        index
+                    )
+                ],
+                components:
+                    buildSexPartComponents(
+                        scene.owner_id,
+                        scene.target_id,
+                        scene.category,
+                        phase
+                    )
+            });
+
+        const sceneLinks =
+            [
+                ...scene.sceneLinks
+            ];
+
+        sceneLinks[index] =
+            message.url;
+
+        const finalPart =
+            index === scene.parts.length - 1;
+
+        const nextPartAt =
+            finalPart
+                ? Date.now()
+                : Date.now() + scene.interval_ms;
+
+        const checkpointed =
+            await checkpointScenePart(
+                scene.id,
+                index,
+                sceneLinks,
+                nextPartAt,
+                finalPart
+            );
+
+        if (
+            !checkpointed
+        )
+            return;
+
+        const updated =
+            await getActiveScene(
+                scene.id
+            );
+
+        if (
+            finalPart
+        )
+            await finishScene(
+                channel,
+                updated.id,
+                updated.owner_id,
+                updated.target_id,
+                updated.category,
+                updated.result,
+                updated.sceneLinks,
+                updated.author,
+                updated.color
+            );
+        else
+            schedulePornSceneRecord(
+                client,
+                updated
+            );
+
+    }
+    catch (error) {
+
+        await logError(
+            client,
+            {
+                title: 'Porn Scene Part Failed',
+                error,
+                fields: [
+                    {
+                        name: '\uD83C\uDF9E\uFE0F Part',
+                        value: `${index + 1}/${scene.parts.length}`,
+                        inline: true
+                    },
+                    {
+                        name: '\uD83D\uDC65 Users',
+                        value: `<@${scene.owner_id}> + <@${scene.target_id}>`,
+                        inline: false
+                    }
+                ]
+            }
+        );
+
+        schedulePornSceneRecord(
+            client,
+            scene,
+            60 * 1000
+        );
+
+    }
+
+}
+
+async function scheduleScene(
     channel,
     requesterId,
     targetId,
@@ -340,129 +659,71 @@ function scheduleScene(
             result.totalParts
         );
 
-    const sceneLinks = [];
+    const scene =
+        await createActiveScene({
+            sceneType: 'porn',
+            channelId: channel.id,
+            ownerId: requesterId,
+            targetId,
+            category: sceneCategory,
+            parts: phases,
+            result,
+            title: sceneTitle,
+            author: requesterAuthor,
+            color: sceneColor,
+            intervalMs,
+            nextPartAt: Date.now()
+        });
 
-    phases.forEach(
-        (phase, index) => {
-
-            setTimeout(
-                async () => {
-
-                    try {
-
-                        const message =
-                            await channel.send({
-                                embeds: [
-                                    buildPartEmbed(
-                                        requesterId,
-                                        targetId,
-                                        sceneCategory,
-                                        phase,
-                                        sceneTitle,
-                                        requesterAuthor,
-                                        sceneColor,
-                                        result,
-                                        index
-                                    )
-                                ],
-                                components:
-                                    buildSexPartComponents(
-                                        requesterId,
-                                        targetId,
-                                        sceneCategory,
-                                        phase
-                                    )
-                            });
-
-                        sceneLinks[index] =
-                            message.url;
-
-                        if (
-                            index === phases.length - 1
-                        ) {
-
-                            await finishScene(
-                                channel,
-                                requesterId,
-                                targetId,
-                                sceneCategory,
-                                result,
-                                sceneLinks,
-                                requesterAuthor,
-                                sceneColor
-                            );
-
-                        }
-
-                    }
-                    catch (error) {
-
-                        console.error(
-                            'PORN SCENE ERROR'
-                        );
-                        console.error(
-                            error
-                        );
-
-                        await logError(
-                            channel.client,
-                            {
-                                title:
-                                    'Porn Scene Part Failed',
-                                error,
-                                fields: [
-                                    {
-                                        name:
-                                            '\uD83C\uDF9E\uFE0F Part',
-                                        value:
-                                            `${index + 1}/${phases.length}`,
-                                        inline:
-                                            true
-                                    },
-                                    {
-                                        name:
-                                            '\uD83C\uDFAD Phase',
-                                        value:
-                                            phase,
-                                        inline:
-                                            true
-                                    },
-                                    {
-                                        name:
-                                            '\uD83D\uDCCD Channel',
-                                        value:
-                                            `<#${channel.id}>`,
-                                        inline:
-                                            true
-                                    },
-                                    {
-                                        name:
-                                            '\uD83D\uDC65 Users',
-                                        value:
-                                            `<@${requesterId}> + <@${targetId}>`,
-                                        inline:
-                                            false
-                                    }
-                                ]
-                            }
-                        );
-
-                        clearSceneBusy(
-                            requesterId,
-                            targetId
-                        );
-
-                    }
-
-                },
-                index * intervalMs
-            );
-
-        }
+    schedulePornSceneRecord(
+        channel.client,
+        scene
     );
+
+    return scene;
+
+}
+
+async function restorePornScenes(
+    client,
+    scenes = null
+) {
+
+    const activeScenes =
+        scenes ??
+        await getRestorableScenes();
+
+    const pornScenes =
+        activeScenes.filter(
+            (scene) =>
+                scene.scene_type === 'porn'
+        );
+
+    for (
+        const scene of pornScenes
+    ) {
+
+        setSceneBusy(
+            scene.owner_id,
+            scene.target_id,
+            {
+                channelId: scene.channel_id,
+                startedAt: scene.created_at
+            }
+        );
+
+        schedulePornSceneRecord(
+            client,
+            scene
+        );
+
+    }
+
+    return pornScenes.length;
 
 }
 
 module.exports = {
+    restorePornScenes,
     scheduleScene
 };

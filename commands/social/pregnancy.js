@@ -11,10 +11,6 @@ const {
     buildPregnancyStatusEmbed
 } = require('../../features/pregnancy/pregnancyEmbeds');
 
-const {
-    isCarrierEligible
-} = require('../../utils/pregnancy');
-
 module.exports = {
 
     data:
@@ -45,11 +41,6 @@ module.exports = {
                 () => null
             );
 
-        const canCarry =
-            isCarrierEligible(
-                targetMember
-            );
-
         const [
             status,
             dailyFertility
@@ -58,13 +49,9 @@ module.exports = {
                 getPregnancyStatus(
                     target.id
                 ),
-                canCarry
-                    ? getDailyCarrierFertility(
-                        target.id
-                    )
-                    : Promise.resolve(
-                        null
-                    )
+                getDailyCarrierFertility(
+                    target.id
+                )
             ]);
 
         await interaction.editReply({

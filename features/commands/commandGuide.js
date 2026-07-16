@@ -173,7 +173,7 @@ function buildSections() {
                     requestCooldownLabel(
                         COOLDOWNS.PORN_SCENE_REQUEST
                     ),
-                    'Make a shared porn career scene.'
+                    'Make a shared porn career scene. Active filming resumes after bot restarts.'
                 ),
                 commandDetail(
                     '/customscene',
@@ -181,7 +181,7 @@ function buildSections() {
                     cooldownLabel(
                         COOLDOWNS.CUSTOM_SCENE
                     ),
-                    `Build a solo custom scene. Costs ${ECONOMY.CUSTOM_SCENE_PART_COST} coins per selected part.`
+                    `Build a solo custom scene. Costs ${ECONOMY.CUSTOM_SCENE_PART_COST} coins per selected part and resumes after bot restarts.`
                 ),
                 commandDetail(
                     '/train',
@@ -337,7 +337,7 @@ function buildSections() {
                     '/pregnancy',
                     privateReply,
                     'None',
-                    'Check your own fertility and pregnancy status.'
+                    'Check your private daily fertility value and pregnancy status.'
                 )
             ]
         },
@@ -351,7 +351,8 @@ function buildSections() {
                     '/dice',
                     '/slots',
                     '/blackjack',
-                    '/holdem'
+                    '/holdem',
+                    '/lottery'
                 ]),
             commands: [
                 commandDetail(
@@ -385,6 +386,12 @@ function buildSections() {
                         COOLDOWNS.HOLDEM
                     ),
                     'Bet up to 50 coins per street, play Texas Hold\'em against the dealer.'
+                ),
+                commandDetail(
+                    '/lottery',
+                    `Any channel, private reply. Public panel in <#${CHANNELS.LOTTERY}>.`,
+                    'None',
+                    `Buy up to ${ECONOMY.LOTTERY_MAX_TICKETS_PER_USER} weekly tickets for ${ECONOMY.LOTTERY_TICKET_PRICE} coins each.`
                 )
             ]
         },
@@ -412,7 +419,7 @@ function buildSections() {
                     'Pillow Talk',
                     `<#${CHANNELS.PILLOW_TALK}>`,
                     'Automatic',
-                    'Relationship links and pregnancy RP notices.'
+                    'Profile likes, relationship links, gifts, and pregnancy RP notices.'
                 ),
                 commandDetail(
                     'Editing Room',

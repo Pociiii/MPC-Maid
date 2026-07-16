@@ -155,6 +155,10 @@ const gifAdminInspect =
 const dropCommand =
     require('../commands/games/drop');
 
+const {
+    handleLotteryButton
+} = require('../features/lottery/lottery');
+
 async function replyInteractionError(
     interaction
 ) {
@@ -337,6 +341,18 @@ async function routeInteraction(
 
             case 'profile_like':
                 await handleProfileLike(
+                    interaction
+                );
+                return true;
+
+            case 'lottery_open_shop':
+            case 'lottery_rules':
+            case 'lottery_buy_1':
+            case 'lottery_buy_5':
+            case 'lottery_buy_max':
+            case 'lottery_view_tickets':
+            case 'lottery_refresh':
+                await handleLotteryButton(
                     interaction
                 );
                 return true;

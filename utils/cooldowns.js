@@ -81,6 +81,17 @@ function startCooldown(
 
 }
 
+function clearCooldown(
+    userId,
+    command
+) {
+
+    cooldowns.delete(
+        `${userId}-${command}`
+    );
+
+}
+
 function formatCooldownTimestamp(
     remaining
 ) {
@@ -154,6 +165,7 @@ async function handleCooldown(
 
 module.exports = {
     checkCooldown,
+    clearCooldown,
     formatCooldownTimestamp,
     getCooldownRemaining,
     startCooldown,

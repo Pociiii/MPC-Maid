@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "check": "node --check index.js",
+    "test:lottery": "node scripts/testLottery.js",
+    "test:scene-recovery": "node scripts/testSceneRecovery.js",
     "preflight:nodb": "node scripts/preflight.js --skip-db",
     "preflight": "node scripts/preflight.js"
   },

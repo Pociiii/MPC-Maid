@@ -2,17 +2,14 @@ const db =
     require('./database');
 
 const {
-    DEFAULT_PARTNER_FERTILITY,
     PREGNANCY
 } = require('../data/pregnancyConfig');
 
 const {
     calculatePregnancyChance,
-    getBestPartnerCandidates,
-    getCarrierFertility,
-    getPartnerFertility,
-    pickRandomPartner,
-    rollCarrierFertility
+    generateDailyFertility,
+    getUniquePartnerCandidates,
+    pickRandomPartner
 } = require('../utils/pregnancy');
 
 const RESET_HOUR_UTC =
@@ -192,12 +189,10 @@ async function getOrCreatePregnancyProfile(
 
     await dbRun(
         `INSERT OR IGNORE INTO pregnancy_profiles (
-            user_id,
-            partner_fertility
-        ) VALUES (?, ?)`,
+            user_id
+        ) VALUES (?)`,
         [
-            userId,
-            DEFAULT_PARTNER_FERTILITY
+            userId
         ]
     );
 
@@ -287,14 +282,23 @@ async function getDailyCarrierFertility(
             userId
         );
 
+    const storedFertility =
+        Number(
+            profile.carrier_fertility
+        );
+
     if (
-        profile.carrier_fertility &&
-        profile.fertility_date === date
+        profile.fertility_date === date &&
+        Number.isInteger(
+            storedFertility
+        ) &&
+        storedFertility >= PREGNANCY.MIN_DAILY_FERTILITY &&
+        storedFertility <= PREGNANCY.MAX_DAILY_FERTILITY
     )
-        return profile.carrier_fertility;
+        return storedFertility;
 
     const fertility =
-        rollCarrierFertility();
+        generateDailyFertility();
 
     await dbRun(
         `UPDATE pregnancy_profiles
@@ -310,20 +314,6 @@ async function getDailyCarrierFertility(
     );
 
     return fertility;
-
-}
-
-async function getPartnerFertilityKey(
-    userId
-) {
-
-    const profile =
-        await getOrCreatePregnancyProfile(
-            userId
-        );
-
-    return profile.partner_fertility ??
-        DEFAULT_PARTNER_FERTILITY;
 
 }
 
@@ -352,14 +342,13 @@ async function addDailyPartner(
 ) {
 
     const partnerFertility =
-        await getPartnerFertilityKey(
-            partnerId
+        await getDailyCarrierFertility(
+            partnerId,
+            date
         );
 
     const partnerChance =
-        getPartnerFertility(
-            partnerFertility
-        ).chance;
+        partnerFertility;
 
     const result =
         await dbRun(
@@ -722,8 +711,7 @@ async function getDailyPartners(
 ) {
 
     return dbAll(
-        `SELECT partner_id AS userId,
-                partner_fertility AS fertilityKey
+        `SELECT partner_id AS userId
          FROM pregnancy_daily_partners
          WHERE carrier_id = ?
          AND partner_date = ?`,
@@ -801,25 +789,39 @@ async function processPregnancyChecks(
 
         }
 
-        const partners =
+        const storedPartners =
             await getDailyPartners(
                 carrierId,
                 date
             );
 
-        const bestPartners =
-            getBestPartnerCandidates(
+        const partners =
+            await Promise.all(
+                storedPartners.map(
+                    async (partner) => ({
+                        ...partner,
+                        dailyFertility:
+                            await getDailyCarrierFertility(
+                                partner.userId,
+                                date
+                            )
+                    })
+                )
+            );
+
+        const eligiblePartners =
+            getUniquePartnerCandidates(
                 partners
             );
 
         if (
-            bestPartners.length === 0
+            eligiblePartners.length === 0
         )
             continue;
 
         const father =
             pickRandomPartner(
-                bestPartners
+                eligiblePartners
             );
 
         const carrierFertility =
@@ -831,7 +833,7 @@ async function processPregnancyChecks(
         const chance =
             calculatePregnancyChance(
                 carrierFertility,
-                father.fertilityKey
+                father.dailyFertility
             );
 
         const success =
@@ -964,7 +966,6 @@ module.exports = {
     getActivePregnancy,
     getDailyCarrierFertility,
     getNextPregnancyCheckTimestamp,
-    getPartnerFertilityKey,
     getPregnancyDate,
     getPregnancyDay,
     getPregnancyMilestones,

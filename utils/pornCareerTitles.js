@@ -5,111 +5,115 @@ const titlePools = {
     male: {
         single: {
             performance: [
-                'Natural Talent',
-                'Scene Stealer',
-                'Camera Charmer',
-                'Peak Performer',
-                'Bedroom Virtuoso'
+                'Silver Tongue',
+                'Smooth Operator',
+                'Bedroom Director',
+                'Velvet Performer',
+                'Midnight Maestro'
             ],
             stamina: [
-                'Long Take Lover',
-                'Tireless Tease',
-                'Endurance Star',
-                'After Hours Ace',
-                'Marathon Lover'
+                'Night Owl',
+                'Iron Endurance',
+                'After Midnight',
+                'Never Off Duty',
+                'Dawn Survivor'
             ],
             fame: [
-                'Crowd Favorite',
-                'Rising Fantasy',
-                'Viral Temptation',
-                'Spotlight Star',
-                'Household Sin'
+                'Club Favorite',
+                'Midnight Celebrity',
+                'Velvet Icon',
+                'House Legend',
+                'King of Midnight'
             ]
         },
+
         combo: {
             fame_performance: [
-                'Main Event',
-                'Box Office Star',
-                'Fan Favorite',
-                'Headline Act',
-                'Studio Icon'
+                'Velvet Superstar',
+                'Main Attraction',
+                'Midnight Headliner',
+                'Club Royalty',
+                'Living Fantasy'
             ],
             fame_stamina: [
-                'Encore Machine',
-                'Late Night Legend',
-                'Crowd Pleaser',
-                'Afterparty Star',
-                'Midnight Idol'
+                'Afterparty King',
+                'Sleepless Idol',
+                'Nightlife Legend',
+                'Last One Standing',
+                'Midnight Emperor'
             ],
             performance_stamina: [
-                'Relentless Performer',
-                'One-Take Wonder',
-                'All Night Pro',
-                'Endless Scene Star',
-                'No-Cut Legend'
+                'Relentless Stud',
+                'One-Take Legend',
+                'Endless Appetite',
+                'Untamed Performer',
+                'Bedroom Machine'
             ]
         },
+
         balanced: [
-            'Jack of All Trades',
-            'Triple Threat',
-            'Complete Package',
-            'Studio Favorite',
-            'All-Round Star'
+            'Gentleman of Midnight',
+            'Club Veteran',
+            'Velvet Gentleman',
+            'The Complete Package',
+            'MPC Elite'
         ]
     },
     female: {
         single: {
             performance: [
-                'Natural Talent',
-                'Scene Siren',
-                'Camera Charmer',
-                'Peak Temptress',
-                'Bedroom Virtuoso'
+                'Velvet Vixen',
+                'Scene Goddess',
+                'Spotlight Temptress',
+                'Midnight Muse',
+                'Bedroom Queen'
             ],
             stamina: [
-                'Long Take Lover',
-                'Tireless Tease',
-                'Endurance Star',
-                'After Hours Muse',
-                'Marathon Muse'
+                'Night Temptress',
+                'After Midnight',
+                'Endless Desire',
+                'Velvet Addiction',
+                'Queen of the Night'
             ],
             fame: [
-                'Crowd Favorite',
-                'Rising Fantasy',
-                'Viral Temptation',
-                'Spotlight Siren',
-                'Household Sin'
+                'Club Darling',
+                'Velvet Icon',
+                'Midnight Queen',
+                'Fantasy Girl',
+                'House Goddess'
             ]
         },
+
         combo: {
             fame_performance: [
-                'Main Event',
-                'Box Office Siren',
-                'Fan Favorite',
-                'Headline Muse',
-                'Studio Icon'
+                'Velvet Superstar',
+                'Midnight Diva',
+                'Club Royalty',
+                'Ultimate Fantasy',
+                'Living Temptation'
             ],
             fame_stamina: [
-                'Encore Muse',
-                'Late Night Legend',
-                'Crowd Pleaser',
-                'Afterparty Muse',
-                'Midnight Idol'
+                'Afterparty Queen',
+                'Sleepless Siren',
+                'Nightlife Goddess',
+                'Last Girl Standing',
+                'Midnight Empress'
             ],
             performance_stamina: [
-                'Relentless Performer',
-                'One-Take Wonder',
-                'All Night Muse',
-                'Endless Scene Star',
-                'No-Cut Legend'
+                'Relentless Vixen',
+                'One-Take Goddess',
+                'Endless Desire',
+                'Bedroom Addiction',
+                'Velvet Temptation'
             ]
         },
+
         balanced: [
-            'Jack of All Trades',
-            'Triple Threat',
-            'Complete Package',
-            'Studio Muse',
-            'All-Round Star'
+            'Lady of Midnight',
+            'Velvet Queen',
+            'Midnight Darling',
+            'The Complete Fantasy',
+            'MPC Elite'
         ]
     }
 };

@@ -438,7 +438,7 @@ async function acceptScene(
 
     }
 
-    scheduleScene(
+    await scheduleScene(
         channel,
         requesterId,
         targetId,
