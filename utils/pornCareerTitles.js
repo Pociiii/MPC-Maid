@@ -215,15 +215,14 @@ function getPornCareerTitle(
     const lowest =
         stats[stats.length - 1].value;
 
-    const tier =
-        getTitleTier(
-            highest
-        );
-
     if (
         highest - lowest <= 1
     )
-        return titles.balanced[tier];
+        return titles.balanced[
+            getTitleTier(
+                lowest
+            )
+        ];
 
     if (
         highest >= 4 &&
@@ -241,11 +240,19 @@ function getPornCareerTitle(
                     '_'
                 );
 
-        return titles.combo[comboKey][tier];
+        return titles.combo[comboKey][
+            getTitleTier(
+                stats[1].value
+            )
+        ];
 
     }
 
-    return titles.single[stats[0].key][tier];
+    return titles.single[stats[0].key][
+        getTitleTier(
+            highest
+        )
+    ];
 
 }
 

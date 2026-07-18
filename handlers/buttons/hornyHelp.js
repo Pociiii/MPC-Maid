@@ -69,6 +69,12 @@ const {
     replyButtonAlreadyUsed
 } = require('../../utils/buttonDedup');
 
+const {
+    recordSuccessfulHornyHelp,
+    releaseHornyHelpReservation,
+    reserveHornyHelp
+} = require('../../utils/hornyHelpFairness');
+
 const sceneRoot =
     getRuntimeDataPath(
         'scenes'
@@ -324,11 +330,42 @@ module.exports = async (
 
     }
 
+    const helperReservation =
+        reserveHornyHelp(
+            interaction.user.id
+        );
+
+    if (
+        !helperReservation.allowed
+    ) {
+
+        const retryTimestamp =
+            Math.floor(
+                helperReservation.expiresAt / 1000
+            );
+
+        return interaction.followUp({
+
+            content:
+                helperReservation.reason === 'processing'
+                    ? 'Your previous help click is still being processed.'
+                    : `You handled the last help, so let someone else take this one. You can help again after somebody else does, or <t:${retryTimestamp}:R>.`,
+
+            flags: 64
+
+        });
+
+    }
+
     if (
         !claimButton(
             interaction
         )
     ) {
+
+        releaseHornyHelpReservation(
+            interaction.user.id
+        );
 
         await replyButtonAlreadyUsed(
             interaction
@@ -405,6 +442,10 @@ module.exports = async (
                 embed
             ]
         }
+    );
+
+    recordSuccessfulHornyHelp(
+        interaction.user.id
     );
 
     await Promise.all([

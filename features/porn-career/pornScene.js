@@ -99,8 +99,6 @@ async function acceptScene(
 
     }
 
-    await interaction.deferUpdate();
-
     const existingRequest =
         getPendingRequest(
             requesterId,
@@ -110,6 +108,8 @@ async function acceptScene(
     if (
         !existingRequest
     ) {
+
+        await interaction.deferUpdate();
 
         if (
             isBusyWithEachOther(
@@ -146,7 +146,7 @@ async function acceptScene(
         )
     ) {
 
-        await interaction.followUp({
+        await interaction.reply({
             content:
                 'One of you is currently filming another scene. Try accepting again later.',
             flags:
@@ -156,6 +156,8 @@ async function acceptScene(
         return;
 
     }
+
+    await interaction.deferUpdate();
 
     const pendingRequest =
         consumePendingRequest(

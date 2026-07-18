@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node index.js",
     "check": "node --check index.js",
+    "test:cooldown-persistence": "node scripts/testCooldownPersistence.js",
+    "test:horny-help-fairness": "node scripts/testHornyHelpFairness.js",
     "test:lottery": "node scripts/testLottery.js",
+    "test:porn-career-titles": "node scripts/testPornCareerTitles.js",
     "test:scene-recovery": "node scripts/testSceneRecovery.js",
     "preflight:nodb": "node scripts/preflight.js --skip-db",
     "preflight": "node scripts/preflight.js"

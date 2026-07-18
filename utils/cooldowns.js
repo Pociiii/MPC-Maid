@@ -1,5 +1,96 @@
+const fs =
+    require('fs');
+
+const path =
+    require('path');
+
+const {
+    getRuntimeDataPath
+} = require('./runtimeData');
+
+const cooldownsPath =
+    getRuntimeDataPath(
+        'command-cooldowns.json'
+    );
+
+function loadCooldowns() {
+
+    try {
+
+        const stored =
+            JSON.parse(
+                fs.readFileSync(
+                    cooldownsPath,
+                    'utf8'
+                )
+            );
+
+        const now =
+            Date.now();
+
+        return new Map(
+            (Array.isArray(
+                stored
+            )
+                ? stored
+                : []
+            ).filter(
+                (entry) =>
+                    Array.isArray(
+                        entry
+                    ) &&
+                    typeof entry[0] === 'string' &&
+                    Number.isFinite(
+                        entry[1]
+                    ) &&
+                    entry[1] > now
+            )
+        );
+
+    }
+    catch (error) {
+
+        if (
+            error.code !== 'ENOENT'
+        )
+            console.error(
+                'COMMAND COOLDOWN RESTORE ERROR',
+                error
+            );
+
+        return new Map();
+
+    }
+
+}
+
 const cooldowns =
-    new Map();
+    loadCooldowns();
+
+function persistCooldowns() {
+
+    fs.mkdirSync(
+        path.dirname(
+            cooldownsPath
+        ),
+        {
+            recursive:
+                true
+        }
+    );
+
+    fs.writeFileSync(
+        cooldownsPath,
+        JSON.stringify(
+            Array.from(
+                cooldowns.entries()
+            ),
+            null,
+            2
+        )
+    );
+
+}
 
 const {
     cooldownFlavor,
@@ -36,6 +127,8 @@ function checkCooldown(
         now + seconds * 1000
     );
 
+    persistCooldowns();
+
     return 0;
 
 }
@@ -64,6 +157,18 @@ function getCooldownRemaining(
             (expiresAt - now) / 1000
         );
 
+    if (
+        expiresAt
+    ) {
+
+        cooldowns.delete(
+            key
+        );
+
+        persistCooldowns();
+
+    }
+
     return 0;
 
 }
@@ -79,6 +184,8 @@ function startCooldown(
         Date.now() + seconds * 1000
     );
 
+    persistCooldowns();
+
 }
 
 function clearCooldown(
@@ -86,9 +193,15 @@ function clearCooldown(
     command
 ) {
 
-    cooldowns.delete(
-        `${userId}-${command}`
-    );
+    const removed =
+        cooldowns.delete(
+            `${userId}-${command}`
+        );
+
+    if (
+        removed
+    )
+        persistCooldowns();
 
 }
 
