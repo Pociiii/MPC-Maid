@@ -70,10 +70,11 @@ const {
 } = require('../../utils/buttonDedup');
 
 const {
-    recordSuccessfulHornyHelp,
-    releaseHornyHelpReservation,
-    reserveHornyHelp
-} = require('../../utils/hornyHelpFairness');
+    getCooldownMessage,
+    recordSuccessfulSocialInteraction,
+    releaseSocialInteractionReservation,
+    reserveSocialInteraction
+} = require('../../utils/socialInteractionCooldown');
 
 const sceneRoot =
     getRuntimeDataPath(
@@ -330,26 +331,20 @@ module.exports = async (
 
     }
 
-    const helperReservation =
-        reserveHornyHelp(
+    const interactionReservation =
+        reserveSocialInteraction(
             interaction.user.id
         );
 
     if (
-        !helperReservation.allowed
+        !interactionReservation.allowed
     ) {
-
-        const retryTimestamp =
-            Math.floor(
-                helperReservation.expiresAt / 1000
-            );
-
         return interaction.followUp({
 
             content:
-                helperReservation.reason === 'processing'
-                    ? 'Your previous help click is still being processed.'
-                    : `You handled the last help, so let someone else take this one. You can help again after somebody else does, or <t:${retryTimestamp}:R>.`,
+                getCooldownMessage(
+                    interactionReservation
+                ),
 
             flags: 64
 
@@ -363,7 +358,7 @@ module.exports = async (
         )
     ) {
 
-        releaseHornyHelpReservation(
+        releaseSocialInteractionReservation(
             interaction.user.id
         );
 
@@ -444,7 +439,7 @@ module.exports = async (
         }
     );
 
-    recordSuccessfulHornyHelp(
+    recordSuccessfulSocialInteraction(
         interaction.user.id
     );
 

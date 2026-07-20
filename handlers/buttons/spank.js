@@ -58,6 +58,13 @@ const {
     replyButtonAlreadyUsed
 } = require('../../utils/buttonDedup');
 
+const {
+    getCooldownMessage,
+    recordSuccessfulSocialInteraction,
+    releaseSocialInteractionReservation,
+    reserveSocialInteraction
+} = require('../../utils/socialInteractionCooldown');
+
 module.exports = async (
     interaction
 ) => {
@@ -108,11 +115,35 @@ module.exports = async (
 
     }
 
+    const interactionReservation =
+        reserveSocialInteraction(
+            interaction.user.id
+        );
+
+    if (
+        !interactionReservation.allowed
+    ) {
+
+        return interaction.reply({
+            content:
+                getCooldownMessage(
+                    interactionReservation
+                ),
+            flags:
+                64
+        });
+
+    }
+
     if (
         !claimButton(
             interaction
         )
     ) {
+
+        releaseSocialInteractionReservation(
+            interaction.user.id
+        );
 
         await replyButtonAlreadyUsed(
             interaction
@@ -194,6 +225,10 @@ module.exports = async (
                 embed
             ]
         }
+    );
+
+    recordSuccessfulSocialInteraction(
+        interaction.user.id
     );
 
     await addSpankGiven(
