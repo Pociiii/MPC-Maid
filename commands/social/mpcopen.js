@@ -24,7 +24,6 @@ const fomoSentences = [
     'Tonight becomes tomorrow\'s gossip.',
     'Don\'t be the one asking what happened.',
     'The best stories start with showing up.',
-    'Your FOMO has officially been warned.',
     'Some nights should not be missed.',
     'Come make a memory—or become jealous of one.',
     'The room is open. Your alibi can wait.'
@@ -107,6 +106,11 @@ module.exports = {
         interaction
     ) {
 
+        await interaction.deferReply({
+            flags:
+                64
+        });
+
         const roomName =
             interaction.options.getString(
                 'room-name',
@@ -129,11 +133,9 @@ module.exports = {
             !hostMessage
         ) {
 
-            await interaction.reply({
+            await interaction.editReply({
                 content:
-                    'Room name and message cannot be blank.',
-                flags:
-                    64
+                    'Room name and message cannot be blank.'
             });
 
             return;
@@ -146,11 +148,9 @@ module.exports = {
             )
         ) {
 
-            await interaction.reply({
+            await interaction.editReply({
                 content:
-                    'Please upload a picture or GIF.',
-                flags:
-                    64
+                    'Please upload a picture or GIF.'
             });
 
             return;
@@ -185,7 +185,24 @@ module.exports = {
                     true
             });
 
-        await interaction.reply({
+        const channel =
+            interaction.channel;
+
+        if (
+            !channel?.send
+        ) {
+
+            await interaction.editReply({
+                content:
+                    'I could not post the room announcement in this channel.'
+            });
+
+            return;
+
+        }
+
+        const post =
+            await channel.send({
             content:
                 `<@&${ROLES.STILETTO_GANG}> <@&${ROLES.TAILORED_FEW}> <@&${ROLES.EVENTS}> @here`,
             embeds: [
@@ -202,6 +219,11 @@ module.exports = {
                 ],
                 users: []
             }
+        });
+
+        await interaction.editReply({
+            content:
+                `Room opening posted: ${post.url}`
         });
 
     }
