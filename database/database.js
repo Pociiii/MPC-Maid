@@ -82,12 +82,27 @@ const db = new sqlite3.Database('./database.db', (err) => {
         'utf8'
     );
 
+    const commandGuideSchema = fs.readFileSync(
+        path.join(__dirname, 'schemas', 'command_guide.sql'),
+        'utf8'
+    );
+
+    const memberCardPanelSchema = fs.readFileSync(
+        path.join(__dirname, 'schemas', 'member_card_panel.sql'),
+        'utf8'
+    );
+
+    const gifSubmissionPanelSchema = fs.readFileSync(
+        path.join(__dirname, 'schemas', 'gif_submission_panel.sql'),
+        'utf8'
+    );
+
     const activeScenesSchema = fs.readFileSync(
         path.join(__dirname, 'schemas', 'active_scenes.sql'),
         'utf8'
     );
 
-    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${dailyWyrSchema}\n${profileLikesSchema}\n${achievementsSchema}\n${pregnancySchema}\n${relationshipsSchema}\n${spankDilliSchema}\n${giftsSchema}\n${lotterySchema}\n${activeScenesSchema}`, async (err) => {
+    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${dailyWyrSchema}\n${profileLikesSchema}\n${achievementsSchema}\n${pregnancySchema}\n${relationshipsSchema}\n${spankDilliSchema}\n${giftsSchema}\n${lotterySchema}\n${commandGuideSchema}\n${memberCardPanelSchema}\n${gifSubmissionPanelSchema}\n${activeScenesSchema}`, async (err) => {
 
         if (err) {
             console.error(err);

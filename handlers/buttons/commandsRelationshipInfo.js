@@ -55,7 +55,7 @@ module.exports = {
 - \`/relationship breakup user:@user\` removes a dating link.
 - Relationship removal posts a small Moments notice only when the removal succeeds.`,
                 footerText:
-                    '/commands - Relationship Info',
+                    'MPC Maid Command Guide - Relationship Info',
                 timestamp:
                     true
             });

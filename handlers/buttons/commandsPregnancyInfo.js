@@ -49,7 +49,7 @@ module.exports = {
 - Birth happens on **Day 30**.
 - Use \`/pregnancy\` to check your own private status.`,
                 footerText:
-                    '/commands - Pregnancy Info',
+                    'MPC Maid Command Guide - Pregnancy Info',
                 timestamp:
                     true
             });

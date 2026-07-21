@@ -6,9 +6,16 @@ const {
 } = require('discord.js');
 
 const {
-    createBotEmbed,
     createEmbed
 } = require('../../utils/embeds');
+
+const db =
+    require('../../database/database');
+
+const {
+    logError,
+    logWarning
+} = require('../../utils/inboxLogger');
 
 const {
     CHANNELS,
@@ -124,7 +131,8 @@ function buildSections() {
                     '/profile',
                     '/daily',
                     '/leaderboard',
-                    '/achievements'
+                    '/achievements',
+                    '/mpcopen'
                 ]),
             commands: [
                 commandDetail(
@@ -150,6 +158,12 @@ function buildSections() {
                     privateReply,
                     'None',
                     'Check achievement progress.'
+                ),
+                commandDetail(
+                    '/mpcopen',
+                    'Any channel, public announcement',
+                    'None',
+                    'Announce an open MPC room with host text and optional media.'
                 )
             ]
         },
@@ -347,13 +361,14 @@ function buildSections() {
             emoji:
                 '🎰',
             summary:
-                commandSummary([
+                `${commandSummary([
                     '/dice',
                     '/slots',
                     '/blackjack',
                     '/holdem',
                     '/lottery'
-                ]),
+                ])}
+- <#${CHANNELS.SPANK_DILLI}> panel`,
             commands: [
                 commandDetail(
                     '/dice',
@@ -388,6 +403,12 @@ function buildSections() {
                     'Bet up to 50 coins per street, play Texas Hold\'em against the dealer.'
                 ),
                 commandDetail(
+                    'Spank Dilli Panel',
+                    `<#${CHANNELS.SPANK_DILLI}>`,
+                    'None',
+                    'Use the permanent button to play for the shared prize.'
+                ),
+                commandDetail(
                     '/lottery',
                     `Any channel, private reply. Public panel in <#${CHANNELS.LOTTERY}>.`,
                     'None',
@@ -401,8 +422,14 @@ function buildSections() {
             emoji:
                 '📣',
             summary:
-                `<#${CHANNELS.MAID_FEED}> <#${CHANNELS.MOMENTS}> <#${CHANNELS.PILLOW_TALK}> <#${CHANNELS.EDITING_ROOM}> <#${CHANNELS.UPDATES}>`,
+                `<#${CHANNELS.GIFS}> <#${CHANNELS.MAID_FEED}> <#${CHANNELS.MOMENTS}> <#${CHANNELS.PILLOW_TALK}> <#${CHANNELS.EDITING_ROOM}> <#${CHANNELS.UPDATES}>`,
             commands: [
+                commandDetail(
+                    'GIF Submission Panel',
+                    `<#${CHANNELS.GIFS}>`,
+                    'None',
+                    'Submit scene GIFs, interaction GIFs, or scene-title suggestions.'
+                ),
                 commandDetail(
                     'Maid Feed',
                     `<#${CHANNELS.MAID_FEED}>`,
@@ -446,24 +473,27 @@ function buildSections() {
 }
 
 function buildCommandOverviewEmbed(
-    interaction
+    client
 ) {
 
     const sections =
         buildSections();
 
     const embed =
-        createBotEmbed(
-            interaction,
-            {
-                command:
-                    '/commands',
-                title:
-                    'MPC Maid Commands',
-                description:
-                    'Pick a section from the menu for channels, cooldowns, and short notes.'
-            }
-        );
+        createEmbed({
+            color:
+                getRandomColor(),
+            authorName:
+                client.user.username,
+            title:
+                'MPC Maid Commands',
+            description:
+                'Pick a section from the menu for channels, cooldowns, and short notes.',
+            footerText:
+                'MPC Maid Command Guide',
+            timestamp:
+                true
+        });
 
     embed.addFields(
         {
@@ -510,7 +540,7 @@ function buildCommandSectionEmbed(
             description:
                 'Short version only. Big systems have their own info buttons.',
             footerText:
-                '/commands',
+                'MPC Maid Command Guide',
             timestamp:
                 true
         });
@@ -619,8 +649,239 @@ function buildCommandGuideComponents() {
 
 }
 
+function dbRun(
+    sql,
+    params = []
+) {
+
+    return new Promise(
+        (resolve, reject) =>
+            db.run(
+                sql,
+                params,
+                function onRun(error) {
+                    error
+                        ? reject(error)
+                        : resolve({
+                            changes: this.changes,
+                            lastID: this.lastID
+                        });
+                }
+            )
+    );
+
+}
+
+function dbGet(
+    sql,
+    params = []
+) {
+
+    return new Promise(
+        (resolve, reject) =>
+            db.get(
+                sql,
+                params,
+                (error, row) =>
+                    error
+                        ? reject(error)
+                        : resolve(row)
+            )
+    );
+
+}
+
+async function getCommandGuideChannel(
+    client
+) {
+
+    return client.channels.cache.get(
+        CHANNELS.COMMANDS
+    ) ??
+        await client.channels.fetch(
+            CHANNELS.COMMANDS
+        ).catch(
+            () => null
+        );
+
+}
+
+function buildCommandGuideMessage(
+    client
+) {
+
+    return {
+        embeds: [
+            buildCommandOverviewEmbed(
+                client
+            )
+        ],
+        components:
+            buildCommandGuideComponents()
+    };
+
+}
+
+async function findExistingCommandGuide(
+    channel,
+    client
+) {
+
+    const messages =
+        await channel.messages.fetch({
+            limit:
+                100
+        }).catch(
+            () => null
+        );
+
+    return messages?.find(
+        (message) =>
+            message.author?.id === client.user.id &&
+            message.embeds?.some(
+                (embed) =>
+                    embed.title === 'MPC Maid Commands'
+            )
+    ) ?? null;
+
+}
+
+async function ensurePersistentCommandGuide(
+    client
+) {
+
+    const channel =
+        await getCommandGuideChannel(
+            client
+        );
+
+    if (
+        !channel?.messages?.fetch ||
+        !channel?.send
+    ) {
+
+        void logWarning(
+            client,
+            {
+                title:
+                    'Command Guide Channel Missing',
+                description:
+                    `Could not use <#${CHANNELS.COMMANDS}> for the command guide.`
+            }
+        );
+
+        return null;
+
+    }
+
+    await dbRun(
+        `INSERT OR IGNORE INTO command_guide_settings (
+            id,
+            channel_id,
+            updated_at
+        ) VALUES (1, ?, ?)`,
+        [
+            CHANNELS.COMMANDS,
+            Date.now()
+        ]
+    );
+
+    const settings =
+        await dbGet(
+            'SELECT * FROM command_guide_settings WHERE id = 1'
+        );
+
+    let message =
+        settings?.message_id
+            ? await channel.messages.fetch(
+                settings.message_id
+            ).catch(
+                () => null
+            )
+            : null;
+
+    if (
+        !message
+    )
+        message =
+            await findExistingCommandGuide(
+                channel,
+                client
+            );
+
+    if (
+        message
+    )
+        await message.edit(
+            buildCommandGuideMessage(
+                client
+            )
+        );
+    else
+        message =
+            await channel.send(
+                buildCommandGuideMessage(
+                    client
+                )
+            );
+
+    await dbRun(
+        `UPDATE command_guide_settings
+         SET channel_id = ?, message_id = ?, updated_at = ?
+         WHERE id = 1`,
+        [
+            CHANNELS.COMMANDS,
+            message.id,
+            Date.now()
+        ]
+    );
+
+    return message;
+
+}
+
+async function startCommandGuide(
+    client
+) {
+
+    try {
+
+        return await ensurePersistentCommandGuide(
+            client
+        );
+
+    }
+    catch (error) {
+
+        void logError(
+            client,
+            {
+                title:
+                    'Command Guide Startup Failed',
+                error,
+                fields: [
+                    {
+                        name:
+                            '📍 Channel',
+                        value:
+                            `<#${CHANNELS.COMMANDS}>`,
+                        inline:
+                            true
+                    }
+                ]
+            }
+        );
+
+        return null;
+
+    }
+
+}
+
 module.exports = {
     buildCommandGuideComponents,
     buildCommandOverviewEmbed,
-    buildCommandSectionEmbed
+    buildCommandSectionEmbed,
+    ensurePersistentCommandGuide,
+    startCommandGuide
 };

@@ -77,7 +77,7 @@ async execute(
                 image:
                     rejectedGifUrl,
                 footerText:
-                    '/gifsubmit',
+                    'GIF Submission Panel',
                 timestamp:
                     true
             });

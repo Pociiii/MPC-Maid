@@ -76,7 +76,7 @@ function buildApprovedEmbed(
         .setFooter({
             text:
                 commandFooter(
-                    '/gifsubmit'
+                    'GIF Submission Panel'
                 )
         })
         .setFields(
@@ -190,7 +190,7 @@ function buildApprovalFeedEmbed(
         .setFooter({
             text:
                 commandFooter(
-                    '/gifsubmit'
+                    'GIF Submission Panel'
                 )
         });
 

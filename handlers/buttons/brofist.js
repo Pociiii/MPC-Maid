@@ -15,6 +15,7 @@ const {
 } = require('../../utils/mpcLogo');
 
 const {
+    CHANNELS,
     getRandomColor
 } = require('../../data/constants');
 
@@ -133,7 +134,7 @@ module.exports = async (
 
         await interaction.reply({
             content:
-                'No Brofist GIFs are ready yet. Use `/gifsubmit` to send some in.',
+                `No Brofist GIFs are ready yet. Use the GIF submission panel in <#${CHANNELS.GIFS}> to send some in.`,
             flags:
                 64
         });

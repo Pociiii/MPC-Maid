@@ -63,7 +63,7 @@ module.exports = {
 - Use \`/train\` to upgrade stats.
 - Use \`/shop\` to buy boosters and \`/inventory\` to see them.`,
                 footerText:
-                    '/commands - Porn Career Info',
+                    'MPC Maid Command Guide - Porn Career Info',
                 timestamp:
                     true
             });

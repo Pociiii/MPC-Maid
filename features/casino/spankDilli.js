@@ -33,6 +33,11 @@ const {
     syncUserAchievementCounters
 } = require('../achievements/achievements');
 
+const {
+    logError,
+    logWarning
+} = require('../../utils/inboxLogger');
+
 const emojis =
     require('../../utils/emojis');
 
@@ -211,7 +216,7 @@ function buildPanelEmbed(
             description:
                 'Click the button, play the spank, and see if Dilli pays out.',
             footerText:
-                '/spankdilli',
+                'MPC Maid - Spank Dilli',
             timestamp:
                 true
         });
@@ -293,6 +298,211 @@ async function updatePanelMessage(
 
 }
 
+async function getSpankDilliChannel(
+    client
+) {
+
+    return client.channels.cache.get(
+        CHANNELS.SPANK_DILLI
+    ) ??
+        await client.channels.fetch(
+            CHANNELS.SPANK_DILLI
+        ).catch(
+            () => null
+        );
+
+}
+
+async function buildPanelMessage(
+    source
+) {
+
+    const state =
+        await getState();
+
+    const owner =
+        await getPanelOwner(
+            source
+        );
+
+    return {
+        embeds: [
+            buildPanelEmbed(
+                state,
+                owner
+            )
+        ],
+        components: [
+            getButtonRow()
+        ]
+    };
+
+}
+
+async function findExistingPanel(
+    channel,
+    client
+) {
+
+    const messages =
+        await channel.messages.fetch({
+            limit:
+                100
+        }).catch(
+            () => null
+        );
+
+    return messages?.find(
+        (message) =>
+            message.author?.id === client.user.id &&
+            message.embeds?.some(
+                (embed) =>
+                    embed.title === 'Spank Dilli'
+            ) &&
+            message.components?.some(
+                (row) =>
+                    row.components?.some(
+                        (component) =>
+                            component.customId === 'spank_dilli'
+                    )
+            )
+    ) ?? null;
+
+}
+
+async function ensurePersistentSpankDilliPanel(
+    client
+) {
+
+    const channel =
+        await getSpankDilliChannel(
+            client
+        );
+
+    if (
+        !channel?.messages?.fetch ||
+        !channel?.send
+    ) {
+
+        void logWarning(
+            client,
+            {
+                title:
+                    'Spank Dilli Channel Missing',
+                description:
+                    `Could not use <#${CHANNELS.SPANK_DILLI}> for the Spank Dilli panel.`
+            }
+        );
+
+        return null;
+
+    }
+
+    await dbRun(
+        `INSERT OR IGNORE INTO spank_dilli_panel_settings (
+            id,
+            channel_id,
+            updated_at
+        ) VALUES (1, ?, ?)`,
+        [
+            CHANNELS.SPANK_DILLI,
+            Date.now()
+        ]
+    );
+
+    const settings =
+        await dbGet(
+            'SELECT * FROM spank_dilli_panel_settings WHERE id = 1'
+        );
+
+    let message =
+        settings?.message_id
+            ? await channel.messages.fetch(
+                settings.message_id
+            ).catch(
+                () => null
+            )
+            : null;
+
+    if (
+        !message
+    )
+        message =
+            await findExistingPanel(
+                channel,
+                client
+            );
+
+    const payload =
+        await buildPanelMessage(
+            channel
+        );
+
+    if (
+        message
+    )
+        await message.edit(
+            payload
+        );
+    else
+        message =
+            await channel.send(
+                payload
+            );
+
+    await dbRun(
+        `UPDATE spank_dilli_panel_settings
+         SET channel_id = ?, message_id = ?, updated_at = ?
+         WHERE id = 1`,
+        [
+            CHANNELS.SPANK_DILLI,
+            message.id,
+            Date.now()
+        ]
+    );
+
+    return message;
+
+}
+
+async function startSpankDilliPanel(
+    client
+) {
+
+    try {
+
+        return await ensurePersistentSpankDilliPanel(
+            client
+        );
+
+    }
+    catch (error) {
+
+        void logError(
+            client,
+            {
+                title:
+                    'Spank Dilli Panel Startup Failed',
+                error,
+                fields: [
+                    {
+                        name:
+                            '📍 Channel',
+                        value:
+                            `<#${CHANNELS.SPANK_DILLI}>`,
+                        inline:
+                            true
+                    }
+                ]
+            }
+        );
+
+        return null;
+
+    }
+
+}
+
 function wait(
     ms
 ) {
@@ -363,7 +573,7 @@ async function announceWinner(
                     maidFeedFlavor.spankDilli
                 )}`,
             footerText:
-                '/spankdilli',
+                'MPC Maid - Spank Dilli',
             timestamp:
                 true
         });
@@ -573,9 +783,12 @@ async function handleSpankDilli(
 }
 
 module.exports = {
+    buildPanelMessage,
     buildPanelEmbed,
+    ensurePersistentSpankDilliPanel,
     getButtonRow,
     getPanelOwner,
     getState,
-    handleSpankDilli
+    handleSpankDilli,
+    startSpankDilliPanel
 };

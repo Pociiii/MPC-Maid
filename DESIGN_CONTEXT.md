@@ -11,7 +11,7 @@ remain concise and easy to use on mobile.
 
 - Production and event workflows belong in this bot.
 - General moderation is handled by MEE6.
-- Staff-only commands and workflows must not appear in the public `/commands`
+- Staff-only commands and workflows must not appear in the public command
   guide or public changelog.
 - Social flavor must not accidentally create progression rewards.
 
@@ -41,6 +41,8 @@ remain concise and easy to use on mobile.
 - Moments: major story/RP moments where currently configured.
 - Pillow Talk: relationship-oriented RP and successful gift notifications.
 - Commands: command discovery and guidance.
+- Member Card: persistent panel for generating private MPC membership cards.
+- GIF Submission: persistent panel for GIF and scene-title contributions.
 
 Channel IDs are defined centrally in `data/constants.js`; command code must not
 hardcode them.
@@ -49,7 +51,7 @@ hardcode them.
 
 Current public command families include:
 
-- General: `/profile`, `/daily`, `/leaderboard`, `/achievements`, `/commands`.
+- General: `/profile`, `/daily`, `/leaderboard`, `/achievements`, `/mpcopen`.
 - Porn Career: `/pornscene`, `/customscene`, `/train`, `/shop boosters`,
   `/inventory boosters`.
 - Gifts: `/shop gifts`, `/inventory gifts`, `/gift send`.
@@ -57,12 +59,20 @@ Current public command families include:
   `/firework`.
 - Showcase and interactions: `/drop`, `/wiggle`, `/flex`, `/horny` and their
   interaction buttons.
-- Casino: `/dice`, `/slots`, `/blackjack`, `/holdem`, `/spankdilli`.
-- Member contribution: GIF submission commands exposed by the current command
-  guide.
+- Casino: `/dice`, `/slots`, `/blackjack`, `/holdem`; Spank Dilli uses its
+  persistent channel panel.
+- Member contribution: the persistent GIF submission panel exposed by the
+  current command guide.
 
-The command definitions in `commands/` and the generated `/commands` guide are
-the final source for exact options and channel descriptions.
+The command definitions in `commands/` and the persistent command guide are the
+final source for exact options and channel descriptions. The guide is refreshed
+automatically in the Commands channel when the bot starts.
+
+`/mpcopen` posts a public room-opening announcement with the host's server
+display name and profile image, required room name and message text, optional
+image/GIF media, and controlled Stiletto Gang, Tailored Few, Events, and `@here`
+mentions. Command access is managed through Discord rather than code-level
+default permissions.
 
 ## Economy and Progression
 
@@ -237,8 +247,9 @@ invalid prices, and insufficient catalogue entries for a daily rotation.
 - Blackjack and current Hold'em sessions are in memory.
 - Hold'em is user-versus-dealer, reveals hole cards privately, advances a public
   board, charges by street, and evaluates the best five-card hand from seven.
-- Spank Dilli maintains persistent shared state and posts winner announcements
-  to Maid Feed.
+- Spank Dilli maintains persistent shared state, refreshes or repairs its panel
+  in the dedicated channel at startup, and posts winner announcements to Maid
+  Feed.
 
 ## GIF Data and Submission
 

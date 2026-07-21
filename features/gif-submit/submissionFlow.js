@@ -137,7 +137,7 @@ function buildReviewEmbed(
                 gifUrl,
             footerText:
                 commandFooter(
-                    '/gifsubmit'
+                    'GIF Submission Panel'
                 ),
             timestamp:
                 true
@@ -237,7 +237,7 @@ function buildDuplicateEmbed(
             gifUrl,
         footerText:
             commandFooter(
-                '/gifsubmit'
+                'GIF Submission Panel'
             ),
         timestamp:
             true
@@ -258,7 +258,7 @@ function buildSubmittedEmbed(
             gifUrl,
         footerText:
             commandFooter(
-                '/gifsubmit'
+                'GIF Submission Panel'
             ),
         timestamp:
             true
@@ -277,7 +277,7 @@ function buildReviewChannelMissingEmbed() {
             'The GIF review channel is not available right now, so the submission was not sent.',
         footerText:
             commandFooter(
-                '/gifsubmit'
+                'GIF Submission Panel'
             ),
         timestamp:
             true

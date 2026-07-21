@@ -96,6 +96,22 @@ const {
 } = require('./features/lottery/lottery');
 
 const {
+    startCommandGuide
+} = require('./features/commands/commandGuide');
+
+const {
+    startMemberCardPanel
+} = require('./features/member-card/memberCardPanel');
+
+const {
+    startSpankDilliPanel
+} = require('./features/casino/spankDilli');
+
+const {
+    startGifSubmissionPanel
+} = require('./features/gif-submit/panel');
+
+const {
     restorePornScenes
 } = require('./features/porn-career/sceneScheduler');
 
@@ -440,6 +456,22 @@ async readyClient => {
         );
 
         startDailyWyrScheduler(
+            readyClient
+        );
+
+        await startCommandGuide(
+            readyClient
+        );
+
+        await startMemberCardPanel(
+            readyClient
+        );
+
+        await startGifSubmissionPanel(
+            readyClient
+        );
+
+        await startSpankDilliPanel(
             readyClient
         );
 

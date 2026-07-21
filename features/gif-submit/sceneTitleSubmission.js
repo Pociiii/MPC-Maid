@@ -337,7 +337,7 @@ function buildReviewEmbed(
                 'Scene Title Suggestion',
             footerText:
                 commandFooter(
-                    '/gifsubmit'
+                    'GIF Submission Panel'
                 ),
             timestamp:
                 true
@@ -429,7 +429,7 @@ function buildResultEmbed(
                 'Scene Title Approved',
             footerText:
                 commandFooter(
-                    '/gifsubmit'
+                    'GIF Submission Panel'
                 ),
             timestamp:
                 true
@@ -785,7 +785,7 @@ async function rejectSceneTitle(
                 description:
                     'Your scene title suggestion was rejected. You can suggest another title any time.',
                 footerText:
-                    '/gifsubmit',
+                    'GIF Submission Panel',
                 timestamp:
                     true
             });
