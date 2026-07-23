@@ -456,11 +456,6 @@ module.exports = async (
         trackDailyQuest(
             interaction.client,
             interaction.user.id,
-            'horny_help'
-        ),
-        trackDailyQuest(
-            interaction.client,
-            interaction.user.id,
             'social_interaction'
         ),
         trackDailyQuest(

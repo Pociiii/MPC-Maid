@@ -139,42 +139,6 @@ const questPool = [
     },
     {
         id:
-            'horny_help_1',
-        action:
-            'horny_help',
-        label:
-            'Help someone horny 1 time',
-        target:
-            1,
-        tier:
-            'easy'
-    },
-    {
-        id:
-            'horny_help_2',
-        action:
-            'horny_help',
-        label:
-            'Help someone horny 2 times',
-        target:
-            2,
-        tier:
-            'medium'
-    },
-    {
-        id:
-            'horny_help_3',
-        action:
-            'horny_help',
-        label:
-            'Help someone horny 3 times',
-        target:
-            3,
-        tier:
-            'hard'
-    },
-    {
-        id:
             'dice_1',
         action:
             'dice',
@@ -736,6 +700,48 @@ async function getStoredDailyQuests(
 
 }
 
+async function convertRetiredDailyQuests(
+    quests
+) {
+
+    return Promise.all(
+        quests.map(
+            async (quest) => {
+
+                if (
+                    quest.action !==
+                    'horny_help'
+                )
+                    return quest;
+
+                const label =
+                    `Give or receive ${quest.target} interaction${quest.target === 1 ? '' : 's'}`;
+
+                await dbRun(
+                    `UPDATE daily_quests
+                     SET action = ?,
+                         label = ?
+                     WHERE rowid = ?`,
+                    [
+                        'social_interaction',
+                        label,
+                        quest.row_id
+                    ]
+                );
+
+                return {
+                    ...quest,
+                    action:
+                        'social_interaction',
+                    label
+                };
+
+            }
+        )
+    );
+
+}
+
 async function normalizeDailyQuests(
     userId,
     questDate,
@@ -838,7 +844,9 @@ async function ensureDailyQuests(
         return normalizeDailyQuests(
             userId,
             questDate,
-            existing
+            await convertRetiredDailyQuests(
+                existing
+            )
         );
 
     await createDailyQuests(

@@ -9,7 +9,7 @@ const {
 } = require('./runtimeData');
 
 const cooldownMs =
-    5 * 60 * 1000;
+    2 * 60 * 1000;
 
 const reservationMs =
     60 * 1000;
