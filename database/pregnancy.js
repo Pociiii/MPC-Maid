@@ -455,7 +455,7 @@ async function createPregnancy(
     const dueAt =
         addDays(
             now,
-            PREGNANCY.DURATION_DAYS
+            PREGNANCY.DURATION_DAYS - 1
         ).toISOString();
 
     const babyGender =
@@ -547,7 +547,7 @@ async function forcePregnancy(
             new Date(
                 startedAt
             ),
-            PREGNANCY.DURATION_DAYS
+            PREGNANCY.DURATION_DAYS - 1
         ).toISOString();
 
     const babyGender =

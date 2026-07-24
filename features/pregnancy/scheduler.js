@@ -16,6 +16,10 @@ const {
 } = require('./pregnancyEmbeds');
 
 const {
+    buildPregnancyAnnouncementPayload
+} = require('./pregnancyAnnouncements');
+
+const {
     logError
 } = require('../../utils/inboxLogger');
 
@@ -89,14 +93,15 @@ async function announcePregnancyResults(
                 result.pregnancy
             );
 
-        await channel.send({
-            embeds: [
+        await channel.send(
+            buildPregnancyAnnouncementPayload(
+                result.pregnancy,
                 buildPregnancyConfirmedEmbed(
                     result.pregnancy,
                     carrier
                 )
-            ]
-        });
+            )
+        );
 
     }
 
@@ -132,14 +137,15 @@ async function announceMilestones(
                 pregnancy
             );
 
-        await channel.send({
-            embeds: [
+        await channel.send(
+            buildPregnancyAnnouncementPayload(
+                pregnancy,
                 buildGenderRevealEmbed(
                     pregnancy,
                     carrier
                 )
-            ]
-        });
+            )
+        );
 
     }
 
@@ -153,14 +159,15 @@ async function announceMilestones(
                 pregnancy
             );
 
-        await channel.send({
-            embeds: [
+        await channel.send(
+            buildPregnancyAnnouncementPayload(
+                pregnancy,
                 buildBirthEmbed(
                     pregnancy,
                     carrier
                 )
-            ]
-        });
+            )
+        );
 
     }
 

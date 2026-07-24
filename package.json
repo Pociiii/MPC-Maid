@@ -10,6 +10,7 @@
     "test:horny-help-fairness": "node scripts/testSocialInteractionCooldown.js",
     "test:social-interaction-cooldown": "node scripts/testSocialInteractionCooldown.js",
     "test:lottery": "node scripts/testLottery.js",
+    "test:pregnancy": "node scripts/testPregnancySystem.js",
     "test:porn-career-titles": "node scripts/testPornCareerTitles.js",
     "test:scene-recovery": "node scripts/testSceneRecovery.js",
     "preflight:nodb": "node scripts/preflight.js --skip-db",
