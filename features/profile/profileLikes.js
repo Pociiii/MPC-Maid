@@ -177,7 +177,7 @@ async function postProfileLikeMoment(
             command:
                 '/profile',
             content:
-                null,
+                `<@${targetUserId}>`,
             fields: [
                 {
                     name:

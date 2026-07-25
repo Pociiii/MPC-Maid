@@ -1704,10 +1704,11 @@ async function handleLotteryButton(
             interaction.client,
             {
                 title: 'Lottery Tickets Purchased',
+                threadId: CHANNELS.MAID_FEED,
                 fields: [
                     {
                         name: '👤 User',
-                        value: interaction.user.id,
+                        value: `<@${interaction.user.id}>`,
                         inline: true
                     },
                     {
