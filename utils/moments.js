@@ -44,14 +44,6 @@ const flavorPools = {
         'Two names just moved a little closer on the board.',
         'That bond has enough glow to earn a Moment.'
     ],
-    relationship_broken: [
-        'Not every link survives the neon lights.',
-        'The room caught a quiet goodbye.',
-        'A familiar bond just changed shape.',
-        'One chapter softened into something different.',
-        'The board marked a gentle ending.',
-        'Some connections leave a trace even when they loosen.'
-    ],
     breed_accepted: [
         'Two members slipped away for some private time.',
         'The private rooms were not so quiet today.',

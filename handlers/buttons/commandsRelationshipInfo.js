@@ -25,7 +25,7 @@ module.exports = {
 **How it works**
 - Relationship requests are sent by DM.
 - The other user must press Accept before the link is created.
-- Accepted and broken links can appear in <#${CHANNELS.PILLOW_TALK}> as small RP notices.
+- Accepted links can appear in <#${CHANNELS.PILLOW_TALK}> as small RP notices.
 - Use \`/relationship view user:@user\` to privately check someone's links.
 
 **Romance**
@@ -53,7 +53,7 @@ module.exports = {
 **Removing links**
 - \`/relationship divorce user:@user\` removes a marriage link.
 - \`/relationship breakup user:@user\` removes a dating link.
-- Relationship removal posts a small Moments notice only when the removal succeeds.`,
+- Relationship removals are private and do not post a public notice.`,
                 footerText:
                     'MPC Maid Command Guide - Relationship Info',
                 timestamp:

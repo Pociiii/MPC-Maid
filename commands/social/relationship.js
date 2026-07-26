@@ -6,7 +6,6 @@ const {
 } = require('discord.js');
 
 const {
-    CHANNELS,
     getRandomColor
 } = require('../../data/constants');
 
@@ -17,14 +16,6 @@ const {
 const {
     commandFooter
 } = require('../../utils/version');
-
-const {
-    mpc_logo
-} = require('../../utils/emojis');
-
-const {
-    postMoment
-} = require('../../utils/moments');
 
 const {
     assertNoFamilyRelationshipBetween,
@@ -926,10 +917,7 @@ async function removeOrReply(
     firstId,
     secondId,
     successText,
-    failureText,
-    linkLabel = relationshipLinkLabel(
-        type
-    )
+    failureText
 ) {
 
     const removed =
@@ -947,90 +935,6 @@ async function removeOrReply(
         flags:
             64
     });
-
-    if (
-        removed
-    )
-        await postRelationshipBrokenMoment(
-            interaction,
-            firstId,
-            secondId,
-            linkLabel
-        );
-
-}
-
-async function postRelationshipBrokenMoment(
-    interaction,
-    firstId,
-    secondId,
-    linkLabel
-) {
-
-    const firstMember =
-        await fetchMemberOrNull(
-            interaction.guild,
-            firstId
-        );
-
-    const secondMember =
-        await fetchMemberOrNull(
-            interaction.guild,
-            secondId
-        );
-
-    const authorName =
-        firstMember?.displayName ??
-        interaction.member.displayName;
-
-    const authorIcon =
-        firstMember?.user.displayAvatarURL() ??
-        interaction.user.displayAvatarURL();
-
-    const thumbnail =
-        secondMember?.user.displayAvatarURL() ??
-        interaction.user.displayAvatarURL();
-
-    await postMoment(
-        interaction.client,
-        {
-            type:
-                'relationship_broken',
-            channelId:
-                CHANNELS.PILLOW_TALK,
-            color:
-                getRandomColor(),
-            authorName,
-            authorIcon,
-            thumbnail,
-            title:
-                `${mpc_logo} Moment`,
-            flavor:
-                `${userMention(
-                    firstId
-                )} and ${userMention(
-                    secondId
-                )} are no longer linked.`,
-            command:
-                '/relationship',
-            fields: [
-                {
-                    name:
-                        '\uD83E\uDD1D Bond',
-                    value:
-                        linkLabel,
-                    inline:
-                        true
-                }
-            ]
-        }
-    ).catch(
-        (error) =>
-            console.error(
-                'RELATIONSHIP MOMENT ERROR',
-                error
-            )
-    );
 
 }
 
