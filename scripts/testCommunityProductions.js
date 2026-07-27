@@ -110,16 +110,23 @@ async function main() {
     await db.ready;
 
     for (
-        let index = 0;
-        index < 1_000;
-        index += 1
-    )
-        assert.notEqual(
-            pickProductionType(
-                'FFF'
-            ),
+        const previousType of [
+            'MFM',
+            'FMF',
             'FFF'
-        );
+        ]
+    )
+        for (
+            let index = 0;
+            index < 1_000;
+            index += 1
+        )
+            assert.notEqual(
+                pickProductionType(
+                    previousType
+                ),
+                previousType
+            );
 
     for (
         const userId of [

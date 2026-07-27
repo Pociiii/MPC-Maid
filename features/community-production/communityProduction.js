@@ -159,27 +159,35 @@ function pickProductionType(
     previousType = null
 ) {
 
-    const roll =
-        Math.random() * 100;
+    const choices = [
+        {
+            type:
+                'MFM',
+            weight:
+                40
+        },
+        {
+            type:
+                'FMF',
+            weight:
+                40
+        },
+        {
+            type:
+                'FFF',
+            weight:
+                20
+        }
+    ].filter(
+        (choice) =>
+            choice.type !== previousType
+    );
 
-    if (
-        previousType === 'FFF'
-    )
-        return roll < 50
-            ? 'MFM'
-            : 'FMF';
-
-    if (
-        roll < 40
-    )
-        return 'MFM';
-
-    if (
-        roll < 80
-    )
-        return 'FMF';
-
-    return 'FFF';
+    return weightedPick(
+        choices,
+        (choice) =>
+            choice.weight
+    ).type;
 
 }
 
