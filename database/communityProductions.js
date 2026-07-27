@@ -160,6 +160,20 @@ async function getOpenCasting() {
 
 }
 
+async function getLatestProductionType() {
+
+    const row =
+        await get(
+            `SELECT production_type
+             FROM community_productions
+             ORDER BY id DESC LIMIT 1`
+        );
+
+    return row?.production_type ??
+        null;
+
+}
+
 async function getRestorableProductions() {
 
     return (
@@ -553,6 +567,7 @@ module.exports = {
     createProduction,
     expireCasting,
     getOpenCasting,
+    getLatestProductionType,
     getProduction,
     getRestorableProductions,
     markCompleted,

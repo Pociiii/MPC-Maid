@@ -60,6 +60,7 @@ const {
     claimCastingSlot,
     createProduction,
     expireCasting,
+    getLatestProductionType,
     getOpenCasting,
     getProduction,
     getRestorableProductions,
@@ -154,10 +155,19 @@ function weightedPick(
 
 }
 
-function pickProductionType() {
+function pickProductionType(
+    previousType = null
+) {
 
     const roll =
         Math.random() * 100;
+
+    if (
+        previousType === 'FFF'
+    )
+        return roll < 50
+            ? 'MFM'
+            : 'FMF';
 
     if (
         roll < 40
@@ -556,7 +566,9 @@ async function createNextCasting(
             }
 
             const productionType =
-                pickProductionType();
+                pickProductionType(
+                    await getLatestProductionType()
+                );
 
             let production =
                 await createProduction({
@@ -1686,6 +1698,7 @@ async function startCommunityProductions(
 module.exports = {
     handleJoin,
     pickGift,
+    pickProductionType,
     pickProductionGif,
     startCommunityProductions
 };

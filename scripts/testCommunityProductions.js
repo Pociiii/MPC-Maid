@@ -45,6 +45,7 @@ const {
 } = require('../database/communityProductions');
 
 const {
+    pickProductionType,
     startCommunityProductions
 } = require('../features/community-production/communityProduction');
 
@@ -107,6 +108,18 @@ async function closeDatabase() {
 async function main() {
 
     await db.ready;
+
+    for (
+        let index = 0;
+        index < 1_000;
+        index += 1
+    )
+        assert.notEqual(
+            pickProductionType(
+                'FFF'
+            ),
+            'FFF'
+        );
 
     for (
         const userId of [
