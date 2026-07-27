@@ -342,9 +342,19 @@ function buildCastingEmbed(
         },
         {
             name:
-                'Casting Closes',
+                state === 'running' ||
+                state === 'finalizing' ||
+                state === 'completed'
+                    ? 'Scene Started'
+                    : 'Casting Closes',
             value:
-                `<t:${Math.floor(production.casting_closes_at / 1000)}:R>`,
+                state === 'running' ||
+                state === 'finalizing' ||
+                state === 'completed'
+                    ? production.sceneLinks[0]
+                        ? `[View first part](${production.sceneLinks[0]})`
+                        : 'Starting now\u2026'
+                    : `<t:${Math.floor(production.casting_closes_at / 1000)}:R>`,
             inline:
                 true
         },
@@ -1065,33 +1075,35 @@ function buildPartEmbed(
         );
 
     const embed =
-        addProductionFields(
-            buildOfficialEmbed(
-                client,
-                production,
-                {
-                    description:
-                        getPhaseFlavor(
-                            phase
-                        ),
-                    image:
-                        gif.url,
-                    footerText:
-                        gif.total > 0
-                            ? `Community Production \u2022 Part ${partIndex + 1}/${PARTS.length} \u2022 GIF #${gif.index}/${gif.total}${gif.fallback ? ' \u2022 Pair fallback' : ''}`
-                            : `Community Production \u2022 Part ${partIndex + 1}/${PARTS.length} \u2022 No matching GIF`
-                }
-            ),
-            production
+        buildOfficialEmbed(
+            client,
+            production,
+            {
+                description:
+                    getPhaseFlavor(
+                        phase
+                    ),
+                image:
+                    gif.url,
+                footerText:
+                    gif.total > 0
+                        ? `Community Production \u2022 Part ${partIndex + 1}/${PARTS.length} \u2022 ${phase[0].toUpperCase()}${phase.slice(1)} \u2022 GIF #${gif.index}/${gif.total}${gif.fallback ? ' \u2022 Pair fallback' : ''}`
+                        : `Community Production \u2022 Part ${partIndex + 1}/${PARTS.length} \u2022 ${phase[0].toUpperCase()}${phase.slice(1)} \u2022 No matching GIF`
+            }
         );
 
     embed.addFields({
         name:
-            '\uD83C\uDF9E\uFE0F Part',
+            '\uD83D\uDC65 Cast',
         value:
-            `${partIndex + 1}/${PARTS.length} \u2022 ${phase[0].toUpperCase()}${phase.slice(1)}`,
+            production.slots.map(
+                (slot) =>
+                    `<@${slot.userId}>`
+            ).join(
+                ' + '
+            ),
         inline:
-            true
+            false
     });
 
     return embed;
@@ -1194,6 +1206,20 @@ async function finishProduction(
         });
 
         await moments.send({
+            content:
+                updated.slots.map(
+                    (slot) =>
+                        `<@${slot.userId}>`
+                ).join(
+                    ' '
+                ),
+            allowedMentions: {
+                users:
+                    updated.slots.map(
+                        (slot) =>
+                            slot.userId
+                    )
+            },
             embeds: [
                 embed
             ]
@@ -1332,6 +1358,16 @@ async function postNextPart(
         const updated =
             await getProduction(
                 production.id
+            );
+
+        if (
+            index === 0
+        )
+            await updateCastingMessage(
+                client,
+                updated
+            ).catch(
+                () => false
             );
 
         if (
