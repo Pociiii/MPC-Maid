@@ -102,7 +102,12 @@ const db = new sqlite3.Database('./database.db', (err) => {
         'utf8'
     );
 
-    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${dailyWyrSchema}\n${profileLikesSchema}\n${achievementsSchema}\n${pregnancySchema}\n${relationshipsSchema}\n${spankDilliSchema}\n${giftsSchema}\n${lotterySchema}\n${commandGuideSchema}\n${memberCardPanelSchema}\n${gifSubmissionPanelSchema}\n${activeScenesSchema}`, async (err) => {
+    const communityProductionsSchema = fs.readFileSync(
+        path.join(__dirname, 'schemas', 'community_productions.sql'),
+        'utf8'
+    );
+
+    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${dailyWyrSchema}\n${profileLikesSchema}\n${achievementsSchema}\n${pregnancySchema}\n${relationshipsSchema}\n${spankDilliSchema}\n${giftsSchema}\n${lotterySchema}\n${commandGuideSchema}\n${memberCardPanelSchema}\n${gifSubmissionPanelSchema}\n${activeScenesSchema}\n${communityProductionsSchema}`, async (err) => {
 
         if (err) {
             console.error(err);

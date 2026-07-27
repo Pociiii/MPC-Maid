@@ -803,6 +803,7 @@ module.exports = {
     buildFinalEmbed,
     buildPartEmbed,
     buildStartEmbed,
+    getPhaseFlavor,
     getScenePairColor,
     getRandomSceneName
 };

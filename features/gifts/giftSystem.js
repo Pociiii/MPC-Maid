@@ -8,12 +8,6 @@ const { CATEGORY_ORDER, calculateGiftCollectionValue, getDailyGiftShop, getGiftD
 const { claimButton, replyButtonAlreadyUsed } = require('../../utils/buttonDedup');
 
 const categoryNames = { common: 'Common', uncommon: 'Uncommon', premium: 'Premium', luxury: 'Luxury' };
-const flavor = {
-    common: ['{sender} quietly made {receiver}\'s night a little sweeter.', 'A thoughtful surprise found its way from {sender} to {receiver}.'],
-    uncommon: ['{sender} decided {receiver} deserved a little spoiling.', 'A special delivery arrived for {receiver}, courtesy of {sender}.'],
-    premium: ['{sender} was clearly in the mood to spoil {receiver}.', '{sender} made sure {receiver} would remember tonight.'],
-    luxury: ['{sender} clearly decided subtlety was overrated.', '{receiver}\'s collection just entered a different tax bracket.']
-};
 
 function groupLines(items) {
     return CATEGORY_ORDER.map((category) => {
@@ -83,8 +77,7 @@ async function postGiftNotification(interaction, receiverId, gift) {
     const senderName = interaction.member.displayName;
     const senderMention = `<@${interaction.user.id}>`;
     const receiverMention = `<@${receiverId}>`;
-    const intro = flavor[gift.category][Math.floor(Math.random() * flavor[gift.category].length)].replace('{sender}', senderMention).replace('{receiver}', receiverMention);
-    const embed = createEmbed({ color: getRandomColor(), authorName: senderName, authorIcon: interaction.user.displayAvatarURL(), thumbnail: receiver.user.displayAvatarURL(), title: gift.category === 'luxury' ? 'Living the Dream' : 'A Midnight Gift', description: `${intro}\n\n${senderMention} gave ${receiverMention} a ${gift.emoji} **${gift.name}**.\n\nThe gift now has a permanent place in ${receiverMention}'s collection.`, footerText: commandFooter('/gift send'), timestamp: true });
+    const embed = createEmbed({ color: getRandomColor(), authorName: senderName, authorIcon: interaction.user.displayAvatarURL(), thumbnail: receiver.user.displayAvatarURL(), title: gift.category === 'luxury' ? 'Living the Dream' : 'A Midnight Gift', description: `${senderMention} gave ${receiverMention} a ${gift.emoji} **${gift.name}**.`, footerText: commandFooter('/gift send'), timestamp: true });
     const channel = await interaction.client.channels.fetch(CHANNELS.PILLOW_TALK);
     await channel.send({ content: receiverMention, embeds: [embed], allowedMentions: { users: [receiverId] } });
 }

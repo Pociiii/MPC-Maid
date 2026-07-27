@@ -13,6 +13,7 @@
     "test:pregnancy": "node scripts/testPregnancySystem.js",
     "test:porn-career-titles": "node scripts/testPornCareerTitles.js",
     "test:scene-recovery": "node scripts/testSceneRecovery.js",
+    "test:community-productions": "node scripts/testCommunityProductions.js",
     "preflight:nodb": "node scripts/preflight.js --skip-db",
     "preflight": "node scripts/preflight.js"
   },

@@ -123,6 +123,10 @@ const {
     getRestorableScenes
 } = require('./database/activeScenes');
 
+const {
+    startCommunityProductions
+} = require('./features/community-production/communityProduction');
+
 process.on(
     'unhandledRejection',
     error => {
@@ -394,6 +398,11 @@ async readyClient => {
                 restorableScenes
             );
 
+        const communityProductions =
+            await startCommunityProductions(
+                readyClient
+            );
+
         const restoredRequests =
             restorePendingSceneRequests(
                 readyClient
@@ -412,6 +421,14 @@ async readyClient => {
                             '\uD83C\uDFAC Active Scenes Restored',
                         value:
                             `${restoredPornScenes} porn, ${restoredCustomScenes} custom. ${clearedBusy} stale busy entries cleared.`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            '\uD83C\uDFAC Community Productions',
+                        value:
+                            `${communityProductions.running} running, casting ${communityProductions.casting ? 'restored' : 'scheduled'}.`,
                         inline:
                             true
                     },

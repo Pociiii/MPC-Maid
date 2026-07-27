@@ -159,6 +159,10 @@ const {
     handleLotteryButton
 } = require('../features/lottery/lottery');
 
+const {
+    handleJoin: handleCommunityProductionJoin
+} = require('../features/community-production/communityProduction');
+
 async function replyInteractionError(
     interaction
 ) {
@@ -377,6 +381,14 @@ async function routeInteraction(
                 await pornSceneSpank(
                     interaction
                 );
+                return true;
+
+            case 'community_join':
+
+                await handleCommunityProductionJoin(
+                    interaction
+                );
+
                 return true;
 
             case 'commands_porncareer_info':

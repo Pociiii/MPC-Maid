@@ -222,6 +222,24 @@ function isBusy(
 
 }
 
+function setUserBusy(
+    userId,
+    data = {}
+) {
+
+    busyUsers.set(
+        String(
+            userId
+        ),
+        {
+            ...data,
+            type:
+                data.type ?? 'activity'
+        }
+    );
+
+}
+
 function setSceneBusy(
     requesterId,
     targetId,
@@ -323,6 +341,7 @@ module.exports = {
     removePendingRequest,
     getPendingRequests,
     isBusy,
+    setUserBusy,
     setSceneBusy,
     clearSceneBusy,
     getBusyUser,
