@@ -10,6 +10,7 @@ const { createEmbed } = require('../../utils/embeds');
 const { getRandomColor } = require('../../data/constants');
 const { getGifCount } = require('../../utils/gifs');
 const {
+    canonicalCastOrder,
     castSymbol,
     sceneGroups
 } = require('../../data/sceneSubmitGroups');
@@ -67,16 +68,13 @@ function buildInteractionLines() {
 
     const hornyFolder = path.join(gifsFolder, 'horny');
 
-    const hornyLines = fs.readdirSync(hornyFolder, { withFileTypes: true })
-        .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
-        .map((entry) =>
+    const hornyLines = canonicalCastOrder
+        .map((category) =>
             fileCountLine(
-                castSymbol[entry.name.replace(/\.json$/, '')] ??
-                entry.name.replace(/\.json$/, '').toUpperCase(),
-                path.join(hornyFolder, entry.name)
+                castSymbol[category],
+                path.join(hornyFolder, `${category}.json`)
             )
-        )
-        .sort();
+        );
 
     return [
         ...directFiles,

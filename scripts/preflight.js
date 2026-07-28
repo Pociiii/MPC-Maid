@@ -1000,6 +1000,33 @@ function checkContent() {
             `Core GIF list has a blank/non-string entry: ${entry}`
         );
 
+    const {
+        canonicalCastOrder
+    } = require('../data/sceneSubmitGroups');
+
+    for (
+        const category of canonicalCastOrder
+    ) {
+
+        const filePath =
+            path.join(
+                runtimeDataDir,
+                'gifs',
+                'horny',
+                `${category}.json`
+            );
+
+        if (
+            !fs.existsSync(
+                filePath
+            )
+        )
+            addFailure(
+                `Missing horny GIF category: ${rel(filePath)}`
+            );
+
+    }
+
     const coreSceneSummary =
         summarizeArrayContent(
             path.join(

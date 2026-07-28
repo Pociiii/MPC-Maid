@@ -12,6 +12,31 @@ const castSymbol = {
     bf: '\u26AB\u2640\uFE0F'
 };
 
+const canonicalCastOrder = [
+    'wm',
+    'bm',
+    'wf',
+    'bf'
+];
+
+function canonicalizeCastCategories(
+    categories
+) {
+
+    return [...categories].sort(
+        (first, second) =>
+            canonicalCastOrder.indexOf(
+                first
+            ) -
+            canonicalCastOrder.indexOf(
+                second
+            )
+    ).join(
+        '_'
+    );
+
+}
+
 function castLabel(
     ...parts
 ) {
@@ -281,6 +306,8 @@ function getSceneCategoryName(
 }
 
 module.exports = {
+    canonicalCastOrder,
+    canonicalizeCastCategories,
     castLabel,
     castSymbol,
     sceneTypes,

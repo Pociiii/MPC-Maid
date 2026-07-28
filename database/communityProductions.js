@@ -1,6 +1,10 @@
 const db =
     require('./database');
 
+const {
+    canonicalizeCastCategories
+} = require('../data/sceneSubmitGroups');
+
 function run(
     sql,
     params = []
@@ -322,18 +326,11 @@ async function claimCastingSlot(
                         ? 'running'
                         : 'casting',
                     full
-                        ? [...slots].sort(
-                            (first, second) =>
-                                first.gender === second.gender
-                                    ? first.index - second.index
-                                    : first.gender === 'm'
-                                        ? -1
-                                        : 1
-                        ).map(
-                            (slot) =>
-                                slot.category
-                        ).join(
-                            '_'
+                        ? canonicalizeCastCategories(
+                            slots.map(
+                                (slot) =>
+                                    slot.category
+                            )
                         )
                         : null,
                     full

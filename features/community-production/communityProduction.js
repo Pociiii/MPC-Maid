@@ -19,6 +19,10 @@ const gifts =
     require('../../data/gifts/gifts');
 
 const {
+    canonicalizeCastCategories
+} = require('../../data/sceneSubmitGroups');
+
+const {
     createEmbed
 } = require('../../utils/embeds');
 
@@ -702,6 +706,29 @@ async function rotateCasting(
 
 }
 
+function getCanonicalProductionCategory(
+    production
+) {
+
+    const categories =
+        production.slots
+            .filter(
+                (slot) =>
+                    slot.category
+            )
+            .map(
+                (slot) =>
+                    slot.category
+            );
+
+    return categories.length === production.slots.length
+        ? canonicalizeCastCategories(
+            categories
+        )
+        : production.category;
+
+}
+
 function tripleGifPath(
     production,
     phase
@@ -711,7 +738,9 @@ function tripleGifPath(
         getRuntimeDataPath(
             `scenes_${production.production_type.toLowerCase()}`
         ),
-        production.category,
+        getCanonicalProductionCategory(
+            production
+        ),
         `${phase}.json`
     );
 
@@ -814,6 +843,11 @@ function pickProductionGif(
             phase
         );
 
+    const requestedCategory =
+        getCanonicalProductionCategory(
+            production
+        );
+
     if (
         getGifCount(
             requestedPath
@@ -825,7 +859,7 @@ function pickProductionGif(
                 userIds
             ),
             category:
-                production.category,
+                requestedCategory,
             fallback:
                 false
         };
@@ -1786,6 +1820,7 @@ async function startCommunityProductions(
 }
 
 module.exports = {
+    getCanonicalProductionCategory,
     handleJoin,
     pickGift,
     pickProductionType,

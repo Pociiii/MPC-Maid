@@ -45,6 +45,7 @@ const {
 } = require('../database/communityProductions');
 
 const {
+    getCanonicalProductionCategory,
     pickProductionType,
     startCommunityProductions
 } = require('../features/community-production/communityProduction');
@@ -108,6 +109,84 @@ async function closeDatabase() {
 async function main() {
 
     await db.ready;
+
+    assert.equal(
+        getCanonicalProductionCategory({
+            category:
+                'wm_wf_bm',
+            slots: [
+                {
+                    index:
+                        0,
+                    gender:
+                        'm',
+                    category:
+                        'wm'
+                },
+                {
+                    index:
+                        1,
+                    gender:
+                        'f',
+                    category:
+                        'wf'
+                },
+                {
+                    index:
+                        2,
+                    gender:
+                        'm',
+                    category:
+                        'bm'
+                }
+            ]
+        }),
+        'wm_bm_wf'
+    );
+
+    assert.equal(
+        getCanonicalProductionCategory({
+            category:
+                'bm_wm_wf',
+            slots: [
+                {
+                    category:
+                        'bm'
+                },
+                {
+                    category:
+                        'wf'
+                },
+                {
+                    category:
+                        'wm'
+                }
+            ]
+        }),
+        'wm_bm_wf'
+    );
+
+    assert.equal(
+        getCanonicalProductionCategory({
+            category:
+                'bm_bf_wf',
+            slots: [
+                {
+                    category:
+                        'bm'
+                },
+                {
+                    category:
+                        'bf'
+                },
+                {
+                    category:
+                        'wf'
+                }
+            ]
+        }),
+        'bm_wf_bf'
+    );
 
     for (
         const previousType of [
