@@ -59,6 +59,10 @@ const {
 } = require('../porn-career/sceneCommon');
 
 const {
+    trackDailyQuest
+} = require('../daily-quests/dailyQuests');
+
+const {
     applyRewardsOnce,
     checkpointPart,
     claimCastingSlot,
@@ -1225,6 +1229,20 @@ async function finishProduction(
     const rewardsApplied =
         await applyRewardsOnce(
             production.id
+        );
+
+    if (
+        rewardsApplied
+    )
+        await Promise.all(
+            production.slots.map(
+                (slot) =>
+                    trackDailyQuest(
+                        client,
+                        slot.userId,
+                        'porn_scene'
+                    )
+            )
         );
 
     const updated =
