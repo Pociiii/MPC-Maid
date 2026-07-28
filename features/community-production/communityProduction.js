@@ -742,6 +742,23 @@ function fallbackGifPaths(
             second += 1
         ) {
 
+            if (
+                (
+                    production.production_type === 'MFM' ||
+                    production.production_type === 'FMF'
+                ) &&
+                ![
+                    categories[first],
+                    categories[second]
+                ].some(
+                    (category) =>
+                        category?.endsWith(
+                            'm'
+                        )
+                )
+            )
+                continue;
+
             const category =
                 getTwoPersonSceneCategory(
                     categories[first],
