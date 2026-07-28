@@ -383,7 +383,15 @@ function buildCastingEmbed(
             name:
                 'Guaranteed Rewards',
             value:
-                '\uD83E\uDE99 150\u2013225 Coins\n\u2B50 40\u201355 XP\n\uD83C\uDFC6 +10 Ranking\n\uD83C\uDFAC +1 Career Scene\n\u26A1 1 weighted Booster\n\uD83C\uDF81 1 weighted Gift',
+                '\uD83E\uDE99 150\u2013225 Coins\n\u2B50 40\u201355 XP',
+            inline:
+                false
+        },
+        {
+            name:
+                'Possible Bonuses',
+            value:
+                '\u26A1 10% chance of a weighted Booster\n\uD83C\uDF81 10% chance of a weighted Gift',
             inline:
                 false
         }
