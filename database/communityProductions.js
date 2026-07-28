@@ -474,41 +474,45 @@ async function applyRewardsOnce(
             await run(
                 `UPDATE users
                  SET coins = coins + ?, xp = xp + ?,
-                     ranking = ranking + ?,
                      scenes_completed = scenes_completed + 1
                  WHERE id = ?`,
                 [
                     reward.coins,
                     reward.xp,
-                    reward.ranking,
                     reward.userId
                 ]
             );
 
-            await run(
-                `INSERT INTO user_boosters (
-                    user_id, stat, tier, quantity
-                 ) VALUES (?, ?, ?, 1)
-                 ON CONFLICT(user_id, stat, tier)
-                 DO UPDATE SET quantity = quantity + 1`,
-                [
-                    reward.userId,
-                    reward.booster.stat,
-                    reward.booster.tier
-                ]
-            );
+            if (
+                reward.booster
+            )
+                await run(
+                    `INSERT INTO user_boosters (
+                        user_id, stat, tier, quantity
+                     ) VALUES (?, ?, ?, 1)
+                     ON CONFLICT(user_id, stat, tier)
+                     DO UPDATE SET quantity = quantity + 1`,
+                    [
+                        reward.userId,
+                        reward.booster.stat,
+                        reward.booster.tier
+                    ]
+                );
 
-            await run(
-                `INSERT INTO user_gift_inventory (
-                    user_id, gift_key, quantity
-                 ) VALUES (?, ?, 1)
-                 ON CONFLICT(user_id, gift_key)
-                 DO UPDATE SET quantity = quantity + 1`,
-                [
-                    reward.userId,
-                    reward.gift.key
-                ]
-            );
+            if (
+                reward.gift
+            )
+                await run(
+                    `INSERT INTO user_gift_inventory (
+                        user_id, gift_key, quantity
+                     ) VALUES (?, ?, 1)
+                     ON CONFLICT(user_id, gift_key)
+                     DO UPDATE SET quantity = quantity + 1`,
+                    [
+                        reward.userId,
+                        reward.gift.key
+                    ]
+                );
 
         }
 

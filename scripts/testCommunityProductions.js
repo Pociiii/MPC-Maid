@@ -278,22 +278,26 @@ async function main() {
                     200,
                 xp:
                     50,
-                ranking:
-                    10,
-                booster: {
-                    stat:
-                        'performance',
-                    tier:
-                        2
-                },
-                gift: {
-                    key:
-                        'rose',
-                    name:
-                        'Rose',
-                    emoji:
-                        'rose'
-                }
+                booster:
+                    slot.userId === 'male-a'
+                        ? {
+                            stat:
+                                'performance',
+                            tier:
+                                2
+                        }
+                        : null,
+                gift:
+                    slot.userId === 'male-a'
+                        ? {
+                            key:
+                                'rose',
+                            name:
+                                'Rose',
+                            emoji:
+                                'rose'
+                        }
+                        : null
             })
         );
 
@@ -366,7 +370,7 @@ async function main() {
 
     assert.equal(
         user.ranking,
-        10
+        0
     );
 
     assert.equal(
@@ -382,6 +386,28 @@ async function main() {
     assert.equal(
         gift.quantity,
         1
+    );
+
+    assert.equal(
+        await dbGet(
+            `SELECT quantity FROM user_boosters
+             WHERE user_id = ?`,
+            [
+                'female-a'
+            ]
+        ),
+        undefined
+    );
+
+    assert.equal(
+        await dbGet(
+            `SELECT quantity FROM user_gift_inventory
+             WHERE user_id = ?`,
+            [
+                'female-a'
+            ]
+        ),
+        undefined
     );
 
     console.log(

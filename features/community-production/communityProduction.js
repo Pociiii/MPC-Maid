@@ -79,6 +79,9 @@ const CASTING_MS =
 const SCENE_MS =
     60 * 60 * 1000;
 
+const BONUS_REWARD_CHANCE =
+    0.1;
+
 const PARTS = [
     'foreplay',
     'foreplay',
@@ -1050,12 +1053,16 @@ function buildRewards(
                     40,
                     55
                 ),
-            ranking:
-                10,
             booster:
-                pickBooster(),
+                Math.random() <
+                BONUS_REWARD_CHANCE
+                    ? pickBooster()
+                    : null,
             gift:
-                pickGift()
+                Math.random() <
+                BONUS_REWARD_CHANCE
+                    ? pickGift()
+                    : null
         })
     );
 
@@ -1185,7 +1192,7 @@ async function finishProduction(
                         title:
                             `\uD83C\uDFC1 Production Finished \u2014 ${updated.title}`,
                         description:
-                            'The official MPC production has wrapped. Every cast member received their guaranteed rewards.'
+                            'The official MPC production has wrapped. Every cast member received coins and XP, with a chance of a bonus booster or gift.'
                     }
                 ),
                 updated
@@ -1196,8 +1203,22 @@ async function finishProduction(
                 '\uD83C\uDF81 Rewards',
             value:
                 updated.rewards.map(
-                    (reward) =>
-                        `<@${reward.userId}> \u2014 ${reward.coins} coins, ${reward.xp} XP, ${boosterStatLabels[reward.booster.stat]} T${reward.booster.tier}, ${reward.gift.emoji} ${reward.gift.name}`
+                    (reward) => {
+
+                        const bonuses = [
+                            reward.booster
+                                ? `${boosterStatLabels[reward.booster.stat]} T${reward.booster.tier}`
+                                : null,
+                            reward.gift
+                                ? `${reward.gift.emoji} ${reward.gift.name}`
+                                : null
+                        ].filter(
+                            Boolean
+                        );
+
+                        return `<@${reward.userId}> \u2014 ${reward.coins} coins, ${reward.xp} XP${bonuses.length ? `, \uD83C\uDF81 ${bonuses.join(', ')}` : ''}`;
+
+                    }
                 ).join(
                     '\n'
                 ),
