@@ -99,6 +99,8 @@ their persisted rotation changes at exactly the same boundary.
 ## Daily Quests
 
 - Each user receives three personal daily quests.
+- Titty Drop quests reimburse their required 50-coin posts and award 25 net
+  coins, so completing one is never a coin loss.
 - `/daily` is private and includes quest and weekly-streak progress.
 - Assigned quests must be possible for all supported genders.
 - Individual completion and full-set rewards use configured coin/XP values.

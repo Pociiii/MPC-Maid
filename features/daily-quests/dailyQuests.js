@@ -3,6 +3,7 @@ const db =
 
 const {
     CHANNELS,
+    ECONOMY,
     getRandomColor
 } = require('../../data/constants');
 
@@ -357,7 +358,17 @@ const questPool = [
     (quest) => ({
         ...quest,
         reward:
-            rewardByTier[quest.tier]
+            {
+                ...rewardByTier[quest.tier],
+                coins:
+                    quest.action === 'titty_drop'
+                        ? (
+                            ECONOMY.DROP_COST *
+                            quest.target
+                        ) +
+                        ECONOMY.DAILY_TITTY_DROP_NET_REWARD
+                        : rewardByTier[quest.tier].coins
+            }
     })
 );
 
@@ -825,6 +836,31 @@ async function createDailyQuests(
 
 }
 
+async function refreshTittyDropQuestRewards(
+    userId,
+    questDate
+) {
+
+    await dbRun(
+        `UPDATE daily_quests
+         SET reward_coins = (? * target) + ?
+         WHERE user_id = ?
+         AND quest_date = ?
+         AND action = 'titty_drop'
+         AND completed = 0
+         AND reward_coins < (? * target) + ?`,
+        [
+            ECONOMY.DROP_COST,
+            ECONOMY.DAILY_TITTY_DROP_NET_REWARD,
+            userId,
+            questDate,
+            ECONOMY.DROP_COST,
+            ECONOMY.DAILY_TITTY_DROP_NET_REWARD
+        ]
+    );
+
+}
+
 async function ensureDailyQuests(
     userId
 ) {
@@ -840,7 +876,19 @@ async function ensureDailyQuests(
 
     if (
         existing.length
-    )
+    ) {
+
+        await refreshTittyDropQuestRewards(
+            userId,
+            questDate
+        );
+
+        existing =
+            await getStoredDailyQuests(
+                userId,
+                questDate
+            );
+
         return normalizeDailyQuests(
             userId,
             questDate,
@@ -848,6 +896,8 @@ async function ensureDailyQuests(
                 existing
             )
         );
+
+    }
 
     await createDailyQuests(
         userId,
