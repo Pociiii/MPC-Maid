@@ -45,6 +45,8 @@ This file contains only unfinished work. Implemented behavior belongs in
 
 - Compare coin income from daily quests and Daily WYR with sinks from training,
   boosters, gifts, custom scenes, drinks, fireworks, and casino games.
+- Watch the 65% lottery jackpot contribution to confirm that removing 35% of
+  ticket sales controls inflation without making the game feel unrewarding.
 - Revisit gift and booster prices after real usage data exists.
 - Review showcase, casino, and scene-request cooldowns after several active
   days.
@@ -74,7 +76,7 @@ These are not required by the current database or command set.
 - Catalog completed Porn Career productions without moving live scene parts out
   of the Porn Career channel.
 - Keep studios cosmetic: do not add passive stat, ranking, XP, or coin bonuses.
-- Tune the 10,000 purchase, 250 upkeep, and 1,000 reopen costs after measuring
+- Tune the 10,000 purchase, 500 upkeep, and 1,000 reopen costs after measuring
   the live coin economy.
 
 ### Private Scene Threads

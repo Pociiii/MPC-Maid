@@ -1,4 +1,8 @@
-module.exports = [
+const {
+    ECONOMY
+} = require('../constants');
+
+const gifts = [
     // Common
     { key: 'rose', name: 'Rose', emoji: '🌹', category: 'common', price: 40 },
     { key: 'coffee', name: 'Coffee', emoji: '☕', category: 'common', price: 50 },
@@ -68,3 +72,15 @@ module.exports = [
     { key: 'golden_throne', name: 'Golden Throne', emoji: '🪙', category: 'luxury', price: 30000 },
     { key: 'star_named', name: 'Name a Star', emoji: '⭐', category: 'luxury', price: 12000 }
 ];
+
+module.exports = gifts.map(
+    (gift) => ({
+        ...gift,
+        price:
+            Math.ceil(
+                gift.price *
+                ECONOMY.GIFT_PRICE_MULTIPLIER /
+                5
+            ) * 5
+    })
+);

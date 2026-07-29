@@ -33,6 +33,10 @@ const db =
 const lottery =
     require('../features/lottery/lottery');
 
+const {
+    ECONOMY
+} = require('../data/constants');
+
 function dbRun(
     sql,
     params = []
@@ -95,7 +99,7 @@ async function main() {
 
     assert.equal(
         initial.jackpot,
-        2500
+        ECONOMY.LOTTERY_BASE_PRIZE
     );
 
     await dbRun(
@@ -113,7 +117,10 @@ async function main() {
         );
 
     assert.equal(one.quantity, 1);
-    assert.equal(one.cost, 100);
+    assert.equal(
+        one.cost,
+        ECONOMY.LOTTERY_TICKET_PRICE
+    );
 
     const maximum =
         await lottery.buyLotteryTickets(
@@ -145,8 +152,20 @@ async function main() {
     const afterPurchase =
         await lottery.getLotterySummary();
 
+    const expectedJackpot =
+        ECONOMY.LOTTERY_BASE_PRIZE +
+        Math.floor(
+            20 *
+            ECONOMY.LOTTERY_TICKET_PRICE *
+            ECONOMY.LOTTERY_JACKPOT_PERCENTAGE /
+            100
+        );
+
     assert.equal(afterPurchase.totalTickets, 20);
-    assert.equal(afterPurchase.jackpot, 4100);
+    assert.equal(
+        afterPurchase.jackpot,
+        expectedJackpot
+    );
 
     const numbers =
         await lottery.getUserTicketNumbers(
@@ -213,7 +232,10 @@ async function main() {
             ? firstDraw
             : duplicateDraw;
 
-    assert.equal(winningDraw.prize, 4100);
+    assert.equal(
+        winningDraw.prize,
+        expectedJackpot
+    );
     assert.ok(
         numbers.some(
             (ticket) =>
@@ -229,13 +251,21 @@ async function main() {
             ]
         );
 
-    assert.equal(winner.coins, 7100);
+    assert.equal(
+        winner.coins,
+        5000 -
+            (20 * ECONOMY.LOTTERY_TICKET_PRICE) +
+            expectedJackpot
+    );
 
     const next =
         await lottery.getLotterySummary();
 
     assert.equal(next.totalTickets, 0);
-    assert.equal(next.jackpot, 2500);
+    assert.equal(
+        next.jackpot,
+        ECONOMY.LOTTERY_BASE_PRIZE
+    );
 
     const noTicketDraw =
         await lottery.drawCurrentLottery(

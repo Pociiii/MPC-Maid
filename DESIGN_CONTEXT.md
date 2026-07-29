@@ -79,13 +79,16 @@ default permissions.
 - Users have coins, XP, Porn Career stats, ranking, scene counts, and social
   interaction counters.
 - Training spends both XP and coins; costs rise with stat level and increase
-  sharply after stat 40.
+  sharply after stat 40. Coin costs use a 1.5 multiplier with a 50-coin
+  minimum.
 - Performance, Stamina, and Fame combine between scene partners.
 - Achievements track configured milestones and contribute achievement points.
 - Leaderboards include ranking, scenes, coins, social interactions, and
   achievement points as defined in the current leaderboard configuration.
 - Gifts and relationships are RP/social systems only. They never award XP,
   ranking, Reputation, career stats, quests, achievements, or gameplay bonuses.
+- Gift catalogue prices use the configurable `1.5` economy multiplier and round
+  up to the nearest five coins.
 
 ## Daily Reset
 
@@ -116,7 +119,7 @@ their persisted rotation changes at exactly the same boundary.
 ## Porn Career
 
 - `/pornscene` is a consent-based two-user production flow.
-- Player Studios cost 10,000 coins, charge 250 coins at the 12:00 UTC daily
+- Player Studios cost 10,000 coins, charge 500 coins at the 12:00 UTC daily
   reset, and cost 1,000 coins to reopen after an upkeep closure.
 - An open requester's studio mirrors their Porn Career production live into its
   persistent forum thread. Productions attached while open finish and count

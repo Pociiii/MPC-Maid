@@ -57,11 +57,18 @@ function getStatUpgradeCoinCost(
             currentStat / 10
         );
 
-    return Math.floor(
+    const previousCost =
         (currentStat * 20) +
         (milestone * 50) +
         (prestigeLevel * 40) +
-        (prestigeLevel * prestigeLevel * 5)
+        (prestigeLevel * prestigeLevel * 5);
+
+    return Math.max(
+        50,
+        Math.ceil(
+            previousCost *
+            1.5
+        )
     );
 
 }

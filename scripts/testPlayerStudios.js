@@ -120,7 +120,7 @@ function closeDatabase() {
     const upkeep = await processStudioUpkeep(
         completed.id,
         'owner',
-        250,
+        500,
         '2026-07-30'
     );
     assert.equal(upkeep.closed, false);
@@ -129,7 +129,7 @@ function closeDatabase() {
     const closure = await processStudioUpkeep(
         completed.id,
         'owner',
-        250,
+        500,
         '2026-07-31'
     );
     assert.equal(closure.closed, true);
