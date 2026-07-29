@@ -127,6 +127,10 @@ const {
     startCommunityProductions
 } = require('./features/community-production/communityProduction');
 
+const {
+    startPlayerStudios
+} = require('./features/player-studios/studios');
+
 process.on(
     'unhandledRejection',
     error => {
@@ -383,6 +387,11 @@ async readyClient => {
 
         await db.ready;
 
+        const playerStudios =
+            await startPlayerStudios(
+                readyClient
+            );
+
         const restorableScenes =
             await getRestorableScenes();
 
@@ -429,6 +438,14 @@ async readyClient => {
                             '\uD83C\uDFAC Community Productions',
                         value:
                             `${communityProductions.running} running, casting ${communityProductions.casting ? 'restored' : 'scheduled'}.`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            '\uD83C\uDFAC Player Studios',
+                        value:
+                            `${playerStudios.processed} upkeep processed, ${playerStudios.closed} closed, ${playerStudios.mirrors} mirrors restored, ${playerStudios.refunded} interrupted purchases refunded.`,
                         inline:
                             true
                     },

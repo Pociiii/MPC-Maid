@@ -163,6 +163,11 @@ const {
     handleJoin: handleCommunityProductionJoin
 } = require('../features/community-production/communityProduction');
 
+const {
+    handleStudioBuy,
+    handleStudioReopen
+} = require('../features/player-studios/studios');
+
 async function replyInteractionError(
     interaction
 ) {
@@ -389,6 +394,18 @@ async function routeInteraction(
                     interaction
                 );
 
+                return true;
+
+            case 'studio_buy':
+                await handleStudioBuy(
+                    interaction
+                );
+                return true;
+
+            case 'studio_reopen':
+                await handleStudioReopen(
+                    interaction
+                );
                 return true;
 
             case 'commands_porncareer_info':

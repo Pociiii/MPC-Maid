@@ -1,0 +1,359 @@
+const db = require('./database');
+
+function run(sql, params = []) {
+    return new Promise((resolve, reject) =>
+        db.run(sql, params, function onRun(error) {
+            error ? reject(error) : resolve({ changes: this.changes, lastID: this.lastID });
+        })
+    );
+}
+
+function get(sql, params = []) {
+    return new Promise((resolve, reject) =>
+        db.get(sql, params, (error, row) => error ? reject(error) : resolve(row))
+    );
+}
+
+function all(sql, params = []) {
+    return new Promise((resolve, reject) =>
+        db.all(sql, params, (error, rows) => error ? reject(error) : resolve(rows))
+    );
+}
+
+async function getStudioByOwner(ownerId) {
+    return get('SELECT * FROM studios WHERE owner_id = ?', [ownerId]);
+}
+
+async function getStudioById(studioId) {
+    return get('SELECT * FROM studios WHERE id = ?', [studioId]);
+}
+
+async function getOpenStudios() {
+    return all(
+        `SELECT * FROM studios
+         WHERE status = 'open' AND thread_id IS NOT NULL
+         ORDER BY total_viewers DESC, movies_produced DESC, opened_at`
+    );
+}
+
+async function getProvisioningStudios() {
+    return all(
+        `SELECT * FROM studios
+         WHERE status = 'provisioning'
+         ORDER BY created_at`
+    );
+}
+
+async function beginStudioPurchase(ownerId, cost, resetDate, displayName) {
+    await run('BEGIN IMMEDIATE');
+
+    try {
+        if (await getStudioByOwner(ownerId)) {
+            await run('COMMIT');
+            return { ok: false, reason: 'exists' };
+        }
+
+        const spent = await run(
+            'UPDATE users SET coins = coins - ? WHERE id = ? AND coins >= ?',
+            [cost, ownerId, cost]
+        );
+
+        if (!spent.changes) {
+            await run('COMMIT');
+            return { ok: false, reason: 'coins' };
+        }
+
+        const now = Date.now();
+        const created = await run(
+            `INSERT INTO studios (
+                owner_id, status, display_name, opened_at, last_upkeep_date,
+                created_at, updated_at
+             ) VALUES (?, 'provisioning', ?, ?, ?, ?, ?)`,
+            [ownerId, displayName, now, resetDate, now, now]
+        );
+
+        await run('COMMIT');
+        return { ok: true, studio: await getStudioById(created.lastID) };
+    }
+    catch (error) {
+        await run('ROLLBACK').catch(() => null);
+        throw error;
+    }
+}
+
+async function finishStudioPurchase(studioId, threadId, overviewMessageId) {
+    await run(
+        `UPDATE studios
+         SET status = 'open', thread_id = ?, overview_message_id = ?, updated_at = ?
+         WHERE id = ? AND status = 'provisioning'`,
+        [threadId, overviewMessageId, Date.now(), studioId]
+    );
+
+    return getStudioById(studioId);
+}
+
+async function saveProvisioningThread(studioId, threadId) {
+    await run(
+        `UPDATE studios SET thread_id = ?, updated_at = ?
+         WHERE id = ? AND status = 'provisioning'`,
+        [threadId, Date.now(), studioId]
+    );
+}
+
+async function cancelStudioPurchase(studioId, ownerId, cost) {
+    await run('BEGIN IMMEDIATE');
+
+    try {
+        const removed = await run(
+            `DELETE FROM studios
+             WHERE id = ? AND owner_id = ? AND status = 'provisioning'`,
+            [studioId, ownerId]
+        );
+
+        if (removed.changes)
+            await run(
+                'UPDATE users SET coins = coins + ? WHERE id = ?',
+                [cost, ownerId]
+            );
+
+        await run('COMMIT');
+        return Boolean(removed.changes);
+    }
+    catch (error) {
+        await run('ROLLBACK').catch(() => null);
+        throw error;
+    }
+}
+
+async function reopenStudio(ownerId, cost, resetDate) {
+    await run('BEGIN IMMEDIATE');
+
+    try {
+        const studio = await getStudioByOwner(ownerId);
+
+        if (!studio || studio.status !== 'closed') {
+            await run('COMMIT');
+            return { ok: false, reason: 'status' };
+        }
+
+        const spent = await run(
+            'UPDATE users SET coins = coins - ? WHERE id = ? AND coins >= ?',
+            [cost, ownerId, cost]
+        );
+
+        if (!spent.changes) {
+            await run('COMMIT');
+            return { ok: false, reason: 'coins' };
+        }
+
+        await run(
+            `UPDATE studios
+             SET status = 'open', closed_at = NULL, last_upkeep_date = ?, updated_at = ?
+             WHERE id = ? AND status = 'closed'`,
+            [resetDate, Date.now(), studio.id]
+        );
+
+        await run('COMMIT');
+        return { ok: true, studio: await getStudioById(studio.id) };
+    }
+    catch (error) {
+        await run('ROLLBACK').catch(() => null);
+        throw error;
+    }
+}
+
+async function processStudioUpkeep(studioId, ownerId, cost, resetDate) {
+    await run('BEGIN IMMEDIATE');
+
+    try {
+        const studio = await get(
+            `SELECT * FROM studios
+             WHERE id = ? AND owner_id = ? AND status = 'open'`,
+            [studioId, ownerId]
+        );
+
+        if (!studio || studio.last_upkeep_date >= resetDate) {
+            await run('COMMIT');
+            return { changed: false, studio };
+        }
+
+        const spent = await run(
+            'UPDATE users SET coins = coins - ? WHERE id = ? AND coins >= ?',
+            [cost, ownerId, cost]
+        );
+        const now = Date.now();
+
+        if (spent.changes)
+            await run(
+                'UPDATE studios SET last_upkeep_date = ?, updated_at = ? WHERE id = ?',
+                [resetDate, now, studioId]
+            );
+        else
+            await run(
+                `UPDATE studios
+                 SET status = 'closed', closed_at = ?, last_upkeep_date = ?, updated_at = ?
+                 WHERE id = ?`,
+                [now, resetDate, now, studioId]
+            );
+
+        await run('COMMIT');
+        return {
+            changed: true,
+            closed: !spent.changes,
+            studio: await getStudioById(studioId)
+        };
+    }
+    catch (error) {
+        await run('ROLLBACK').catch(() => null);
+        throw error;
+    }
+}
+
+async function getStudiosDueUpkeep(resetDate) {
+    return all(
+        `SELECT * FROM studios
+         WHERE status = 'open' AND last_upkeep_date < ?`,
+        [resetDate]
+    );
+}
+
+async function attachSceneToOpenStudio(activeSceneId, requesterId, title, startedAt) {
+    const studio = await getStudioByOwner(requesterId);
+
+    if (!studio || studio.status !== 'open' || !studio.thread_id)
+        return null;
+
+    await run(
+        `INSERT OR IGNORE INTO studio_scenes (
+            studio_id, active_scene_id, title, requester_id, started_at
+         ) VALUES (?, ?, ?, ?, ?)`,
+        [studio.id, activeSceneId, title, requesterId, startedAt]
+    );
+
+    return getStudioScene(activeSceneId);
+}
+
+async function getStudioScene(activeSceneId) {
+    return get(
+        `SELECT ss.*, s.owner_id, s.thread_id, s.overview_message_id,
+                s.opened_at, s.display_name, s.status AS studio_status
+         FROM studio_scenes ss
+         JOIN studios s ON s.id = ss.studio_id
+         WHERE ss.active_scene_id = ?`,
+        [activeSceneId]
+    );
+}
+
+async function queueMirror(studioSceneId, mirrorKey, embed) {
+    const now = Date.now();
+
+    await run(
+        `INSERT INTO studio_mirrors (
+            studio_scene_id, mirror_key, embed_json, created_at
+         ) VALUES (?, ?, ?, ?)
+         ON CONFLICT(studio_scene_id, mirror_key)
+         DO UPDATE SET embed_json = excluded.embed_json
+         WHERE studio_mirrors.status = 'pending'`,
+        [
+            studioSceneId,
+            mirrorKey,
+            JSON.stringify(embed.toJSON ? embed.toJSON() : embed),
+            now
+        ]
+    );
+
+    return get(
+        `SELECT * FROM studio_mirrors
+         WHERE studio_scene_id = ? AND mirror_key = ?`,
+        [studioSceneId, mirrorKey]
+    );
+}
+
+async function markMirrorPosted(mirrorId, messageId) {
+    await run(
+        `UPDATE studio_mirrors
+         SET status = 'posted', message_id = ?, posted_at = ?
+         WHERE id = ? AND status = 'pending'`,
+        [messageId, Date.now(), mirrorId]
+    );
+}
+
+async function getPendingMirrors() {
+    return all(
+        `SELECT sm.*, s.thread_id
+         FROM studio_mirrors sm
+         JOIN studio_scenes ss ON ss.id = sm.studio_scene_id
+         JOIN studios s ON s.id = ss.studio_id
+         WHERE sm.status = 'pending' AND s.thread_id IS NOT NULL
+         ORDER BY sm.created_at, sm.id`
+    );
+}
+
+async function completeStudioScene(activeSceneId, viewers, outcome, title) {
+    await run('BEGIN IMMEDIATE');
+
+    try {
+        const studioScene = await get(
+            'SELECT * FROM studio_scenes WHERE active_scene_id = ?',
+            [activeSceneId]
+        );
+
+        if (!studioScene || studioScene.status === 'completed') {
+            await run('COMMIT');
+            return false;
+        }
+
+        const now = Date.now();
+        const completed = await run(
+            `UPDATE studio_scenes
+             SET status = 'completed', viewers = ?, outcome = ?, title = ?, completed_at = ?
+             WHERE id = ? AND status = 'running'`,
+            [viewers, outcome, title, now, studioScene.id]
+        );
+
+        if (completed.changes)
+            await run(
+                `UPDATE studios
+                 SET movies_produced = movies_produced + 1,
+                     total_viewers = total_viewers + ?,
+                     viral_hits = viral_hits + ?,
+                     latest_scene_title = ?, latest_scene_at = ?, updated_at = ?
+                 WHERE id = ?`,
+                [
+                    viewers,
+                    outcome === 'Viral Hit' ? 1 : 0,
+                    title,
+                    now,
+                    now,
+                    studioScene.studio_id
+                ]
+            );
+
+        await run('COMMIT');
+        return Boolean(completed.changes);
+    }
+    catch (error) {
+        await run('ROLLBACK').catch(() => null);
+        throw error;
+    }
+}
+
+module.exports = {
+    attachSceneToOpenStudio,
+    beginStudioPurchase,
+    cancelStudioPurchase,
+    completeStudioScene,
+    finishStudioPurchase,
+    getOpenStudios,
+    getPendingMirrors,
+    getProvisioningStudios,
+    getStudioById,
+    getStudioByOwner,
+    getStudioScene,
+    getStudiosDueUpkeep,
+    markMirrorPosted,
+    processStudioUpkeep,
+    queueMirror,
+    reopenStudio,
+    saveProvisioningThread
+};

@@ -175,6 +175,8 @@ function buildSections() {
             summary:
                 commandSummary([
                     '/pornscene',
+                    '/mystudio',
+                    '/studios',
                     '/customscene',
                     '/train',
                     '/shop',
@@ -188,6 +190,18 @@ function buildSections() {
                         COOLDOWNS.PORN_SCENE_REQUEST
                     ),
                     'Make a shared porn career scene. Active filming resumes after bot restarts.'
+                ),
+                commandDetail(
+                    '/mystudio',
+                    privateReply,
+                    `Upkeep resets ${dailyReset}`,
+                    `Buy or reopen a player studio. Purchase: ${ECONOMY.STUDIO_PURCHASE_COST} coins; daily upkeep: ${ECONOMY.STUDIO_DAILY_UPKEEP} coins.`
+                ),
+                commandDetail(
+                    '/studios',
+                    'Any channel, public reply',
+                    'None',
+                    'Browse open player studios and their production threads.'
                 ),
                 commandDetail(
                     '/customscene',

@@ -43,8 +43,14 @@ const {
 } = require('./sceneEmbeds');
 
 const {
-    scheduleScene
+    scheduleScene,
+    startScheduledScene
 } = require('./sceneScheduler');
+
+const {
+    addStudioField,
+    sendMirror
+} = require('../player-studios/studios');
 
 const {
     displayNameFor,
@@ -383,6 +389,43 @@ async function acceptScene(
         `${targetDisplayName} accepted your scene request. The scene is starting in <#${CHANNELS.PORN_CAREER}>.`
     );
 
+    const scheduled =
+        await scheduleScene(
+            channel,
+            requesterId,
+            targetId,
+            sceneCategory,
+            result,
+            sceneTitle,
+            requesterAuthor,
+            sceneColor
+        );
+
+    const startEmbed =
+        buildStartEmbed(
+            requesterId,
+            targetId,
+            sceneCategory,
+            sceneTitle,
+            result,
+            requesterUser,
+            targetUser,
+            booster,
+            requesterAuthor,
+            formatStatValue,
+            sceneColor
+        );
+
+    if (
+        scheduled.studioScene
+    )
+        addStudioField(
+            startEmbed,
+            scheduled.studioScene,
+            interaction.guild?.id ??
+                process.env.GUILD_ID
+        );
+
     const momentsChannel =
         interaction.client.channels.cache.get(
             CHANNELS.MOMENTS
@@ -399,19 +442,7 @@ async function acceptScene(
 
         await momentsChannel.send({
             embeds: [
-                buildStartEmbed(
-                    requesterId,
-                    targetId,
-                    sceneCategory,
-                    sceneTitle,
-                    result,
-                    requesterUser,
-                    targetUser,
-                    booster,
-                    requesterAuthor,
-                    formatStatValue,
-                    sceneColor
-                )
+                startEmbed
             ]
         });
 
@@ -440,15 +471,19 @@ async function acceptScene(
 
     }
 
-    await scheduleScene(
-        channel,
-        requesterId,
-        targetId,
-        sceneCategory,
-        result,
-        sceneTitle,
-        requesterAuthor,
-        sceneColor
+    if (
+        scheduled.studioScene
+    )
+        await sendMirror(
+            interaction.client,
+            scheduled.studioScene,
+            'started',
+            startEmbed
+        );
+
+    startScheduledScene(
+        interaction.client,
+        scheduled.scene
     );
 
 }

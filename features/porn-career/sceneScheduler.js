@@ -57,6 +57,17 @@ const {
     recordActivityMoment
 } = require('../activity/activityMoments');
 
+const {
+    getStudioScene
+} = require('../../database/studios');
+
+const {
+    addStudioField,
+    attachScene,
+    finishStudioProduction,
+    sendMirror
+} = require('../player-studios/studios');
+
 const sceneTimers =
     new Map();
 
@@ -101,6 +112,19 @@ async function finishScene(
     requesterAuthor,
     sceneColor
 ) {
+
+    const activeScene =
+        await getActiveScene(
+            sceneId
+        );
+
+    const studioScene =
+        await getStudioScene(
+            sceneId
+        );
+
+    let studioFinished =
+        false;
 
     const rewardBonuses =
         await buildSceneRewardBonuses(
@@ -241,6 +265,27 @@ async function finishScene(
 
         try {
 
+            const finalEmbed =
+                buildFinalEmbed(
+                    requesterId,
+                    targetId,
+                    result,
+                    sceneLinks,
+                    requesterAuthor,
+                    sceneColor,
+                    rewardBonuses
+                );
+
+            if (
+                studioScene
+            )
+                addStudioField(
+                    finalEmbed,
+                    studioScene,
+                    channel.guild?.id ??
+                        process.env.GUILD_ID
+                );
+
             await momentsChannel.send({
                 content:
                     `<@${requesterId}> <@${targetId}>`,
@@ -251,17 +296,22 @@ async function finishScene(
                     ]
                 },
                 embeds: [
-                    buildFinalEmbed(
-                        requesterId,
-                        targetId,
-                        result,
-                        sceneLinks,
-                        requesterAuthor,
-                        sceneColor,
-                        rewardBonuses
-                    )
+                    finalEmbed
                 ]
             });
+
+            if (
+                activeScene &&
+                studioScene
+            ) {
+                await finishStudioProduction(
+                    channel.client,
+                    activeScene,
+                    finalEmbed
+                );
+                studioFinished =
+                    true;
+            }
 
         }
         catch (error) {
@@ -308,6 +358,38 @@ async function finishScene(
                     }
                 ]
             }
+        );
+
+    }
+
+    if (
+        activeScene &&
+        studioScene &&
+        !studioFinished
+    ) {
+
+        const finalEmbed =
+            buildFinalEmbed(
+                requesterId,
+                targetId,
+                result,
+                sceneLinks,
+                requesterAuthor,
+                sceneColor,
+                rewardBonuses
+            );
+
+        addStudioField(
+            finalEmbed,
+            studioScene,
+            channel.guild?.id ??
+                process.env.GUILD_ID
+        );
+
+        await finishStudioProduction(
+            channel.client,
+            activeScene,
+            finalEmbed
         );
 
     }
@@ -526,20 +608,38 @@ async function postNextPornScenePart(
 
     try {
 
+        const partEmbed =
+            buildPartEmbed(
+                scene.owner_id,
+                scene.target_id,
+                scene.category,
+                phase,
+                scene.title,
+                scene.author,
+                scene.color,
+                scene.result,
+                index
+            );
+
+        const studioScene =
+            await getStudioScene(
+                scene.id
+            );
+
+        if (
+            studioScene
+        )
+            addStudioField(
+                partEmbed,
+                studioScene,
+                channel.guild?.id ??
+                    process.env.GUILD_ID
+            );
+
         const message =
             await channel.send({
                 embeds: [
-                    buildPartEmbed(
-                        scene.owner_id,
-                        scene.target_id,
-                        scene.category,
-                        phase,
-                        scene.title,
-                        scene.author,
-                        scene.color,
-                        scene.result,
-                        index
-                    )
+                    partEmbed
                 ],
                 components:
                     buildSexPartComponents(
@@ -549,6 +649,16 @@ async function postNextPornScenePart(
                         phase
                     )
             });
+
+        if (
+            studioScene
+        )
+            await sendMirror(
+                client,
+                studioScene,
+                `part:${index}`,
+                partEmbed
+            );
 
         const sceneLinks =
             [
@@ -675,12 +785,15 @@ async function scheduleScene(
             nextPartAt: Date.now()
         });
 
-    schedulePornSceneRecord(
-        channel.client,
-        scene
-    );
+    const studioScene =
+        await attachScene(
+            scene
+        );
 
-    return scene;
+    return {
+        scene,
+        studioScene
+    };
 
 }
 
@@ -725,5 +838,7 @@ async function restorePornScenes(
 
 module.exports = {
     restorePornScenes,
-    scheduleScene
+    scheduleScene,
+    startScheduledScene:
+        schedulePornSceneRecord
 };

@@ -116,6 +116,11 @@ their persisted rotation changes at exactly the same boundary.
 ## Porn Career
 
 - `/pornscene` is a consent-based two-user production flow.
+- Player Studios cost 10,000 coins, charge 250 coins at the 12:00 UTC daily
+  reset, and cost 1,000 coins to reopen after an upkeep closure.
+- An open requester's studio mirrors their Porn Career production live into its
+  persistent forum thread. Productions attached while open finish and count
+  once across closure or bot restarts.
 - Scene parts are selected from role/cast-compatible GIF pools.
 - Maximum phase counts are foreplay 2, oral 2, sex 3, and finale 1.
 - Performance affects score/critical behavior, Stamina affects scene length,

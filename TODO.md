@@ -67,13 +67,15 @@ These are not required by the current database or command set.
 
 ### Production Studios
 
-- Design `studios` and production-catalog persistence.
-- Use one forum thread per studio, with an editable overview as the first post.
-- Decide purchase, tier, style, upkeep, closure, and upgrade rules.
+- Live-test the MVP specified in `PORN_CAREER_STUDIO_DESIGN.md`.
+- Verify purchase, forum provisioning/refund recovery, daily upkeep, closure,
+  reopening, mirror recovery, and exactly-once completion statistics.
+- Use one forum post/thread per studio, with an editable overview first message.
 - Catalog completed Porn Career productions without moving live scene parts out
   of the Porn Career channel.
-- Finalize whether open studios grant a small scene XP bonus before writing the
-  schema.
+- Keep studios cosmetic: do not add passive stat, ranking, XP, or coin bonuses.
+- Tune the 10,000 purchase, 250 upkeep, and 1,000 reopen costs after measuring
+  the live coin economy.
 
 ### Private Scene Threads
 
