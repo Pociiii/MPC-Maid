@@ -348,6 +348,42 @@ async function main() {
         true
     );
 
+    await dbRun(
+        `INSERT INTO lotteries (
+            status,
+            ticket_price,
+            max_tickets_per_user,
+            base_prize,
+            jackpot_percentage,
+            opens_at,
+            draws_at,
+            created_at
+         ) VALUES ('OPEN', 100, 20, 1000, 65, ?, ?, ?)`,
+        [
+            Date.now() - 60_000,
+            Date.now() + 60_000,
+            Date.now()
+        ]
+    );
+
+    for (
+        let ticketNumber = 1;
+        ticketNumber <= 20;
+        ticketNumber += 1
+    )
+        await dbRun(
+            `INSERT INTO lottery_tickets (
+                lottery_id,
+                user_id,
+                ticket_number,
+                purchased_at
+             ) VALUES (1, 'female-a', ?, ?)`,
+            [
+                ticketNumber,
+                Date.now()
+            ]
+        );
+
     const rewards =
         running.slots.map(
             (slot) => ({
@@ -376,7 +412,9 @@ async function main() {
                             emoji:
                                 'rose'
                         }
-                        : null
+                        : null,
+                lotteryTicket:
+                    true
             })
         );
 
@@ -465,6 +503,51 @@ async function main() {
     assert.equal(
         gift.quantity,
         1
+    );
+
+    const maleLotteryTickets =
+        await dbGet(
+            `SELECT COUNT(*) AS count
+             FROM lottery_tickets
+             WHERE lottery_id = 1 AND user_id = 'male-a'`
+        );
+
+    const femaleLotteryTickets =
+        await dbGet(
+            `SELECT COUNT(*) AS count
+             FROM lottery_tickets
+             WHERE lottery_id = 1 AND user_id = 'female-a'`
+        );
+
+    const rewardedProduction =
+        await getProduction(
+            production.id
+        );
+
+    assert.equal(
+        maleLotteryTickets.count,
+        1
+    );
+
+    assert.equal(
+        femaleLotteryTickets.count,
+        20
+    );
+
+    assert.equal(
+        rewardedProduction.rewards.find(
+            (reward) =>
+                reward.userId === 'male-a'
+        ).lotteryTicket.number,
+        21
+    );
+
+    assert.equal(
+        rewardedProduction.rewards.find(
+            (reward) =>
+                reward.userId === 'female-a'
+        ).lotteryTicket,
+        null
     );
 
     assert.equal(

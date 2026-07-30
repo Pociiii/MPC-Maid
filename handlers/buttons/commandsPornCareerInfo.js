@@ -38,7 +38,7 @@ module.exports = {
 - Use \`/pornscene partner:@user\`.
 - The partner gets a DM with Accept / Decline.
 - Request cooldown: **${minutes(COOLDOWNS.PORN_SCENE_REQUEST)}**.
-- You pick no booster, or one booster from \`/inventory\`.
+- You pick no booster, or one booster from \`/inventory boosters\`.
 - The booster is spent when the request is sent.
 - If they decline, nothing posts publicly.
 
@@ -47,6 +47,12 @@ module.exports = {
 - Final results and scene links post in <#${CHANNELS.MOMENTS}>.
 - Scenes post in parts over about 1 hour.
 - Custom scenes use \`/customscene\` and cost **${ECONOMY.CUSTOM_SCENE_PART_COST} coins per selected part**.
+
+**Player Studios**
+- Use \`/mystudio\` to view, buy, or reopen your studio.
+- A studio costs **${ECONOMY.STUDIO_PURCHASE_COST} coins**, with **${ECONOMY.STUDIO_DAILY_UPKEEP} coins** daily upkeep.
+- Use \`/studios\` to browse open studios and their production threads.
+- Productions started while your studio is open are mirrored into its thread.
 
 **Stats**
 - **Performance**: better result and higher critical chance.
@@ -61,7 +67,7 @@ module.exports = {
 - More Stamina can add extra XP.
 - The requester gets **+${ECONOMY.PORN_SCENE_STARTER_XP_BONUS} XP** for starting.
 - Use \`/train\` to upgrade stats.
-- Use \`/shop\` to buy boosters and \`/inventory\` to see them.`,
+- Use \`/shop boosters\` to buy boosters and \`/inventory boosters\` to see them.`,
                 footerText:
                     'MPC Maid Command Guide - Porn Career Info',
                 timestamp:

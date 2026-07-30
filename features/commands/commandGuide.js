@@ -179,8 +179,8 @@ function buildSections() {
                     '/studios',
                     '/customscene',
                     '/train',
-                    '/shop',
-                    '/inventory'
+                    '/shop boosters',
+                    '/inventory boosters'
                 ]),
             commands: [
                 commandDetail(

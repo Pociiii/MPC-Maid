@@ -511,13 +511,94 @@ async function applyRewardsOnce(
                     ]
                 );
 
+            if (
+                reward.lotteryTicket
+            ) {
+
+                const lottery =
+                    await get(
+                        `SELECT id, max_tickets_per_user
+                         FROM lotteries
+                         WHERE status = 'OPEN' AND draws_at > ?
+                         ORDER BY id DESC
+                         LIMIT 1`,
+                        [
+                            Date.now()
+                        ]
+                    );
+
+                const owned =
+                    lottery
+                        ? await get(
+                            `SELECT COUNT(*) AS count
+                             FROM lottery_tickets
+                             WHERE lottery_id = ? AND user_id = ?`,
+                            [
+                                lottery.id,
+                                reward.userId
+                            ]
+                        )
+                        : null;
+
+                if (
+                    lottery &&
+                    Number(
+                        owned?.count ?? 0
+                    ) < lottery.max_tickets_per_user
+                ) {
+
+                    const highest =
+                        await get(
+                            `SELECT COALESCE(MAX(ticket_number), 0) AS number
+                             FROM lottery_tickets
+                             WHERE lottery_id = ?`,
+                            [
+                                lottery.id
+                            ]
+                        );
+
+                    const ticketNumber =
+                        Number(
+                            highest.number
+                        ) + 1;
+
+                    await run(
+                        `INSERT INTO lottery_tickets (
+                            lottery_id,
+                            user_id,
+                            ticket_number,
+                            purchased_at
+                         ) VALUES (?, ?, ?, ?)`,
+                        [
+                            lottery.id,
+                            reward.userId,
+                            ticketNumber,
+                            Date.now()
+                        ]
+                    );
+
+                    reward.lotteryTicket = {
+                        number:
+                            ticketNumber
+                    };
+
+                }
+                else
+                    reward.lotteryTicket =
+                        null;
+
+            }
+
         }
 
         await run(
             `UPDATE community_productions
-             SET rewards_applied = 1, updated_at = ?
+             SET rewards_json = ?, rewards_applied = 1, updated_at = ?
              WHERE id = ? AND rewards_applied = 0`,
             [
+                JSON.stringify(
+                    production.rewards
+                ),
                 Date.now(),
                 productionId
             ]

@@ -52,15 +52,15 @@ hardcode them.
 Current public command families include:
 
 - General: `/profile`, `/daily`, `/leaderboard`, `/achievements`, `/mpcopen`.
-- Porn Career: `/pornscene`, `/customscene`, `/train`, `/shop boosters`,
-  `/inventory boosters`.
+- Porn Career: `/pornscene`, `/mystudio`, `/studios`, `/customscene`, `/train`,
+  `/shop boosters`, `/inventory boosters`.
 - Gifts: `/shop gifts`, `/inventory gifts`, `/gift send`.
 - Social/RP: `/relationship`, `/breed`, `/pregnancy`, `/matchme`, `/drink`,
   `/firework`.
 - Showcase and interactions: `/drop`, `/wiggle`, `/flex`, `/horny` and their
   interaction buttons.
-- Casino: `/dice`, `/slots`, `/blackjack`, `/holdem`; Spank Dilli uses its
-  persistent channel panel.
+- Casino: `/dice`, `/slots`, `/blackjack`, `/holdem`, `/lottery`; Spank Dilli
+  uses its persistent channel panel.
 - Member contribution: the persistent GIF submission panel exposed by the
   current command guide.
 
@@ -248,6 +248,9 @@ invalid prices, and insufficient catalogue entries for a daily rotation.
   notices to Maid Feed.
 - Gift actions deliberately do not call quest, achievement, activity, XP,
   ranking, or Reputation helpers.
+- Community productions can award a bonus booster, gift, or free ticket for the
+  active weekly lottery. Lottery ticket bonuses are skipped when the member has
+  reached that lottery's 20-ticket limit and do not add ticket revenue.
 
 ## Casino
 

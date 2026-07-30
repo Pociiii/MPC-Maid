@@ -1125,7 +1125,10 @@ function buildRewards(
                 Math.random() <
                 BONUS_REWARD_CHANCE
                     ? pickGift()
-                    : null
+                    : null,
+            lotteryTicket:
+                Math.random() <
+                BONUS_REWARD_CHANCE
         })
     );
 
@@ -1269,7 +1272,7 @@ async function finishProduction(
                         title:
                             `\uD83C\uDFC1 Production Finished \u2014 ${updated.title}`,
                         description:
-                            'The official MPC production has wrapped. Every cast member received coins and XP, with a chance of a bonus booster or gift.'
+                            'The official MPC production has wrapped. Every cast member received coins and XP, with a chance of a bonus booster, gift, or lottery ticket.'
                     }
                 ),
                 updated
@@ -1288,6 +1291,9 @@ async function finishProduction(
                                 : null,
                             reward.gift
                                 ? `${reward.gift.emoji} ${reward.gift.name}`
+                                : null,
+                            reward.lotteryTicket
+                                ? `Lottery Ticket #${reward.lotteryTicket.number}`
                                 : null
                         ].filter(
                             Boolean
