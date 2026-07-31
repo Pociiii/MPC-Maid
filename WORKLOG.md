@@ -14,6 +14,18 @@ titles, Daily WYR questions, the gift catalogue, and SQLite schema readiness.
 The database is upgraded additively. Do not delete `database.db`; back it up,
 then run the bot or preflight to create missing tables.
 
+## Latest: Player Studio Staff
+
+- Added a data-driven abstract NPC roster to `/mystudio`.
+- Added a persistent Hired Staff field and private Manage Staff catalogue.
+- Added the Personal Agent for 5,000 coins with 750-coin daily upkeep.
+- Personal Agent owners can send the normal `/pornscene` request while busy,
+  but consent, cooldowns, acceptance, and the one-active-scene rule are
+  unchanged.
+- Added separate NPC upkeep, suspension, and one-day-cost reactivation without
+  accumulated staff debt or automatic studio closure.
+- Updated the persistent Commands-channel guide and Porn Career info panel.
+
 ## Latest: Permanent Gift System
 
 - Changed the existing commands to `/shop boosters`, `/shop gifts`,

@@ -7,6 +7,10 @@ const {
     isBusy
 } = require('../../utils/pornScenes');
 
+const {
+    hasActiveStudioNpc
+} = require('../../database/studios');
+
 function parseBooster(
     selected
 ) {
@@ -81,6 +85,10 @@ module.exports = {
         if (
             isBusy(
                 interaction.user.id
+            ) &&
+            !await hasActiveStudioNpc(
+                interaction.user.id,
+                'personal_agent'
             )
         ) {
 

@@ -27,6 +27,10 @@ const {
 } = require('../../utils/pornScenes');
 
 const {
+    hasActiveStudioNpc
+} = require('../../database/studios');
+
+const {
     boosterStatLabels,
     formatBoosterSelectDescription,
     getUserBoosters
@@ -132,6 +136,10 @@ module.exports = {
         if (
             isBusy(
                 interaction.user.id
+            ) &&
+            !await hasActiveStudioNpc(
+                interaction.user.id,
+                'personal_agent'
             )
         ) {
 

@@ -123,6 +123,13 @@ their persisted rotation changes at exactly the same boundary.
 - `/pornscene` is a consent-based two-user production flow.
 - Player Studios cost 10,000 coins, charge 500 coins at the 12:00 UTC daily
   reset, and cost 1,000 coins to reopen after an upkeep closure.
+- Open studio owners can manage abstract NPC staff through `/mystudio`.
+- The Personal Agent costs 5,000 coins to hire and 750 coins per day. While
+  active, it lets its owner send the normal `/pornscene` request while busy;
+  it does not change consent, acceptance, cooldowns, or the one-active-scene
+  rule. Both participants must still be free when Accept is pressed.
+- Failed NPC upkeep suspends that NPC without closing the studio. Reactivation
+  costs one day of its upkeep, and suspended staff do not accumulate debt.
 - An open requester's studio mirrors their Porn Career production live into its
   persistent forum thread. Productions attached while open finish and count
   once across closure or bot restarts.

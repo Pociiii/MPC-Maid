@@ -10,6 +10,10 @@ const {
     getRandomColor
 } = require('../../data/constants');
 
+const {
+    PREGNANCY
+} = require('../../data/pregnancyConfig');
+
 module.exports = {
 
     async execute(
@@ -30,24 +34,24 @@ module.exports = {
 
 **How it starts**
 - Use \`/breed partner:@user\`.
-- The other user must accept in DM.
-- Female/Female works too for futa RP.
-- If both can carry, the requester chooses who carries.
+- The other member must accept the request in DM.
+- A member with the Female role can carry; Male and Female members can be partners.
+- If both members can carry, the requester chooses the carrier.
+- Accepting adds that partner to the carrier's list for the current daily check; it does not cause an immediate pregnancy.
 
 **Daily check**
-- Pregnancy rolls happen **once per day**.
+- Each eligible carrier receives at most **one pregnancy roll per day**.
 - Next check: <t:${nextCheck}:F> (<t:${nextCheck}:R>).
-- Every user receives a daily fertility value from **3% to 7%**.
-- Pregnancy chance is the carrier's fertility plus one randomly selected partner's fertility (**6% to 14%**).
-- More partners do not create more rolls.
-- If there are multiple partners, one is selected randomly.
+- Daily fertility is **${PREGNANCY.MIN_DAILY_FERTILITY}% to ${PREGNANCY.MAX_DAILY_FERTILITY}%** per member.
+- The roll combines the carrier's fertility with one partner's fertility (**${PREGNANCY.MIN_DAILY_FERTILITY * 2}% to ${PREGNANCY.MAX_DAILY_FERTILITY * 2}%**).
+- Multiple accepted partners do not create extra rolls; one is selected randomly for that day's check.
 - Failed rolls stay private.
 
 **Pregnancy**
-- Full pregnancy lasts **30 days**.
-- Gender reveal happens on **Day 7**.
-- Birth happens on **Day 30**.
-- Use \`/pregnancy\` to check your own private status.`,
+- Pregnancy lasts **${PREGNANCY.DURATION_DAYS} days**.
+- The baby's gender is revealed on **Day ${PREGNANCY.GENDER_REVEAL_DAY}**.
+- Birth happens on **Day ${PREGNANCY.DURATION_DAYS}**.
+- Use \`/pregnancy\` to privately check fertility, pregnancy status, children, and history.`,
                 footerText:
                     'MPC Maid Command Guide - Pregnancy Info',
                 timestamp:

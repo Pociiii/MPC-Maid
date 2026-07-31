@@ -28,6 +28,139 @@ async function getStudioById(studioId) {
     return get('SELECT * FROM studios WHERE id = ?', [studioId]);
 }
 
+async function getStudioStaff(studioId) {
+    return all(
+        `SELECT * FROM studio_staff
+         WHERE studio_id = ?
+         ORDER BY hired_at, id`,
+        [studioId]
+    );
+}
+
+async function getStudioStaffByOwner(ownerId) {
+    return all(
+        `SELECT ss.*
+         FROM studio_staff ss
+         JOIN studios s ON s.id = ss.studio_id
+         WHERE s.owner_id = ?
+         ORDER BY ss.hired_at, ss.id`,
+        [ownerId]
+    );
+}
+
+async function hasActiveStudioNpc(ownerId, npcKey) {
+    const row = await get(
+        `SELECT 1 AS active
+         FROM studio_staff ss
+         JOIN studios s ON s.id = ss.studio_id
+         WHERE s.owner_id = ?
+         AND s.status = 'open'
+         AND ss.npc_key = ?
+         AND ss.status = 'active'`,
+        [ownerId, npcKey]
+    );
+
+    return Boolean(row?.active);
+}
+
+async function hireStudioNpc(ownerId, npcKey, cost, resetDate) {
+    await run('BEGIN IMMEDIATE');
+
+    try {
+        const studio = await getStudioByOwner(ownerId);
+
+        if (!studio || studio.status !== 'open') {
+            await run('COMMIT');
+            return { ok: false, reason: 'studio' };
+        }
+
+        const existing = await get(
+            'SELECT * FROM studio_staff WHERE studio_id = ? AND npc_key = ?',
+            [studio.id, npcKey]
+        );
+
+        if (existing) {
+            await run('COMMIT');
+            return { ok: false, reason: 'exists' };
+        }
+
+        const spent = await run(
+            'UPDATE users SET coins = coins - ? WHERE id = ? AND coins >= ?',
+            [cost, ownerId, cost]
+        );
+
+        if (!spent.changes) {
+            await run('COMMIT');
+            return { ok: false, reason: 'coins' };
+        }
+
+        const now = Date.now();
+        await run(
+            `INSERT INTO studio_staff (
+                studio_id, npc_key, status, hired_at,
+                last_upkeep_date, updated_at
+             ) VALUES (?, ?, 'active', ?, ?, ?)`,
+            [studio.id, npcKey, now, resetDate, now]
+        );
+
+        await run('COMMIT');
+        return { ok: true };
+    }
+    catch (error) {
+        await run('ROLLBACK').catch(() => null);
+        throw error;
+    }
+}
+
+async function reactivateStudioNpc(ownerId, npcKey, cost, resetDate) {
+    await run('BEGIN IMMEDIATE');
+
+    try {
+        const studio = await getStudioByOwner(ownerId);
+
+        if (!studio || studio.status !== 'open') {
+            await run('COMMIT');
+            return { ok: false, reason: 'studio' };
+        }
+
+        const staff = await get(
+            `SELECT * FROM studio_staff
+             WHERE studio_id = ? AND npc_key = ?`,
+            [studio.id, npcKey]
+        );
+
+        if (!staff || staff.status !== 'suspended') {
+            await run('COMMIT');
+            return { ok: false, reason: 'status' };
+        }
+
+        const spent = await run(
+            'UPDATE users SET coins = coins - ? WHERE id = ? AND coins >= ?',
+            [cost, ownerId, cost]
+        );
+
+        if (!spent.changes) {
+            await run('COMMIT');
+            return { ok: false, reason: 'coins' };
+        }
+
+        await run(
+            `UPDATE studio_staff
+             SET status = 'active', last_upkeep_date = ?,
+                 suspended_at = NULL, updated_at = ?
+             WHERE id = ? AND status = 'suspended'`,
+            [resetDate, Date.now(), staff.id]
+        );
+
+        await run('COMMIT');
+        return { ok: true };
+    }
+    catch (error) {
+        await run('ROLLBACK').catch(() => null);
+        throw error;
+    }
+}
+
 async function getOpenStudios() {
     return all(
         `SELECT * FROM studios
@@ -153,6 +286,13 @@ async function reopenStudio(ownerId, cost, resetDate) {
             [resetDate, Date.now(), studio.id]
         );
 
+        await run(
+            `UPDATE studio_staff
+             SET last_upkeep_date = ?, updated_at = ?
+             WHERE studio_id = ? AND status = 'active'`,
+            [resetDate, Date.now(), studio.id]
+        );
+
         await run('COMMIT');
         return { ok: true, studio: await getStudioById(studio.id) };
     }
@@ -215,6 +355,84 @@ async function getStudiosDueUpkeep(resetDate) {
          WHERE status = 'open' AND last_upkeep_date < ?`,
         [resetDate]
     );
+}
+
+async function getStudioStaffDueUpkeep(resetDate) {
+    return all(
+        `SELECT ss.*, s.owner_id
+         FROM studio_staff ss
+         JOIN studios s ON s.id = ss.studio_id
+         WHERE ss.status = 'active'
+         AND ss.last_upkeep_date < ?
+         AND s.status = 'open'
+         ORDER BY ss.last_upkeep_date, ss.id`,
+        [resetDate]
+    );
+}
+
+async function processStudioStaffUpkeep(
+    staffId,
+    ownerId,
+    cost,
+    resetDate
+) {
+    await run('BEGIN IMMEDIATE');
+
+    try {
+        const staff = await get(
+            `SELECT ss.*, s.status AS studio_status
+             FROM studio_staff ss
+             JOIN studios s ON s.id = ss.studio_id
+             WHERE ss.id = ? AND s.owner_id = ?`,
+            [staffId, ownerId]
+        );
+
+        if (
+            !staff ||
+            staff.status !== 'active' ||
+            staff.studio_status !== 'open' ||
+            staff.last_upkeep_date >= resetDate
+        ) {
+            await run('COMMIT');
+            return { changed: false, staff };
+        }
+
+        const spent = await run(
+            'UPDATE users SET coins = coins - ? WHERE id = ? AND coins >= ?',
+            [cost, ownerId, cost]
+        );
+        const now = Date.now();
+
+        if (spent.changes)
+            await run(
+                `UPDATE studio_staff
+                 SET last_upkeep_date = ?, updated_at = ?
+                 WHERE id = ?`,
+                [resetDate, now, staffId]
+            );
+        else
+            await run(
+                `UPDATE studio_staff
+                 SET status = 'suspended', suspended_at = ?,
+                     last_upkeep_date = ?, updated_at = ?
+                 WHERE id = ?`,
+                [now, resetDate, now, staffId]
+            );
+
+        await run('COMMIT');
+        return {
+            changed: true,
+            suspended: !spent.changes,
+            staff: await get(
+                'SELECT * FROM studio_staff WHERE id = ?',
+                [staffId]
+            )
+        };
+    }
+    catch (error) {
+        await run('ROLLBACK').catch(() => null);
+        throw error;
+    }
 }
 
 async function attachSceneToOpenStudio(activeSceneId, requesterId, title, startedAt) {
@@ -350,10 +568,17 @@ module.exports = {
     getStudioById,
     getStudioByOwner,
     getStudioScene,
+    getStudioStaff,
+    getStudioStaffByOwner,
+    getStudioStaffDueUpkeep,
     getStudiosDueUpkeep,
+    hasActiveStudioNpc,
+    hireStudioNpc,
     markMirrorPosted,
+    processStudioStaffUpkeep,
     processStudioUpkeep,
     queueMirror,
+    reactivateStudioNpc,
     reopenStudio,
     saveProvisioningThread
 };

@@ -399,7 +399,7 @@ function buildCastingEmbed(
             name:
                 'Possible Bonuses',
             value:
-                '\u26A1 10% chance of a weighted Booster\n\uD83C\uDF81 10% chance of a weighted Gift',
+                '\u26A1 10% chance of a weighted Booster\n\uD83C\uDF81 10% chance of a weighted Gift\n\uD83C\uDF9F\uFE0F 10% chance of a Lottery Ticket (if below the 20-ticket limit)',
             inline:
                 false
         }

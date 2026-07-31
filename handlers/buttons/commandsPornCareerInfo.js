@@ -9,6 +9,10 @@ const {
     getRandomColor
 } = require('../../data/constants');
 
+const {
+    getStudioNpc
+} = require('../../data/studioNpcs');
+
 function minutes(
     seconds
 ) {
@@ -24,6 +28,11 @@ module.exports = {
     async execute(
         interaction
     ) {
+
+        const personalAgent =
+            getStudioNpc(
+                'personal_agent'
+            );
 
         const embed =
             createEmbed({
@@ -53,6 +62,10 @@ module.exports = {
 - A studio costs **${ECONOMY.STUDIO_PURCHASE_COST} coins**, with **${ECONOMY.STUDIO_DAILY_UPKEEP} coins** daily upkeep.
 - Use \`/studios\` to browse open studios and their production threads.
 - Productions started while your studio is open are mirrored into its thread.
+- Use **Manage Staff** in \`/mystudio\` to hire abstract NPC staff.
+- The **Personal Agent** costs **${personalAgent.hireCost} coins**, with **${personalAgent.dailyUpkeep} coins** daily upkeep.
+- An active Personal Agent lets its owner send normal \`/pornscene\` requests while already filming. Consent and the one-scene limit are unchanged; Accept only works when both members are free.
+- Unpaid staff upkeep suspends that NPC without closing the studio. Reactivation costs one day of that NPC's upkeep.
 
 **Stats**
 - **Performance**: better result and higher critical chance.

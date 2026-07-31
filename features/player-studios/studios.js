@@ -1,7 +1,8 @@
 const {
     ActionRowBuilder,
     ButtonBuilder,
-    ButtonStyle
+    ButtonStyle,
+    StringSelectMenuBuilder
 } = require('discord.js');
 
 const {
@@ -13,6 +14,11 @@ const {
 const {
     createEmbed
 } = require('../../utils/embeds');
+
+const {
+    STUDIO_NPCS,
+    getStudioNpc
+} = require('../../data/studioNpcs');
 
 const {
     getOrCreateUser
@@ -40,10 +46,15 @@ const {
     getStudioById,
     getStudioByOwner,
     getStudioScene,
+    getStudioStaffByOwner,
+    getStudioStaffDueUpkeep,
     getStudiosDueUpkeep,
+    hireStudioNpc,
     markMirrorPosted,
+    processStudioStaffUpkeep,
     processStudioUpkeep,
     queueMirror,
+    reactivateStudioNpc,
     reopenStudio,
     saveProvisioningThread
 } = require('../../database/studios');
@@ -74,6 +85,32 @@ function anniversaryBadge(openedAt, now = Date.now()) {
 
 function formatNumber(value) {
     return Number(value ?? 0).toLocaleString('en-US');
+}
+
+function buildHiredStaffValue(studio, staff) {
+    if (!staff.length)
+        return 'No staff hired. Use **Manage Staff** to view available NPCs.';
+
+    return staff.map((member) => {
+        const npc = getStudioNpc(member.npc_key);
+
+        if (!npc)
+            return `\u2753 **Unknown Staff (${member.npc_key})**`;
+
+        const active = member.status === 'active' && studio.status === 'open';
+        const status = member.status === 'suspended'
+            ? 'Suspended'
+            : active
+                ? 'Active'
+                : 'Inactive \u2014 studio closed';
+        const timing = active
+            ? `\nNext upkeep: <t:${getNextResetTimestamp()}:R>`
+            : '';
+
+        return `${npc.emoji} **${npc.name}** \u2014 ${status}\n` +
+            `${npc.description}\n` +
+            `Daily upkeep: **${formatNumber(npc.dailyUpkeep)} coins**${timing}`;
+    }).join('\n\n');
 }
 
 async function fetchOwnerTarget(client, ownerId) {
@@ -192,7 +229,7 @@ async function createStudioForumPost(client, studio, ownerId) {
     return finishStudioPurchase(studio.id, thread.id, starter.id);
 }
 
-function buildMyStudioReply(studio, user, target) {
+function buildMyStudioReply(studio, user, target, staff = []) {
     if (!studio) {
         const embed = createEmbed({
             color: getRandomColor(),
@@ -223,6 +260,12 @@ function buildMyStudioReply(studio, user, target) {
 
     const embed = buildOverviewEmbed(studio, target);
 
+    embed.addFields({
+        name: '\uD83D\uDC65 Hired Staff',
+        value: buildHiredStaffValue(studio, staff),
+        inline: false
+    });
+
     if (studio.thread_id)
         embed.addFields({
             name: 'Studio',
@@ -243,17 +286,177 @@ function buildMyStudioReply(studio, user, target) {
             )
         );
 
+    components.push(
+        new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId('studio_staff')
+                .setLabel('Manage Staff')
+                .setEmoji('\uD83D\uDC65')
+                .setStyle(ButtonStyle.Secondary)
+        )
+    );
+
     return { embeds: [embed], components };
 }
 
 async function buildMyStudio(interaction) {
-    const [user, studio, target] = await Promise.all([
+    const [user, studio, target, staff] = await Promise.all([
         getOrCreateUser(interaction.user.id),
         getStudioByOwner(interaction.user.id),
-        fetchOwnerTarget(interaction.client, interaction.user.id)
+        fetchOwnerTarget(interaction.client, interaction.user.id),
+        getStudioStaffByOwner(interaction.user.id)
     ]);
 
-    return buildMyStudioReply(studio, user, target);
+    return buildMyStudioReply(studio, user, target, staff);
+}
+
+async function buildStudioStaffReply(interaction) {
+    const [studio, user, staff] = await Promise.all([
+        getStudioByOwner(interaction.user.id),
+        getOrCreateUser(interaction.user.id),
+        getStudioStaffByOwner(interaction.user.id)
+    ]);
+
+    if (!studio)
+        return {
+            content: 'Open a player studio before hiring staff.',
+            embeds: [],
+            components: []
+        };
+
+    const embed = createEmbed({
+        color: getRandomColor(),
+        title: '\uD83D\uDC65 Studio Staff',
+        description:
+            `Hire abstract NPC staff to unlock studio services.\n` +
+            `Your balance: **${formatNumber(user.coins)} coins**`,
+        footerText: '/mystudio \u2022 Manage Staff',
+        timestamp: true
+    });
+
+    for (const npc of STUDIO_NPCS) {
+        const hired = staff.find((member) => member.npc_key === npc.key);
+        const status = !hired
+            ? 'Available'
+            : hired.status === 'suspended'
+                ? 'Suspended'
+                : studio.status === 'open'
+                    ? 'Active'
+                    : 'Inactive \u2014 studio closed';
+
+        embed.addFields({
+            name: `${npc.emoji} ${npc.name} \u2014 ${status}`,
+            value:
+                `${npc.description}\n` +
+                `Hire: **${formatNumber(npc.hireCost)} coins** \u2022 ` +
+                `Daily upkeep: **${formatNumber(npc.dailyUpkeep)} coins**`,
+            inline: false
+        });
+    }
+
+    const actionable = STUDIO_NPCS.filter((npc) => {
+        const hired = staff.find((member) => member.npc_key === npc.key);
+        return !hired || hired.status === 'suspended';
+    });
+    const components = [];
+
+    if (studio.status === 'open' && actionable.length)
+        components.push(
+            new ActionRowBuilder().addComponents(
+                new StringSelectMenuBuilder()
+                    .setCustomId('studio_staff_select')
+                    .setPlaceholder('Select an NPC to hire or reactivate')
+                    .addOptions(
+                        ...actionable.map((npc) => {
+                            const hired = staff.find(
+                                (member) => member.npc_key === npc.key
+                            );
+                            const reactivating = hired?.status === 'suspended';
+
+                            return {
+                                label: `${reactivating ? 'Reactivate' : 'Hire'} ${npc.name}`,
+                                description: reactivating
+                                    ? `${formatNumber(npc.dailyUpkeep)} coins to reactivate`
+                                    : `${formatNumber(npc.hireCost)} coins to hire`,
+                                emoji: npc.emoji,
+                                value: npc.key
+                            };
+                        })
+                    )
+            )
+        );
+
+    components.push(
+        new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId('studio_staff_back')
+                .setLabel('Back to Studio')
+                .setStyle(ButtonStyle.Secondary)
+        )
+    );
+
+    if (studio.status !== 'open')
+        embed.setDescription(
+            `${embed.data.description}\n\nReopen your studio to hire or reactivate staff.`
+        );
+
+    return { embeds: [embed], components };
+}
+
+async function handleStudioStaff(interaction) {
+    await interaction.deferUpdate();
+    await interaction.editReply(
+        await buildStudioStaffReply(interaction)
+    );
+}
+
+async function handleStudioStaffBack(interaction) {
+    await interaction.deferUpdate();
+    await interaction.editReply(
+        await buildMyStudio(interaction)
+    );
+}
+
+async function handleStudioStaffSelect(interaction) {
+    await interaction.deferUpdate();
+
+    const npc = getStudioNpc(interaction.values[0]);
+
+    if (!npc) {
+        await interaction.editReply({
+            ...await buildStudioStaffReply(interaction),
+            content: 'That NPC is no longer available.'
+        });
+        return;
+    }
+
+    const staff = await getStudioStaffByOwner(interaction.user.id);
+    const hired = staff.find((member) => member.npc_key === npc.key);
+    const result = hired?.status === 'suspended'
+        ? await reactivateStudioNpc(
+            interaction.user.id,
+            npc.key,
+            npc.dailyUpkeep,
+            getDailyQuestDate()
+        )
+        : await hireStudioNpc(
+            interaction.user.id,
+            npc.key,
+            npc.hireCost,
+            getDailyQuestDate()
+        );
+    const reason = result.reason === 'coins'
+        ? 'You no longer have enough coins.'
+        : result.reason === 'studio'
+            ? 'Your studio must be open.'
+            : 'That staff member is no longer available for this action.';
+
+    await interaction.editReply({
+        ...await buildStudioStaffReply(interaction),
+        content: result.ok
+            ? `${npc.emoji} **${npc.name}** is now active.`
+            : reason
+    });
 }
 
 async function handleStudioBuy(interaction) {
@@ -274,9 +477,12 @@ async function handleStudioBuy(interaction) {
     if (!result.ok) {
         const target = await fetchOwnerTarget(interaction.client, interaction.user.id);
         const user = await getOrCreateUser(interaction.user.id);
-        const studio = await getStudioByOwner(interaction.user.id);
+        const [studio, staff] = await Promise.all([
+            getStudioByOwner(interaction.user.id),
+            getStudioStaffByOwner(interaction.user.id)
+        ]);
         await interaction.editReply({
-            ...buildMyStudioReply(studio, user, target),
+            ...buildMyStudioReply(studio, user, target, staff),
             content: result.reason === 'exists'
                 ? 'You already own a studio.'
                 : 'You no longer have enough coins to buy a studio.'
@@ -292,8 +498,9 @@ async function handleStudioBuy(interaction) {
         );
         const user = await getOrCreateUser(interaction.user.id);
         const target = await fetchOwnerTarget(interaction.client, interaction.user.id);
+        const staff = await getStudioStaffByOwner(interaction.user.id);
         await interaction.editReply({
-            ...buildMyStudioReply(studio, user, target),
+            ...buildMyStudioReply(studio, user, target, staff),
             content: `Your studio is open: ${studioUrl(target.guildId, studio.thread_id)}`
         });
     }
@@ -324,15 +531,18 @@ async function handleStudioReopen(interaction) {
         ECONOMY.STUDIO_REOPEN_COST,
         getDailyQuestDate()
     );
-    const studio = await getStudioByOwner(interaction.user.id);
-    const user = await getOrCreateUser(interaction.user.id);
-    const target = await fetchOwnerTarget(interaction.client, interaction.user.id);
+    const [studio, user, target, staff] = await Promise.all([
+        getStudioByOwner(interaction.user.id),
+        getOrCreateUser(interaction.user.id),
+        fetchOwnerTarget(interaction.client, interaction.user.id),
+        getStudioStaffByOwner(interaction.user.id)
+    ]);
 
     if (result.ok)
         await updateStudioOverview(interaction.client, result.studio).catch(() => false);
 
     await interaction.editReply({
-        ...buildMyStudioReply(studio, user, target),
+        ...buildMyStudioReply(studio, user, target, staff),
         content: result.ok
             ? 'Your studio is open again. Future requested scenes will be produced there.'
             : result.reason === 'coins'
@@ -550,7 +760,48 @@ async function runStudioUpkeep(client) {
         await updateStudioOverview(client, latest).catch(() => false);
     }
 
-    return { processed, closed };
+    const staffDue = await getStudioStaffDueUpkeep(resetDate);
+    let staffProcessed = 0;
+    let staffSuspended = 0;
+
+    for (const staff of staffDue) {
+        const npc = getStudioNpc(staff.npc_key);
+
+        if (!npc)
+            continue;
+
+        let chargeDate = nextResetDate(staff.last_upkeep_date);
+        let latest = staff;
+
+        while (chargeDate <= resetDate && latest.status === 'active') {
+            const result = await processStudioStaffUpkeep(
+                staff.id,
+                staff.owner_id,
+                npc.dailyUpkeep,
+                chargeDate
+            );
+
+            if (!result.changed)
+                break;
+
+            staffProcessed += 1;
+            latest = result.staff;
+
+            if (result.suspended) {
+                staffSuspended += 1;
+                break;
+            }
+
+            chargeDate = nextResetDate(chargeDate);
+        }
+    }
+
+    return {
+        processed,
+        closed,
+        staffProcessed,
+        staffSuspended
+    };
 }
 
 function scheduleStudioUpkeep(client) {
@@ -591,6 +842,9 @@ module.exports = {
     finishStudioProduction,
     handleStudioBuy,
     handleStudioReopen,
+    handleStudioStaff,
+    handleStudioStaffBack,
+    handleStudioStaffSelect,
     sendMirror,
     startPlayerStudios,
     studioName,

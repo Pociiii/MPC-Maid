@@ -31,6 +31,10 @@ const {
 const ROLES =
     require('../../data/roles.json');
 
+const {
+    getStudioNpc
+} = require('../../data/studioNpcs');
+
 function minutes(
     seconds
 ) {
@@ -120,6 +124,11 @@ function buildSections() {
     const privateReply =
         'Any channel, private reply';
 
+    const personalAgent =
+        getStudioNpc(
+            'personal_agent'
+        );
+
     return {
         general: {
             label:
@@ -195,7 +204,7 @@ function buildSections() {
                     '/mystudio',
                     privateReply,
                     `Upkeep resets ${dailyReset}`,
-                    `Buy or reopen a player studio. Purchase: ${ECONOMY.STUDIO_PURCHASE_COST} coins; daily upkeep: ${ECONOMY.STUDIO_DAILY_UPKEEP} coins.`
+                    `Buy, reopen, and manage staff for a player studio. Studio: ${ECONOMY.STUDIO_PURCHASE_COST} coins plus ${ECONOMY.STUDIO_DAILY_UPKEEP}/day. Personal Agent: ${personalAgent.hireCost} coins plus ${personalAgent.dailyUpkeep}/day.`
                 ),
                 commandDetail(
                     '/studios',

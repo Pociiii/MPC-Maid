@@ -165,7 +165,10 @@ const {
 
 const {
     handleStudioBuy,
-    handleStudioReopen
+    handleStudioReopen,
+    handleStudioStaff,
+    handleStudioStaffBack,
+    handleStudioStaffSelect
 } = require('../features/player-studios/studios');
 
 async function replyInteractionError(
@@ -404,6 +407,18 @@ async function routeInteraction(
 
             case 'studio_reopen':
                 await handleStudioReopen(
+                    interaction
+                );
+                return true;
+
+            case 'studio_staff':
+                await handleStudioStaff(
+                    interaction
+                );
+                return true;
+
+            case 'studio_staff_back':
+                await handleStudioStaffBack(
                     interaction
                 );
                 return true;
@@ -747,6 +762,14 @@ async function routeInteraction(
             case 'pornscene_booster':
 
                 await pornSceneBooster.execute(
+                    interaction
+                );
+
+                return true;
+
+            case 'studio_staff_select':
+
+                await handleStudioStaffSelect(
                     interaction
                 );
 

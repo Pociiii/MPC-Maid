@@ -39,6 +39,23 @@ CREATE TABLE IF NOT EXISTS studio_scenes (
 CREATE INDEX IF NOT EXISTS idx_studio_scenes_studio
 ON studio_scenes(studio_id, status);
 
+CREATE TABLE IF NOT EXISTS studio_staff (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    studio_id INTEGER NOT NULL,
+    npc_key TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'active'
+        CHECK (status IN ('active', 'suspended')),
+    hired_at INTEGER NOT NULL,
+    last_upkeep_date TEXT NOT NULL,
+    suspended_at INTEGER,
+    updated_at INTEGER NOT NULL,
+    UNIQUE (studio_id, npc_key),
+    FOREIGN KEY (studio_id) REFERENCES studios(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_studio_staff_upkeep
+ON studio_staff(status, last_upkeep_date);
+
 CREATE TABLE IF NOT EXISTS studio_mirrors (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     studio_scene_id INTEGER NOT NULL,

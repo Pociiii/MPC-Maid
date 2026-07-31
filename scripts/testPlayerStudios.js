@@ -17,11 +17,16 @@ const {
     beginStudioPurchase,
     completeStudioScene,
     finishStudioPurchase,
+    getStudioStaffByOwner,
     getStudioByOwner,
     getStudioScene,
+    hasActiveStudioNpc,
+    hireStudioNpc,
     markMirrorPosted,
+    processStudioStaffUpkeep,
     processStudioUpkeep,
     queueMirror,
+    reactivateStudioNpc,
     reopenStudio
 } = require('../database/studios');
 
@@ -68,6 +73,28 @@ function closeDatabase() {
         'overview'
     );
     assert.equal(studio.status, 'open');
+
+    await run(`UPDATE users SET coins = 7000 WHERE id = 'owner'`);
+    const hired = await hireStudioNpc(
+        'owner',
+        'personal_agent',
+        5000,
+        '2026-07-29'
+    );
+    assert.equal(hired.ok, true);
+    assert.equal(
+        await hasActiveStudioNpc('owner', 'personal_agent'),
+        true
+    );
+    assert.deepEqual(
+        await hireStudioNpc(
+            'owner',
+            'personal_agent',
+            5000,
+            '2026-07-29'
+        ),
+        { ok: false, reason: 'exists' }
+    );
 
     await run(
         `INSERT INTO active_scenes (
@@ -125,6 +152,15 @@ function closeDatabase() {
     );
     assert.equal(upkeep.closed, false);
 
+    const [agent] = await getStudioStaffByOwner('owner');
+    const agentUpkeep = await processStudioStaffUpkeep(
+        agent.id,
+        'owner',
+        750,
+        '2026-07-30'
+    );
+    assert.equal(agentUpkeep.suspended, false);
+
     await run(`UPDATE users SET coins = 0 WHERE id = 'owner'`);
     const closure = await processStudioUpkeep(
         completed.id,
@@ -133,6 +169,10 @@ function closeDatabase() {
         '2026-07-31'
     );
     assert.equal(closure.closed, true);
+    assert.equal(
+        await hasActiveStudioNpc('owner', 'personal_agent'),
+        false
+    );
 
     const stillAttached = await getStudioScene(1);
     assert.equal(stillAttached.status, 'completed');
@@ -145,6 +185,40 @@ function closeDatabase() {
     );
     assert.equal(reopened.ok, true);
     assert.equal(reopened.studio.status, 'open');
+    assert.equal(
+        await hasActiveStudioNpc('owner', 'personal_agent'),
+        true
+    );
+
+    await run(`UPDATE users SET coins = 0 WHERE id = 'owner'`);
+    const suspension = await processStudioStaffUpkeep(
+        agent.id,
+        'owner',
+        750,
+        '2026-08-01'
+    );
+    assert.equal(suspension.suspended, true);
+    assert.equal(
+        (await getStudioByOwner('owner')).status,
+        'open'
+    );
+    assert.equal(
+        await hasActiveStudioNpc('owner', 'personal_agent'),
+        false
+    );
+
+    await run(`UPDATE users SET coins = 750 WHERE id = 'owner'`);
+    const reactivated = await reactivateStudioNpc(
+        'owner',
+        'personal_agent',
+        750,
+        '2026-08-01'
+    );
+    assert.equal(reactivated.ok, true);
+    assert.equal(
+        await hasActiveStudioNpc('owner', 'personal_agent'),
+        true
+    );
 
     await closeDatabase();
     process.chdir(originalDirectory);
