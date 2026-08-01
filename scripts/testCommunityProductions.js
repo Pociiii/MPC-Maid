@@ -495,6 +495,19 @@ async function main() {
         1
     );
 
+    const productionIncome =
+        await dbGet(
+            `SELECT SUM(amount) AS amount
+             FROM user_coin_income
+             WHERE user_id = 'male-a'
+             AND source = 'community_production'`
+        );
+
+    assert.equal(
+        productionIncome.amount,
+        200
+    );
+
     assert.equal(
         booster.quantity,
         1

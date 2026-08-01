@@ -350,6 +350,18 @@ async function main() {
     assert.equal(rewardA.ranking, 7);
     assert.equal(rewardA.scenes_completed, 1);
 
+    const rewardIncome =
+        await dbGet(
+            `SELECT SUM(amount) AS amount
+             FROM user_coin_income
+             WHERE user_id = ? AND source = 'porn_scene'`,
+            [
+                'reward-a'
+            ]
+        );
+
+    assert.equal(rewardIncome.amount, 125);
+
     console.log(
         'Active scene restart recovery tests passed.'
     );

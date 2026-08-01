@@ -698,7 +698,11 @@ async function handleSpankDilli(
 
         await addCoins(
             interaction.user.id,
-            prizeAfterSpank
+            prizeAfterSpank,
+            {
+                source:
+                    'spank_dilli'
+            }
         );
 
         await syncUserAchievementCounters(

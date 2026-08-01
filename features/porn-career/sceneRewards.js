@@ -183,11 +183,19 @@ async function applyRewards(
         ),
         addCoins(
             requesterId,
-            result.coins
+            result.coins,
+            {
+                source:
+                    'porn_scene'
+            }
         ),
         addCoins(
             targetId,
-            result.coins
+            result.coins,
+            {
+                source:
+                    'porn_scene'
+            }
         ),
         addRanking(
             requesterId,

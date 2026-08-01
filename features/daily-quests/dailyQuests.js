@@ -1553,7 +1553,11 @@ async function grantQuestReward(
     await Promise.all([
         addCoins(
             userId,
-            quest.reward_coins
+            quest.reward_coins,
+            {
+                source:
+                    'daily_quest'
+            }
         ),
         addXP(
             userId,
@@ -1644,7 +1648,11 @@ async function maybeGrantDailyBonus(
         await Promise.all([
             addCoins(
                 userId,
-            DAILY_BONUS.coins
+                DAILY_BONUS.coins,
+                {
+                    source:
+                        'daily_quest_bonus'
+                }
         ),
         addXP(
             userId,

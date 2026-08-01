@@ -244,7 +244,16 @@ module.exports = {
 
             await addCoins(
                 interaction.user.id,
-                payout
+                payout,
+                {
+                    incomeAmount:
+                        Math.max(
+                            0,
+                            result.coins
+                        ),
+                    source:
+                        'casino_dice'
+                }
             );
 
         }

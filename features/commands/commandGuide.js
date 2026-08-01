@@ -204,7 +204,7 @@ function buildSections() {
                     '/mystudio',
                     privateReply,
                     `Upkeep resets ${dailyReset}`,
-                    `Buy, reopen, and manage staff for a player studio. Studio: ${ECONOMY.STUDIO_PURCHASE_COST} coins plus ${ECONOMY.STUDIO_DAILY_UPKEEP}/day. Personal Agent: ${personalAgent.hireCost} coins plus ${personalAgent.dailyUpkeep}/day.`
+                    `Buy, close, reopen, and manage staff for a player studio. The overview shows previous-day gameplay income. Closing pauses all upkeep; reopening costs ${ECONOMY.STUDIO_REOPEN_COST} coins. Studio: ${ECONOMY.STUDIO_PURCHASE_COST} coins plus ${ECONOMY.STUDIO_DAILY_UPKEEP}/day. Personal Agent: ${personalAgent.hireCost} coins plus ${personalAgent.dailyUpkeep}/day.`
                 ),
                 commandDetail(
                     '/studios',

@@ -361,7 +361,16 @@ async function spinSession(
 
         await addCoins(
             session.userId,
-            payout
+            payout,
+            {
+                incomeAmount:
+                    Math.max(
+                        0,
+                        payout - session.bet
+                    ),
+                source:
+                    'casino_slots'
+            }
         );
 
         await syncUserAchievementCounters(

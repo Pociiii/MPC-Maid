@@ -1110,7 +1110,11 @@ async function grantVoteReward(
     await Promise.all([
         addCoins(
             userId,
-            ECONOMY.DAILY_WYR_VOTE_COINS
+            ECONOMY.DAILY_WYR_VOTE_COINS,
+            {
+                source:
+                    'daily_wyr'
+            }
         ),
         addXP(
             userId,

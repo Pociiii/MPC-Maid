@@ -22,6 +22,10 @@ const {
 } = require('../../utils/embeds');
 
 const {
+    getCoinIncomeDate
+} = require('../../utils/coinIncome');
+
+const {
     commandFooter
 } = require('../../utils/version');
 
@@ -1293,6 +1297,22 @@ async function drawCurrentLottery(
                         [
                             prize,
                             winner.user_id
+                        ]
+                    );
+
+                    await dbRun(
+                        `INSERT INTO user_coin_income (
+                            user_id, income_date, source, amount, updated_at
+                         ) VALUES (?, ?, 'lottery_prize', ?, ?)
+                         ON CONFLICT(user_id, income_date, source)
+                         DO UPDATE SET
+                            amount = amount + excluded.amount,
+                            updated_at = excluded.updated_at`,
+                        [
+                            winner.user_id,
+                            getCoinIncomeDate(),
+                            prize,
+                            completedAt
                         ]
                     );
 

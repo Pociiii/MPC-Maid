@@ -258,6 +258,19 @@ async function cancelStudioPurchase(studioId, ownerId, cost) {
     }
 }
 
+async function closeStudio(ownerId) {
+    const result = await run(
+        `UPDATE studios
+         SET status = 'closed', closed_at = ?, updated_at = ?
+         WHERE owner_id = ? AND status = 'open'`,
+        [Date.now(), Date.now(), ownerId]
+    );
+
+    return result.changes
+        ? { ok: true, studio: await getStudioByOwner(ownerId) }
+        : { ok: false, reason: 'status' };
+}
+
 async function reopenStudio(ownerId, cost, resetDate) {
     await run('BEGIN IMMEDIATE');
 
@@ -560,6 +573,7 @@ module.exports = {
     attachSceneToOpenStudio,
     beginStudioPurchase,
     cancelStudioPurchase,
+    closeStudio,
     completeStudioScene,
     finishStudioPurchase,
     getOpenStudios,

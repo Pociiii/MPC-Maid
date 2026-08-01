@@ -165,6 +165,9 @@ const {
 
 const {
     handleStudioBuy,
+    handleStudioClose,
+    handleStudioCloseCancel,
+    handleStudioCloseConfirm,
     handleStudioReopen,
     handleStudioStaff,
     handleStudioStaffBack,
@@ -407,6 +410,24 @@ async function routeInteraction(
 
             case 'studio_reopen':
                 await handleStudioReopen(
+                    interaction
+                );
+                return true;
+
+            case 'studio_close':
+                await handleStudioClose(
+                    interaction
+                );
+                return true;
+
+            case 'studio_close_confirm':
+                await handleStudioCloseConfirm(
+                    interaction
+                );
+                return true;
+
+            case 'studio_close_cancel':
+                await handleStudioCloseCancel(
                     interaction
                 );
                 return true;

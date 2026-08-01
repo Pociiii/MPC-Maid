@@ -16,6 +16,11 @@ const {
 } = require('../../utils/embeds');
 
 const {
+    getCoinIncome,
+    getPreviousCoinIncomeDate
+} = require('../../utils/coinIncome');
+
+const {
     STUDIO_NPCS,
     getStudioNpc
 } = require('../../data/studioNpcs');
@@ -38,6 +43,7 @@ const {
     attachSceneToOpenStudio,
     beginStudioPurchase,
     cancelStudioPurchase,
+    closeStudio,
     completeStudioScene,
     finishStudioPurchase,
     getOpenStudios,
@@ -97,20 +103,15 @@ function buildHiredStaffValue(studio, staff) {
         if (!npc)
             return `\u2753 **Unknown Staff (${member.npc_key})**`;
 
-        const active = member.status === 'active' && studio.status === 'open';
-        const status = member.status === 'suspended'
-            ? 'Suspended'
-            : active
-                ? 'Active'
-                : 'Inactive \u2014 studio closed';
-        const timing = active
-            ? `\nNext upkeep: <t:${getNextResetTimestamp()}:R>`
-            : '';
-
-        return `${npc.emoji} **${npc.name}** \u2014 ${status}\n` +
-            `${npc.description}\n` +
-            `Daily upkeep: **${formatNumber(npc.dailyUpkeep)} coins**${timing}`;
+        return `${npc.emoji} **${npc.name}**`;
     }).join('\n\n');
+}
+
+function getPreviousDayIncome(ownerId) {
+    return getCoinIncome(
+        ownerId,
+        getPreviousCoinIncomeDate()
+    );
 }
 
 async function fetchOwnerTarget(client, ownerId) {
@@ -127,7 +128,7 @@ async function fetchOwnerTarget(client, ownerId) {
     };
 }
 
-function buildOverviewEmbed(studio, target) {
+function buildOverviewEmbed(studio, target, previousDayIncome = 0) {
     const embed = createEmbed({
         color: getRandomColor(),
         authorName: studioName(studio.display_name ?? target.displayName),
@@ -170,8 +171,8 @@ function buildOverviewEmbed(studio, target) {
             inline: true
         },
         {
-            name: 'Latest Release',
-            value: studio.latest_scene_title ?? 'No releases yet',
+            name: 'Studio Income \u2014 Previous Day',
+            value: `\uD83E\DE99 ${formatNumber(previousDayIncome)} coins`,
             inline: false
         },
         {
@@ -201,9 +202,12 @@ async function updateStudioOverview(client, studioOrId) {
     if (!message?.edit)
         return false;
 
-    const target = await fetchOwnerTarget(client, studio.owner_id);
+    const [target, previousDayIncome] = await Promise.all([
+        fetchOwnerTarget(client, studio.owner_id),
+        getPreviousDayIncome(studio.owner_id)
+    ]);
     await message.edit({
-        embeds: [buildOverviewEmbed(studio, target)]
+        embeds: [buildOverviewEmbed(studio, target, previousDayIncome)]
     });
     return true;
 }
@@ -215,11 +219,20 @@ async function createStudioForumPost(client, studio, ownerId) {
     if (!forum?.threads?.create)
         throw new Error(`Studio forum ${CHANNELS.STUDIO_FORUM} is unavailable or is not a forum.`);
 
-    const target = await fetchOwnerTarget(client, ownerId);
+    const [target, previousDayIncome] = await Promise.all([
+        fetchOwnerTarget(client, ownerId),
+        getPreviousDayIncome(ownerId)
+    ]);
     const thread = await forum.threads.create({
         name: studioName(target.displayName).slice(0, 100),
         message: {
-            embeds: [buildOverviewEmbed({ ...studio, status: 'open' }, target)]
+            embeds: [
+                buildOverviewEmbed(
+                    { ...studio, status: 'open' },
+                    target,
+                    previousDayIncome
+                )
+            ]
         },
         reason: `Player Studio purchase by ${ownerId}`
     });
@@ -229,7 +242,13 @@ async function createStudioForumPost(client, studio, ownerId) {
     return finishStudioPurchase(studio.id, thread.id, starter.id);
 }
 
-function buildMyStudioReply(studio, user, target, staff = []) {
+function buildMyStudioReply(
+    studio,
+    user,
+    target,
+    staff = [],
+    previousDayIncome = 0
+) {
     if (!studio) {
         const embed = createEmbed({
             color: getRandomColor(),
@@ -258,7 +277,11 @@ function buildMyStudioReply(studio, user, target, staff = []) {
         };
     }
 
-    const embed = buildOverviewEmbed(studio, target);
+    const embed = buildOverviewEmbed(
+        studio,
+        target,
+        previousDayIncome
+    );
 
     embed.addFields({
         name: '\uD83D\uDC65 Hired Staff',
@@ -292,7 +315,18 @@ function buildMyStudioReply(studio, user, target, staff = []) {
                 .setCustomId('studio_staff')
                 .setLabel('Manage Staff')
                 .setEmoji('\uD83D\uDC65')
-                .setStyle(ButtonStyle.Secondary)
+                .setStyle(ButtonStyle.Secondary),
+            ...(
+                studio.status === 'open'
+                    ? [
+                        new ButtonBuilder()
+                            .setCustomId('studio_close')
+                            .setLabel('Close Studio')
+                            .setEmoji('\uD83D\uDD12')
+                            .setStyle(ButtonStyle.Danger)
+                    ]
+                    : []
+            )
         )
     );
 
@@ -300,14 +334,21 @@ function buildMyStudioReply(studio, user, target, staff = []) {
 }
 
 async function buildMyStudio(interaction) {
-    const [user, studio, target, staff] = await Promise.all([
+    const [user, studio, target, staff, previousDayIncome] = await Promise.all([
         getOrCreateUser(interaction.user.id),
         getStudioByOwner(interaction.user.id),
         fetchOwnerTarget(interaction.client, interaction.user.id),
-        getStudioStaffByOwner(interaction.user.id)
+        getStudioStaffByOwner(interaction.user.id),
+        getPreviousDayIncome(interaction.user.id)
     ]);
 
-    return buildMyStudioReply(studio, user, target, staff);
+    return buildMyStudioReply(
+        studio,
+        user,
+        target,
+        staff,
+        previousDayIncome
+    );
 }
 
 async function buildStudioStaffReply(interaction) {
@@ -477,12 +518,19 @@ async function handleStudioBuy(interaction) {
     if (!result.ok) {
         const target = await fetchOwnerTarget(interaction.client, interaction.user.id);
         const user = await getOrCreateUser(interaction.user.id);
-        const [studio, staff] = await Promise.all([
+        const [studio, staff, previousDayIncome] = await Promise.all([
             getStudioByOwner(interaction.user.id),
-            getStudioStaffByOwner(interaction.user.id)
+            getStudioStaffByOwner(interaction.user.id),
+            getPreviousDayIncome(interaction.user.id)
         ]);
         await interaction.editReply({
-            ...buildMyStudioReply(studio, user, target, staff),
+            ...buildMyStudioReply(
+                studio,
+                user,
+                target,
+                staff,
+                previousDayIncome
+            ),
             content: result.reason === 'exists'
                 ? 'You already own a studio.'
                 : 'You no longer have enough coins to buy a studio.'
@@ -496,11 +544,20 @@ async function handleStudioBuy(interaction) {
             result.studio,
             interaction.user.id
         );
-        const user = await getOrCreateUser(interaction.user.id);
-        const target = await fetchOwnerTarget(interaction.client, interaction.user.id);
-        const staff = await getStudioStaffByOwner(interaction.user.id);
+        const [user, target, staff, previousDayIncome] = await Promise.all([
+            getOrCreateUser(interaction.user.id),
+            fetchOwnerTarget(interaction.client, interaction.user.id),
+            getStudioStaffByOwner(interaction.user.id),
+            getPreviousDayIncome(interaction.user.id)
+        ]);
         await interaction.editReply({
-            ...buildMyStudioReply(studio, user, target, staff),
+            ...buildMyStudioReply(
+                studio,
+                user,
+                target,
+                staff,
+                previousDayIncome
+            ),
             content: `Your studio is open: ${studioUrl(target.guildId, studio.thread_id)}`
         });
     }
@@ -531,24 +588,108 @@ async function handleStudioReopen(interaction) {
         ECONOMY.STUDIO_REOPEN_COST,
         getDailyQuestDate()
     );
-    const [studio, user, target, staff] = await Promise.all([
+    const [studio, user, target, staff, previousDayIncome] = await Promise.all([
         getStudioByOwner(interaction.user.id),
         getOrCreateUser(interaction.user.id),
         fetchOwnerTarget(interaction.client, interaction.user.id),
-        getStudioStaffByOwner(interaction.user.id)
+        getStudioStaffByOwner(interaction.user.id),
+        getPreviousDayIncome(interaction.user.id)
     ]);
 
     if (result.ok)
         await updateStudioOverview(interaction.client, result.studio).catch(() => false);
 
     await interaction.editReply({
-        ...buildMyStudioReply(studio, user, target, staff),
+        ...buildMyStudioReply(
+            studio,
+            user,
+            target,
+            staff,
+            previousDayIncome
+        ),
         content: result.ok
             ? 'Your studio is open again. Future requested scenes will be produced there.'
             : result.reason === 'coins'
                 ? 'You no longer have enough coins to reopen your studio.'
                 : 'This studio cannot be reopened.'
     });
+}
+
+async function handleStudioClose(interaction) {
+    await interaction.deferUpdate();
+
+    const studio = await getStudioByOwner(interaction.user.id);
+
+    if (!studio || studio.status !== 'open') {
+        await interaction.editReply({
+            ...await buildMyStudio(interaction),
+            content: 'This studio is already closed.'
+        });
+        return;
+    }
+
+    const embed = createEmbed({
+        color: getRandomColor(),
+        title: '\uD83D\uDD12 Close Studio?',
+        description:
+            'Closing pauses studio upkeep and every staff upkeep charge. Staff benefits become inactive until the studio is reopened.\n\n' +
+            `Existing productions will still finish. Reopening costs **${formatNumber(ECONOMY.STUDIO_REOPEN_COST)} coins**.`,
+        footerText: '/mystudio',
+        timestamp: true
+    });
+
+    await interaction.editReply({
+        content: null,
+        embeds: [embed],
+        components: [
+            new ActionRowBuilder().addComponents(
+                new ButtonBuilder()
+                    .setCustomId('studio_close_confirm')
+                    .setLabel('Confirm Close')
+                    .setStyle(ButtonStyle.Danger),
+                new ButtonBuilder()
+                    .setCustomId('studio_close_cancel')
+                    .setLabel('Keep Open')
+                    .setStyle(ButtonStyle.Secondary)
+            )
+        ]
+    });
+}
+
+async function handleStudioCloseConfirm(interaction) {
+    await interaction.deferUpdate();
+
+    const result = await closeStudio(interaction.user.id);
+    const [studio, user, target, staff, previousDayIncome] = await Promise.all([
+        getStudioByOwner(interaction.user.id),
+        getOrCreateUser(interaction.user.id),
+        fetchOwnerTarget(interaction.client, interaction.user.id),
+        getStudioStaffByOwner(interaction.user.id),
+        getPreviousDayIncome(interaction.user.id)
+    ]);
+
+    if (result.ok)
+        await updateStudioOverview(interaction.client, result.studio).catch(() => false);
+
+    await interaction.editReply({
+        ...buildMyStudioReply(
+            studio,
+            user,
+            target,
+            staff,
+            previousDayIncome
+        ),
+        content: result.ok
+            ? 'Your studio is closed. Studio and staff upkeep are paused until you reopen it.'
+            : 'This studio is already closed.'
+    });
+}
+
+async function handleStudioCloseCancel(interaction) {
+    await interaction.deferUpdate();
+    await interaction.editReply(
+        await buildMyStudio(interaction)
+    );
 }
 
 async function buildStudiosReply(interaction) {
@@ -841,6 +982,9 @@ module.exports = {
     buildStudiosReply,
     finishStudioProduction,
     handleStudioBuy,
+    handleStudioClose,
+    handleStudioCloseCancel,
+    handleStudioCloseConfirm,
     handleStudioReopen,
     handleStudioStaff,
     handleStudioStaffBack,

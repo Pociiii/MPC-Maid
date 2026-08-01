@@ -15,6 +15,7 @@ const db = require('../database/database');
 const {
     attachSceneToOpenStudio,
     beginStudioPurchase,
+    closeStudio,
     completeStudioScene,
     finishStudioPurchase,
     getStudioStaffByOwner,
@@ -86,6 +87,7 @@ function closeDatabase() {
         await hasActiveStudioNpc('owner', 'personal_agent'),
         true
     );
+
     assert.deepEqual(
         await hireStudioNpc(
             'owner',
@@ -190,12 +192,49 @@ function closeDatabase() {
         true
     );
 
+    const manualClosure = await closeStudio('owner');
+    assert.equal(manualClosure.ok, true);
+    assert.equal(
+        await hasActiveStudioNpc('owner', 'personal_agent'),
+        false
+    );
+    assert.equal(
+        (await processStudioUpkeep(
+            completed.id,
+            'owner',
+            500,
+            '2026-08-02'
+        )).changed,
+        false
+    );
+    assert.equal(
+        (await processStudioStaffUpkeep(
+            agent.id,
+            'owner',
+            750,
+            '2026-08-02'
+        )).changed,
+        false
+    );
+
+    await run(`UPDATE users SET coins = 1000 WHERE id = 'owner'`);
+    const reopenedAfterManualClose = await reopenStudio(
+        'owner',
+        1000,
+        '2026-08-02'
+    );
+    assert.equal(reopenedAfterManualClose.ok, true);
+    assert.equal(
+        await hasActiveStudioNpc('owner', 'personal_agent'),
+        true
+    );
+
     await run(`UPDATE users SET coins = 0 WHERE id = 'owner'`);
     const suspension = await processStudioStaffUpkeep(
         agent.id,
         'owner',
         750,
-        '2026-08-01'
+        '2026-08-03'
     );
     assert.equal(suspension.suspended, true);
     assert.equal(
@@ -212,7 +251,7 @@ function closeDatabase() {
         'owner',
         'personal_agent',
         750,
-        '2026-08-01'
+        '2026-08-03'
     );
     assert.equal(reactivated.ok, true);
     assert.equal(

@@ -29,3 +29,16 @@ CREATE TABLE IF NOT EXISTS users (
     father_id TEXT DEFAULT NULL
 
 );
+
+CREATE TABLE IF NOT EXISTS user_coin_income (
+    user_id TEXT NOT NULL,
+    income_date TEXT NOT NULL,
+    source TEXT NOT NULL,
+    amount INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (user_id, income_date, source),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_coin_income_date
+ON user_coin_income(user_id, income_date);

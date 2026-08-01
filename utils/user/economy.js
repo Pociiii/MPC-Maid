@@ -9,6 +9,10 @@ const {
     runUserUpdate
 } = require('./db');
 
+const {
+    recordCoinIncome
+} = require('../coinIncome');
+
 async function getBalance(
     userId
 ) {
@@ -22,18 +26,33 @@ async function getBalance(
 
 }
 
-function addCoins(
+async function addCoins(
     userId,
-    amount
+    amount,
+    {
+        incomeAmount = amount,
+        source = null
+    } = {}
 ) {
 
-    return runUserUpdate(
+    const result = await runUserUpdate(
         'UPDATE users SET coins = coins + ? WHERE id = ?',
         [
             amount,
             userId
         ]
     );
+
+    if (
+        source
+    )
+        await recordCoinIncome(
+            userId,
+            incomeAmount,
+            source
+        );
+
+    return result;
 
 }
 

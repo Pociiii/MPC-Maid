@@ -62,6 +62,8 @@ module.exports = {
 - A studio costs **${ECONOMY.STUDIO_PURCHASE_COST} coins**, with **${ECONOMY.STUDIO_DAILY_UPKEEP} coins** daily upkeep.
 - Use \`/studios\` to browse open studios and their production threads.
 - Productions started while your studio is open are mirrored into its thread.
+- Studio Overview shows the owner's total gameplay coin income from the previous 12:00 UTC economy day.
+- Use **Close Studio** in \`/mystudio\` to pause studio and staff upkeep. Existing productions still finish, and reopening costs **${ECONOMY.STUDIO_REOPEN_COST} coins**.
 - Use **Manage Staff** in \`/mystudio\` to hire abstract NPC staff.
 - The **Personal Agent** costs **${personalAgent.hireCost} coins**, with **${personalAgent.dailyUpkeep} coins** daily upkeep.
 - An active Personal Agent lets its owner send normal \`/pornscene\` requests while already filming. Consent and the one-scene limit are unchanged; Accept only works when both members are free.

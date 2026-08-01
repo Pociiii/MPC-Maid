@@ -123,6 +123,14 @@ their persisted rotation changes at exactly the same boundary.
 - `/pornscene` is a consent-based two-user production flow.
 - Player Studios cost 10,000 coins, charge 500 coins at the 12:00 UTC daily
   reset, and cost 1,000 coins to reopen after an upkeep closure.
+- Owners can manually close an open studio through `/mystudio`. Closure pauses
+  studio and staff upkeep and disables staff benefits until the studio is
+  reopened; already attached productions still finish normally.
+- Studio overviews show the owner's total coin income from the previous
+  12:00 UTC economy day. The income ledger includes quests, Daily WYR, Porn
+  Career scenes, community productions, casino profit, Spank Dilli, and lottery
+  prizes. It excludes starting coins, purchases, refunds, returned wagers, and
+  administrative balance corrections.
 - Open studio owners can manage abstract NPC staff through `/mystudio`.
 - The Personal Agent costs 5,000 coins to hire and 750 coins per day. While
   active, it lets its owner send the normal `/pornscene` request while busy;

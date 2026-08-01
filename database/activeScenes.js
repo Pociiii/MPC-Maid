@@ -1,6 +1,10 @@
 const db =
     require('./database');
 
+const {
+    getCoinIncomeDate
+} = require('../utils/coinIncome');
+
 function dbRun(
     sql,
     params = []
@@ -295,6 +299,22 @@ async function applyPornSceneRewardsOnce(
         );
 
         await dbRun(
+            `INSERT INTO user_coin_income (
+                user_id, income_date, source, amount, updated_at
+             ) VALUES (?, ?, 'porn_scene', ?, ?)
+             ON CONFLICT(user_id, income_date, source)
+             DO UPDATE SET
+                amount = amount + excluded.amount,
+                updated_at = excluded.updated_at`,
+            [
+                requesterId,
+                getCoinIncomeDate(),
+                result.coins,
+                Date.now()
+            ]
+        );
+
+        await dbRun(
             `UPDATE users
              SET xp = xp + ?,
                  coins = coins + ?,
@@ -306,6 +326,22 @@ async function applyPornSceneRewardsOnce(
                 result.coins,
                 result.rankingChange,
                 targetId
+            ]
+        );
+
+        await dbRun(
+            `INSERT INTO user_coin_income (
+                user_id, income_date, source, amount, updated_at
+             ) VALUES (?, ?, 'porn_scene', ?, ?)
+             ON CONFLICT(user_id, income_date, source)
+             DO UPDATE SET
+                amount = amount + excluded.amount,
+                updated_at = excluded.updated_at`,
+            [
+                targetId,
+                getCoinIncomeDate(),
+                result.coins,
+                Date.now()
             ]
         );
 

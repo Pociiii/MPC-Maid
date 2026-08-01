@@ -1137,7 +1137,16 @@ async function paySession(
 
         await addCoins(
             session.userId,
-            session.payout
+            session.payout,
+            {
+                incomeAmount:
+                    Math.max(
+                        0,
+                        session.payout - session.committed
+                    ),
+                source:
+                    'casino_holdem'
+            }
         );
 
         if (

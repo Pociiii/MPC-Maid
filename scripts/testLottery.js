@@ -258,6 +258,21 @@ async function main() {
             expectedJackpot
     );
 
+    const lotteryIncome =
+        await dbGet(
+            `SELECT SUM(amount) AS amount
+             FROM user_coin_income
+             WHERE user_id = ? AND source = 'lottery_prize'`,
+            [
+                winningDraw.winnerId
+            ]
+        );
+
+    assert.equal(
+        lotteryIncome.amount,
+        expectedJackpot
+    );
+
     const next =
         await lottery.getLotterySummary();
 

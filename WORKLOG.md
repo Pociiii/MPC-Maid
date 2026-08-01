@@ -24,6 +24,12 @@ then run the bot or preflight to create missing tables.
   unchanged.
 - Added separate NPC upkeep, suspension, and one-day-cost reactivation without
   accumulated staff debt or automatic studio closure.
+- Added a confirmed manual studio-close action that pauses studio and staff
+  upkeep until the owner pays the normal reopening cost.
+- Replaced Latest Release on studio overviews with previous-day owner income,
+  backed by a 12:00 UTC ledger covering every gameplay coin source and casino
+  profit without counting refunds or returned wagers.
+- Simplified the Hired Staff overview field to staff types only.
 - Updated the persistent Commands-channel guide and Porn Career info panel.
 
 ## Latest: Permanent Gift System

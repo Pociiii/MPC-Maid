@@ -2,6 +2,10 @@ const db =
     require('./database');
 
 const {
+    getCoinIncomeDate
+} = require('../utils/coinIncome');
+
+const {
     canonicalizeCastCategories
 } = require('../data/sceneSubmitGroups');
 
@@ -477,6 +481,22 @@ async function applyRewardsOnce(
                     reward.coins,
                     reward.xp,
                     reward.userId
+                ]
+            );
+
+            await run(
+                `INSERT INTO user_coin_income (
+                    user_id, income_date, source, amount, updated_at
+                 ) VALUES (?, ?, 'community_production', ?, ?)
+                 ON CONFLICT(user_id, income_date, source)
+                 DO UPDATE SET
+                    amount = amount + excluded.amount,
+                    updated_at = excluded.updated_at`,
+                [
+                    reward.userId,
+                    getCoinIncomeDate(),
+                    reward.coins,
+                    Date.now()
                 ]
             );
 
