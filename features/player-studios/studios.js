@@ -172,7 +172,7 @@ function buildOverviewEmbed(studio, target, previousDayIncome = 0) {
         },
         {
             name: 'Studio Income \u2014 Previous Day',
-            value: `\uD83E\DE99 ${formatNumber(previousDayIncome)} coins`,
+            value: `\uD83E\uDE99 ${formatNumber(previousDayIncome)} coins`,
             inline: false
         },
         {
