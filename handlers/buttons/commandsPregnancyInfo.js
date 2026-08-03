@@ -43,7 +43,8 @@ module.exports = {
 - Each eligible carrier receives at most **one pregnancy roll per day**.
 - Next check: <t:${nextCheck}:F> (<t:${nextCheck}:R>).
 - Daily fertility is **${PREGNANCY.MIN_DAILY_FERTILITY}% to ${PREGNANCY.MAX_DAILY_FERTILITY}%** per member.
-- The roll combines the carrier's fertility with one partner's fertility (**${PREGNANCY.MIN_DAILY_FERTILITY * 2}% to ${PREGNANCY.MAX_DAILY_FERTILITY * 2}%**).
+- The roll combines the carrier's fertility with one partner's fertility, capped at **${PREGNANCY.MAX_PREGNANCY_CHANCE}%**.
+- Use \`/shop fertility\` to activate a **${PREGNANCY.FERTILITY_PILL_COST}-coin** pill for the current pregnancy day. Each selected participant's active pill adds **+${PREGNANCY.FERTILITY_PILL_BONUS} points**, without exceeding the cap.
 - Multiple accepted partners do not create extra rolls; one is selected randomly for that day's check.
 - Failed rolls stay private.
 

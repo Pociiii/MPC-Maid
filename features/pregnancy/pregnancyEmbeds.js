@@ -23,6 +23,7 @@ const {
 
 const {
     getNextPregnancyCheckTimestamp,
+    getNextPregnancyResetTimestamp,
     getPregnancyDay
 } = require('../../database/pregnancy');
 
@@ -230,6 +231,19 @@ function buildPregnancyStatusEmbed(
                 false
         }
     );
+
+    const pillBonus =
+        status.fertilityPill
+            ? PREGNANCY.FERTILITY_PILL_BONUS
+            : 0;
+
+    embed.addFields({
+        name: '💊 Fertility Pill',
+        value: status.fertilityPill
+            ? `**Active (+${pillBonus} points)**\nPersonal contribution: **${Number(dailyFertility) + pillBonus}%**\nExpires at <t:${getNextPregnancyResetTimestamp()}:F>`
+            : `Inactive\nPersonal contribution: **${Number(dailyFertility)}%**`,
+        inline: false
+    });
 
     if (
         active

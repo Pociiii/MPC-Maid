@@ -313,6 +313,7 @@ function buildSections() {
                     '/drink',
                     '/firework',
                     '/breed',
+                    '/shop fertility',
                     '/pregnancy'
                 ]),
             commands: [
@@ -375,6 +376,12 @@ function buildSections() {
                     privateReply,
                     'None',
                     'Check your private daily fertility value and pregnancy status.'
+                ),
+                commandDetail(
+                    '/shop fertility',
+                    privateReply,
+                    'Until the next pregnancy reset',
+                    'Activate a fertility pill for the current pregnancy day.'
                 )
             ]
         },

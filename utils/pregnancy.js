@@ -188,13 +188,17 @@ function generateDailyFertility(
 
 function calculatePregnancyChance(
     carrierDailyFertility,
-    partnerDailyFertility
+    partnerDailyFertility,
+    carrierPillBonus = 0,
+    partnerPillBonus = 0
 ) {
 
-    return Number(
-        carrierDailyFertility
-    ) + Number(
-        partnerDailyFertility
+    return Math.min(
+        PREGNANCY.MAX_PREGNANCY_CHANCE,
+        Number(carrierDailyFertility) +
+        Number(partnerDailyFertility) +
+        Number(carrierPillBonus) +
+        Number(partnerPillBonus)
     );
 
 }

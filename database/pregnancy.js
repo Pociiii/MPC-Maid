@@ -2,6 +2,10 @@ const db =
     require('./database');
 
 const {
+    randomUUID
+} = require('node:crypto');
+
+const {
     PREGNANCY
 } = require('../data/pregnancyConfig');
 
@@ -151,6 +155,31 @@ function getNextPregnancyCheckTimestamp(
     if (
         next <= now
     )
+        next.setUTCDate(
+            next.getUTCDate() + 1
+        );
+
+    return Math.floor(
+        next.getTime() / 1000
+    );
+
+}
+
+function getNextPregnancyResetTimestamp(
+    now = new Date()
+) {
+
+    const next =
+        new Date(now);
+
+    next.setUTCHours(
+        RESET_HOUR_UTC,
+        0,
+        0,
+        0
+    );
+
+    if (next <= now)
         next.setUTCDate(
             next.getUTCDate() + 1
         );
@@ -335,6 +364,93 @@ async function getActivePregnancy(
 
 }
 
+async function getFertilityPillActivation(
+    userId,
+    date = getPregnancyDate()
+) {
+
+    return dbGet(
+        `SELECT *
+         FROM fertility_pill_activations
+         WHERE user_id = ?
+         AND active_date = ?`,
+        [
+            userId,
+            date
+        ]
+    );
+
+}
+
+function purchaseFertilityPill(
+    userId,
+    date = getPregnancyDate()
+) {
+
+    if (!/^\d+$/.test(userId) || !/^\d{4}-\d{2}-\d{2}$/.test(date))
+        return Promise.reject(
+            new Error('Invalid fertility pill purchase identity or date.')
+        );
+
+    const token =
+        randomUUID();
+
+    return new Promise(
+        (resolve, reject) => {
+
+            db.exec(
+                `BEGIN IMMEDIATE;
+                 INSERT OR IGNORE INTO users (id) VALUES ('${userId}');
+                 INSERT OR IGNORE INTO fertility_pill_activations
+                    (user_id, active_date, cost_paid, purchase_token)
+                 SELECT '${userId}', '${date}', ${PREGNANCY.FERTILITY_PILL_COST}, '${token}'
+                 WHERE NOT EXISTS (
+                    SELECT 1 FROM pregnancies
+                    WHERE carrier_id = '${userId}' AND status = 'pregnant'
+                 )
+                 AND (SELECT coins FROM users WHERE id = '${userId}') >= ${PREGNANCY.FERTILITY_PILL_COST};
+                 UPDATE users
+                 SET coins = coins - ${PREGNANCY.FERTILITY_PILL_COST}
+                 WHERE id = '${userId}' AND changes() = 1;
+                 COMMIT;`,
+                async (error) => {
+
+                    if (error) {
+                        db.run(
+                            'ROLLBACK',
+                            () => reject(error)
+                        );
+                        return;
+                    }
+
+                    try {
+                        const [activation, pregnancy] = await Promise.all([
+                            getFertilityPillActivation(userId, date),
+                            getActivePregnancy(userId)
+                        ]);
+
+                        resolve({
+                            status: activation?.purchase_token === token
+                                ? 'purchased'
+                                : activation
+                                    ? 'active'
+                                    : pregnancy
+                                        ? 'pregnant'
+                                        : 'insufficient'
+                        });
+                    }
+                    catch (lookupError) {
+                        reject(lookupError);
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
 async function addDailyPartner(
     carrierId,
     partnerId,
@@ -384,7 +500,8 @@ async function getPregnancyStatus(
     const [
         activePregnancy,
         profile,
-        childrenRow
+        childrenRow,
+        fertilityPill
     ] =
         await Promise.all([
             getActivePregnancy(
@@ -401,7 +518,8 @@ async function getPregnancyStatus(
                 [
                     userId
                 ]
-            )
+            ),
+            getFertilityPillActivation(userId)
         ]);
 
     return {
@@ -411,6 +529,7 @@ async function getPregnancyStatus(
                 profile.children_born ?? 0,
                 childrenRow?.count ?? 0
             ),
+        fertilityPill,
         profile
     };
 
@@ -728,7 +847,9 @@ async function markDailyCheck(
     date,
     chance,
     success,
-    fatherId = null
+    fatherId = null,
+    carrierPillBonus = 0,
+    partnerPillBonus = 0
 ) {
 
     await dbRun(
@@ -737,8 +858,10 @@ async function markDailyCheck(
             check_date,
             rolled_chance,
             success,
-            father_id
-        ) VALUES (?, ?, ?, ?, ?)`,
+            father_id,
+            carrier_pill_bonus,
+            partner_pill_bonus
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
             carrierId,
             date,
@@ -746,7 +869,9 @@ async function markDailyCheck(
             success
                 ? 1
                 : 0,
-            fatherId
+            fatherId,
+            carrierPillBonus,
+            partnerPillBonus
         ]
     );
 
@@ -830,10 +955,26 @@ async function processPregnancyChecks(
                 date
             );
 
+        const [
+            carrierPill,
+            partnerPill
+        ] = await Promise.all([
+            getFertilityPillActivation(carrierId, date),
+            getFertilityPillActivation(father.userId, date)
+        ]);
+
+        const carrierPillBonus =
+            carrierPill ? PREGNANCY.FERTILITY_PILL_BONUS : 0;
+
+        const partnerPillBonus =
+            partnerPill ? PREGNANCY.FERTILITY_PILL_BONUS : 0;
+
         const chance =
             calculatePregnancyChance(
                 carrierFertility,
-                father.dailyFertility
+                father.dailyFertility,
+                carrierPillBonus,
+                partnerPillBonus
             );
 
         const success =
@@ -854,15 +995,19 @@ async function processPregnancyChecks(
             success,
             success
                 ? father.userId
-                : null
+                : null,
+            carrierPillBonus,
+            partnerPillBonus
         );
 
         results.push({
             carrierFertility,
+            carrierPillBonus,
             chance,
             fatherId:
                 father.userId,
             pregnancy,
+            partnerPillBonus,
             success,
             carrierId
         });
@@ -965,13 +1110,16 @@ module.exports = {
     forcePregnancy,
     getActivePregnancy,
     getDailyCarrierFertility,
+    getFertilityPillActivation,
     getNextPregnancyCheckTimestamp,
+    getNextPregnancyResetTimestamp,
     getPregnancyDate,
     getPregnancyDay,
     getPregnancyMilestones,
     getPregnancyStatus,
     getPreviousPregnancyDate,
     processPregnancyChecks,
+    purchaseFertilityPill,
     resetDailyCheck,
     resetDailyPartners
 };

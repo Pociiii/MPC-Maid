@@ -6,6 +6,7 @@ const {
     buildShopReply
 } = require('../../features/shop/boosterShop');
 const { buildGiftShopReply } = require('../../features/gifts/giftSystem');
+const { buildFertilityShopReply } = require('../../features/shop/fertilityShop');
 
 module.exports = {
 
@@ -15,10 +16,11 @@ module.exports = {
                 'shop'
             )
             .setDescription(
-                'Buy boosters or gifts with coins'
+                'Buy boosters, gifts, or fertility pills with coins'
             )
             .addSubcommand((subcommand) => subcommand.setName('boosters').setDescription('Buy scene boosters'))
-            .addSubcommand((subcommand) => subcommand.setName('gifts').setDescription('Browse your daily gift shop')),
+            .addSubcommand((subcommand) => subcommand.setName('gifts').setDescription('Browse your daily gift shop'))
+            .addSubcommand((subcommand) => subcommand.setName('fertility').setDescription('Activate a fertility pill')),
 
     async execute(
         interaction
@@ -29,7 +31,15 @@ module.exports = {
                 64
         });
 
-        await interaction.editReply(await (interaction.options.getSubcommand() === 'gifts' ? buildGiftShopReply(interaction) : buildShopReply(interaction)));
+        const builders = {
+            boosters: buildShopReply,
+            fertility: buildFertilityShopReply,
+            gifts: buildGiftShopReply
+        };
+
+        await interaction.editReply(
+            await builders[interaction.options.getSubcommand()](interaction)
+        );
 
     }
 

@@ -429,6 +429,20 @@ async function runMigrations(
         'INTEGER DEFAULT 1'
     );
 
+    await addColumnIfMissing(
+        db,
+        'pregnancy_daily_checks',
+        'carrier_pill_bonus',
+        'INTEGER DEFAULT 0'
+    );
+
+    await addColumnIfMissing(
+        db,
+        'pregnancy_daily_checks',
+        'partner_pill_bonus',
+        'INTEGER DEFAULT 0'
+    );
+
 }
 
 module.exports = {

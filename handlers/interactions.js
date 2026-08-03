@@ -40,6 +40,9 @@ const {
     buyShopBooster
 } = require('../features/shop/boosterShop');
 const {
+    buyFertilityPill
+} = require('../features/shop/fertilityShop');
+const {
     cancelGiftInteraction,
     confirmGiftPurchase,
     confirmGiftSend,
@@ -528,6 +531,16 @@ async function routeInteraction(
             case 'gift_buy':
                 await confirmGiftPurchase(interaction);
                 return true;
+
+            case 'fertility_pill_buy': {
+
+                const [, ownerId] = interaction.customId.split(':');
+
+                await buyFertilityPill(interaction, ownerId);
+
+                return true;
+
+            }
 
             case 'gift_send_confirm':
                 await confirmGiftSend(interaction);

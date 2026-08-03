@@ -30,9 +30,21 @@ CREATE TABLE IF NOT EXISTS pregnancy_daily_checks (
     rolled_chance INTEGER NOT NULL,
     success INTEGER DEFAULT 0,
     father_id TEXT,
+    carrier_pill_bonus INTEGER DEFAULT 0,
+    partner_pill_bonus INTEGER DEFAULT 0,
     checked_at TEXT DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (carrier_id, check_date)
+);
+
+CREATE TABLE IF NOT EXISTS fertility_pill_activations (
+    user_id TEXT NOT NULL,
+    active_date TEXT NOT NULL,
+    cost_paid INTEGER NOT NULL,
+    purchase_token TEXT NOT NULL,
+    purchased_at TEXT DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (user_id, active_date)
 );
 
 CREATE TABLE IF NOT EXISTS pregnancies (
