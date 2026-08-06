@@ -174,7 +174,11 @@ const {
     handleStudioReopen,
     handleStudioStaff,
     handleStudioStaffBack,
-    handleStudioStaffSelect
+    handleStudioStaffFireConfirm,
+    handleStudioStaffFireSelect,
+    handleStudioStaffHireSelect,
+    handleStudioUpgrade,
+    handleStudioUpgradeConfirm
 } = require('../features/player-studios/studios');
 
 async function replyInteractionError(
@@ -445,6 +449,23 @@ async function routeInteraction(
                 await handleStudioStaffBack(
                     interaction
                 );
+                return true;
+
+            case 'studio_upgrade':
+                await handleStudioUpgrade(interaction);
+                return true;
+
+            case 'studio_upgrade_confirm':
+                await handleStudioUpgradeConfirm(interaction);
+                return true;
+
+            case 'studio_upgrade_cancel':
+            case 'studio_staff_fire_cancel':
+                await handleStudioStaffBack(interaction);
+                return true;
+
+            case 'studio_staff_fire_confirm':
+                await handleStudioStaffFireConfirm(interaction);
                 return true;
 
             case 'commands_porncareer_info':
@@ -801,9 +822,17 @@ async function routeInteraction(
 
                 return true;
 
-            case 'studio_staff_select':
+            case 'studio_staff_hire_select':
 
-                await handleStudioStaffSelect(
+                await handleStudioStaffHireSelect(
+                    interaction
+                );
+
+                return true;
+
+            case 'studio_staff_fire_select':
+
+                await handleStudioStaffFireSelect(
                     interaction
                 );
 

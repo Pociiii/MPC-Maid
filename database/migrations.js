@@ -74,6 +74,13 @@ async function runMigrations(
     db
 ) {
 
+    await addColumnIfMissing(
+        db,
+        'studios',
+        'tier',
+        'INTEGER NOT NULL DEFAULT 1 CHECK (tier BETWEEN 1 AND 4)'
+    );
+
     await run(
         db,
         `CREATE TABLE IF NOT EXISTS daily_quest_weekly_streaks (

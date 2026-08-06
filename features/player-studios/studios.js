@@ -26,6 +26,11 @@ const {
 } = require('../../data/studioNpcs');
 
 const {
+    getNextStudioTier,
+    getStudioTier
+} = require('../../data/studioTiers');
+
+const {
     getOrCreateUser
 } = require('../../utils/users');
 
@@ -46,6 +51,7 @@ const {
     closeStudio,
     completeStudioScene,
     finishStudioPurchase,
+    fireStudioNpc,
     getOpenStudios,
     getPendingMirrors,
     getProvisioningStudios,
@@ -62,7 +68,8 @@ const {
     queueMirror,
     reactivateStudioNpc,
     reopenStudio,
-    saveProvisioningThread
+    saveProvisioningThread,
+    upgradeStudio
 } = require('../../database/studios');
 
 let upkeepTimer = null;
@@ -129,6 +136,7 @@ async function fetchOwnerTarget(client, ownerId) {
 }
 
 function buildOverviewEmbed(studio, target, previousDayIncome = 0) {
+    const tier = getStudioTier(studio.tier);
     const embed = createEmbed({
         color: getRandomColor(),
         authorName: studioName(studio.display_name ?? target.displayName),
@@ -154,6 +162,11 @@ function buildOverviewEmbed(studio, target, previousDayIncome = 0) {
             name: 'Status',
             value: studio.status === 'open' ? 'Open' : 'Closed',
             inline: true
+        },
+        {
+            name: 'Studio Tier',
+            value: `${tier.emoji} **Tier ${tier.numeral} — ${tier.name}**`,
+            inline: false
         },
         {
             name: 'Movies Produced',
@@ -250,14 +263,17 @@ function buildMyStudioReply(
     previousDayIncome = 0
 ) {
     if (!studio) {
+        const tier = getStudioTier(1);
         const embed = createEmbed({
             color: getRandomColor(),
             authorName: studioName(target.displayName),
             authorIcon: target.avatar,
             title: 'Open Your Studio',
             description:
-                `Purchase: **${formatNumber(ECONOMY.STUDIO_PURCHASE_COST)} coins**\n` +
-                `Daily upkeep: **${formatNumber(ECONOMY.STUDIO_DAILY_UPKEEP)} coins**\n` +
+                `${tier.emoji} **Tier ${tier.numeral} — ${tier.name}**\n` +
+                `Purchase: **${formatNumber(tier.purchaseCost)} coins**\n` +
+                `Daily upkeep: **${formatNumber(tier.dailyUpkeep)} coins**\n` +
+                `Staff slots: **${tier.staffSlots}**\n` +
                 `Your balance: **${formatNumber(user.coins)} coins**`,
             footerText: '/mystudio',
             timestamp: true
@@ -282,6 +298,15 @@ function buildMyStudioReply(
         target,
         previousDayIncome
     );
+    const tier = getStudioTier(studio.tier);
+    const nextTier = getNextStudioTier(studio.tier);
+    const activeStaff = staff.filter((member) => member.status === 'active').length;
+
+    embed.addFields({
+        name: '\uD83D\uDC65 Staff Capacity',
+        value: `**${activeStaff}/${tier.staffSlots}** active slots used`,
+        inline: true
+    });
 
     embed.addFields({
         name: '\uD83D\uDC65 Hired Staff',
@@ -306,6 +331,18 @@ function buildMyStudioReply(
                     .setLabel(`Reopen — ${formatNumber(ECONOMY.STUDIO_REOPEN_COST)} coins`)
                     .setStyle(ButtonStyle.Success)
                     .setDisabled(user.coins < ECONOMY.STUDIO_REOPEN_COST)
+            )
+        );
+
+    if (studio.status === 'open' && nextTier)
+        components.push(
+            new ActionRowBuilder().addComponents(
+                new ButtonBuilder()
+                    .setCustomId('studio_upgrade')
+                    .setLabel(`Upgrade to Tier ${nextTier.numeral} — ${formatNumber(nextTier.upgradeCost)} coins`)
+                    .setEmoji(nextTier.emoji)
+                    .setStyle(ButtonStyle.Primary)
+                    .setDisabled(user.coins < nextTier.upgradeCost)
             )
         );
 
@@ -365,11 +402,14 @@ async function buildStudioStaffReply(interaction) {
             components: []
         };
 
+    const tier = getStudioTier(studio.tier);
+    const activeCount = staff.filter((member) => member.status === 'active').length;
     const embed = createEmbed({
         color: getRandomColor(),
         title: '\uD83D\uDC65 Studio Staff',
         description:
-            `Hire abstract NPC staff to unlock studio services.\n` +
+            `Hire or fire NPC staff to shape your studio.\n` +
+            `Active slots: **${activeCount}/${tier.staffSlots}**\n` +
             `Your balance: **${formatNumber(user.coins)} coins**`,
         footerText: '/mystudio \u2022 Manage Staff',
         timestamp: true
@@ -395,20 +435,20 @@ async function buildStudioStaffReply(interaction) {
         });
     }
 
-    const actionable = STUDIO_NPCS.filter((npc) => {
+    const hireable = STUDIO_NPCS.filter((npc) => {
         const hired = staff.find((member) => member.npc_key === npc.key);
         return !hired || hired.status === 'suspended';
     });
     const components = [];
 
-    if (studio.status === 'open' && actionable.length)
+    if (studio.status === 'open' && hireable.length)
         components.push(
             new ActionRowBuilder().addComponents(
                 new StringSelectMenuBuilder()
-                    .setCustomId('studio_staff_select')
-                    .setPlaceholder('Select an NPC to hire or reactivate')
+                    .setCustomId('studio_staff_hire_select')
+                    .setPlaceholder('Hire or reactivate staff')
                     .addOptions(
-                        ...actionable.map((npc) => {
+                        ...hireable.map((npc) => {
                             const hired = staff.find(
                                 (member) => member.npc_key === npc.key
                             );
@@ -424,6 +464,24 @@ async function buildStudioStaffReply(interaction) {
                             };
                         })
                     )
+            )
+        );
+
+    if (staff.length)
+        components.push(
+            new ActionRowBuilder().addComponents(
+                new StringSelectMenuBuilder()
+                    .setCustomId('studio_staff_fire_select')
+                    .setPlaceholder('Fire staff')
+                    .addOptions(...staff.map((member) => {
+                        const npc = getStudioNpc(member.npc_key);
+                        return {
+                            label: `Fire ${npc?.name ?? member.npc_key}`,
+                            description: 'No refund; rehiring costs the full hire price',
+                            ...(npc?.emoji ? { emoji: npc.emoji } : {}),
+                            value: member.npc_key
+                        };
+                    }))
             )
         );
 
@@ -458,7 +516,7 @@ async function handleStudioStaffBack(interaction) {
     );
 }
 
-async function handleStudioStaffSelect(interaction) {
+async function handleStudioStaffHireSelect(interaction) {
     await interaction.deferUpdate();
 
     const npc = getStudioNpc(interaction.values[0]);
@@ -478,16 +536,20 @@ async function handleStudioStaffSelect(interaction) {
             interaction.user.id,
             npc.key,
             npc.dailyUpkeep,
-            getDailyQuestDate()
+            getDailyQuestDate(),
+            getStudioTier((await getStudioByOwner(interaction.user.id)).tier).staffSlots
         )
         : await hireStudioNpc(
             interaction.user.id,
             npc.key,
             npc.hireCost,
-            getDailyQuestDate()
+            getDailyQuestDate(),
+            getStudioTier((await getStudioByOwner(interaction.user.id)).tier).staffSlots
         );
     const reason = result.reason === 'coins'
         ? 'You no longer have enough coins.'
+        : result.reason === 'slots'
+            ? 'Every active staff slot is occupied. Upgrade your studio or fire an active employee.'
         : result.reason === 'studio'
             ? 'Your studio must be open.'
             : 'That staff member is no longer available for this action.';
@@ -497,6 +559,93 @@ async function handleStudioStaffSelect(interaction) {
         content: result.ok
             ? `${npc.emoji} **${npc.name}** is now active.`
             : reason
+    });
+}
+
+async function handleStudioStaffFireSelect(interaction) {
+    await interaction.deferUpdate();
+    const npc = getStudioNpc(interaction.values[0]);
+
+    if (!npc) {
+        await interaction.editReply({ ...await buildStudioStaffReply(interaction), content: 'That employee is no longer available.' });
+        return;
+    }
+
+    const embed = createEmbed({
+        color: getRandomColor(),
+        title: `Fire ${npc.emoji} ${npc.name}?`,
+        description: `There is no refund. Hiring this employee again will cost **${formatNumber(npc.hireCost)} coins**.`,
+        footerText: '/mystudio • Manage Staff',
+        timestamp: true
+    });
+    await interaction.editReply({
+        content: null,
+        embeds: [embed],
+        components: [new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId(`studio_staff_fire_confirm:${npc.key}`).setLabel('Confirm Fire').setStyle(ButtonStyle.Danger),
+            new ButtonBuilder().setCustomId('studio_staff_fire_cancel').setLabel('Keep Employee').setStyle(ButtonStyle.Secondary)
+        )]
+    });
+}
+
+async function handleStudioStaffFireConfirm(interaction) {
+    await interaction.deferUpdate();
+    const npc = getStudioNpc(interaction.customId.split(':')[1]);
+    const result = npc ? await fireStudioNpc(interaction.user.id, npc.key) : { ok: false };
+    await interaction.editReply({
+        ...await buildStudioStaffReply(interaction),
+        content: result.ok ? `${npc.emoji} **${npc.name}** was fired. The staff slot is now free.` : 'That employee is no longer on your staff.'
+    });
+}
+
+async function handleStudioUpgrade(interaction) {
+    await interaction.deferUpdate();
+    const studio = await getStudioByOwner(interaction.user.id);
+    const nextTier = studio && getNextStudioTier(studio.tier);
+
+    if (!studio || studio.status !== 'open' || !nextTier) {
+        await interaction.editReply({ ...await buildMyStudio(interaction), content: 'This studio cannot be upgraded.' });
+        return;
+    }
+
+    const embed = createEmbed({
+        color: getRandomColor(),
+        title: `${nextTier.emoji} Upgrade to Tier ${nextTier.numeral}?`,
+        description:
+            `**${nextTier.name}** costs **${formatNumber(nextTier.upgradeCost)} coins**.\n\n` +
+            `Daily upkeep: **${formatNumber(nextTier.dailyUpkeep)} coins**\n` +
+            `Staff slots: **${nextTier.staffSlots}**\n\nUpgrades are permanent and cannot be refunded.`,
+        footerText: '/mystudio',
+        timestamp: true
+    });
+    await interaction.editReply({
+        content: null,
+        embeds: [embed],
+        components: [new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId(`studio_upgrade_confirm:${studio.tier}`).setLabel(`Pay ${formatNumber(nextTier.upgradeCost)} coins`).setStyle(ButtonStyle.Success),
+            new ButtonBuilder().setCustomId('studio_upgrade_cancel').setLabel('Cancel').setStyle(ButtonStyle.Secondary)
+        )]
+    });
+}
+
+async function handleStudioUpgradeConfirm(interaction) {
+    await interaction.deferUpdate();
+    const studio = await getStudioByOwner(interaction.user.id);
+    const nextTier = studio && getNextStudioTier(studio.tier);
+    const expectedTier = Number(interaction.customId.split(':')[1]);
+    const result = nextTier
+        && studio.tier === expectedTier
+        ? await upgradeStudio(interaction.user.id, expectedTier, nextTier.upgradeCost)
+        : { ok: false, reason: 'status' };
+
+    if (result.ok)
+        await updateStudioOverview(interaction.client, result.studio).catch(() => false);
+
+    await interaction.editReply({
+        ...await buildMyStudio(interaction),
+        content: result.ok
+            ? `${nextTier.emoji} Your studio is now **Tier ${nextTier.numeral} — ${nextTier.name}**.`
+            : result.reason === 'coins' ? 'You no longer have enough coins for this upgrade.' : 'This studio cannot be upgraded.'
     });
 }
 
@@ -880,7 +1029,7 @@ async function runStudioUpkeep(client) {
             const result = await processStudioUpkeep(
                 studio.id,
                 studio.owner_id,
-                ECONOMY.STUDIO_DAILY_UPKEEP,
+                getStudioTier(latest.tier).dailyUpkeep,
                 chargeDate
             );
 
@@ -988,7 +1137,11 @@ module.exports = {
     handleStudioReopen,
     handleStudioStaff,
     handleStudioStaffBack,
-    handleStudioStaffSelect,
+    handleStudioStaffFireConfirm,
+    handleStudioStaffFireSelect,
+    handleStudioStaffHireSelect,
+    handleStudioUpgrade,
+    handleStudioUpgradeConfirm,
     sendMirror,
     startPlayerStudios,
     studioName,

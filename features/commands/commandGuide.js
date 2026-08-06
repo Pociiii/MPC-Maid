@@ -35,6 +35,10 @@ const {
     getStudioNpc
 } = require('../../data/studioNpcs');
 
+const {
+    STUDIO_TIERS
+} = require('../../data/studioTiers');
+
 function minutes(
     seconds
 ) {
@@ -204,7 +208,7 @@ function buildSections() {
                     '/mystudio',
                     privateReply,
                     `Upkeep resets ${dailyReset}`,
-                    `Buy, close, reopen, and manage staff for a player studio. The overview shows previous-day gameplay income. Closing pauses all upkeep; reopening costs ${ECONOMY.STUDIO_REOPEN_COST} coins. Studio: ${ECONOMY.STUDIO_PURCHASE_COST} coins plus ${ECONOMY.STUDIO_DAILY_UPKEEP}/day. Personal Agent: ${personalAgent.hireCost} coins plus ${personalAgent.dailyUpkeep}/day.`
+                    `Buy and permanently upgrade a tiered player studio, or close, reopen, and manage its staff. Tiers provide ${STUDIO_TIERS.map((tier) => `${tier.staffSlots} slot${tier.staffSlots === 1 ? '' : 's'} at ${tier.dailyUpkeep}/day`).join(', ')}. Firing staff gives no refund. Reopening costs ${ECONOMY.STUDIO_REOPEN_COST} coins. Personal Agent: ${personalAgent.hireCost} coins plus ${personalAgent.dailyUpkeep}/day.`
                 ),
                 commandDetail(
                     '/studios',

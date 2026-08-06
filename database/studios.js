@@ -63,7 +63,7 @@ async function hasActiveStudioNpc(ownerId, npcKey) {
     return Boolean(row?.active);
 }
 
-async function hireStudioNpc(ownerId, npcKey, cost, resetDate) {
+async function hireStudioNpc(ownerId, npcKey, cost, resetDate, staffSlots = 1) {
     await run('BEGIN IMMEDIATE');
 
     try {
@@ -82,6 +82,17 @@ async function hireStudioNpc(ownerId, npcKey, cost, resetDate) {
         if (existing) {
             await run('COMMIT');
             return { ok: false, reason: 'exists' };
+        }
+
+        const activeCount = await get(
+            `SELECT COUNT(*) AS count FROM studio_staff
+             WHERE studio_id = ? AND status = 'active'`,
+            [studio.id]
+        );
+
+        if (activeCount.count >= staffSlots) {
+            await run('COMMIT');
+            return { ok: false, reason: 'slots' };
         }
 
         const spent = await run(
@@ -112,7 +123,7 @@ async function hireStudioNpc(ownerId, npcKey, cost, resetDate) {
     }
 }
 
-async function reactivateStudioNpc(ownerId, npcKey, cost, resetDate) {
+async function reactivateStudioNpc(ownerId, npcKey, cost, resetDate, staffSlots = 1) {
     await run('BEGIN IMMEDIATE');
 
     try {
@@ -132,6 +143,17 @@ async function reactivateStudioNpc(ownerId, npcKey, cost, resetDate) {
         if (!staff || staff.status !== 'suspended') {
             await run('COMMIT');
             return { ok: false, reason: 'status' };
+        }
+
+        const activeCount = await get(
+            `SELECT COUNT(*) AS count FROM studio_staff
+             WHERE studio_id = ? AND status = 'active'`,
+            [studio.id]
+        );
+
+        if (activeCount.count >= staffSlots) {
+            await run('COMMIT');
+            return { ok: false, reason: 'slots' };
         }
 
         const spent = await run(
@@ -154,6 +176,53 @@ async function reactivateStudioNpc(ownerId, npcKey, cost, resetDate) {
 
         await run('COMMIT');
         return { ok: true };
+    }
+    catch (error) {
+        await run('ROLLBACK').catch(() => null);
+        throw error;
+    }
+}
+
+async function fireStudioNpc(ownerId, npcKey) {
+    const removed = await run(
+        `DELETE FROM studio_staff
+         WHERE studio_id = (SELECT id FROM studios WHERE owner_id = ?)
+         AND npc_key = ?`,
+        [ownerId, npcKey]
+    );
+
+    return removed.changes
+        ? { ok: true }
+        : { ok: false, reason: 'missing' };
+}
+
+async function upgradeStudio(ownerId, expectedTier, cost) {
+    await run('BEGIN IMMEDIATE');
+
+    try {
+        const studio = await getStudioByOwner(ownerId);
+
+        if (!studio || studio.status !== 'open' || studio.tier !== expectedTier) {
+            await run('COMMIT');
+            return { ok: false, reason: 'status' };
+        }
+
+        const spent = await run(
+            'UPDATE users SET coins = coins - ? WHERE id = ? AND coins >= ?',
+            [cost, ownerId, cost]
+        );
+
+        if (!spent.changes) {
+            await run('COMMIT');
+            return { ok: false, reason: 'coins' };
+        }
+
+        await run(
+            'UPDATE studios SET tier = tier + 1, updated_at = ? WHERE id = ?',
+            [Date.now(), studio.id]
+        );
+        await run('COMMIT');
+        return { ok: true, studio: await getStudioById(studio.id) };
     }
     catch (error) {
         await run('ROLLBACK').catch(() => null);
@@ -576,6 +645,7 @@ module.exports = {
     closeStudio,
     completeStudioScene,
     finishStudioPurchase,
+    fireStudioNpc,
     getOpenStudios,
     getPendingMirrors,
     getProvisioningStudios,
@@ -594,5 +664,6 @@ module.exports = {
     queueMirror,
     reactivateStudioNpc,
     reopenStudio,
-    saveProvisioningThread
+    saveProvisioningThread,
+    upgradeStudio
 };

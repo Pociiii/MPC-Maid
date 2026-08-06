@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS studios (
     status TEXT NOT NULL DEFAULT 'provisioning'
         CHECK (status IN ('provisioning', 'open', 'closed')),
     display_name TEXT NOT NULL,
+    tier INTEGER NOT NULL DEFAULT 1 CHECK (tier BETWEEN 1 AND 4),
     opened_at INTEGER NOT NULL,
     thread_id TEXT UNIQUE,
     overview_message_id TEXT,

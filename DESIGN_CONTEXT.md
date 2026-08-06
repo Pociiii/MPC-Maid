@@ -121,8 +121,11 @@ their persisted rotation changes at exactly the same boundary.
 ## Porn Career
 
 - `/pornscene` is a consent-based two-user production flow.
-- Player Studios cost 10,000 coins, charge 500 coins at the 12:00 UTC daily
-  reset, and cost 1,000 coins to reopen after an upkeep closure.
+- Player Studios begin at Tier I for 10,000 coins. Permanent upgrades cost
+  20,000, 40,000, and 75,000 coins for Tiers II-IV. Their daily upkeep is
+  500, 750, 1,000, and 1,250 coins, and they provide one through four active
+  staff slots respectively. Existing studios migrate to Tier I.
+- Studios cost 1,000 coins to reopen after an upkeep closure.
 - Owners can manually close an open studio through `/mystudio`. Closure pauses
   studio and staff upkeep and disables staff benefits until the studio is
   reopened; already attached productions still finish normally.
@@ -131,7 +134,10 @@ their persisted rotation changes at exactly the same boundary.
   Career scenes, community productions, casino profit, Spank Dilli, and lottery
   prizes. It excludes starting coins, purchases, refunds, returned wagers, and
   administrative balance corrections.
-- Open studio owners can manage abstract NPC staff through `/mystudio`.
+- Open studio owners can hire or reactivate NPC staff through `/mystudio`, up
+  to their tier's active-slot capacity. Suspended staff do not consume slots.
+  Employed staff, including suspended staff, can be fired after confirmation;
+  firing gives no refund and rehiring later costs the full hire price.
 - The Personal Agent costs 5,000 coins to hire and 750 coins per day. While
   active, it lets its owner send the normal `/pornscene` request while busy;
   it does not change consent, acceptance, cooldowns, or the one-active-scene

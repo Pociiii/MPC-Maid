@@ -13,6 +13,10 @@ const {
     getStudioNpc
 } = require('../../data/studioNpcs');
 
+const {
+    STUDIO_TIERS
+} = require('../../data/studioTiers');
+
 function minutes(
     seconds
 ) {
@@ -59,12 +63,12 @@ module.exports = {
 
 **Player Studios**
 - Use \`/mystudio\` to view, buy, or reopen your studio.
-- A studio costs **${ECONOMY.STUDIO_PURCHASE_COST} coins**, with **${ECONOMY.STUDIO_DAILY_UPKEEP} coins** daily upkeep.
+- Studio tiers: ${STUDIO_TIERS.map((tier) => `**${tier.numeral}** ${tier.name} (${tier.tier === 1 ? `${tier.purchaseCost} purchase` : `${tier.upgradeCost} upgrade`}, ${tier.dailyUpkeep}/day, ${tier.staffSlots} staff slot${tier.staffSlots === 1 ? '' : 's'})`).join('; ')}.
 - Use \`/studios\` to browse open studios and their production threads.
 - Productions started while your studio is open are mirrored into its thread.
 - Studio Overview shows the owner's total gameplay coin income from the previous 12:00 UTC economy day.
 - Use **Close Studio** in \`/mystudio\` to pause studio and staff upkeep. Existing productions still finish, and reopening costs **${ECONOMY.STUDIO_REOPEN_COST} coins**.
-- Use **Manage Staff** in \`/mystudio\` to hire abstract NPC staff.
+- Use **Manage Staff** in \`/mystudio\` to hire, reactivate, or fire NPC staff. Firing gives no refund.
 - The **Personal Agent** costs **${personalAgent.hireCost} coins**, with **${personalAgent.dailyUpkeep} coins** daily upkeep.
 - An active Personal Agent lets its owner send normal \`/pornscene\` requests while already filming. Consent and the one-scene limit are unchanged; Accept only works when both members are free.
 - Unpaid staff upkeep suspends that NPC without closing the studio. Reactivation costs one day of that NPC's upkeep.

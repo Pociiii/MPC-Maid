@@ -17,6 +17,7 @@ const {
     beginStudioPurchase,
     closeStudio,
     completeStudioScene,
+    fireStudioNpc,
     finishStudioPurchase,
     getStudioStaffByOwner,
     getStudioByOwner,
@@ -28,7 +29,8 @@ const {
     processStudioUpkeep,
     queueMirror,
     reactivateStudioNpc,
-    reopenStudio
+    reopenStudio,
+    upgradeStudio
 } = require('../database/studios');
 
 function run(sql, params = []) {
@@ -74,6 +76,7 @@ function closeDatabase() {
         'overview'
     );
     assert.equal(studio.status, 'open');
+    assert.equal(studio.tier, 1);
 
     await run(`UPDATE users SET coins = 7000 WHERE id = 'owner'`);
     const hired = await hireStudioNpc(
@@ -97,6 +100,32 @@ function closeDatabase() {
         ),
         { ok: false, reason: 'exists' }
     );
+
+    assert.deepEqual(
+        await hireStudioNpc('owner', 'extra_staff', 1, '2026-07-29', 1),
+        { ok: false, reason: 'slots' }
+    );
+
+    await run(`UPDATE users SET coins = 20000 WHERE id = 'owner'`);
+    const upgraded = await upgradeStudio('owner', 1, 20000);
+    assert.equal(upgraded.ok, true);
+    assert.equal(upgraded.studio.tier, 2);
+    assert.deepEqual(
+        await upgradeStudio('owner', 1, 20000),
+        { ok: false, reason: 'status' }
+    );
+
+    await run(`UPDATE users SET coins = 1 WHERE id = 'owner'`);
+    assert.equal(
+        (await hireStudioNpc('owner', 'extra_staff', 1, '2026-07-29', 2)).ok,
+        true
+    );
+    assert.equal((await fireStudioNpc('owner', 'extra_staff')).ok, true);
+    assert.deepEqual(
+        await fireStudioNpc('owner', 'extra_staff'),
+        { ok: false, reason: 'missing' }
+    );
+    await run(`UPDATE users SET coins = 7000 WHERE id = 'owner'`);
 
     await run(
         `INSERT INTO active_scenes (
