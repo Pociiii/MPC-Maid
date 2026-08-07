@@ -32,9 +32,16 @@ const {
 } = require('../../utils/inboxLogger');
 
 const {
-    calculateScene,
     formatStatValue
 } = require('./sceneMath');
+
+const {
+    hasActiveStudioNpc
+} = require('../../database/studios');
+
+const {
+    calculateStudioSceneResult
+} = require('./studioSceneEffects');
 
 const {
     buildStartEmbed,
@@ -58,6 +65,10 @@ const {
     getTwoPersonSceneCategory,
     safeSendUserDm
 } = require('./sceneCommon');
+
+const {
+    returnReservedBooster
+} = require('./pendingSceneRequests');
 
 async function editSceneRequestMessage(
     interaction,
@@ -222,6 +233,11 @@ async function acceptScene(
     }
     catch (error) {
 
+        await returnReservedBooster(
+            requesterId,
+            pendingRequest
+        );
+
         await editSceneRequestMessage(
             interaction,
             {
@@ -241,6 +257,11 @@ async function acceptScene(
     if (
         !sceneCategory
     ) {
+
+        await returnReservedBooster(
+            requesterId,
+            pendingRequest
+        );
 
         await editSceneRequestMessage(
             interaction,
@@ -271,6 +292,11 @@ async function acceptScene(
     if (
         !channel
     ) {
+
+        await returnReservedBooster(
+            requesterId,
+            pendingRequest
+        );
 
         await editSceneRequestMessage(
             interaction,
@@ -321,12 +347,22 @@ async function acceptScene(
     const booster =
         pendingRequest?.booster ?? null;
 
-    const result =
-        calculateScene(
-            requesterUser,
-            targetUser,
-            booster
-        );
+    const [
+        productionManager,
+        talentScout,
+        marketingExpert
+    ] = await Promise.all([
+        hasActiveStudioNpc(requesterId, 'production_manager'),
+        hasActiveStudioNpc(requesterId, 'talent_scout'),
+        hasActiveStudioNpc(requesterId, 'marketing_expert')
+    ]);
+
+    const result = calculateStudioSceneResult(
+        requesterUser,
+        targetUser,
+        booster,
+        { productionManager, talentScout, marketingExpert }
+    );
 
     const sceneTitle =
         getRandomSceneName(
@@ -538,6 +574,11 @@ async function declineScene(
         return;
 
     }
+
+    await returnReservedBooster(
+        requesterId,
+        pendingRequest
+    );
 
     await editSceneRequestMessage(
         interaction,

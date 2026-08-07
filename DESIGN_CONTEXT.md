@@ -142,6 +142,23 @@ their persisted rotation changes at exactly the same boundary.
   active, it lets its owner send the normal `/pornscene` request while busy;
   it does not change consent, acceptance, cooldowns, or the one-active-scene
   rule. Both participants must still be free when Accept is pressed.
+- The Cleaner costs 2,500 coins to hire and 250 coins per day. While active,
+  it reduces only the studio tier's base upkeep by 25%, rounded down; it does
+  not reduce staff upkeep or alter `/pornscene` cooldowns.
+- The Casting Director costs 3,500 coins to hire and 400 coins per day. Scene
+  requests sent while it is active are permanently marked with no expiration,
+  even if that employee later becomes inactive. Owners can privately review
+  and manually cancel outgoing pending requests through `/mystudio`.
+- Scene boosters are reserved when a request is sent. Acceptance consumes the
+  reservation; decline, expiration, delivery failure, and manual cancellation
+  return it to the requester.
+- The Production Manager costs 4,000 coins to hire and 500 coins per day. It
+  snapshots a 10% interval reduction when an owner-requested scene starts.
+- The Talent Scout costs 6,000 coins to hire and 800 coins per day. It rolls
+  two complete results and keeps one by outcome, score, viewers, then XP.
+- The Marketing Expert costs 4,500 coins to hire and 600 coins per day. It
+  snapshots a 10% requester-only coin bonus, rounded down from base coins; the
+  partner retains the base reward and income tracking records the exact totals.
 - Failed NPC upkeep suspends that NPC without closing the studio. Reactivation
   costs one day of its upkeep, and suspended staff do not accumulate debt.
 - An open requester's studio mirrors their Porn Career production live into its

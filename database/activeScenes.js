@@ -254,6 +254,9 @@ async function applyPornSceneRewardsOnce(
     targetXp
 ) {
 
+    const requesterCoins = result.requesterCoins ?? result.coins;
+    const targetCoins = result.targetCoins ?? result.coins;
+
     await dbRun(
         'BEGIN IMMEDIATE'
     );
@@ -292,7 +295,7 @@ async function applyPornSceneRewardsOnce(
              WHERE id = ?`,
             [
                 requesterXp,
-                result.coins,
+                requesterCoins,
                 result.rankingChange,
                 requesterId
             ]
@@ -309,7 +312,7 @@ async function applyPornSceneRewardsOnce(
             [
                 requesterId,
                 getCoinIncomeDate(),
-                result.coins,
+                requesterCoins,
                 Date.now()
             ]
         );
@@ -323,7 +326,7 @@ async function applyPornSceneRewardsOnce(
              WHERE id = ?`,
             [
                 targetXp,
-                result.coins,
+                targetCoins,
                 result.rankingChange,
                 targetId
             ]
@@ -340,7 +343,7 @@ async function applyPornSceneRewardsOnce(
             [
                 targetId,
                 getCoinIncomeDate(),
-                result.coins,
+                targetCoins,
                 Date.now()
             ]
         );

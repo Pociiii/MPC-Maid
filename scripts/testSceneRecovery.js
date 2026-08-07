@@ -53,6 +53,12 @@ const {
 } = require('../features/porn-career/sceneScheduler');
 
 const {
+    applyProductionManagerInterval,
+    compareSceneResults,
+    selectBetterSceneResult
+} = require('../features/porn-career/studioSceneEffects');
+
+const {
     isBusy
 } = require('../utils/pornScenes');
 
@@ -123,6 +129,13 @@ async function closeDatabase() {
 }
 
 async function main() {
+
+    assert.equal(applyProductionManagerInterval(600000, true), 540000);
+    assert.equal(applyProductionManagerInterval(600000, false), 600000);
+    const awkward = { outcome: 'Awkward Scene', score: 100, viewers: 1000, xp: 10 };
+    const hot = { outcome: 'Hot Scene', score: 1, viewers: 1, xp: 35 };
+    assert.equal(compareSceneResults(hot, awkward) > 0, true);
+    assert.equal(selectBetterSceneResult(awkward, hot), hot);
 
     await db.ready;
 
@@ -312,6 +325,9 @@ async function main() {
 
     const rewardResult = {
         coins: 125,
+        requesterCoins: 137,
+        targetCoins: 125,
+        marketingBonus: 12,
         rankingChange: 7
     };
 
@@ -345,7 +361,7 @@ async function main() {
 
     assert.equal(firstReward, true);
     assert.equal(duplicateReward, false);
-    assert.equal(rewardA.coins, 625);
+    assert.equal(rewardA.coins, 637);
     assert.equal(rewardA.xp, 30);
     assert.equal(rewardA.ranking, 7);
     assert.equal(rewardA.scenes_completed, 1);
@@ -360,7 +376,13 @@ async function main() {
             ]
         );
 
-    assert.equal(rewardIncome.amount, 125);
+    assert.equal(rewardIncome.amount, 137);
+
+    const rewardB = await dbGet(
+        'SELECT * FROM users WHERE id = ?',
+        ['reward-b']
+    );
+    assert.equal(rewardB.coins, 625);
 
     console.log(
         'Active scene restart recovery tests passed.'

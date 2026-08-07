@@ -9,6 +9,7 @@ const temporaryDirectory = fs.mkdtempSync(
 );
 
 process.chdir(temporaryDirectory);
+process.env.MPC_DATA_DIR = temporaryDirectory;
 
 const db = require('../database/database');
 
@@ -32,6 +33,23 @@ const {
     reopenStudio,
     upgradeStudio
 } = require('../database/studios');
+
+const {
+    getStudioUpkeepCost
+} = require('../features/player-studios/studios');
+
+const {
+    resolvePendingRequest
+} = require('../features/porn-career/pendingSceneRequests');
+
+const {
+    addPendingRequest,
+    getPendingRequest
+} = require('../utils/pornScenes');
+
+const {
+    getUserBoosters
+} = require('../utils/boosters');
 
 function run(sql, params = []) {
     return new Promise((resolve, reject) =>
@@ -77,6 +95,11 @@ function closeDatabase() {
     );
     assert.equal(studio.status, 'open');
     assert.equal(studio.tier, 1);
+    assert.equal(getStudioUpkeepCost(500, false), 500);
+    assert.equal(getStudioUpkeepCost(500, true), 375);
+    assert.equal(getStudioUpkeepCost(750, true), 563);
+    assert.equal(getStudioUpkeepCost(1000, true), 750);
+    assert.equal(getStudioUpkeepCost(1250, true), 938);
 
     await run(`UPDATE users SET coins = 7000 WHERE id = 'owner'`);
     const hired = await hireStudioNpc(
@@ -124,6 +147,44 @@ function closeDatabase() {
     assert.deepEqual(
         await fireStudioNpc('owner', 'extra_staff'),
         { ok: false, reason: 'missing' }
+    );
+
+    addPendingRequest('owner', 'target', {
+        messageId: 'request-message',
+        expiresAt: null,
+        createdAt: Date.now(),
+        booster: { stat: 'fame', tier: 1 }
+    });
+    let editedRequest = null;
+    const requestClient = {
+        users: {
+            fetch: async () => ({
+                createDM: async () => ({
+                    messages: {
+                        fetch: async () => ({
+                            edit: async (payload) => {
+                                editedRequest = payload;
+                            }
+                        })
+                    }
+                })
+            })
+        }
+    };
+    const cancelled = await resolvePendingRequest(
+        requestClient,
+        'owner',
+        'target',
+        'Scene request cancelled by the requester.'
+    );
+    assert.equal(cancelled.expiresAt, null);
+    assert.equal(getPendingRequest('owner', 'target'), undefined);
+    assert.equal(editedRequest.content, 'Scene request cancelled by the requester.');
+    assert.equal(
+        (await getUserBoosters('owner')).find(
+            (booster) => booster.stat === 'fame' && booster.tier === 1
+        ).quantity,
+        1
     );
     await run(`UPDATE users SET coins = 7000 WHERE id = 'owner'`);
 

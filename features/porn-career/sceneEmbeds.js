@@ -586,7 +586,9 @@ function formatFinalSummary(
     return [
         `**${result.outcome}**`,
         `${result.viewers.toLocaleString()} viewers`,
-        `${result.coins} coins each`,
+        result.marketingBonus
+            ? `${result.coins} coins each (+${result.marketingBonus} requester Marketing)`
+            : `${result.coins} coins each`,
         `${formatSignedNumber(
             result.rankingChange
         )} ranking`,
@@ -708,6 +710,18 @@ function buildStartEmbed(
     sceneColor
 ) {
 
+    const studioCrew = [
+        result.studioEffects?.productionManager
+            ? '\uD83C\uDFA5 Production Manager'
+            : null,
+        result.studioEffects?.talentScout
+            ? '\uD83C\uDFAF Talent Scout'
+            : null,
+        result.studioEffects?.marketingExpert
+            ? '\uD83D\uDCE2 Marketing Expert'
+            : null
+    ].filter(Boolean);
+
     return createEmbed({
         color:
             sceneColor,
@@ -749,7 +763,7 @@ function buildStartEmbed(
                     `- Parts: **${result.totalParts}**
 - Booster: **${formatBooster(
                         booster
-                    )}**`,
+                    )}**${studioCrew.length ? `\n- Studio crew: **${studioCrew.join(', ')}**` : ''}`,
                 inline:
                     false
             },

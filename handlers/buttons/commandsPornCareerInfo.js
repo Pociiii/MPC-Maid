@@ -38,6 +38,12 @@ module.exports = {
                 'personal_agent'
             );
 
+        const cleaner = getStudioNpc('cleaner');
+        const castingDirector = getStudioNpc('casting_director');
+        const productionManager = getStudioNpc('production_manager');
+        const talentScout = getStudioNpc('talent_scout');
+        const marketingExpert = getStudioNpc('marketing_expert');
+
         const embed =
             createEmbed({
                 color:
@@ -52,7 +58,7 @@ module.exports = {
 - The partner gets a DM with Accept / Decline.
 - Request cooldown: **${minutes(COOLDOWNS.PORN_SCENE_REQUEST)}**.
 - You pick no booster, or one booster from \`/inventory boosters\`.
-- The booster is spent when the request is sent.
+- The booster is reserved when the request is sent and returned if the request does not start a scene.
 - If they decline, nothing posts publicly.
 
 **Scenes**
@@ -71,6 +77,11 @@ module.exports = {
 - Use **Manage Staff** in \`/mystudio\` to hire, reactivate, or fire NPC staff. Firing gives no refund.
 - The **Personal Agent** costs **${personalAgent.hireCost} coins**, with **${personalAgent.dailyUpkeep} coins** daily upkeep.
 - An active Personal Agent lets its owner send normal \`/pornscene\` requests while already filming. Consent and the one-scene limit are unchanged; Accept only works when both members are free.
+- The **Cleaner** costs **${cleaner.hireCost} coins**, with **${cleaner.dailyUpkeep} coins** daily upkeep, and reduces base studio upkeep by **25%**.
+- The **Casting Director** costs **${castingDirector.hireCost} coins**, with **${castingDirector.dailyUpkeep} coins** daily upkeep. Requests sent while active do not expire and can be cancelled through **Pending Requests**.
+- The **Production Manager** costs **${productionManager.hireCost} coins**, with **${productionManager.dailyUpkeep} coins** daily upkeep, and makes requested scenes **10% faster**.
+- The **Talent Scout** costs **${talentScout.hireCost} coins**, with **${talentScout.dailyUpkeep} coins** daily upkeep, rolls requested scenes twice, and keeps the better complete result.
+- The **Marketing Expert** costs **${marketingExpert.hireCost} coins**, with **${marketingExpert.dailyUpkeep} coins** daily upkeep, and gives the requester **10% more scene coins**.
 - Unpaid staff upkeep suspends that NPC without closing the studio. Reactivation costs one day of that NPC's upkeep.
 
 **Stats**

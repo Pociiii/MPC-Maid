@@ -35,6 +35,18 @@ const {
 } = require('../../utils/users');
 
 const {
+    getPendingRequests
+} = require('../../utils/pornScenes');
+
+const {
+    resolvePendingRequest
+} = require('../porn-career/pendingSceneRequests');
+
+const {
+    getSceneCategoryName
+} = require('../porn-career/sceneCommon');
+
+const {
     logError,
     logWarning
 } = require('../../utils/inboxLogger');
@@ -61,6 +73,7 @@ const {
     getStudioStaffByOwner,
     getStudioStaffDueUpkeep,
     getStudiosDueUpkeep,
+    hasActiveStudioNpc,
     hireStudioNpc,
     markMirrorPosted,
     processStudioStaffUpkeep,
@@ -98,6 +111,13 @@ function anniversaryBadge(openedAt, now = Date.now()) {
 
 function formatNumber(value) {
     return Number(value ?? 0).toLocaleString('en-US');
+}
+
+function getStudioUpkeepCost(baseUpkeep, cleanerActive = false) {
+    const discount = cleanerActive
+        ? Math.floor(baseUpkeep * 0.25)
+        : 0;
+    return baseUpkeep - discount;
 }
 
 function buildHiredStaffValue(studio, staff) {
@@ -301,12 +321,25 @@ function buildMyStudioReply(
     const tier = getStudioTier(studio.tier);
     const nextTier = getNextStudioTier(studio.tier);
     const activeStaff = staff.filter((member) => member.status === 'active').length;
+    const cleanerActive = studio.status === 'open' && staff.some(
+        (member) => member.npc_key === 'cleaner' && member.status === 'active'
+    );
+    const effectiveUpkeep = getStudioUpkeepCost(tier.dailyUpkeep, cleanerActive);
 
-    embed.addFields({
-        name: '\uD83D\uDC65 Staff Capacity',
-        value: `**${activeStaff}/${tier.staffSlots}** active slots used`,
-        inline: true
-    });
+    embed.addFields(
+        {
+            name: '\uD83D\uDC65 Staff Capacity',
+            value: `**${activeStaff}/${tier.staffSlots}** active slots used`,
+            inline: true
+        },
+        {
+            name: 'Daily Studio Upkeep',
+            value: cleanerActive
+                ? `**${formatNumber(effectiveUpkeep)} coins** (25% Cleaner discount)`
+                : `**${formatNumber(tier.dailyUpkeep)} coins**`,
+            inline: true
+        }
+    );
 
     embed.addFields({
         name: '\uD83D\uDC65 Hired Staff',
@@ -352,6 +385,11 @@ function buildMyStudioReply(
                 .setCustomId('studio_staff')
                 .setLabel('Manage Staff')
                 .setEmoji('\uD83D\uDC65')
+                .setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder()
+                .setCustomId('studio_pending_requests')
+                .setLabel('Pending Requests')
+                .setEmoji('\uD83D\uDCE8')
                 .setStyle(ButtonStyle.Secondary),
             ...(
                 studio.status === 'open'
@@ -514,6 +552,124 @@ async function handleStudioStaffBack(interaction) {
     await interaction.editReply(
         await buildMyStudio(interaction)
     );
+}
+
+function getOutgoingPendingRequests(ownerId) {
+    return getPendingRequests()
+        .filter((request) => request.requesterId === ownerId)
+        .sort((left, right) => (left.createdAt ?? 0) - (right.createdAt ?? 0));
+}
+
+async function buildPendingRequestsReply(interaction) {
+    const studio = await getStudioByOwner(interaction.user.id);
+
+    if (!studio)
+        return {
+            content: 'Open a player studio before managing outgoing requests.',
+            embeds: [],
+            components: []
+        };
+
+    const requests = getOutgoingPendingRequests(interaction.user.id);
+    const visible = requests.slice(0, 25);
+    const lines = visible.map((request) => {
+        const sent = request.createdAt
+            ? `<t:${Math.floor(request.createdAt / 1000)}:R>`
+            : 'before request tracking was added';
+        const window = request.expiresAt == null
+            ? '\uD83C\uDFAD No expiration'
+            : `expires <t:${Math.floor(request.expiresAt / 1000)}:R>`;
+        return `<@${request.targetId}> — ${getSceneCategoryName(request.sceneCategory)}\nSent ${sent} • ${window}`;
+    });
+    const embed = createEmbed({
+        color: getRandomColor(),
+        title: '\uD83D\uDCE8 Outgoing Scene Requests',
+        description: lines.length
+            ? `${lines.join('\n\n')}${requests.length > 25 ? `\n\nShowing 25 of ${requests.length}. Cancel one to reveal the next request.` : ''}`
+            : 'You have no pending outgoing scene requests.',
+        footerText: '/mystudio • Pending Requests',
+        timestamp: true
+    });
+    const components = [];
+
+    if (visible.length)
+        components.push(
+            new ActionRowBuilder().addComponents(
+                new StringSelectMenuBuilder()
+                    .setCustomId('studio_pending_cancel_select')
+                    .setPlaceholder('Cancel a pending request')
+                    .addOptions(...visible.map((request) => ({
+                        label: `Cancel request to ${request.targetDisplayName ?? request.targetId}`.slice(0, 100),
+                        description: request.expiresAt == null ? 'No expiration' : '24-hour request',
+                        value: request.targetId
+                    })))
+            )
+        );
+
+    components.push(
+        new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId('studio_staff_back')
+                .setLabel('Back to Studio')
+                .setStyle(ButtonStyle.Secondary)
+        )
+    );
+    return { embeds: [embed], components };
+}
+
+async function handleStudioPendingRequests(interaction) {
+    await interaction.deferUpdate();
+    await interaction.editReply(await buildPendingRequestsReply(interaction));
+}
+
+async function handleStudioPendingCancelSelect(interaction) {
+    await interaction.deferUpdate();
+    const targetId = interaction.values[0];
+    const request = getOutgoingPendingRequests(interaction.user.id)
+        .find((entry) => entry.targetId === targetId);
+
+    if (!request) {
+        await interaction.editReply({
+            ...await buildPendingRequestsReply(interaction),
+            content: 'That request is no longer pending.'
+        });
+        return;
+    }
+
+    const embed = createEmbed({
+        color: getRandomColor(),
+        title: 'Cancel Scene Request?',
+        description:
+            `Cancel your request to <@${targetId}>?\n\n` +
+            `${request.booster ? 'The reserved booster will be returned.' : 'No booster is reserved for this request.'}`,
+        footerText: '/mystudio • Pending Requests',
+        timestamp: true
+    });
+    await interaction.editReply({
+        content: null,
+        embeds: [embed],
+        components: [new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId(`studio_pending_cancel_confirm:${targetId}`).setLabel('Confirm Cancel').setStyle(ButtonStyle.Danger),
+            new ButtonBuilder().setCustomId('studio_pending_cancel_back').setLabel('Keep Request').setStyle(ButtonStyle.Secondary)
+        )]
+    });
+}
+
+async function handleStudioPendingCancelConfirm(interaction) {
+    await interaction.deferUpdate();
+    const targetId = interaction.customId.split(':')[1];
+    const request = await resolvePendingRequest(
+        interaction.client,
+        interaction.user.id,
+        targetId,
+        'Scene request cancelled by the requester.'
+    );
+    await interaction.editReply({
+        ...await buildPendingRequestsReply(interaction),
+        content: request
+            ? `Your scene request to <@${targetId}> was cancelled.${request.booster ? ' The reserved booster was returned.' : ''}`
+            : 'That request is no longer pending.'
+    });
 }
 
 async function handleStudioStaffHireSelect(interaction) {
@@ -1026,10 +1182,17 @@ async function runStudioUpkeep(client) {
         let latest = studio;
 
         while (chargeDate <= resetDate && latest.status === 'open') {
+            const cleanerActive = await hasActiveStudioNpc(
+                studio.owner_id,
+                'cleaner'
+            );
             const result = await processStudioUpkeep(
                 studio.id,
                 studio.owner_id,
-                getStudioTier(latest.tier).dailyUpkeep,
+                getStudioUpkeepCost(
+                    getStudioTier(latest.tier).dailyUpkeep,
+                    cleanerActive
+                ),
                 chargeDate
             );
 
@@ -1130,11 +1293,15 @@ module.exports = {
     buildMyStudio,
     buildStudiosReply,
     finishStudioProduction,
+    getStudioUpkeepCost,
     handleStudioBuy,
     handleStudioClose,
     handleStudioCloseCancel,
     handleStudioCloseConfirm,
     handleStudioReopen,
+    handleStudioPendingCancelConfirm,
+    handleStudioPendingCancelSelect,
+    handleStudioPendingRequests,
     handleStudioStaff,
     handleStudioStaffBack,
     handleStudioStaffFireConfirm,

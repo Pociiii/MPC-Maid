@@ -171,6 +171,9 @@ const {
     handleStudioClose,
     handleStudioCloseCancel,
     handleStudioCloseConfirm,
+    handleStudioPendingCancelConfirm,
+    handleStudioPendingCancelSelect,
+    handleStudioPendingRequests,
     handleStudioReopen,
     handleStudioStaff,
     handleStudioStaffBack,
@@ -449,6 +452,15 @@ async function routeInteraction(
                 await handleStudioStaffBack(
                     interaction
                 );
+                return true;
+
+            case 'studio_pending_requests':
+            case 'studio_pending_cancel_back':
+                await handleStudioPendingRequests(interaction);
+                return true;
+
+            case 'studio_pending_cancel_confirm':
+                await handleStudioPendingCancelConfirm(interaction);
                 return true;
 
             case 'studio_upgrade':
@@ -833,6 +845,14 @@ async function routeInteraction(
             case 'studio_staff_fire_select':
 
                 await handleStudioStaffFireSelect(
+                    interaction
+                );
+
+                return true;
+
+            case 'studio_pending_cancel_select':
+
+                await handleStudioPendingCancelSelect(
                     interaction
                 );
 

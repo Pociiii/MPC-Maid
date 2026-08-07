@@ -161,6 +161,9 @@ async function applyRewards(
     rewardBonuses = getEmptySceneRewardBonuses()
 ) {
 
+    const requesterCoins = result.requesterCoins ?? result.coins;
+    const targetCoins = result.targetCoins ?? result.coins;
+
     const normalizedBonuses =
         normalizeSceneRewardBonuses(
             rewardBonuses
@@ -183,7 +186,7 @@ async function applyRewards(
         ),
         addCoins(
             requesterId,
-            result.coins,
+            requesterCoins,
             {
                 source:
                     'porn_scene'
@@ -191,7 +194,7 @@ async function applyRewards(
         ),
         addCoins(
             targetId,
-            result.coins,
+            targetCoins,
             {
                 source:
                     'porn_scene'

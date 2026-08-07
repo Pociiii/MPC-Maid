@@ -16,9 +16,16 @@ const {
 const {
     addPendingRequest,
     getPendingRequest,
-    getPendingRequests,
-    removePendingRequest
+    getPendingRequests
 } = require('../../utils/pornScenes');
+
+const {
+    hasActiveStudioNpc
+} = require('../../database/studios');
+
+const {
+    resolvePendingRequest
+} = require('./pendingSceneRequests');
 
 const {
     getOrCreateUser
@@ -86,56 +93,21 @@ function scheduleRequestExpiry(
                 )
                     return;
 
-                removePendingRequest(
+                const resolved = await resolvePendingRequest(
+                    client,
                     requesterId,
-                    targetId
+                    targetId,
+                    'Scene request expired.',
+                    expectedMessageId
                 );
+
+                if (!resolved)
+                    return;
 
                 await safeSendUserDm(
                     client,
                     requesterId,
                     `${pendingRequest.targetDisplayName ?? 'Your partner'} did not answer the scene request in time. The request expired.`
-                );
-
-                let requestMessage =
-                    message;
-
-                if (
-                    !requestMessage
-                ) {
-
-                    const target =
-                        await client.users.fetch(
-                            targetId
-                        ).catch(
-                            () => null
-                        );
-
-                    const dmChannel =
-                        await target?.createDM().catch(
-                            () => null
-                        );
-
-                    requestMessage =
-                        await dmChannel?.messages.fetch(
-                            pendingRequest.messageId
-                        ).catch(
-                            () => null
-                        );
-
-                }
-
-                await requestMessage?.edit({
-                    content:
-                        'Scene request expired.',
-                    embeds:
-                        [],
-                    components:
-                        [],
-                    attachments:
-                        []
-                }).catch(
-                    () => null
                 );
 
             },
@@ -159,17 +131,17 @@ function restorePendingSceneRequests(
     const requests =
         getPendingRequests();
 
-    for (
-        const request of requests
-    )
+    for (const request of requests) {
+        if (request.expiresAt == null)
+            continue;
+
         scheduleRequestExpiry(
             client,
             request.requesterId,
             request.targetId,
-            Number(
-                request.expiresAt
-            ) - now
+            Number(request.expiresAt) - now
         );
+    }
 
     return requests.length;
 
@@ -181,6 +153,11 @@ async function sendPornSceneRequest(
     sceneCategory,
     booster = null
 ) {
+
+    const indefinite = await hasActiveStudioNpc(
+        interaction.user.id,
+        'casting_director'
+    );
 
     const target =
         await interaction.client.users.fetch(
@@ -291,6 +268,16 @@ async function sendPornSceneRequest(
                 'Use `/train` to raise stats and help your scene partner get better outcomes.',
             inline:
                 false
+        },
+        {
+            name:
+                '\u23F3 Request Window',
+            value:
+                indefinite
+                    ? 'Held by a Casting Director — no expiration.'
+                    : 'Expires after 24 hours.',
+            inline:
+                true
         }
     );
 
@@ -389,7 +376,11 @@ async function sendPornSceneRequest(
             messageId:
                 message.id,
             expiresAt:
-                Date.now() + requestExpiryMs,
+                indefinite
+                    ? null
+                    : Date.now() + requestExpiryMs,
+            createdAt:
+                Date.now(),
             targetDisplayName,
             sceneCategory,
             booster
@@ -399,16 +390,17 @@ async function sendPornSceneRequest(
     await safeSendUserDm(
         interaction.client,
         interaction.user.id,
-        `Your scene request was sent to ${targetDisplayName}. Waiting for them to accept or decline.`
+        `Your scene request was sent to ${targetDisplayName}. Waiting for them to accept or decline.${indefinite ? ' Your Casting Director will keep it pending without expiration.' : ''}`
     );
 
-    scheduleRequestExpiry(
-        interaction.client,
-        interaction.user.id,
-        targetId,
-        requestExpiryMs,
-        message
-    );
+    if (!indefinite)
+        scheduleRequestExpiry(
+            interaction.client,
+            interaction.user.id,
+            targetId,
+            requestExpiryMs,
+            message
+        );
 
     try {
 

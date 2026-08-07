@@ -42,6 +42,10 @@ const {
 } = require('./sceneMath');
 
 const {
+    applyProductionManagerInterval
+} = require('./studioSceneEffects');
+
+const {
     buildFinalEmbed,
     buildPartEmbed
 } = require('./sceneEmbeds');
@@ -404,7 +408,7 @@ async function finishScene(
             'scene',
             {
                 coins:
-                    result.coins,
+                    result.requesterCoins ?? result.coins,
                 criticalScene:
                     result.criticalScene,
                 outcome:
@@ -765,8 +769,11 @@ async function scheduleScene(
         );
 
     const intervalMs =
-        getIntervalMs(
-            result.totalParts
+        applyProductionManagerInterval(
+            getIntervalMs(
+                result.totalParts
+            ),
+            result.studioEffects?.productionManager
         );
 
     const scene =

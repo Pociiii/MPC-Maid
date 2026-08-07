@@ -132,6 +132,11 @@ function buildSections() {
         getStudioNpc(
             'personal_agent'
         );
+    const cleaner = getStudioNpc('cleaner');
+    const castingDirector = getStudioNpc('casting_director');
+    const productionManager = getStudioNpc('production_manager');
+    const talentScout = getStudioNpc('talent_scout');
+    const marketingExpert = getStudioNpc('marketing_expert');
 
     return {
         general: {
@@ -208,7 +213,7 @@ function buildSections() {
                     '/mystudio',
                     privateReply,
                     `Upkeep resets ${dailyReset}`,
-                    `Buy and permanently upgrade a tiered player studio, or close, reopen, and manage its staff. Tiers provide ${STUDIO_TIERS.map((tier) => `${tier.staffSlots} slot${tier.staffSlots === 1 ? '' : 's'} at ${tier.dailyUpkeep}/day`).join(', ')}. Firing staff gives no refund. Reopening costs ${ECONOMY.STUDIO_REOPEN_COST} coins. Personal Agent: ${personalAgent.hireCost} coins plus ${personalAgent.dailyUpkeep}/day.`
+                    `Buy and permanently upgrade a tiered studio, then manage staff and pending requests. Tiers provide ${STUDIO_TIERS.map((tier) => `${tier.staffSlots} slot${tier.staffSlots === 1 ? '' : 's'} at ${tier.dailyUpkeep}/day`).join(', ')}. Staff: Agent ${personalAgent.hireCost}/${personalAgent.dailyUpkeep}; Cleaner ${cleaner.hireCost}/${cleaner.dailyUpkeep}; Casting ${castingDirector.hireCost}/${castingDirector.dailyUpkeep}; Manager ${productionManager.hireCost}/${productionManager.dailyUpkeep}; Scout ${talentScout.hireCost}/${talentScout.dailyUpkeep}; Marketing ${marketingExpert.hireCost}/${marketingExpert.dailyUpkeep} (hire/daily).`
                 ),
                 commandDetail(
                     '/studios',
