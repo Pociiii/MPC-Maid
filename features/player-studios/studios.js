@@ -179,14 +179,19 @@ function buildOverviewEmbed(studio, target, previousDayIncome = 0) {
             inline: true
         },
         {
-            name: 'Status',
-            value: studio.status === 'open' ? 'Open' : 'Closed',
+            name: 'Anniversary Badge',
+            value: anniversaryBadge(studio.opened_at),
             inline: true
         },
         {
             name: 'Studio Tier',
             value: `${tier.emoji} **Tier ${tier.numeral} — ${tier.name}**`,
-            inline: false
+            inline: true
+        },
+        {
+            name: 'Status',
+            value: studio.status === 'open' ? 'Open' : 'Closed',
+            inline: true
         },
         {
             name: 'Movies Produced',
@@ -207,11 +212,6 @@ function buildOverviewEmbed(studio, target, previousDayIncome = 0) {
             name: 'Studio Income \u2014 Previous Day',
             value: `\uD83E\uDE99 ${formatNumber(previousDayIncome)} coins`,
             inline: false
-        },
-        {
-            name: 'Anniversary Badge',
-            value: anniversaryBadge(studio.opened_at),
-            inline: true
         }
     );
 
@@ -325,19 +325,27 @@ function buildMyStudioReply(
         (member) => member.npc_key === 'cleaner' && member.status === 'active'
     );
     const effectiveUpkeep = getStudioUpkeepCost(tier.dailyUpkeep, cleanerActive);
+    const staffUpkeep = staff
+        .filter((member) => member.status === 'active')
+        .reduce((total, member) => {
+            const npc = getStudioNpc(member.npc_key);
+            return total + (npc?.dailyUpkeep ?? 0);
+        }, 0);
+    const totalUpkeep = effectiveUpkeep + staffUpkeep;
 
     embed.addFields(
         {
-            name: '\uD83D\uDC65 Staff Capacity',
-            value: `**${activeStaff}/${tier.staffSlots}** active slots used`,
-            inline: true
+            name: 'Daily Studio & Staff Upkeep',
+            value:
+                `**${formatNumber(totalUpkeep)} coins** ` +
+                `(Studio: ${formatNumber(effectiveUpkeep)}${cleanerActive ? ', 25% Cleaner discount' : ''}; ` +
+                `Staff: ${formatNumber(staffUpkeep)})`,
+            inline: false
         },
         {
-            name: 'Daily Studio Upkeep',
-            value: cleanerActive
-                ? `**${formatNumber(effectiveUpkeep)} coins** (25% Cleaner discount)`
-                : `**${formatNumber(tier.dailyUpkeep)} coins**`,
-            inline: true
+            name: '\uD83D\uDC65 Staff Capacity',
+            value: `**${activeStaff}/${tier.staffSlots}** active slots used`,
+            inline: false
         }
     );
 

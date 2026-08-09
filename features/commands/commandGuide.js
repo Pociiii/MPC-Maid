@@ -149,8 +149,7 @@ function buildSections() {
                     '/profile',
                     '/daily',
                     '/leaderboard',
-                    '/achievements',
-                    '/mpcopen'
+                    '/achievements'
                 ]),
             commands: [
                 commandDetail(
@@ -176,12 +175,6 @@ function buildSections() {
                     privateReply,
                     'None',
                     'Check achievement progress.'
-                ),
-                commandDetail(
-                    '/mpcopen',
-                    'Any channel, public announcement',
-                    'None',
-                    'Announce an open MPC room with host text and optional media.'
                 )
             ]
         },
@@ -406,8 +399,7 @@ function buildSections() {
                     '/blackjack',
                     '/holdem',
                     '/lottery'
-                ])}
-- <#${CHANNELS.SPANK_DILLI}> panel`,
+                ])}`,
             commands: [
                 commandDetail(
                     '/dice',
@@ -440,12 +432,6 @@ function buildSections() {
                         COOLDOWNS.HOLDEM
                     ),
                     'Bet up to 50 coins per street, play Texas Hold\'em against the dealer.'
-                ),
-                commandDetail(
-                    'Spank Dilli Panel',
-                    `<#${CHANNELS.SPANK_DILLI}>`,
-                    'None',
-                    'Use the permanent button to play for the shared prize.'
                 ),
                 commandDetail(
                     '/lottery',
