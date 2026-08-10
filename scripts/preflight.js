@@ -1456,7 +1456,6 @@ function checkDatabase() {
         'pregnancies',
         'relationships',
         'relationship_requests',
-        'spank_dilli_state',
         'user_activity_period_stats',
         'user_activity_moment_posts'
         ,'user_gift_inventory'
@@ -1474,8 +1473,7 @@ function checkDatabase() {
         'profile_likes.sql',
         'achievements.sql',
         'pregnancy.sql',
-        'relationships.sql',
-        'spank_dilli.sql'
+        'relationships.sql'
         ,'gifts.sql'
     ];
 

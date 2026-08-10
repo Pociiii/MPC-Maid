@@ -67,11 +67,6 @@ const db = new sqlite3.Database('./database.db', (err) => {
         'utf8'
     );
 
-    const spankDilliSchema = fs.readFileSync(
-        path.join(__dirname, 'schemas', 'spank_dilli.sql'),
-        'utf8'
-    );
-
     const giftsSchema = fs.readFileSync(
         path.join(__dirname, 'schemas', 'gifts.sql'),
         'utf8'
@@ -112,7 +107,7 @@ const db = new sqlite3.Database('./database.db', (err) => {
         'utf8'
     );
 
-    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${dailyWyrSchema}\n${profileLikesSchema}\n${achievementsSchema}\n${pregnancySchema}\n${relationshipsSchema}\n${spankDilliSchema}\n${giftsSchema}\n${lotterySchema}\n${commandGuideSchema}\n${memberCardPanelSchema}\n${gifSubmissionPanelSchema}\n${activeScenesSchema}\n${communityProductionsSchema}\n${studiosSchema}`, async (err) => {
+    db.exec(`${usersSchema}\n${boostersSchema}\n${dailyQuestsSchema}\n${dailyWyrSchema}\n${profileLikesSchema}\n${achievementsSchema}\n${pregnancySchema}\n${relationshipsSchema}\n${giftsSchema}\n${lotterySchema}\n${commandGuideSchema}\n${memberCardPanelSchema}\n${gifSubmissionPanelSchema}\n${activeScenesSchema}\n${communityProductionsSchema}\n${studiosSchema}`, async (err) => {
 
         if (err) {
             console.error(err);

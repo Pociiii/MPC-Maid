@@ -73,10 +73,6 @@ const {
 } = require('../features/casino/slots');
 
 const {
-    handleSpankDilli
-} = require('../features/casino/spankDilli');
-
-const {
     handleDailyWyrVote
 } = require('../features/daily-wyr/dailyWyr');
 
@@ -342,12 +338,6 @@ async function routeInteraction(
                     interaction.customId.split(
                         ':'
                     )[1]
-                );
-                return true;
-
-            case 'spank_dilli':
-                await handleSpankDilli(
-                    interaction
                 );
                 return true;
 

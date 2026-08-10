@@ -104,10 +104,6 @@ const {
 } = require('./features/member-card/memberCardPanel');
 
 const {
-    startSpankDilliPanel
-} = require('./features/casino/spankDilli');
-
-const {
     startGifSubmissionPanel
 } = require('./features/gif-submit/panel');
 
@@ -502,10 +498,6 @@ async readyClient => {
         );
 
         await startGifSubmissionPanel(
-            readyClient
-        );
-
-        await startSpankDilliPanel(
             readyClient
         );
 

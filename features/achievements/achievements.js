@@ -41,8 +41,6 @@ const categoryLabels = {
         'Interaction Buttons',
     casino_plays:
         'Casino Plays',
-    spank_dilli_spanks:
-        'Spank Dilli',
     titty_drops:
         'Titty Drops',
     drinks_bought:

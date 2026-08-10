@@ -22,7 +22,7 @@ online.
 - Rotate the Discord bot token before final hosting.
 
 Current schema-backed systems include daily quests, achievements, pregnancy,
-relationships, Spank Dilli, Daily WYR, activity Moments, and profile likes.
+relationships, Daily WYR, activity Moments, and profile likes.
 
 ## Install On Ubuntu/Debian
 

@@ -36,8 +36,7 @@ the SQLite schema.
 - GIF Submit with scene title suggestions for staff review.
 - Daily Would You Rather in General with anonymous voting, rewards, and a
   discussion thread.
-- Casino games: `/dice`, `/slots`, `/blackjack`, `/holdem`, weekly lottery,
-  and Spank Dilli.
+- Casino games: `/dice`, `/slots`, `/blackjack`, `/holdem`, and weekly lottery.
 - RP systems: relationships, pregnancy, breed requests, matchme, drink, and
   firework.
 

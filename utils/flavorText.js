@@ -97,14 +97,6 @@ const maidFeedFlavor = {
         'The shared library picked up another spark.',
         'That one is ready for future mischief.',
         'A fresh reaction just found its place.'
-    ],
-    spankDilli: [
-        'The casino corner just made some noise.',
-        'Someone walked away with the prize.',
-        'Spank Dilli paid out, and the feed noticed.',
-        'The table got loud for the right reason.',
-        'A lucky swing just turned into a payout.',
-        'The house blinked, and someone collected.'
     ]
 };
 

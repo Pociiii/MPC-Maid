@@ -409,9 +409,6 @@ const actionCounterLabels = {
     casino_plays:
         (value) =>
             `Play casino games ${value.toLocaleString()} time${value === 1 ? '' : 's'}`,
-    spank_dilli_spanks:
-        (value) =>
-            `Spank Dilli ${value.toLocaleString()} time${value === 1 ? '' : 's'}`,
     shop_purchases:
         (value) =>
             `Buy ${value.toLocaleString()} shop item${value === 1 ? '' : 's'}`,
@@ -480,17 +477,6 @@ const endlessAchievements = {
         label:
             (value) =>
                 `Click interaction buttons ${value} times`,
-        points:
-            50
-    },
-    spank_dilli_spanks: {
-        startsAfter:
-            1000,
-        step:
-            100,
-        label:
-            (value) =>
-                `Spank Dilli ${value.toLocaleString()} times`,
         points:
             50
     },
