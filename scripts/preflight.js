@@ -1451,6 +1451,7 @@ function checkDatabase() {
         'pregnancy_profiles',
         'pregnancy_daily_partners',
         'pregnancy_daily_checks',
+        'pregnancy_forced_queue',
         'fertility_pill_activations',
         'pregnancies',
         'relationships',

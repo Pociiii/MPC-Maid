@@ -47,6 +47,13 @@ CREATE TABLE IF NOT EXISTS fertility_pill_activations (
     PRIMARY KEY (user_id, active_date)
 );
 
+CREATE TABLE IF NOT EXISTS pregnancy_forced_queue (
+    carrier_id TEXT PRIMARY KEY,
+    father_id TEXT NOT NULL,
+    scheduled_date TEXT NOT NULL,
+    queued_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS pregnancies (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     carrier_id TEXT NOT NULL,

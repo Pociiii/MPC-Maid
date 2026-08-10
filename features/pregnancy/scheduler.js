@@ -6,7 +6,8 @@ const {
     getPregnancyMilestones,
     getNextPregnancyCheckTimestamp,
     getPreviousPregnancyDate,
-    processPregnancyChecks
+    processPregnancyChecks,
+    processScheduledPregnancies
 } = require('../../database/pregnancy');
 
 const {
@@ -20,6 +21,7 @@ const {
 } = require('./pregnancyAnnouncements');
 
 const {
+    logBotEvent,
     logError
 } = require('../../utils/inboxLogger');
 
@@ -107,6 +109,105 @@ async function announcePregnancyResults(
 
 }
 
+async function logPregnancyResults(
+    client,
+    results
+) {
+
+    for (
+        const result of results
+    ) {
+
+        await logBotEvent(
+            client,
+            {
+                color:
+                    result.success
+                        ? '#57F287'
+                        : '#FEE75C',
+                title:
+                    result.success
+                        ? '🤰 Pregnancy Roll Succeeded'
+                        : '🎲 Pregnancy Roll Failed',
+                description:
+                    `Daily pregnancy roll for **${result.date}**.`,
+                fields: [
+                    {
+                        name:
+                            '🤰 Carrier',
+                        value:
+                            `<@${result.carrierId}>`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            '🧬 Selected Partner',
+                        value:
+                            `<@${result.fatherId}>`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            '🌸 Carrier Fertility',
+                        value:
+                            `**${result.carrierFertility}%**`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            '🧬 Partner Fertility',
+                        value:
+                            `**${result.partnerFertility}%**`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            '💊 Pill Bonuses',
+                        value:
+                            `Carrier: **+${result.carrierPillBonus}%**\nPartner: **+${result.partnerPillBonus}%**`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            '🎯 Final Chance',
+                        value:
+                            `**${result.chance}%**`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            '🎲 Random Roll',
+                        value:
+                            `**${result.roll}** / 100\nSuccess requires a value at or below **${result.chance}**.`,
+                        inline:
+                            true
+                    },
+                    {
+                        name:
+                            '📌 Result',
+                        value:
+                            result.success
+                                ? '**Pregnant**'
+                                : '**Not pregnant**',
+                        inline:
+                            true
+                    }
+                ],
+                footerText:
+                    'MPC Maid Pregnancy Log'
+            }
+        );
+
+    }
+
+}
+
 async function announceMilestones(
     client
 ) {
@@ -179,10 +280,33 @@ async function runPregnancyTick(
 
     try {
 
+        const date =
+            getPreviousPregnancyDate();
+
+        const scheduledResults =
+            await processScheduledPregnancies(
+                date
+            );
+
+        await logPregnancyResults(
+            client,
+            scheduledResults
+        );
+
+        await announcePregnancyResults(
+            client,
+            scheduledResults
+        );
+
         const results =
             await processPregnancyChecks(
-                getPreviousPregnancyDate()
+                date
             );
+
+        await logPregnancyResults(
+            client,
+            results
+        );
 
         await announcePregnancyResults(
             client,
@@ -256,6 +380,7 @@ function startPregnancyScheduler(
 }
 
 module.exports = {
+    logPregnancyResults,
     runPregnancyTick,
     startPregnancyScheduler
 };

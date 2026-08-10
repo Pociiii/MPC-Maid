@@ -713,6 +713,141 @@ async function forcePregnancy(
 
 }
 
+async function scheduleForcedPregnancy(
+    carrierId,
+    fatherId,
+    date = getPregnancyDate()
+) {
+
+    await dbRun(
+        `INSERT INTO pregnancy_forced_queue (
+            carrier_id,
+            father_id,
+            scheduled_date
+        ) VALUES (?, ?, ?)
+        ON CONFLICT(carrier_id) DO UPDATE SET
+            father_id = excluded.father_id,
+            scheduled_date = excluded.scheduled_date,
+            queued_at = CURRENT_TIMESTAMP`,
+        [
+            carrierId,
+            fatherId,
+            date
+        ]
+    );
+
+    return dbGet(
+        `SELECT *
+         FROM pregnancy_forced_queue
+         WHERE carrier_id = ?`,
+        [
+            carrierId
+        ]
+    );
+
+}
+
+async function processScheduledPregnancies(
+    date = getPreviousPregnancyDate()
+) {
+
+    const queued =
+        await dbAll(
+            `SELECT *
+             FROM pregnancy_forced_queue
+             WHERE scheduled_date <= ?
+             ORDER BY queued_at ASC`,
+            [
+                date
+            ]
+        );
+
+    const results = [];
+
+    for (
+        const entry of queued
+    ) {
+
+        const carrierFertility =
+            await getDailyCarrierFertility(
+                entry.carrier_id,
+                entry.scheduled_date
+            );
+
+        const partnerFertility =
+            await getDailyCarrierFertility(
+                entry.father_id,
+                entry.scheduled_date
+            );
+
+        const [
+            carrierPill,
+            partnerPill
+        ] = await Promise.all([
+            getFertilityPillActivation(entry.carrier_id, entry.scheduled_date),
+            getFertilityPillActivation(entry.father_id, entry.scheduled_date)
+        ]);
+
+        const carrierPillBonus =
+            carrierPill ? PREGNANCY.FERTILITY_PILL_BONUS : 0;
+
+        const partnerPillBonus =
+            partnerPill ? PREGNANCY.FERTILITY_PILL_BONUS : 0;
+
+        const chance =
+            calculatePregnancyChance(
+                carrierFertility,
+                partnerFertility,
+                carrierPillBonus,
+                partnerPillBonus
+            );
+
+        const roll =
+            Math.floor(
+                Math.random() * chance
+            ) + 1;
+
+        const pregnancy =
+            await forcePregnancy(
+                entry.carrier_id,
+                entry.father_id,
+                1
+            );
+
+        await dbRun(
+            `DELETE FROM pregnancy_forced_queue
+             WHERE carrier_id = ?
+             AND scheduled_date = ?`,
+            [
+                entry.carrier_id,
+                entry.scheduled_date
+            ]
+        );
+
+        results.push({
+            carrierFertility,
+            carrierPillBonus,
+            chance,
+            date:
+                entry.scheduled_date,
+            fatherId:
+                entry.father_id,
+            partnerFertility,
+            partnerPillBonus,
+            pregnancy,
+            roll,
+            success:
+                true,
+            carrierId:
+                entry.carrier_id
+        });
+
+    }
+
+    return results;
+
+}
+
 async function forceGenderReveal(
     carrierId
 ) {
@@ -977,8 +1112,13 @@ async function processPregnancyChecks(
                 partnerPillBonus
             );
 
+        const roll =
+            Math.floor(
+                Math.random() * 100
+            ) + 1;
+
         const success =
-            Math.random() * 100 < chance;
+            roll <= chance;
 
         const pregnancy =
             success
@@ -1004,10 +1144,14 @@ async function processPregnancyChecks(
             carrierFertility,
             carrierPillBonus,
             chance,
+            date,
             fatherId:
                 father.userId,
             pregnancy,
+            partnerFertility:
+                father.dailyFertility,
             partnerPillBonus,
+            roll,
             success,
             carrierId
         });
@@ -1119,7 +1263,9 @@ module.exports = {
     getPregnancyStatus,
     getPreviousPregnancyDate,
     processPregnancyChecks,
+    processScheduledPregnancies,
     purchaseFertilityPill,
     resetDailyCheck,
-    resetDailyPartners
+    resetDailyPartners,
+    scheduleForcedPregnancy
 };

@@ -37,7 +37,9 @@ const {
     getPregnancyMilestones,
     getPregnancyStatus,
     processPregnancyChecks,
-    purchaseFertilityPill
+    processScheduledPregnancies,
+    purchaseFertilityPill,
+    scheduleForcedPregnancy
 } = require('../database/pregnancy');
 
 const {
@@ -47,6 +49,10 @@ const {
 const {
     buildPregnancyAnnouncementPayload
 } = require('../features/pregnancy/pregnancyAnnouncements');
+
+const {
+    logPregnancyResults
+} = require('../features/pregnancy/scheduler');
 
 const carrierId =
     '100000000000000001';
@@ -154,6 +160,9 @@ async function run() {
     assert.equal(results[0].chance, 16, 'Two pills should add six points to a 10% base chance.');
     assert.equal(results[0].carrierPillBonus, 3);
     assert.equal(results[0].partnerPillBonus, 3);
+    assert.equal(results[0].roll, 1, 'The integer 1-100 roll should be exposed for audit logging.');
+    assert.equal(results[0].date, checkDate);
+    assert.equal(results[0].partnerFertility, 5);
     assert.equal(
         results[0].pregnancy.carrier_id,
         carrierId
@@ -161,6 +170,32 @@ async function run() {
     assert.equal(
         results[0].pregnancy.father_id,
         fatherId
+    );
+
+    const pregnancyLogs = [];
+
+    await logPregnancyResults(
+        {
+            channels: {
+                cache: {
+                    get: () => ({
+                        send: async (payload) => {
+                            pregnancyLogs.push(payload);
+                            return payload;
+                        }
+                    })
+                },
+                fetch: async () => null
+            }
+        },
+        results
+    );
+
+    assert.equal(pregnancyLogs.length, 1, 'Each processed pregnancy roll should create one staff log.');
+    assert.equal(pregnancyLogs[0].embeds[0].data.title, '🤰 Pregnancy Roll Succeeded');
+    assert.match(
+        pregnancyLogs[0].embeds[0].data.fields.find((field) => field.name === '🎲 Random Roll').value,
+        /\*\*1\*\* \/ 100/
     );
 
     const pregnancy =
@@ -271,6 +306,43 @@ async function run() {
         repeatedCheck.length,
         0,
         'A pregnancy roll should not be processed twice for the same date.'
+    );
+
+    const scheduledCarrierId =
+        '100000000000000004';
+
+    const scheduledFatherId =
+        '100000000000000005';
+
+    await scheduleForcedPregnancy(
+        scheduledCarrierId,
+        scheduledFatherId,
+        checkDate
+    );
+
+    assert.equal(
+        await getActivePregnancy(
+            scheduledCarrierId
+        ),
+        undefined,
+        'A scheduled recovery pregnancy must not begin before its cycle.'
+    );
+
+    const scheduledResults =
+        await processScheduledPregnancies(
+            checkDate
+        );
+
+    assert.equal(scheduledResults.length, 1);
+    assert.equal(scheduledResults[0].pregnancy.carrier_id, scheduledCarrierId);
+    assert.equal(scheduledResults[0].pregnancy.father_id, scheduledFatherId);
+    assert.equal(scheduledResults[0].success, true);
+    assert.ok(scheduledResults[0].roll <= scheduledResults[0].chance);
+    assert.ok(await getActivePregnancy(scheduledCarrierId));
+    assert.equal(
+        (await processScheduledPregnancies(checkDate)).length,
+        0,
+        'A scheduled recovery pregnancy must only be consumed once.'
     );
 
 }

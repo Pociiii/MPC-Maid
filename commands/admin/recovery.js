@@ -36,11 +36,13 @@ const {
     forceBirth,
     forceGenderReveal,
     forcePregnancy,
+    getNextPregnancyCheckTimestamp,
     getPregnancyDate,
     getPreviousPregnancyDate,
     processPregnancyChecks,
     resetDailyCheck,
-    resetDailyPartners
+    resetDailyPartners,
+    scheduleForcedPregnancy
 } = require('../../database/pregnancy');
 
 function getOwnerIds() {
@@ -170,6 +172,42 @@ module.exports = {
                         )
                         .setDescription(
                             'Create a database backup now'
+                        )
+            )
+            .addSubcommand(
+                (subcommand) =>
+                    subcommand
+                        .setName(
+                            'pregstart'
+                        )
+                        .setDescription(
+                            'Start and announce a normal pregnancy'
+                        )
+                        .addUserOption(
+                            (option) =>
+                                option
+                                    .setName(
+                                        'female'
+                                    )
+                                    .setDescription(
+                                        'Female carrier'
+                                    )
+                                    .setRequired(
+                                        true
+                                    )
+                        )
+                        .addUserOption(
+                            (option) =>
+                                option
+                                    .setName(
+                                        'male'
+                                    )
+                                    .setDescription(
+                                        'Male father'
+                                    )
+                                    .setRequired(
+                                        true
+                                    )
                         )
             )
             .addSubcommand(
@@ -730,6 +768,72 @@ module.exports = {
                 interaction,
                 'Pregnancy Forced',
                 `<@${carrier.id}> is pregnant with <@${father.id}> as father.\nDay: **${day}/30**\nBaby: **${pregnancy.baby_gender}**`
+            );
+
+            return;
+
+        }
+
+        if (
+            subcommand === 'pregstart'
+        ) {
+
+            await interaction.deferReply({
+                flags:
+                    64
+            });
+
+            const female =
+                interaction.options.getUser(
+                    'female'
+                );
+
+            const male =
+                interaction.options.getUser(
+                    'male'
+                );
+
+            if (
+                female.id === male.id
+            ) {
+
+                await replyResult(
+                    interaction,
+                    'Pregnancy Not Started',
+                    'The female carrier and male father must be different users.'
+                );
+
+                return;
+
+            }
+
+            if (
+                female.bot ||
+                male.bot
+            ) {
+
+                await replyResult(
+                    interaction,
+                    'Pregnancy Not Started',
+                    'Bot accounts cannot be pregnancy participants.'
+                );
+
+                return;
+
+            }
+
+            await scheduleForcedPregnancy(
+                    female.id,
+                    male.id
+                );
+
+            const nextCheck =
+                getNextPregnancyCheckTimestamp();
+
+            await replyResult(
+                interaction,
+                'Pregnancy Scheduled',
+                `<@${female.id}> will become pregnant with <@${male.id}> as the father during the next pregnancy cycle at <t:${nextCheck}:F> (<t:${nextCheck}:R>). The standard confirmation will then be posted in Pillow Talk, followed by the normal Day 7 reveal and Day 30 birth schedule.`
             );
 
             return;
