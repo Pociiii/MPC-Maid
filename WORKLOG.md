@@ -14,6 +14,17 @@ titles, Daily WYR questions, the gift catalogue, and SQLite schema readiness.
 The database is upgraded additively. Do not delete `database.db`; back it up,
 then run the bot or preflight to create missing tables.
 
+## Latest: Dynamic Community Productions
+
+- Community Production casting is now a generic three-person signup rather
+  than a rotating predetermined MFM, FMF, or FFF request.
+- The third slot dynamically prevents MMM while allowing MFM, FMF, and FFF.
+- Waiting members are not busy and are removed if a normal scene reserves them
+  first; final Community Production casts are reserved atomically.
+- Productions now run five parts in at most 28 minutes and award 90-140 coins
+  plus 25-35 XP, with the existing independent bonus rolls unchanged.
+- Casting state remains SQL-backed and is revalidated after restart.
+
 ## Latest: Player Studio Staff
 
 - Added a data-driven abstract NPC roster to `/mystudio`.

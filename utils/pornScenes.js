@@ -240,6 +240,46 @@ function setUserBusy(
 
 }
 
+function tryReserveUsers(
+    userIds,
+    data = {}
+) {
+
+    const ids = [
+        ...new Set(
+            userIds.map(
+                String
+            )
+        )
+    ];
+
+    if (
+        ids.length !== userIds.length ||
+        ids.some(
+            (userId) =>
+                busyUsers.has(
+                    userId
+                )
+        )
+    )
+        return false;
+
+    for (
+        const userId of ids
+    )
+        busyUsers.set(
+            userId,
+            {
+                ...data,
+                type:
+                    data.type ?? 'activity'
+            }
+        );
+
+    return true;
+
+}
+
 function setSceneBusy(
     requesterId,
     targetId,
@@ -263,6 +303,26 @@ function setSceneBusy(
             ...data,
             partnerId:
                 requesterId,
+            type:
+                'pornscene'
+        }
+    );
+
+}
+
+function trySetSceneBusy(
+    requesterId,
+    targetId,
+    data = {}
+) {
+
+    return tryReserveUsers(
+        [
+            requesterId,
+            targetId
+        ],
+        {
+            ...data,
             type:
                 'pornscene'
         }
@@ -342,7 +402,9 @@ module.exports = {
     getPendingRequests,
     isBusy,
     setUserBusy,
+    tryReserveUsers,
     setSceneBusy,
+    trySetSceneBusy,
     clearSceneBusy,
     getBusyUser,
     clearUserBusy,

@@ -41,17 +41,21 @@ const {
     checkpointPart,
     claimCastingSlot,
     createProduction,
-    getProduction
+    getProduction,
+    startCasting
 } = require('../database/communityProductions');
 
 const {
     getCanonicalProductionCategory,
-    pickProductionType,
+    getProductionTypeFromSlots,
     startCommunityProductions
 } = require('../features/community-production/communityProduction');
 
 const {
-    isBusy
+    clearAllSceneBusy,
+    isBusy,
+    tryReserveUsers,
+    trySetSceneBusy
 } = require('../utils/pornScenes');
 
 function dbRun(
@@ -109,6 +113,17 @@ async function closeDatabase() {
 async function main() {
 
     await db.ready;
+
+    assert.equal(
+        tryReserveUsers(['one', 'two', 'three'], { type: 'test' }),
+        true
+    );
+    assert.equal(
+        trySetSceneBusy('three', 'four'),
+        false
+    );
+    assert.equal(isBusy('four'), false);
+    clearAllSceneBusy();
 
     assert.equal(
         getCanonicalProductionCategory({
@@ -189,29 +204,11 @@ async function main() {
     );
 
     for (
-        const previousType of [
-            'MFM',
-            'FMF',
-            'FFF'
-        ]
-    )
-        for (
-            let index = 0;
-            index < 1_000;
-            index += 1
-        )
-            assert.notEqual(
-                pickProductionType(
-                    previousType
-                ),
-                previousType
-            );
-
-    for (
         const userId of [
             'male-a',
             'female-a',
-            'male-b'
+            'male-b',
+            'male-c'
         ]
     )
         await dbRun(
@@ -224,7 +221,7 @@ async function main() {
     const production =
         await createProduction({
             productionType:
-                'MFM',
+                null,
             title:
                 'Persistence Test',
             castingChannelId:
@@ -233,17 +230,17 @@ async function main() {
                 'scenes',
             slots: [
                 {
-                    gender: 'm',
+                    gender: null,
                     userId: null,
                     category: null
                 },
                 {
-                    gender: 'f',
+                    gender: null,
                     userId: null,
                     category: null
                 },
                 {
-                    gender: 'm',
+                    gender: null,
                     userId: null,
                     category: null
                 }
@@ -272,21 +269,56 @@ async function main() {
         (
             await claimCastingSlot(
                 production.id,
-                'female-a',
-                'bf'
+                'male-b',
+                'bm'
             )
         ).full,
         false
     );
 
+    assert.deepEqual(
+        await claimCastingSlot(
+            production.id,
+            'male-c',
+            'wm'
+        ),
+        {
+            ok: false,
+            reason: 'role_full'
+        }
+    );
+
     assert.equal(
-        (
-            await claimCastingSlot(
-                production.id,
-                'male-b',
-                'bm'
-            )
-        ).full,
+        (await claimCastingSlot(
+            production.id,
+            'female-a',
+            'bf'
+        )).full,
+        true
+    );
+
+    const filled = await getProduction(
+        production.id
+    );
+
+    assert.equal(
+        filled.status,
+        'casting'
+    );
+
+    assert.equal(
+        getProductionTypeFromSlots(filled.slots),
+        'MFM'
+    );
+
+    assert.equal(
+        await startCasting(
+            production.id,
+            filled.slots,
+            'MFM',
+            'wm_bm_bf',
+            'Finalized Test'
+        ),
         true
     );
 

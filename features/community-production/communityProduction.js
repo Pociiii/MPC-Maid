@@ -33,7 +33,7 @@ const {
 const {
     clearUserBusy,
     isBusy,
-    setUserBusy
+    tryReserveUsers
 } = require('../../utils/pornScenes');
 
 const {
@@ -68,12 +68,14 @@ const {
     claimCastingSlot,
     createProduction,
     expireCasting,
-    getLatestProductionType,
     getOpenCasting,
     getProduction,
     getRestorableProductions,
     markCompleted,
-    setCastingMessage
+    removeWaitingUser,
+    setCastingMessage,
+    startCasting,
+    updateCastingSlots
 } = require('../../database/communityProductions');
 
 const {
@@ -85,16 +87,13 @@ const CASTING_MS =
     30 * 60 * 1000;
 
 const SCENE_MS =
-    60 * 60 * 1000;
+    28 * 60 * 1000;
 
 const BONUS_REWARD_CHANCE =
     0.1;
 
 const PARTS = [
     'foreplay',
-    'foreplay',
-    'foreplay',
-    'sex',
     'sex',
     'sex',
     'sex',
@@ -166,61 +165,19 @@ function weightedPick(
 
 }
 
-function pickProductionType(
-    previousType = null
-) {
-
-    const choices = [
-        {
-            type:
-                'MFM',
-            weight:
-                40
-        },
-        {
-            type:
-                'FMF',
-            weight:
-                40
-        },
-        {
-            type:
-                'FFF',
-            weight:
-                20
-        }
-    ].filter(
-        (choice) =>
-            choice.type !== previousType
-    );
-
-    return weightedPick(
-        choices,
-        (choice) =>
-            choice.weight
-    ).type;
-
-}
-
 function buildSlots(
-    productionType
+    _productionType = null
 ) {
 
-    return productionType
-        .split(
-            ''
-        )
-        .map(
-            (gender, index) => ({
-                index,
-                gender:
-                    gender.toLowerCase(),
-                userId:
-                    null,
-                category:
-                    null
-            })
-        );
+    return Array.from(
+        { length: 3 },
+        (_, index) => ({
+            index,
+            gender: null,
+            userId: null,
+            category: null
+        })
+    );
 
 }
 
@@ -282,16 +239,22 @@ function formatSlots(
     return slots.map(
         (slot) => {
 
-            const icon =
-                slot.gender === 'm'
-                    ? '\uD83D\uDC68'
-                    : '\uD83D\uDC69';
+            if (slot.userId)
+                return `\u25CF <@${slot.userId}> \u2014 ${slot.gender === 'm' ? 'Male' : 'Female'}`;
 
-            return `${icon} ${slot.gender === 'm' ? 'Male' : 'Female'}\n${
-                slot.userId
-                    ? `\u2705 <@${slot.userId}>`
-                    : '\u2B1C Available'
-            }`;
+            const joined = slots.filter(
+                (entry) => entry.userId
+            );
+            const maleCount = joined.filter(
+                (entry) => entry.gender === 'm'
+            ).length;
+            const requirement = joined.length === 0
+                ? 'Empty'
+                : maleCount >= 2
+                    ? 'Female Required'
+                    : 'Male or Female';
+
+            return `\u25CB ${requirement}`;
 
         }
     ).join(
@@ -328,7 +291,7 @@ function buildCastingEmbed(
             thumbnail:
                 serverIcon,
             title:
-                '\uD83C\uDFAC Community Production Casting Call',
+                '3some Casting \u2014 Official MPC Production',
             description,
             timestamp:
                 true
@@ -337,17 +300,17 @@ function buildCastingEmbed(
     embed.addFields(
         {
             name:
-                'Scene',
+                'Format',
             value:
-                production.title,
+                production.production_type ?? 'MFM \u2022 FMF \u2022 FFF',
             inline:
                 true
         },
         {
             name:
-                'Type',
+                'Length',
             value:
-                production.production_type,
+                '5 Parts \u2022 Up to 30 Minutes',
             inline:
                 true
         },
@@ -391,7 +354,7 @@ function buildCastingEmbed(
             name:
                 'Guaranteed Rewards',
             value:
-                '\uD83E\uDE99 150\u2013225 Coins\n\u2B50 40\u201355 XP',
+                '\uD83E\uDE99 90\u2013140 Coins\n\u2B50 25\u201335 XP',
             inline:
                 false
         },
@@ -602,28 +565,17 @@ async function createNextCasting(
 
             }
 
-            const productionType =
-                pickProductionType(
-                    await getLatestProductionType()
-                );
-
             let production =
                 await createProduction({
-                    productionType,
+                    productionType: null,
                     title:
-                        getRandomSceneName(
-                            productionType === 'FFF'
-                                ? 'wf_wf_wf'
-                                : 'wm_wf_wf'
-                        ),
+                        'Official MPC 3some',
                     castingChannelId:
                         CHANNELS.CASTING_CALL,
                     sceneChannelId:
                         CHANNELS.PORN_CAREER,
                     slots:
-                        buildSlots(
-                            productionType
-                        ),
+                        buildSlots(),
                     parts:
                         PARTS,
                     castingClosesAt:
@@ -678,16 +630,6 @@ async function rotateCasting(
             expired
         ) {
 
-            for (
-                const slot of casting.slots
-            )
-                if (
-                    slot.userId
-                )
-                    clearUserBusy(
-                        slot.userId
-                    );
-
             const updated =
                 await getProduction(
                     casting.id
@@ -730,6 +672,97 @@ function getCanonicalProductionCategory(
             categories
         )
         : production.category;
+
+}
+
+function getProductionTypeFromSlots(
+    slots
+) {
+
+    const genders = slots.map(
+        (slot) => slot.gender
+    ).sort().join('');
+
+    return {
+        fff: 'FFF',
+        fmm: 'MFM',
+        ffm: 'FMF'
+    }[genders] ?? null;
+
+}
+
+async function revalidateWaitingCast(
+    client,
+    production
+) {
+
+    if (!production || production.status !== 'casting')
+        return production;
+
+    const guild = client.guilds.cache.get(
+        process.env.GUILD_ID
+    ) ?? await client.guilds.fetch?.(
+        process.env.GUILD_ID
+    ).catch(() => null);
+
+    if (!guild)
+        return production;
+
+    const slots = [];
+
+    for (const slot of production.slots) {
+        if (!slot.userId) {
+            slots.push(slot);
+            continue;
+        }
+
+        const member = guild?.members?.cache?.get(slot.userId) ??
+            await guild?.members?.fetch?.(slot.userId).catch(() => null);
+        const categoryResult = member
+            ? getExactMemberCategory(member)
+            : { error: 'Member unavailable.' };
+        const user = member
+            ? await getOrCreateUser(slot.userId)
+            : null;
+        const validStats = user &&
+            user.performance >= 10 &&
+            user.stamina >= 10 &&
+            user.fame >= 10;
+
+        if (
+            categoryResult.error ||
+            !validStats ||
+            isBusy(slot.userId)
+        )
+            slots.push({
+                index: slot.index,
+                gender: null,
+                userId: null,
+                category: null
+            });
+        else
+            slots.push({
+                ...slot,
+                gender: categoryResult.category.slice(-1),
+                category: categoryResult.category
+            });
+    }
+
+    if (JSON.stringify(slots) !== JSON.stringify(production.slots)) {
+        const updated = await updateCastingSlots(
+            production.id,
+            slots,
+            production.slots
+        );
+        return updated
+            ? getProduction(production.id)
+            : revalidateWaitingCast(
+                client,
+                await getProduction(production.id)
+            );
+    }
+
+    return production;
 
 }
 
@@ -1108,13 +1141,13 @@ function buildRewards(
                 slot.userId,
             coins:
                 randomInt(
-                    150,
-                    225
+                    90,
+                    140
                 ),
             xp:
                 randomInt(
-                    40,
-                    55
+                    25,
+                    35
                 ),
             booster:
                 Math.random() <
@@ -1537,7 +1570,7 @@ async function handleJoin(
             )[1]
         );
 
-    const production =
+    let production =
         await getProduction(
             productionId
         );
@@ -1625,15 +1658,9 @@ async function handleJoin(
 
     }
 
-    setUserBusy(
-        interaction.user.id,
-        {
-            type:
-                'community-production',
-            productionId,
-            joinedAt:
-                Date.now()
-        }
+    production = await revalidateWaitingCast(
+        interaction.client,
+        production
     );
 
     let claimed;
@@ -1649,22 +1676,12 @@ async function handleJoin(
 
     }
     catch (error) {
-
-        clearUserBusy(
-            interaction.user.id
-        );
-
         throw error;
-
     }
 
     if (
         !claimed.ok
     ) {
-
-        clearUserBusy(
-            interaction.user.id
-        );
 
         const messages = {
             closed:
@@ -1684,10 +1701,72 @@ async function handleJoin(
 
     }
 
-    const updated =
+    let updated =
         await getProduction(
             productionId
         );
+
+    let started = false;
+
+    if (claimed.full) {
+        updated = await revalidateWaitingCast(
+            interaction.client,
+            updated
+        );
+
+        const full = updated.slots.every(
+            (slot) => slot.userId
+        );
+        const productionType = full
+            ? getProductionTypeFromSlots(updated.slots)
+            : null;
+        const userIds = updated.slots.map(
+            (slot) => slot.userId
+        );
+
+        if (
+            productionType &&
+            tryReserveUsers(
+                userIds,
+                {
+                    type: 'community-production',
+                    productionId,
+                    startedAt: Date.now()
+                }
+            )
+        ) {
+            const category = canonicalizeCastCategories(
+                updated.slots.map((slot) => slot.category)
+            );
+
+            started = await startCasting(
+                productionId,
+                updated.slots,
+                productionType,
+                category,
+                getRandomSceneName(category)
+            );
+
+            if (!started)
+                for (const userId of userIds)
+                    clearUserBusy(userId);
+            else
+                updated = await getProduction(productionId);
+        }
+        else if (full) {
+            const slots = updated.slots.map(
+                (slot) => isBusy(slot.userId)
+                    ? { index: slot.index, gender: null, userId: null, category: null }
+                    : slot
+            );
+            await updateCastingSlots(
+                productionId,
+                slots,
+                updated.slots
+            );
+            updated = await getProduction(productionId);
+        }
+    }
 
     await updateCastingMessage(
         interaction.client,
@@ -1695,13 +1774,13 @@ async function handleJoin(
     );
 
     await interaction.editReply(
-        claimed.full
+        started
             ? `You joined **${updated.title}**. The cast is complete and filming is starting in <#${CHANNELS.PORN_CAREER}>.`
-            : `You joined **${updated.title}**. You will remain busy while casting is open.`
+            : `You joined **${updated.title}**. You remain free until the full cast is ready.`
     );
 
     if (
-        claimed.full
+        started
     ) {
 
         await postStartMoment(
@@ -1729,6 +1808,25 @@ async function handleJoin(
 
 }
 
+async function removeFromCommunityProductionCasting(
+    client,
+    userId
+) {
+
+    const production = await removeWaitingUser(
+        userId
+    );
+
+    if (production)
+        await updateCastingMessage(
+            client,
+            production
+        ).catch(() => false);
+
+    return Boolean(production);
+
+}
+
 async function startCommunityProductions(
     client
 ) {
@@ -1746,23 +1844,15 @@ async function startCommunityProductions(
         const production of productions
     ) {
 
-        for (
-            const slot of production.slots
-        )
-            if (
-                slot.userId
-            )
-                setUserBusy(
-                    slot.userId,
-                    {
-                        type:
-                            'community-production',
-                        productionId:
-                            production.id,
-                        restored:
-                            true
-                    }
-                );
+        if (production.status !== 'casting')
+            tryReserveUsers(
+                production.slots.map((slot) => slot.userId),
+                {
+                    type: 'community-production',
+                    productionId: production.id,
+                    restored: true
+                }
+            );
 
         nextCastingAt =
             Math.max(
@@ -1773,8 +1863,10 @@ async function startCommunityProductions(
         if (
             production.status === 'casting'
         )
-            casting =
-                production;
+            casting = await revalidateWaitingCast(
+                client,
+                production
+            );
         else
             scheduleProduction(
                 client,
@@ -1795,24 +1887,68 @@ async function startCommunityProductions(
             );
         else {
 
-            const updated =
-                await updateCastingMessage(
-                    client,
-                    casting
-                );
-
             if (
-                !updated
-            )
-                await postCasting(
-                    client,
-                    casting
+                casting.slots.every((slot) => slot.userId)
+            ) {
+                const productionType = getProductionTypeFromSlots(
+                    casting.slots
                 );
+                const userIds = casting.slots.map((slot) => slot.userId);
 
-            scheduleCastingRotation(
-                client,
-                casting.casting_closes_at
-            );
+                if (
+                    productionType &&
+                    tryReserveUsers(
+                        userIds,
+                        {
+                            type: 'community-production',
+                            productionId: casting.id,
+                            restored: true
+                        }
+                    )
+                ) {
+                    const category = canonicalizeCastCategories(
+                        casting.slots.map((slot) => slot.category)
+                    );
+                    const started = await startCasting(
+                        casting.id,
+                        casting.slots,
+                        productionType,
+                        category,
+                        getRandomSceneName(category)
+                    );
+
+                    if (started) {
+                        casting = await getProduction(casting.id);
+                        await updateCastingMessage(client, casting);
+                        await postStartMoment(client, casting).catch(() => null);
+                        scheduleProduction(client, casting);
+                        scheduleCastingRotation(client, casting.casting_closes_at);
+                        casting = null;
+                    }
+                    else
+                        for (const userId of userIds)
+                            clearUserBusy(userId);
+                }
+            }
+
+            if (casting) {
+                const updated =
+                    await updateCastingMessage(
+                        client,
+                        casting
+                    );
+
+                if (!updated)
+                    await postCasting(
+                        client,
+                        casting
+                    );
+
+                scheduleCastingRotation(
+                    client,
+                    casting.casting_closes_at
+                );
+            }
 
         }
 
@@ -1845,9 +1981,10 @@ async function startCommunityProductions(
 
 module.exports = {
     getCanonicalProductionCategory,
+    getProductionTypeFromSlots,
     handleJoin,
     pickGift,
-    pickProductionType,
     pickProductionGif,
+    removeFromCommunityProductionCasting,
     startCommunityProductions
 };

@@ -5,10 +5,6 @@ const {
     getCoinIncomeDate
 } = require('../utils/coinIncome');
 
-const {
-    canonicalizeCastCategories
-} = require('../data/sceneSubmitGroups');
-
 function run(
     sql,
     params = []
@@ -275,13 +271,40 @@ async function claimCastingSlot(
 
         }
 
+        const gender =
+            category.slice(
+                -1
+            );
+
+        const genders =
+            slots.filter(
+                (slot) => slot.userId
+            ).map(
+                (slot) => slot.gender
+            );
+
+        if (
+            gender === 'm' &&
+            genders.filter(
+                (value) => value === 'm'
+            ).length >= 2
+        ) {
+
+            await run(
+                'COMMIT'
+            );
+
+            return {
+                ok: false,
+                reason: 'role_full'
+            };
+
+        }
+
         const slotIndex =
             slots.findIndex(
                 (slot) =>
-                    !slot.userId &&
-                    slot.gender === category.slice(
-                        -1
-                    )
+                    !slot.userId
             );
 
         if (
@@ -301,6 +324,7 @@ async function claimCastingSlot(
 
         slots[slotIndex] = {
             ...slots[slotIndex],
+            gender,
             userId,
             category
         };
@@ -317,29 +341,12 @@ async function claimCastingSlot(
             await run(
                 `UPDATE community_productions
                  SET slots_json = ?,
-                     status = ?,
-                     category = ?,
-                     next_part_at = ?,
                      updated_at = ?
                  WHERE id = ? AND status = 'casting'`,
                 [
                     JSON.stringify(
                         slots
                     ),
-                    full
-                        ? 'running'
-                        : 'casting',
-                    full
-                        ? canonicalizeCastCategories(
-                            slots.map(
-                                (slot) =>
-                                    slot.category
-                            )
-                        )
-                        : null,
-                    full
-                        ? Date.now()
-                        : null,
                     Date.now(),
                     productionId
                 ]
@@ -368,6 +375,96 @@ async function claimCastingSlot(
         throw error;
 
     }
+
+}
+
+async function updateCastingSlots(
+    productionId,
+    slots,
+    expectedSlots = null
+) {
+
+    const result = await run(
+        `UPDATE community_productions
+         SET slots_json = ?, updated_at = ?
+         WHERE id = ? AND status = 'casting'
+         ${expectedSlots ? 'AND slots_json = ?' : ''}`,
+        [
+            JSON.stringify(slots),
+            Date.now(),
+            productionId,
+            ...(expectedSlots
+                ? [JSON.stringify(expectedSlots)]
+                : [])
+        ]
+    );
+
+    return result.changes === 1;
+
+}
+
+async function startCasting(
+    productionId,
+    slots,
+    productionType,
+    category,
+    title
+) {
+
+    const result = await run(
+        `UPDATE community_productions
+         SET slots_json = ?, production_type = ?, category = ?, title = ?,
+             status = 'running', next_part_at = ?, updated_at = ?
+         WHERE id = ? AND status = 'casting' AND slots_json = ?`,
+        [
+            JSON.stringify(slots),
+            productionType,
+            category,
+            title,
+            Date.now(),
+            Date.now(),
+            productionId,
+            JSON.stringify(slots)
+        ]
+    );
+
+    return result.changes === 1;
+
+}
+
+async function removeWaitingUser(
+    userId
+) {
+
+    const production =
+        await getOpenCasting();
+
+    if (!production)
+        return null;
+
+    const slots = production.slots.map(
+        (slot) =>
+            slot.userId === String(userId)
+                ? { index: slot.index, gender: null, userId: null, category: null }
+                : slot
+    );
+
+    if (
+        slots.every(
+            (slot, index) => slot === production.slots[index]
+        )
+    )
+        return null;
+
+    await updateCastingSlots(
+        production.id,
+        slots,
+        production.slots
+    );
+
+    return getProduction(
+        production.id
+    );
 
 }
 
@@ -673,5 +770,8 @@ module.exports = {
     getProduction,
     getRestorableProductions,
     markCompleted,
-    setCastingMessage
+    removeWaitingUser,
+    startCasting,
+    setCastingMessage,
+    updateCastingSlots
 };

@@ -20,8 +20,13 @@ const {
     getBusyUser,
     getPendingRequest,
     isBusy,
-    setSceneBusy
+    setSceneBusy,
+    trySetSceneBusy
 } = require('../../utils/pornScenes');
+
+const {
+    removeFromCommunityProductionCasting
+} = require('../community-production/communityProduction');
 
 const {
     mpcLogoAttachment
@@ -388,7 +393,7 @@ async function acceptScene(
             requesterMember.user.displayAvatarURL()
     };
 
-    setSceneBusy(
+    if (!trySetSceneBusy(
         requesterId,
         targetId,
         {
@@ -397,6 +402,30 @@ async function acceptScene(
             startedAt:
                 Date.now()
         }
+    )) {
+        await returnReservedBooster(
+            requesterId,
+            pendingRequest
+        );
+        await editSceneRequestMessage(
+            interaction,
+            {
+                content: 'One of you started another scene first. This request was cancelled.',
+                embeds: [],
+                components: [],
+                attachments: []
+            }
+        );
+        return;
+    }
+
+    await removeFromCommunityProductionCasting(
+        interaction.client,
+        requesterId
+    );
+    await removeFromCommunityProductionCasting(
+        interaction.client,
+        targetId
     );
 
     await editSceneRequestMessage(

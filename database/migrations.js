@@ -74,6 +74,62 @@ async function runMigrations(
     db
 ) {
 
+    const communitySchema = await new Promise(
+        (resolve, reject) =>
+            db.get(
+                `SELECT sql FROM sqlite_master
+                 WHERE type = 'table' AND name = 'community_productions'`,
+                (error, row) => error ? reject(error) : resolve(row?.sql ?? '')
+            )
+    );
+
+    if (/production_type\s+TEXT\s+NOT NULL/i.test(communitySchema)) {
+
+        await run(db, 'PRAGMA foreign_keys = OFF');
+        await run(db, 'BEGIN IMMEDIATE');
+
+        try {
+            await run(db, `CREATE TABLE community_productions_new (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                status TEXT NOT NULL DEFAULT 'casting'
+                    CHECK (status IN ('casting', 'running', 'finalizing', 'completed', 'expired', 'failed')),
+                production_type TEXT CHECK (production_type IN ('MFM', 'FMF', 'FFF')),
+                title TEXT NOT NULL,
+                casting_channel_id TEXT NOT NULL,
+                casting_message_id TEXT,
+                scene_channel_id TEXT NOT NULL,
+                slots_json TEXT NOT NULL,
+                category TEXT,
+                parts_json TEXT NOT NULL,
+                next_part_index INTEGER NOT NULL DEFAULT 0,
+                scene_links_json TEXT NOT NULL DEFAULT '[]',
+                next_part_at INTEGER,
+                casting_closes_at INTEGER NOT NULL,
+                rewards_json TEXT,
+                rewards_applied INTEGER NOT NULL DEFAULT 0,
+                color TEXT,
+                created_at INTEGER NOT NULL,
+                updated_at INTEGER NOT NULL,
+                completed_at INTEGER
+            )`);
+            await run(db, `INSERT INTO community_productions_new
+                SELECT * FROM community_productions`);
+            await run(db, 'DROP TABLE community_productions');
+            await run(db, 'ALTER TABLE community_productions_new RENAME TO community_productions');
+            await run(db, `CREATE INDEX idx_community_productions_restore
+                ON community_productions(status, next_part_at, casting_closes_at)`);
+            await run(db, 'COMMIT');
+        }
+        catch (error) {
+            await run(db, 'ROLLBACK').catch(() => null);
+            throw error;
+        }
+        finally {
+            await run(db, 'PRAGMA foreign_keys = ON');
+        }
+
+    }
+
     await addColumnIfMissing(
         db,
         'studios',

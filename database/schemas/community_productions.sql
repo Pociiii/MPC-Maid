@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS community_productions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     status TEXT NOT NULL DEFAULT 'casting'
         CHECK (status IN ('casting', 'running', 'finalizing', 'completed', 'expired', 'failed')),
-    production_type TEXT NOT NULL
+    production_type TEXT
         CHECK (production_type IN ('MFM', 'FMF', 'FFF')),
     title TEXT NOT NULL,
     casting_channel_id TEXT NOT NULL,

@@ -1065,15 +1065,15 @@ function checkContent() {
         ] of [
             [
                 'data/scenes_mfm',
-                'Future MFM threesome scene GIFs'
+                'MFM Community Production GIFs'
             ],
             [
                 'data/scenes_fmf',
-                'Future FMF threesome scene GIFs'
+                'FMF Community Production GIFs'
             ],
             [
                 'data/scenes_fff',
-                'Future FFF threesome scene GIFs'
+                'FFF Community Production GIFs'
             ]
         ]
     ) {
@@ -1094,7 +1094,7 @@ function checkContent() {
             summary.emptyFiles.length
         )
             addWarning(
-                `${label} still has ${summary.emptyFiles.length} empty files. This matches parked TODO work, not current live commands.`
+                `${label} has ${summary.emptyFiles.length} empty files. Those categories will use the existing pair-GIF fallback.`
             );
 
     }
