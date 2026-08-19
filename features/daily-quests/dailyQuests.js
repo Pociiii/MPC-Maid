@@ -3,7 +3,6 @@ const db =
 
 const {
     CHANNELS,
-    ECONOMY,
     getRandomColor
 } = require('../../data/constants');
 
@@ -38,7 +37,7 @@ const emojis =
     require('../../utils/emojis');
 
 const QUESTS_PER_DAY =
-    3;
+    2;
 
 const assignmentLocks =
     new Map();
@@ -51,13 +50,20 @@ const WEEK_START_DAY_UTC =
 
 const DAILY_BONUS = {
     coins:
-        100,
+        75,
     xp:
-        50
+        35
 };
 
 const WEEKLY_STREAK_TARGET =
     7;
+
+const WEEKLY_STREAK_REWARD = {
+    coins:
+        500,
+    xp:
+        250
+};
 
 const DAILY_QUEST_BOOSTER_CHANCE =
     0.05;
@@ -65,39 +71,31 @@ const DAILY_QUEST_BOOSTER_CHANCE =
 const DAILY_QUEST_BOOSTER_TIER =
     1;
 
-const weeklyRewardTiers = [
-    {
-        tier:
-            2,
-        weight:
-            70
+const rewardByActionAndTarget = {
+    porn_scene: {
+        1: { coins: 60, xp: 30 },
+        2: { coins: 120, xp: 60 },
+        3: { coins: 200, xp: 100 }
     },
-    {
-        tier:
-            3,
-        weight:
-            30
-    }
-];
-
-const rewardByTier = {
-    easy: {
-        coins:
-            40,
-        xp:
-            20
+    titty_drop: {
+        1: { coins: 45, xp: 25 },
+        2: { coins: 90, xp: 45 },
+        3: { coins: 150, xp: 75 }
     },
-    medium: {
-        coins:
-            75,
-        xp:
-            35
+    showcase: {
+        1: { coins: 30, xp: 15 },
+        2: { coins: 55, xp: 25 },
+        3: { coins: 85, xp: 40 }
     },
-    hard: {
-        coins:
-            120,
-        xp:
-            60
+    social_interaction: {
+        1: { coins: 50, xp: 25 },
+        2: { coins: 95, xp: 50 },
+        3: { coins: 160, xp: 80 }
+    },
+    casino_play: {
+        1: { coins: 0, xp: 20 },
+        2: { coins: 0, xp: 40 },
+        3: { coins: 0, xp: 60 }
     }
 };
 
@@ -133,114 +131,6 @@ const questPool = [
             'porn_scene',
         label:
             'Be part of 3 porn scenes',
-        target:
-            3,
-        tier:
-            'hard'
-    },
-    {
-        id:
-            'dice_1',
-        action:
-            'dice',
-        label:
-            'Play dice 1 time',
-        target:
-            1,
-        tier:
-            'easy'
-    },
-    {
-        id:
-            'dice_2',
-        action:
-            'dice',
-        label:
-            'Play dice 2 times',
-        target:
-            2,
-        tier:
-            'medium'
-    },
-    {
-        id:
-            'dice_3',
-        action:
-            'dice',
-        label:
-            'Play dice 3 times',
-        target:
-            3,
-        tier:
-            'hard'
-    },
-    {
-        id:
-            'blackjack_1',
-        action:
-            'blackjack',
-        label:
-            'Play blackjack 1 time',
-        target:
-            1,
-        tier:
-            'easy'
-    },
-    {
-        id:
-            'blackjack_2',
-        action:
-            'blackjack',
-        label:
-            'Play blackjack 2 times',
-        target:
-            2,
-        tier:
-            'medium'
-    },
-    {
-        id:
-            'blackjack_3',
-        action:
-            'blackjack',
-        label:
-            'Play blackjack 3 times',
-        target:
-            3,
-        tier:
-            'hard'
-    },
-    {
-        id:
-            'slots_1',
-        action:
-            'slots',
-        label:
-            'Play slots 1 time',
-        target:
-            1,
-        tier:
-            'easy'
-    },
-    {
-        id:
-            'slots_2',
-        action:
-            'slots',
-        label:
-            'Play slots 2 times',
-        target:
-            2,
-        tier:
-            'medium'
-    },
-    {
-        id:
-            'slots_3',
-        action:
-            'slots',
-        label:
-            'Play slots 3 times',
         target:
             3,
         tier:
@@ -353,22 +243,50 @@ const questPool = [
             3,
         tier:
             'hard'
+    },
+    {
+        id:
+            'casino_play_1',
+        action:
+            'casino_play',
+        label:
+            'Play casino games 1 time',
+        target:
+            1,
+        tier:
+            'easy'
+    },
+    {
+        id:
+            'casino_play_2',
+        action:
+            'casino_play',
+        label:
+            'Play casino games 2 times',
+        target:
+            2,
+        tier:
+            'medium'
+    },
+    {
+        id:
+            'casino_play_3',
+        action:
+            'casino_play',
+        label:
+            'Play casino games 3 times',
+        target:
+            3,
+        tier:
+            'hard'
     }
 ].map(
     (quest) => ({
         ...quest,
         reward:
-            {
-                ...rewardByTier[quest.tier],
-                coins:
-                    quest.action === 'titty_drop'
-                        ? (
-                            ECONOMY.DROP_COST *
-                            quest.target
-                        ) +
-                        ECONOMY.DAILY_TITTY_DROP_NET_REWARD
-                        : rewardByTier[quest.tier].coins
-            }
+            rewardByActionAndTarget[
+                quest.action
+            ][quest.target]
     })
 );
 
@@ -474,13 +392,10 @@ function getWeeklyQuestDate(
     now = new Date()
 ) {
 
-    const weeklyResetDate =
+    return getWeeklyQuestDateFromQuestDate(
         getDailyQuestDate(
             now
-        );
-
-    return getWeeklyQuestDateFromQuestDate(
-        weeklyResetDate
+        )
     );
 
 }
@@ -515,73 +430,17 @@ function getWeeklyQuestDateFromQuestDate(
 
 }
 
-function isSameWeeklyQuestPeriod(
-    firstQuestDate,
-    secondQuestDate
+function clampWeeklyStreakCount(
+    streakCount
 ) {
-
-    if (
-        !firstQuestDate ||
-        !secondQuestDate
-    )
-        return false;
-
-    return getWeeklyQuestDateFromQuestDate(
-        firstQuestDate
-    ) === getWeeklyQuestDateFromQuestDate(
-        secondQuestDate
-    );
-
-}
-
-function getDaysElapsedInWeeklyQuestPeriod(
-    questDate
-) {
-
-    const weekStartDate =
-        getWeeklyQuestDateFromQuestDate(
-            questDate
-        );
-
-    const start =
-        new Date(
-            `${weekStartDate}T00:00:00.000Z`
-        );
-
-    const current =
-        new Date(
-            `${questDate}T00:00:00.000Z`
-        );
-
-    const dayMs =
-        24 * 60 * 60 * 1000;
 
     return Math.min(
         WEEKLY_STREAK_TARGET,
         Math.max(
-            1,
-            Math.floor(
-                (
-                    current.getTime() -
-                    start.getTime()
-                ) / dayMs
-            ) + 1
-        )
-    );
-
-}
-
-function clampWeeklyStreakCount(
-    streakCount,
-    questDate
-) {
-
-    return Math.min(
-        Number(
-            streakCount ?? 0
-        ),
-        getDaysElapsedInWeeklyQuestPeriod(
-            questDate
+            0,
+            Number(
+                streakCount ?? 0
+            )
         )
     );
 
@@ -642,53 +501,54 @@ function addDays(
 
 }
 
-function shuffle(
-    items
+function pickRandomQuest(
+    quests
 ) {
 
-    return [...items]
-        .sort(
-            () =>
-                Math.random() - 0.5
-        );
+    return quests[
+        Math.floor(
+            Math.random() * quests.length
+        )
+    ];
 
 }
 
 function pickDailyQuests() {
 
-    const selected = [];
-    const usedActions =
-        new Set();
-
-    for (
-        const quest of shuffle(
-            questPool
-        )
-    ) {
-
-        if (
-            usedActions.has(
-                quest.action
+    const pornSceneQuest =
+        pickRandomQuest(
+            questPool.filter(
+                (quest) =>
+                    quest.action === 'porn_scene'
             )
-        )
-            continue;
-
-        selected.push(
-            quest
         );
 
-        usedActions.add(
-            quest.action
+    const otherActions = [
+        'titty_drop',
+        'showcase',
+        'social_interaction',
+        'casino_play'
+    ];
+
+    const otherAction =
+        otherActions[
+            Math.floor(
+                Math.random() * otherActions.length
+            )
+        ];
+
+    const otherQuest =
+        pickRandomQuest(
+            questPool.filter(
+                (quest) =>
+                    quest.action === otherAction
+            )
         );
 
-        if (
-            selected.length === QUESTS_PER_DAY
-        )
-            break;
-
-    }
-
-    return selected;
+    return [
+        pornSceneQuest,
+        otherQuest
+    ];
 
 }
 
@@ -843,19 +703,37 @@ async function refreshTittyDropQuestRewards(
 
     await dbRun(
         `UPDATE daily_quests
-         SET reward_coins = (? * target) + ?
+         SET reward_coins = CASE target
+             WHEN 1 THEN ?
+             WHEN 2 THEN ?
+             ELSE ?
+         END,
+             reward_xp = CASE target
+             WHEN 1 THEN ?
+             WHEN 2 THEN ?
+             ELSE ?
+         END
          WHERE user_id = ?
          AND quest_date = ?
          AND action = 'titty_drop'
          AND completed = 0
-         AND reward_coins < (? * target) + ?`,
+         AND reward_coins != CASE target
+             WHEN 1 THEN ?
+             WHEN 2 THEN ?
+             ELSE ?
+         END`,
         [
-            ECONOMY.DROP_COST,
-            ECONOMY.DAILY_TITTY_DROP_NET_REWARD,
+            rewardByActionAndTarget.titty_drop[1].coins,
+            rewardByActionAndTarget.titty_drop[2].coins,
+            rewardByActionAndTarget.titty_drop[3].coins,
+            rewardByActionAndTarget.titty_drop[1].xp,
+            rewardByActionAndTarget.titty_drop[2].xp,
+            rewardByActionAndTarget.titty_drop[3].xp,
             userId,
             questDate,
-            ECONOMY.DROP_COST,
-            ECONOMY.DAILY_TITTY_DROP_NET_REWARD
+            rewardByActionAndTarget.titty_drop[1].coins,
+            rewardByActionAndTarget.titty_drop[2].coins,
+            rewardByActionAndTarget.titty_drop[3].coins
         ]
     );
 
@@ -970,34 +848,17 @@ function formatWeeklyStreakProgress(
     questDate
 ) {
 
-    const currentWeekStreak =
-        isSameWeeklyQuestPeriod(
-            streak.lastCompletedDate,
-            questDate
-        )
-            ? streak
-            : {
-                lastCompletedDate:
-                    null,
-                streakCount:
-                    0,
-                weeklyRewardsClaimed:
-                    0
-            };
-
     if (
-        currentWeekStreak.lastCompletedDate === questDate &&
+        streak.lastCompletedDate === questDate &&
         clampWeeklyStreakCount(
-            currentWeekStreak.streakCount,
-            questDate
+            streak.streakCount
         ) === 0 &&
-        currentWeekStreak.weeklyRewardsClaimed > 0
+        streak.weeklyRewardsClaimed > 0
     )
         return `${WEEKLY_STREAK_TARGET}/${WEEKLY_STREAK_TARGET} - reward claimed today`;
 
     return `${clampWeeklyStreakCount(
-        currentWeekStreak.streakCount,
-        questDate
+        streak.streakCount
     )}/${WEEKLY_STREAK_TARGET}`;
 
 }
@@ -1021,54 +882,10 @@ function pickBooster(
 
 }
 
-function pickWeightedTier(
-    weightedTiers
-) {
-
-    const totalWeight =
-        weightedTiers.reduce(
-            (sum, item) =>
-                sum + item.weight,
-            0
-        );
-
-    let roll =
-        Math.random() *
-        totalWeight;
-
-    for (
-        const item of weightedTiers
-    ) {
-
-        roll -= item.weight;
-
-        if (
-            roll <= 0
-        )
-            return item.tier;
-
-    }
-
-    return weightedTiers[
-        weightedTiers.length - 1
-    ].tier;
-
-}
-
 function pickDailyQuestBooster() {
 
     return pickBooster(
         DAILY_QUEST_BOOSTER_TIER
-    );
-
-}
-
-function pickWeeklyBooster() {
-
-    return pickBooster(
-        pickWeightedTier(
-            weeklyRewardTiers
-        )
     );
 
 }
@@ -1113,24 +930,11 @@ async function updateWeeklyStreak(
         );
 
     const streak =
-        isSameWeeklyQuestPeriod(
-            storedStreak.lastCompletedDate,
-            questDate
-        )
-            ? storedStreak
-            : {
-                lastCompletedDate:
-                    null,
-                streakCount:
-                    0,
-                weeklyRewardsClaimed:
-                    0
-            };
+        storedStreak;
 
     const currentStreakCount =
         clampWeeklyStreakCount(
-            streak.streakCount,
-            questDate
+            streak.streakCount
         );
 
     if (
@@ -1139,8 +943,6 @@ async function updateWeeklyStreak(
         return {
             awarded:
                 false,
-            booster:
-                null,
             streakCount:
                 currentStreakCount
         };
@@ -1160,15 +962,11 @@ async function updateWeeklyStreak(
 
     nextStreakCount =
         clampWeeklyStreakCount(
-            nextStreakCount,
-            questDate
+            nextStreakCount
         );
 
     let awarded =
         false;
-
-    let booster =
-        null;
 
     let rewardsClaimed =
         streak.weeklyRewardsClaimed;
@@ -1177,14 +975,20 @@ async function updateWeeklyStreak(
         nextStreakCount >= WEEKLY_STREAK_TARGET
     ) {
 
-        booster =
-            pickWeeklyBooster();
-
-        await addBooster(
-            userId,
-            booster.stat,
-            booster.tier
-        );
+        await Promise.all([
+            addCoins(
+                userId,
+                WEEKLY_STREAK_REWARD.coins,
+                {
+                    source:
+                        'weekly_quest_streak'
+                }
+            ),
+            addXP(
+                userId,
+                WEEKLY_STREAK_REWARD.xp
+            )
+        ]);
 
         nextStreakCount = 0;
         rewardsClaimed += 1;
@@ -1214,7 +1018,6 @@ async function updateWeeklyStreak(
 
     return {
         awarded,
-        booster,
         streakCount:
             nextStreakCount
     };
@@ -1518,16 +1321,16 @@ async function sendDailySetCompleteFeed(
         });
 
     if (
-        weeklyResult?.awarded &&
-        weeklyResult.booster
+        weeklyResult?.awarded
     )
         embed.addFields({
             name:
                 '\uD83C\uDF81 Weekly Reward',
             value:
-                `- Random booster: **${formatBooster(
-                    weeklyResult.booster
-                )}**\n- Use it with \`/pornscene\`.`,
+                formatReward(
+                    WEEKLY_STREAK_REWARD.coins,
+                    WEEKLY_STREAK_REWARD.xp
+                ),
             inline:
                 false
         });
@@ -1688,6 +1491,18 @@ async function maybeGrantDailyBonus(
             questDate
         );
 
+    if (
+        weeklyResult.awarded
+    )
+        await syncUserAchievementCounters(
+            client,
+            userId,
+            [
+                'wallet_coins',
+                'xp_earned'
+            ]
+        );
+
     await sendDailySetCompleteFeed(
         client,
         userId,
@@ -1737,17 +1552,32 @@ async function updateDailyQuestProgress(
         userId
     );
 
+    const casinoActions =
+        new Set([
+            'dice',
+            'blackjack',
+            'slots'
+        ]);
+
+    const compatibleAction =
+        casinoActions.has(
+            action
+        )
+            ? 'casino_play'
+            : action;
+
     const quests =
         await dbAll(
             `SELECT *
              FROM daily_quests
              WHERE user_id = ?
              AND quest_date = ?
-             AND action = ?
+             AND action IN (?, ?)
              AND completed = 0`,
             [
                 userId,
                 questDate,
+                compatibleAction,
                 action
             ]
         );

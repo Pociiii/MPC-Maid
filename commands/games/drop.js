@@ -14,8 +14,7 @@ const {
 } = require('../../utils/dropPost');
 
 const {
-    COOLDOWNS,
-    ECONOMY
+    COOLDOWNS
 } = require('../../data/constants');
 
 const {
@@ -23,12 +22,6 @@ const {
     getCooldownRemaining,
     startCooldown
 } = require('../../utils/cooldowns');
-
-const {
-    addCoins,
-    getOrCreateUser,
-    spendCoins
-} = require('../../utils/users');
 
 const {
     trackDailyQuest
@@ -56,7 +49,7 @@ function buildConfirmationRow(
                     `drop_confirm:${pendingId}`
                 )
                 .setLabel(
-                    `Confirm ${ECONOMY.DROP_COST} coins`
+                    'Confirm post'
                 )
                 .setStyle(
                     ButtonStyle.Success
@@ -175,29 +168,9 @@ async function completeConfirmedDrop(
     pending
 ) {
 
-    const paid =
-        await spendCoins(
-            interaction.user.id,
-            ECONOMY.DROP_COST
-        );
-
-    if (
-        !paid
-    ) {
-
-        await interaction.update({
-            content:
-                `You need **${ECONOMY.DROP_COST} coins** to post a titty drop.`,
-            components: []
-        });
-
-        return;
-
-    }
-
     await interaction.update({
         content:
-            `Posting titty drop for **${ECONOMY.DROP_COST} coins**...`,
+            'Posting titty drop...',
         components: []
     });
 
@@ -217,21 +190,16 @@ async function completeConfirmedDrop(
 
         await interaction.editReply({
             content:
-                `Titty drop posted for **${ECONOMY.DROP_COST} coins**: ${message.url}`,
+                `Titty drop posted: ${message.url}`,
             components: []
         });
 
     }
     catch (error) {
 
-        await addCoins(
-            interaction.user.id,
-            ECONOMY.DROP_COST
-        );
-
         await interaction.editReply({
             content:
-                'I could not post the titty drop, so the coins were refunded.',
+                'I could not post the titty drop.',
             components: []
         });
 
@@ -307,26 +275,6 @@ module.exports = {
 
         }
 
-        const user =
-            await getOrCreateUser(
-                interaction.user.id
-            );
-
-        if (
-            user.coins < ECONOMY.DROP_COST
-        ) {
-
-            await interaction.reply({
-                content:
-                    `You need **${ECONOMY.DROP_COST} coins** to post a titty drop. You have **${user.coins}**.`,
-                flags:
-                    64
-            });
-
-            return;
-
-        }
-
         const remaining =
             getCooldownRemaining(
                 interaction.user.id,
@@ -364,7 +312,7 @@ module.exports = {
 
         await interaction.reply({
             content:
-                `Posting a titty drop costs **${ECONOMY.DROP_COST} coins**. Confirm to post it in this channel.`,
+                'Confirm to post a titty drop in this channel.',
             components: [
                 buildConfirmationRow(
                     pendingId

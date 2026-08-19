@@ -258,7 +258,7 @@ function buildSections() {
                     cooldownLabel(
                         COOLDOWNS.DROP
                     ),
-                    `Post a standalone titty drop. Costs ${ECONOMY.DROP_COST} coins.`
+                    'Post a standalone titty drop for free.'
                 )
             ]
         },
