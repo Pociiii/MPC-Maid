@@ -1,13 +1,6 @@
 const {
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
     SlashCommandBuilder
 } = require('discord.js');
-
-const {
-    randomUUID
-} = require('crypto');
 
 const {
     buildDropPost
@@ -31,49 +24,6 @@ const {
     incrementAchievementProgress
 } = require('../../features/achievements/achievements');
 
-const pendingDrops =
-    new Map();
-
-const pendingDropTtlMs =
-    2 * 60 * 1000;
-
-function buildConfirmationRow(
-    pendingId,
-    disabled = false
-) {
-
-    return new ActionRowBuilder()
-        .addComponents(
-            new ButtonBuilder()
-                .setCustomId(
-                    `drop_confirm:${pendingId}`
-                )
-                .setLabel(
-                    'Confirm post'
-                )
-                .setStyle(
-                    ButtonStyle.Success
-                )
-                .setDisabled(
-                    disabled
-                ),
-            new ButtonBuilder()
-                .setCustomId(
-                    `drop_cancel:${pendingId}`
-                )
-                .setLabel(
-                    'Cancel'
-                )
-                .setStyle(
-                    ButtonStyle.Secondary
-                )
-                .setDisabled(
-                    disabled
-                )
-        );
-
-}
-
 function buildCooldownNotice(
     remaining
 ) {
@@ -84,57 +34,29 @@ function buildCooldownNotice(
 
 }
 
-function rememberPendingDrop(
-    details
-) {
-
-    const pendingId =
-        randomUUID();
-
-    pendingDrops.set(
-        pendingId,
-        {
-            ...details,
-            expiresAt:
-                Date.now() + pendingDropTtlMs
-        }
-    );
-
-    setTimeout(
-        () =>
-            pendingDrops.delete(
-                pendingId
-            ),
-        pendingDropTtlMs
-    ).unref?.();
-
-    return pendingId;
-
-}
-
 function buildDropOptions(
-    pending
+    details
 ) {
 
     const dropOptions = {
         authorName:
-            pending.displayName,
+            details.displayName,
         thumbnail:
-            pending.avatarUrl,
+            details.avatarUrl,
         userIds: [
-            pending.userId
+            details.userId
         ]
     };
 
     if (
-        pending.mediaUrl
+        details.mediaUrl
     ) {
 
         dropOptions.imageUrl =
-            pending.mediaUrl;
+            details.mediaUrl;
 
         dropOptions.footerText =
-            `Custom media by ${pending.displayName}`;
+            `Custom media by ${details.displayName}`;
 
     }
 
@@ -142,15 +64,15 @@ function buildDropOptions(
 
 }
 
-async function postConfirmedDrop(
+async function postDrop(
     interaction,
-    pending
+    details
 ) {
 
     const reply =
         buildDropPost(
             buildDropOptions(
-                pending
+                details
             )
         );
 
@@ -163,23 +85,22 @@ async function postConfirmedDrop(
 
 }
 
-async function completeConfirmedDrop(
+async function completeDrop(
     interaction,
-    pending
+    details
 ) {
 
-    await interaction.update({
-        content:
-            'Posting titty drop...',
-        components: []
+    await interaction.deferReply({
+        flags:
+            64
     });
 
     try {
 
         const message =
-            await postConfirmedDrop(
+            await postDrop(
                 interaction,
-                pending
+                details
             );
 
         startCooldown(
@@ -190,8 +111,7 @@ async function completeConfirmedDrop(
 
         await interaction.editReply({
             content:
-                `Titty drop posted: ${message.url}`,
-            components: []
+                `Titty drop posted: ${message.url}`
         });
 
     }
@@ -199,8 +119,7 @@ async function completeConfirmedDrop(
 
         await interaction.editReply({
             content:
-                'I could not post the titty drop.',
-            components: []
+                'I could not post the titty drop.'
         });
 
         throw error;
@@ -298,8 +217,9 @@ module.exports = {
 
         }
 
-        const pendingId =
-            rememberPendingDrop({
+        await completeDrop(
+            interaction,
+            {
                 avatarUrl:
                     interaction.user.displayAvatarURL(),
                 displayName:
@@ -308,116 +228,7 @@ module.exports = {
                     attachment?.url ?? null,
                 userId:
                     interaction.user.id
-            });
-
-        await interaction.reply({
-            content:
-                'Confirm to post a titty drop in this channel.',
-            components: [
-                buildConfirmationRow(
-                    pendingId
-                )
-            ],
-            flags:
-                64
-        });
-
-    },
-
-    async handleDropDecision(
-        interaction
-    ) {
-
-        const [
-            action,
-            pendingId
-        ] =
-            interaction.customId.split(
-                ':'
-            );
-
-        const pending =
-            pendingDrops.get(
-                pendingId
-            );
-
-        if (
-            !pending ||
-            pending.expiresAt < Date.now()
-        ) {
-
-            pendingDrops.delete(
-                pendingId
-            );
-
-            await interaction.update({
-                content:
-                    'This drop confirmation expired. Use `/drop` again.',
-                components: []
-            });
-
-            return;
-
-        }
-
-        if (
-            interaction.user.id !== pending.userId
-        ) {
-
-            await interaction.reply({
-                content:
-                    'Only the user who started this drop can use these buttons.',
-                flags:
-                    64
-            });
-
-            return;
-
-        }
-
-        pendingDrops.delete(
-            pendingId
-        );
-
-        if (
-            action === 'drop_cancel'
-        ) {
-
-            await interaction.update({
-                content:
-                    'Titty drop cancelled. No coins were spent.',
-                components: []
-            });
-
-            return;
-
-        }
-
-        const remaining =
-            getCooldownRemaining(
-                interaction.user.id,
-                'drop'
-            );
-
-        if (
-            remaining > 0
-        ) {
-
-            await interaction.update({
-                content:
-                    buildCooldownNotice(
-                        remaining
-                    ),
-                components: []
-            });
-
-            return;
-
-        }
-
-        await completeConfirmedDrop(
-            interaction,
-            pending
+            }
         );
 
     }

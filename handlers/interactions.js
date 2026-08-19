@@ -151,9 +151,6 @@ const {
 const gifAdminInspect =
     require('../features/gif-admin/inspect');
 
-const dropCommand =
-    require('../commands/games/drop');
-
 const {
     handleLotteryButton
 } = require('../features/lottery/lottery');
@@ -343,13 +340,6 @@ async function routeInteraction(
 
             case 'daily_wyr_vote':
                 await handleDailyWyrVote(
-                    interaction
-                );
-                return true;
-
-            case 'drop_confirm':
-            case 'drop_cancel':
-                await dropCommand.handleDropDecision(
                     interaction
                 );
                 return true;
