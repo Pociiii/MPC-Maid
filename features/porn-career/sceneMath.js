@@ -216,26 +216,18 @@ function getTotalParts(
 
 const outcomeRewards = {
     'Awkward Scene': {
-        ranking:
-            -8,
         xp:
             10
     },
     'Solid Scene': {
-        ranking:
-            5,
         xp:
             20
     },
     'Hot Scene': {
-        ranking:
-            12,
         xp:
             35
     },
     'Viral Hit': {
-        ranking:
-            20,
         xp:
             55
     }
@@ -478,9 +470,6 @@ function calculateScene(
         ) +
         staminaXpBonus;
 
-    const rankingChange =
-        outcomeRewards[outcome].ranking;
-
     return {
         totalParts,
         score,
@@ -489,7 +478,6 @@ function calculateScene(
         criticalFlop,
         criticalScene,
         outcome,
-        rankingChange,
         xp,
         staminaXpBonus,
         viewers,

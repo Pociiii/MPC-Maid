@@ -327,8 +327,7 @@ async function main() {
         coins: 125,
         requesterCoins: 137,
         targetCoins: 125,
-        marketingBonus: 12,
-        rankingChange: 7
+        marketingBonus: 12
     };
 
     const firstReward =
@@ -363,7 +362,6 @@ async function main() {
     assert.equal(duplicateReward, false);
     assert.equal(rewardA.coins, 637);
     assert.equal(rewardA.xp, 30);
-    assert.equal(rewardA.ranking, 7);
     assert.equal(rewardA.scenes_completed, 1);
 
     const rewardIncome =

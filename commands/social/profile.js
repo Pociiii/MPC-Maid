@@ -29,10 +29,6 @@ const {
 } = require('../../utils/mpcLogo');
 
 const {
-    getRankTitle
-} = require('../../utils/ranks');
-
-const {
     formatPornCareerName
 } = require('../../utils/pornCareerTitles');
 
@@ -100,11 +96,6 @@ function buildProfileEmbed(
     giftTotal
 ) {
 
-    const rankTitle =
-        getRankTitle(
-            user.ranking
-        );
-
     const embed =
         createEmbed({
             color:
@@ -151,10 +142,9 @@ function buildProfileEmbed(
         },
         {
             name:
-                `${emojis.ranking} Career`,
+                `${emojis.scene_completed} Career`,
             value:
-`- Ranking: **${rankTitle} (${user.ranking})**
-- Scenes: **${user.scenes_completed}**
+`- Scenes: **${user.scenes_completed}**
 - Achievements: **${achievementPoints}**`,
             inline:
                 true

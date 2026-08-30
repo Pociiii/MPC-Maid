@@ -1,6 +1,5 @@
 const {
     addCoins,
-    addRanking,
     addScene,
     addXP
 } = require('../../utils/users');
@@ -200,14 +199,6 @@ async function applyRewards(
                     'porn_scene'
             }
         ),
-        addRanking(
-            requesterId,
-            result.rankingChange
-        ),
-        addRanking(
-            targetId,
-            result.rankingChange
-        ),
         addScene(
             requesterId
         ),
@@ -222,8 +213,7 @@ async function applyRewards(
             requesterId,
             [
                 'xp_earned',
-                'wallet_coins',
-                'ranking_reached'
+                'wallet_coins'
             ]
         ),
         syncUserAchievementCounters(
@@ -231,8 +221,7 @@ async function applyRewards(
             targetId,
             [
                 'xp_earned',
-                'wallet_coins',
-                'ranking_reached'
+                'wallet_coins'
             ]
         )
     ]);
@@ -251,8 +240,7 @@ async function syncSceneRewardCounters(
             requesterId,
             [
                 'xp_earned',
-                'wallet_coins',
-                'ranking_reached'
+                'wallet_coins'
             ]
         ),
         syncUserAchievementCounters(
@@ -260,8 +248,7 @@ async function syncSceneRewardCounters(
             targetId,
             [
                 'xp_earned',
-                'wallet_coins',
-                'ranking_reached'
+                'wallet_coins'
             ]
         )
     ]);

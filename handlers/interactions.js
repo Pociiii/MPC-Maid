@@ -478,7 +478,6 @@ async function routeInteraction(
                 );
                 return true;
 
-            case 'leaderboard_ranking':
             case 'leaderboard_scenes':
             case 'leaderboard_coins':
             case 'leaderboard_spanks':

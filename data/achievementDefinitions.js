@@ -49,15 +49,6 @@ const xpMilestones = [
     50000
 ];
 
-const rankingMilestones = [
-    500,
-    1000,
-    1500,
-    2500,
-    5000,
-    10000
-];
-
 const statMilestones =
     Array.from(
         {
@@ -319,18 +310,6 @@ const resourceAchievements = [
                     milestone
                 )
             )
-    ),
-    ...rankingMilestones.map(
-        (milestone) =>
-            milestoneDefinition(
-                'ranking_reached',
-                milestone,
-                (value) =>
-                    `Reach ${value.toLocaleString()} ranking`,
-                progressionPoints(
-                    milestone
-                )
-            )
     )
 ];
 
@@ -567,17 +546,6 @@ const endlessAchievements = {
                 `Earn ${value.toLocaleString()} total XP`,
         points:
             100
-    },
-    ranking_reached: {
-        startsAfter:
-            10000,
-        step:
-            5000,
-        label:
-            (value) =>
-                `Reach ${value.toLocaleString()} ranking`,
-        points:
-            100
     }
 };
 
@@ -595,7 +563,6 @@ module.exports = {
     gifSubmissionAchievements,
     progressionPoints,
     coinMilestones,
-    rankingMilestones,
     resourceAchievements,
     sceneAchievements,
     showcaseAchievements,

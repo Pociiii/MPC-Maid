@@ -12,13 +12,13 @@ const {
 
 async function buildLeaderboard(
     interaction,
-    view = 'ranking'
+    view = 'scenes'
 ) {
 
     const safeView =
         views[view]
             ? view
-            : 'ranking';
+            : 'scenes';
 
     const embed =
         await builders[safeView](

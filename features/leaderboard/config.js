@@ -5,14 +5,6 @@ const emojis =
     require('../../utils/emojis');
 
 const views = {
-    ranking: {
-        label:
-            'Ranking',
-        emoji:
-            '\uD83C\uDFC6',
-        title:
-            'Ranking Leaderboard'
-    },
     scenes: {
         label:
             'Scenes',

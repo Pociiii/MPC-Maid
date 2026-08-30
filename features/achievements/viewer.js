@@ -44,7 +44,6 @@ const views = {
                 'all_stats',
                 'wallet_coins',
                 'xp_earned',
-                'ranking_reached',
                 'profile_likes_received',
                 'daily_wyr_votes',
                 'drinks_bought',
@@ -98,8 +97,7 @@ const views = {
         keys:
             [
                 'wallet_coins',
-                'xp_earned',
-                'ranking_reached'
+                'xp_earned'
             ]
     },
     activity: {
@@ -204,8 +202,6 @@ const categoryLabels = {
         '\uD83C\uDFAC Porn Career',
     profile_likes_received:
         '\u2764\uFE0F Profile Likes',
-    ranking_reached:
-        '\uD83C\uDFC6 Ranking',
     scene_combined_stat:
         '\uD83D\uDCCA Scene Stat Thresholds',
     scene_combined_three_stats:

@@ -54,7 +54,6 @@ function createUser(
                     performance,
                     stamina,
                     fame,
-                    ranking,
                     scenes_completed,
                     spanks_taken,
                     spanks_given,
@@ -66,7 +65,7 @@ function createUser(
                     mother_id,
                     father_id
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     userId,
                     ECONOMY.STARTING_COINS,
@@ -74,7 +73,6 @@ function createUser(
                     STATS.DEFAULT_PERFORMANCE,
                     STATS.DEFAULT_STAMINA,
                     STATS.DEFAULT_FAME,
-                    STATS.DEFAULT_RANKING,
                     0,
                     STATS.DEFAULT_SPANKS_TAKEN,
                     STATS.DEFAULT_SPANKS_GIVEN,

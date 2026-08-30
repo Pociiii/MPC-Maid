@@ -65,8 +65,6 @@ const categoryLabels = {
         'Porn Career',
     profile_likes_received:
         'Profile Likes',
-    ranking_reached:
-        'Ranking',
     scene_combined_stat:
         'Scene Stat Thresholds',
     scene_combined_three_stats:
@@ -123,11 +121,6 @@ const userAchievementValueGetters = {
         (user) =>
             Number(
                 user.kisses_taken ?? 0
-            ),
-    ranking_reached:
-        (user) =>
-            Number(
-                user.ranking ?? 0
             ),
     spanks_given:
         (user) =>

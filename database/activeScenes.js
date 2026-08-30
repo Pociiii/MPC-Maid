@@ -290,13 +290,11 @@ async function applyPornSceneRewardsOnce(
             `UPDATE users
              SET xp = xp + ?,
                  coins = coins + ?,
-                 ranking = ranking + ?,
                  scenes_completed = scenes_completed + 1
              WHERE id = ?`,
             [
                 requesterXp,
                 requesterCoins,
-                result.rankingChange,
                 requesterId
             ]
         );
@@ -321,13 +319,11 @@ async function applyPornSceneRewardsOnce(
             `UPDATE users
              SET xp = xp + ?,
                  coins = coins + ?,
-                 ranking = ranking + ?,
                  scenes_completed = scenes_completed + 1
              WHERE id = ?`,
             [
                 targetXp,
                 targetCoins,
-                result.rankingChange,
                 targetId
             ]
         );

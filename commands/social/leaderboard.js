@@ -29,7 +29,7 @@ module.exports = {
         await interaction.editReply(
             await buildLeaderboard(
                 interaction,
-                'ranking'
+                'scenes'
             )
         );
 

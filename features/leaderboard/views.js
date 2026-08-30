@@ -14,71 +14,6 @@ const {
     formatRows
 } = require('./ui');
 
-const ranks =
-    require('../../data/ranks.json');
-
-const {
-    getRankTitle
-} = require('../../utils/ranks');
-
-const rankingRowsPerRank =
-    5;
-
-function hasCareerActivity(
-    user
-) {
-
-    return Number(
-        user.scenes_completed
-    ) > 0 ||
-    Number(
-        user.ranking
-    ) !== 0;
-
-}
-
-function formatRankingRows(
-    users
-) {
-
-    if (
-        users.length === 0
-    )
-        return 'No entries yet.';
-
-    const visibleUsers =
-        users
-        .slice(
-            0,
-            rankingRowsPerRank
-        );
-
-    const rows =
-        visibleUsers
-        .map(
-            (user, index) =>
-                `${index + 1}. <@${user.id}> - **${Number(
-                    user.ranking
-                ).toLocaleString()}**`
-        );
-
-    const hiddenCount =
-        users.length -
-        visibleUsers.length;
-
-    if (
-        hiddenCount > 0
-    )
-        rows.push(
-            `+ **${hiddenCount} more**`
-        );
-
-    return rows.join(
-        '\n'
-    );
-
-}
-
 async function getGenderGroups(
     interaction,
     users
@@ -144,82 +79,6 @@ function addPositionField(
         inline:
             false
     });
-
-}
-
-async function buildRankingEmbed(
-    interaction
-) {
-
-    const users =
-        (await allUsers())
-            .filter(
-                hasCareerActivity
-            )
-            .sort(
-                (a, b) =>
-                    Number(
-                        b.ranking
-                    ) -
-                    Number(
-                        a.ranking
-                    )
-            );
-
-    const embed =
-        baseEmbed(
-            interaction,
-            'ranking'
-        );
-
-    embed.addFields(
-        ...ranks.map(
-            (rank) => ({
-                name:
-                    `\uD83C\uDFC6 ${rank.title}`,
-                value:
-                    formatRankingRows(
-                        users.filter(
-                            (user) =>
-                                getRankTitle(
-                                    Number(
-                                        user.ranking
-                                    )
-                                ) === rank.title
-                        )
-                    ),
-                inline:
-                    true
-            })
-        )
-    );
-
-    const requesterRank =
-        rankBy(
-            users,
-            'ranking',
-            interaction.user.id
-        );
-
-    addPositionField(
-        embed,
-        [
-            formatPositionLine(
-                '\uD83C\uDFC6 Overall Ranking',
-                requesterRank,
-                ' rank score',
-                requesterRank
-                    ? getRankTitle(
-                        Number(
-                            requesterRank.value
-                        )
-                    )
-                    : null
-            )
-        ]
-    );
-
-    return embed;
 
 }
 
@@ -698,8 +557,6 @@ async function buildHelpsEmbed(
 }
 
 const builders = {
-    ranking:
-        buildRankingEmbed,
     scenes:
         buildScenesEmbed,
     coins:

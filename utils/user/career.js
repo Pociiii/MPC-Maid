@@ -1,51 +1,6 @@
 const {
-    getOrCreateUser
-} = require('./core');
-
-const {
     runUserUpdate
 } = require('./db');
-
-async function getRanking(
-    userId
-) {
-
-    const user =
-        await getOrCreateUser(
-            userId
-        );
-
-    return user.ranking;
-
-}
-
-async function getScenesCompleted(
-    userId
-) {
-
-    const user =
-        await getOrCreateUser(
-            userId
-        );
-
-    return user.scenes_completed;
-
-}
-
-function addRanking(
-    userId,
-    amount
-) {
-
-    return runUserUpdate(
-        'UPDATE users SET ranking = ranking + ? WHERE id = ?',
-        [
-            amount,
-            userId
-        ]
-    );
-
-}
 
 function addScene(
     userId
@@ -61,8 +16,5 @@ function addScene(
 }
 
 module.exports = {
-    addRanking,
-    addScene,
-    getRanking,
-    getScenesCompleted
+    addScene
 };

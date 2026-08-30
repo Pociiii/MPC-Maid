@@ -518,11 +518,6 @@ async function main() {
     );
 
     assert.equal(
-        user.ranking,
-        0
-    );
-
-    assert.equal(
         user.scenes_completed,
         1
     );

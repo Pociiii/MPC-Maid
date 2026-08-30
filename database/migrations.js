@@ -70,6 +70,32 @@ async function addColumnIfMissing(
 
 }
 
+async function dropColumnIfPresent(
+    db,
+    table,
+    column
+) {
+
+    const columns =
+        await getTableColumns(
+            db,
+            table
+        );
+
+    if (
+        !columns.includes(
+            column
+        )
+    )
+        return;
+
+    await run(
+        db,
+        `ALTER TABLE ${table} DROP COLUMN ${column}`
+    );
+
+}
+
 async function runMigrations(
     db
 ) {
@@ -347,7 +373,6 @@ async function runMigrations(
             count INTEGER DEFAULT 0,
             xp INTEGER DEFAULT 0,
             coins INTEGER DEFAULT 0,
-            ranking INTEGER DEFAULT 0,
             hot_count INTEGER DEFAULT 0,
             viral_count INTEGER DEFAULT 0,
             critical_count INTEGER DEFAULT 0,
@@ -359,6 +384,30 @@ async function runMigrations(
                 period_key
             )
         )`
+    );
+
+    await dropColumnIfPresent(
+        db,
+        'users',
+        'ranking'
+    );
+
+    await dropColumnIfPresent(
+        db,
+        'user_activity_period_stats',
+        'ranking'
+    );
+
+    await run(
+        db,
+        `DELETE FROM user_achievements
+         WHERE achievement_key = 'ranking_reached'`
+    );
+
+    await run(
+        db,
+        `DELETE FROM achievement_progress
+         WHERE achievement_key = 'ranking_reached'`
     );
 
     await run(

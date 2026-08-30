@@ -51,7 +51,6 @@ const STATS = {
     DEFAULT_PERFORMANCE: 1,
     DEFAULT_STAMINA: 1,
     DEFAULT_FAME: 1,
-    DEFAULT_RANKING: 0,
     DEFAULT_SPANKS_TAKEN: 0,
     DEFAULT_SPANKS_GIVEN: 0
 };
@@ -65,33 +64,6 @@ const SCENE_PHASES = {
     ORAL: 'oral',
     SEX: 'sex',
     FINALE: 'finale'
-};
-
-const RANKS = {
-    AMATEUR: {
-        value: 0,
-        title: 'Amateur'
-    },
-
-    RISING_STAR: {
-        value: 500,
-        title: 'Rising Star'
-    },
-
-    PROFESSIONAL: {
-        value: 1000,
-        title: 'Professional'
-    },
-
-    TOP_PERFORMER: {
-        value: 1500,
-        title: 'Top Performer'
-    },
-
-    HALL_OF_FAME: {
-        value: 2500,
-        title: 'Hall of Fame'
-    }
 };
 
 const CHANNELS = {
@@ -146,7 +118,6 @@ module.exports = {
     STATS,
     SCENE_BALANCE,
     SCENE_PHASES,
-    RANKS,
     COOLDOWNS,
     CHANNELS
 };

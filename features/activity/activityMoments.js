@@ -355,13 +355,11 @@ async function updatePeriodStats(
             count,
             xp,
             coins,
-            ranking,
             hot_count,
             viral_count,
             critical_count,
             last_at
         ) VALUES (
-            ?,
             ?,
             ?,
             ?,
@@ -383,7 +381,6 @@ async function updatePeriodStats(
             count = count + excluded.count,
             xp = xp + excluded.xp,
             coins = coins + excluded.coins,
-            ranking = ranking + excluded.ranking,
             hot_count = hot_count + excluded.hot_count,
             viral_count = viral_count + excluded.viral_count,
             critical_count = critical_count + excluded.critical_count,
@@ -399,9 +396,6 @@ async function updatePeriodStats(
             ),
             numberOrZero(
                 details.coins
-            ),
-            numberOrZero(
-                details.ranking
             ),
             hotCountFor(
                 details

@@ -415,8 +415,6 @@ async function finishScene(
                     result.outcome,
                 partnerId:
                     targetId,
-                ranking:
-                    result.rankingChange,
                 xp:
                     getRequesterSceneXp(
                         result,
@@ -437,8 +435,6 @@ async function finishScene(
                     result.outcome,
                 partnerId:
                     requesterId,
-                ranking:
-                    result.rankingChange,
                 xp:
                     getTargetSceneXp(
                         result,

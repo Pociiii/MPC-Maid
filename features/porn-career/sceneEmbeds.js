@@ -467,16 +467,6 @@ function buildPartEmbed(
 
 }
 
-function formatSignedNumber(
-    value
-) {
-
-    return value >= 0
-        ? `+${value}`
-        : `${value}`;
-
-}
-
 function formatBonusNumber(
     value
 ) {
@@ -589,9 +579,6 @@ function formatFinalSummary(
         result.marketingBonus
             ? `${result.coins} coins each (+${result.marketingBonus} requester Marketing)`
             : `${result.coins} coins each`,
-        `${formatSignedNumber(
-            result.rankingChange
-        )} ranking`,
         `${result.totalParts} parts`,
         result.criticalScene
             ? 'critical'

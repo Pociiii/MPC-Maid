@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS users (
     stamina INTEGER DEFAULT 1,
     fame INTEGER DEFAULT 1,
 
-    ranking INTEGER DEFAULT 0,
     scenes_completed INTEGER DEFAULT 0,
 
     spanks_taken INTEGER DEFAULT 0,

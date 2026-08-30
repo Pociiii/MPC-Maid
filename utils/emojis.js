@@ -4,7 +4,6 @@ module.exports = {
     performance: ':muscle:',
     stamina: ':heart:',
     fame: ':crown:',
-    ranking: ':trophy:',
     scene_completed: ':clapper:',
     spank_given: '<a:MPC_spank:1486644512032948314>',
     spank_taken: '<a:MPC_spank:1486644512032948314>',

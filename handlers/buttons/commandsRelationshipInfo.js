@@ -20,7 +20,7 @@ module.exports = {
                 title:
                     'Relationship System',
                 description:
-`Relationships are RP links between members. They do not give coins, XP, ranking, pregnancy bonuses, or porn career advantages.
+`Relationships are RP links between members. They do not give coins, XP, pregnancy bonuses, or porn career advantages.
 
 **How it works**
 - Relationship requests are sent by DM.
